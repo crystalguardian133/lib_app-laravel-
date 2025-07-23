@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>📚 Book Records | Ormoc City Library</title>
-  <link rel="stylesheet" href="/css/books.css">
   <style>
 :root {
   --primary: #004080;
@@ -15,8 +14,9 @@
   --white: #ffffff;
   --gray: #6b7280;
   --highlight: #d2e4ff;
-  --bg-dark: #121212;
-  --text-dark: #e5e5e5;
+  --bg-dark: #696969;
+  --text-dark: #e5e5e5; 
+  --sidebar-bg: #232b2b;
 }
 
 body {
@@ -454,6 +454,9 @@ body.dark-mode .container {
   background-color: var(--bg-dark);
   color: var(--text-dark);
 }
+body.dark-mode .container h2{
+  color: var(--text-dark);
+}
 body.dark-mode tr.selected{
   background-color: #2c3e50;
   color: var(--text-dark);
@@ -564,7 +567,7 @@ body.dark-mode #manage-modal input {
         <label for="genre">📖 Genre</label>
         <input type="text" id="genre" name="genre">
         <label for="published_year">📅 Published Year</label>
-        <input type="number" id="published_year" name="published_year" required>
+        <input type="number" id="published_year" name="published_year" default="1900" required>
         <label for="availability">📦 Availability</label>
         <input type="number" id="availability" name="availability" min="0" required>
         <div class="modal-buttons">
