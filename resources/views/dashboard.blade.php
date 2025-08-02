@@ -5,22 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>📚 Library Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #004080;
-      --accent: #007bff;
-      --light: #f4f7fa;
+      --primary: #1e3a8a;
+      --accent: #3b82f6;
+      --light: #f9fafb;
       --dark: #1f2937;
       --white: #ffffff;
-      --gray: #6b7280;
-      --bg-dark: #121212;
-      --text-dark: #e5e5e5;
+      --gray: #9ca3af;
+      --bg-dark: #0f172a;
+      --text-dark: #e5e7eb;
+      --hover-dark: #334155;
     }
 
     body {
       margin: 0;
       display: flex;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       background-color: var(--light);
       color: var(--dark);
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -43,71 +45,67 @@
       z-index: 1000;
       transition: width 0.3s ease;
       overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-header .logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 4px;
     }
 
     .sidebar.collapsed {
       width: 60px;
     }
 
-    .sidebar h2,
-    .sidebar .label {
-      transition: opacity 0.3s, transform 0.3s;
+    .sidebar.collapsed .label {
+      display: none;
     }
 
-    .sidebar.collapsed h2 {
-  opacity: 0;
-  transform: translateX(-100%);
-  pointer-events: none;
-  text-align: center;
-}
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
 
-.sidebar.collapsed .label {
-  display: none;
-}
-
-.sidebar nav a {
-  display: flex;
-  align-items: center;
-  color: var(--white);
-  text-decoration: none;
-  padding: 12px;
-  margin: 6px 0;
-  border-radius: 6px;
-  transition: background 0.2s, justify-content 0.3s;
-}
-
-.sidebar.collapsed nav a {
-  justify-content: center;
-}
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      transition: background-color 0.2s ease;
+    }
 
     .sidebar nav a:hover {
       background-color: var(--accent);
     }
 
-    .sidebar nav a .icon {
-      margin-right: 10px;
-      font-size: 1.2rem;
-      min-width: 24px;
-      text-align: center;
+    .sidebar.collapsed nav a {
+      justify-content: center;
     }
 
     .sidebar .toggle-btn {
-      display: block;
       margin: 0 auto 1.5rem auto;
-      background: #003366;
+      background: var(--accent);
       color: white;
       border: none;
-      padding: 8px 14px;
-      font-size: 1.2rem;
-      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 6px;
       cursor: pointer;
-      width: 70%;
-      transition: background 0.3s ease;
-      text-align: center;
-    }
-
-    .sidebar .toggle-btn:hover {
-      background-color: #0056b3;
+      width: 100%;
     }
 
     .main {
@@ -124,11 +122,12 @@
     .heading {
       font-size: 2rem;
       margin-bottom: 1.5rem;
+      font-weight: 600;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
     }
 
@@ -136,23 +135,24 @@
       background: var(--white);
       padding: 1.5rem;
       border-radius: 10px;
-      border-left: 5px solid var(--accent);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    body.dark-mode .card {
-      background-color: #1e1e1e;
-      color: var(--text-dark);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: background-color 0.3s ease;
     }
 
     .card h3 {
       font-size: 1rem;
       color: var(--gray);
+      margin-bottom: 0.5rem;
     }
 
     .card .count {
       font-size: 2rem;
       font-weight: bold;
+    }
+
+    body.dark-mode .card {
+      background-color: #1e293b;
+      color: var(--text-dark);
     }
 
     footer {
@@ -163,15 +163,15 @@
     }
 
     .dark-toggle {
-      margin-top: 2rem;
+      margin-top: auto;
       text-align: center;
     }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 52px;
-      height: 28px;
+      width: 50px;
+      height: 26px;
       margin-top: 1rem;
     }
 
@@ -188,7 +188,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #888;
+      background-color: #ccc;
       transition: 0.4s;
       border-radius: 34px;
     }
@@ -196,20 +196,20 @@
     .slider:before {
       position: absolute;
       content: "🌞";
-      height: 24px;
-      width: 24px;
+      height: 22px;
+      width: 22px;
       left: 2px;
       bottom: 2px;
       background-color: white;
       border-radius: 50%;
-      transition: 0.4s;
       text-align: center;
-      line-height: 24px;
-      font-size: 14px;
+      line-height: 22px;
+      font-size: 13px;
+      transition: 0.4s;
     }
 
     input:checked + .slider {
-      background-color: #333;
+      background-color: var(--dark);
     }
 
     input:checked + .slider:before {
@@ -217,7 +217,14 @@
       content: "🌙";
     }
 
-    /* Chatbot Button */
+    .dark-toggle a {
+      display: block;
+      margin-top: 1rem;
+      color: #e0e0e0;
+      font-size: 0.85rem;
+      text-decoration: underline;
+    }
+
     #chatbot-button {
       position: fixed;
       bottom: 20px;
@@ -238,7 +245,7 @@
       bottom: 90px;
       right: 20px;
       width: 320px;
-      background: #fff;
+      background: white;
       border: 1px solid #ccc;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -247,8 +254,11 @@
       z-index: 1000;
       overflow: hidden;
     }
-    #chatbot-window-message-dark{
-      background-color: (--bg-dark);
+
+    body.dark-mode #chatbot-window {
+      background-color: #1e293b;
+      color: var(--text-dark);
+      border: 1px solid #475569;
     }
 
     #chatbot-header {
@@ -266,6 +276,10 @@
       overflow-y: auto;
       padding: 10px;
       background-color: #f9f9f9;
+    }
+
+    body.dark-mode #chatbot-messages {
+      background-color: #0f172a;
     }
 
     #chatbot-input {
@@ -298,31 +312,31 @@
       }
     }
   </style>
+
 </head>
 <body>
-
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <h2>📚 <span class="label">Julita Public Library</span></h2>
+  <div class="sidebar-header">
+    <img src="/images/logo.png" alt="Library Logo" class="logo">
+    <span class="label">Julita Public Library</span>
+  </div>
   <button class="toggle-btn" id="toggleSidebar">☰</button>
   <nav>
     <a href="{{ route('dashboard') }}"><span class="icon">🏠</span><span class="label">Dashboard</span></a>
     <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
     <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
-    <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Manage Transactions</span></a>
-    </nav>
+    <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
+  </nav>
+  
   <div class="dark-toggle">
     <label class="switch">
       <input type="checkbox" id="darkModeToggle">
       <span class="slider"></span>
     </label>
-    <div style="margin-top: 1rem;">
-      <a href="/logout" style="color: #fff; text-decoration: underline;">🚪 Logout</a>
-    </div>
+    <a href="/logout">🚪 Logout</a>
   </div>
 </div>
 
-<!-- Main -->
 <div class="main" id="mainContent">
   <div class="heading">Dashboard Overview</div>
   <div class="stats">
@@ -334,7 +348,7 @@
 </div>
 
 <!-- Chatbot -->
-<div id="chatbot-button">💬</div>
+<button id="chatbot-button">💬</button>
 <div id="chatbot-window">
   <div id="chatbot-header"><span>Chatbot</span><button id="chatbot-close">×</button></div>
   <div id="chatbot-messages"></div>
@@ -347,7 +361,6 @@
 <script>
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('mainContent');
-  const chatbot = document.getElementById('chatbot-window');
   const toggleBtn = document.getElementById('toggleSidebar');
   const darkToggle = document.getElementById('darkModeToggle');
 
@@ -369,6 +382,6 @@
     localStorage.setItem('darkMode', this.checked);
   });
 </script>
-<script src="{{ asset('js/chatbot.js') }}"></script>
+<script src="js/chatbot.js"></script>
 </body>
 </html>

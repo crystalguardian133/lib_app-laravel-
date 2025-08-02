@@ -1,80 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>🕒 Member Time Logs | Julita Leyte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
-      --primary: #004080;
-      --accent: #007bff;
-      --light: #f4f7fa;
-      --white: #ffffff;
+      --primary: #1e3a8a;
+      --accent: #3b82f6;
+      --light: #f9fafb;
       --dark: #1f2937;
-      --highlight: #d2e4ff;
-      --danger: #dc3545;
+      --white: #ffffff;
+      --gray: #9ca3af;
+      --bg-dark: #0f172a;
+      --text-dark: #e5e7eb;
+      --hover-dark: #334155;
+      --danger: #ef4444;
+      --highlight: #dbeafe;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
-      background: var(--light);
-    }
-
-    header {
-      background-color: var(--primary);
-      color: white;
-      padding: 1rem 2rem;
       display: flex;
-      justify-content: space-between;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: var(--primary);
+      color: var(--white);
+      height: 100vh;
+      padding: 1.5rem 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: width 0.3s ease;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-header {
+      display: flex;
       align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
     }
 
-    header h1 {
-      font-size: 1.5rem;
+    .sidebar-header .logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 4px;
     }
 
-    nav a {
-      color: white;
-      margin-left: 1.5rem;
+    .sidebar.collapsed {
+      width: 60px;
+    }
+
+    .sidebar.collapsed .label {
+      display: none;
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
       text-decoration: none;
-      font-weight: 500;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .sidebar nav a:hover {
+      background-color: var(--accent);
+    }
+
+    .sidebar.collapsed nav a {
+      justify-content: center;
+    }
+
+    .sidebar .toggle-btn {
+      margin: 0 auto 1.5rem auto;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .dark-toggle {
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      margin-top: 1rem;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "🌞";
+      height: 22px;
+      width: 22px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 22px;
+      font-size: 13px;
+      transition: 0.4s;
+    }
+
+    input:checked + .slider {
+      background-color: var(--dark);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+      content: "🌙";
+    }
+
+    .main {
+      margin-left: 260px;
+      padding: 2rem;
+      flex-grow: 1;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main.full {
+      margin-left: 80px;
     }
 
     .container {
+      max-width: 960px;
+      margin: auto;
+      background: var(--white);
       padding: 2rem;
-      background: white;
-      margin: 2rem auto;
-      max-width: 800px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    body.dark-mode .container {
+      background-color: var(--hover-dark);
     }
 
     h2 {
       text-align: center;
       color: var(--primary);
     }
+  
 
-    #memberInput {
-      width: 100%;
-      padding: 10px;
+    .top-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .top-controls input {
+      width: 300px;
+      padding: 0.75rem 1rem;
       font-size: 1rem;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 1rem;
+    }
+
+    .top-controls button {
+      background: var(--accent);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     #suggestionBox {
-      position: relative;
-      background: white;
-      border: 1px solid #ccc;
-      max-height: 150px;
+      position: absolute;
+      width: 300px;
+      max-height: 180px;
       overflow-y: auto;
-      border-radius: 6px;
-      z-index: 1000;
+      border: 1px solid #ccc;
+      background: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 999;
+    }
+
+    body.dark-mode #suggestionBox {
+      background: var(--hover-dark);
+      border-color: #475569;
+      color: var(--text-dark);
     }
 
     #suggestionBox div {
@@ -89,25 +250,27 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
+      padding: 14px;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     th {
-      background-color: var(--primary);
+      background: var(--primary);
       color: white;
+      text-align: left;
     }
 
-    button.logout {
+    .logout {
       background: var(--danger);
-      border: none;
       color: white;
-      padding: 6px 12px;
+      border: none;
+      padding: 8px 12px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -116,92 +279,206 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #007bff;
+      background: var(--accent);
       color: white;
-      padding: 10px 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      font-size: 0.95rem;
       z-index: 1000;
     }
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:999; }
-    .modal-content { background:var(--white); padding:2rem; border-radius:12px; width:90%; max-width:800px; }
-    .modal-content h3 { margin-top:0; color:var(--primary); }
-    .modal-content label { display:block; margin-top:1rem; font-weight:bold; }
-    .modal-content input { width:100%; padding:0.5rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:6px; }
-    .actions { margin-top:2rem; display:flex; justify-content:flex-end; gap:1rem; }
-    .actions .cancel { background:#ccc; color:#333; border:none; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; }
-    .actions .submit { background:var(--accent); color:white; border:none; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; }
 
-    .top-controls { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; margin:1rem 0; }
-    .top-controls input { padding:8px 12px; font-size:1rem; border:1px solid #ccc; border-radius:6px; width:300px; }
-    .top-controls button { background:var(--accent); color:var(--white); padding:8px 16px; border:none; border-radius:8px; font-weight:600; font-size:1rem; display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
-    .top-controls button:hover { background:#0056b3; }
-    .table-container { overflow-x:auto; margin-top:1rem; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.4rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .cancel {
+      background: #94a3b8;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+    }
+    body.dark-mode .modal-content {
+  background-color: #1e293b;
+  color: var(--text-dark);
+}
+
+body.dark-mode .modal-content input {
+  background-color: #0f172a;
+  color: var(--text-dark);
+  border: 1px solid #475569;
+}
+
+body.dark-mode .modal-content input::placeholder {
+  color: #9ca3af;
+}
+
+body.dark-mode .actions .cancel {
+  background: #475569;
+  color: #e2e8f0;
+}
+
+body.dark-mode .actions .submit {
+  background: var(--accent);
+  color: white;
+}
+
+body.dark-mode .actions .delete {
+  background: #ef4444;
+  color: white;
+}
+
+    .submit {
+      background: var(--accent);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+    }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>🕒 Member Time Log</h1>
-</header>
-
-<div class="container">
-  <h2>📅 Time In / Time Out</h2>
-  <div class="top-controls">
-  <input type="text" id="memberInput" placeholder="Start typing member name..." autocomplete="off">
-  <div id="suggestionBox"></div>
-    <button id="registerBtn" onclick="openRegisterModal()"><i class="fas fa-user-plus"></i> Register User</button>
-  </div>
-  <table id="logTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>School</th>
-        <th>Time In</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($logs as $log)
-      <tr data-id="{{ $log->id }}">
-        <td>{{ $log->member->name }}</td>
-        <td>{{ $log->member->school }}</td>
-        <td>{{ \Carbon\Carbon::parse($log->time_in)->format('h:i A') }}</td>
-        <td><button class="logout" onclick="timeOut({{ $log->id }}, this)">Time Out</button></td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-</div>
-
-<div class="modal" id="registerModal">
-  <div class="modal-content">
-    <h3>Register New Member</h3>
-    <label for="name">Full Name</label>
-    <input type="text" id="name" name="name" placeholder="Enter full name">
-
-    <label for="age">Age</label>
-    <input type="number" id="age" name="age" placeholder="Enter age">
-
-    <label for="address">Address</label>
-    <input type="text" id="address" name="address" placeholder="Enter address">
-
-    <label for="contactnumber">Contact Number</label>
-    <input type="text" id="contactnumber" name="contactnumber" placeholder="09XXXXXXXXX" maxlength="11" pattern="\d{11}"oninput="this.value = this.value.replace(/\D/g, '')" required >
-
-
-    <label for="school">School</label>
-    <input type="text" id="school" name="school" placeholder="Enter school">
-
-    <div class="actions">
-      <button class="cancel" onclick="closeRegisterModal()">Cancel</button>
-      <button class="submit" onclick="submitRegister()">Submit</button>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="/images/logo.png" alt="Logo" class="logo">
+      <span class="label">Julita Public Library</span>
+    </div>
+    <button class="toggle-btn" id="toggleSidebar">☰</button>
+    <div class="dark-toggle">
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+      </label>
+      <a href="/logout" style="display:block; margin-top:1rem; color:white;">🚪 Logout</a>
     </div>
   </div>
-</div>
 
-<div class="corner-popup" id="popup" style="display:none;"></div>
-<script src="{{asset('js/timelog.js') }}"></script>
-<script src="{{asset('js/memberscript.js')}}"></script>
+  <div class="main" id="mainContent">
+    <div class="container">
+      <h2>📅 Time In / Time Out</h2>
+      <div class="top-controls">
+        <div style="position: relative;">
+          <input type="text" id="memberInput" placeholder="Search member..." autocomplete="off">
+          <div id="suggestionBox"></div>
+        </div>
+        <button onclick="openRegisterModal()"><i class="fas fa-user-plus"></i> Register User</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>School</th>
+            <th>Time In</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach($logs as $log)
+          <tr>
+            <td>{{ $log->member->name }}</td>
+            <td>{{ $log->member->school }}</td>
+            <td>{{ \Carbon\Carbon::parse($log->time_in)->format('h:i A') }}</td>
+            <td><button class="logout" onclick="timeOut({{ $log->id }}, this)">Time Out</button></td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <h3>Register New Member</h3>
+      <label>Full Name</label>
+      <input type="text" id="name">
+
+      <label>Age</label>
+      <input type="number" id="age">
+
+      <label>Address</label>
+      <input type="text" id="address">
+
+      <label>Contact Number</label>
+      <input type="text" id="contactnumber" maxlength="11" pattern="\d{11}" oninput="this.value = this.value.replace(/\D/g, '')">
+
+      <label>School</label>
+      <input type="text" id="school">
+
+      <div class="actions">
+        <button class="cancel" onclick="closeRegisterModal()">Cancel</button>
+        <button class="submit" onclick="submitRegister()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="corner-popup" id="popup" style="display:none;"></div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const darkToggle = document.getElementById('darkModeToggle');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('full');
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const dark = localStorage.getItem('darkMode') === 'true';
+      if (dark) {
+        document.body.classList.add('dark-mode');
+        darkToggle.checked = true;
+      }
+    });
+
+    darkToggle.addEventListener('change', function () {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', this.checked);
+    });
+  </script>
+  <script src="{{ asset('js/timelog.js') }}"></script>
+  <script src="{{ asset('js/memberscript.js') }}"></script>
+  <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
 </body>
 </html>

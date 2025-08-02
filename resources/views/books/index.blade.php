@@ -5,22 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>📚 Book Records</title>
-  <link rel="stylesheet" href="/css/books.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
 :root {
-  --primary: #004080;
-  --accent: #007bff;
-  --light: #f4f7fa;
+  --primary: #1e3a8a;
+  --accent: #3b82f6;
+  --light: #f9fafb;
   --dark: #1f2937;
   --white: #ffffff;
-  --gray: #6b7280;
+  --gray: #9ca3af;
   --highlight: #d2e4ff;
-  --bg-dark: #121212;
+  --bg-dark: #0f172a;
+  --text-dark: #e5e7eb;
+  --hover-dark: #334155;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   background-color: var(--light);
   color: var(--dark);
   display: flex;
@@ -48,13 +50,50 @@ header h1 {
 
 nav a {
   color: var(--white);
-  margin-left: 1.5rem;
   text-decoration: none;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  transition: background-color 0.2s ease;
+  justify-content: flex-start;
 }
 
 nav a:hover {
-  text-decoration: underline;
+  background-color: var(--accent);
+}
+
+.sidebar.collapsed nav a {
+  justify-content: center;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.sidebar-header .logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.sidebar .toggle-btn {
+  margin: 0 auto 1.5rem auto;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
 }
 
 .container {
@@ -103,7 +142,7 @@ h2 {
 }
 
 .top-controls button:hover {
-  background-color: #0056b3;
+  background-color: #1e40af;
   transform: scale(1.03);
 }
 
@@ -248,8 +287,8 @@ tr.selected {
 }
 
 .modal-btn.cancel {
-  background-color: #ccc;
-  color: #333;
+  background-color: #e5e7eb;
+  color: #374151;
 }
 
 .modal-btn.confirm,
@@ -260,90 +299,100 @@ tr.selected {
 
 .modal-btn.confirm:hover,
 #manage-modal .actions .submit:hover {
-  background-color: #0056b3;
+  background-color: #2563eb;
 }
 
 .modal-btn.cancel:hover,
 #manage-modal .actions .cancel:hover {
-  background-color: #b0b0b0;
+  background-color: #d1d5db;
 }
 
 #manage-modal .actions .cancel {
-  background-color: #6c757d;
+  background-color: #6b7280;
   color: white;
 }
 
 #manage-modal .actions .submit.delete {
-  background-color: #dc3545;
+  background-color: #dc2626;
 }
 
-/* SIDEBAR */
-.sidebar {
-  width: 240px;
-  background-color: var(--primary);
-  color: var(--white);
-  height: 100vh;
-  padding: 1.5rem 1rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  transition: width 0.3s ease;
-  overflow-x: hidden;
-}
+    .sidebar {
+      width: 240px;
+      background-color: var(--primary);
+      color: var(--white);
+      height: 100vh;
+      padding: 1.5rem 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: width 0.3s ease;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    }
 
-.sidebar.collapsed {
-  width: 60px;
-}
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
 
-.sidebar .label {
-  transition: opacity 0.3s, transform 0.3s;
-}
+    .sidebar-header .logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
 
-.sidebar.collapsed .label {
-  opacity: 0;
-  transform: translateX(-100%);
-  pointer-events: none;
-}
+    .sidebar.collapsed {
+      width: 60px;
+    }
 
-.sidebar nav a {
-  display: flex;
-  align-items: center;
-  color: var(--white);
-  text-decoration: none;
-  padding: 12px;
-  margin: 6px 0;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
+    .sidebar.collapsed .label {
+      display: none;
+    }
 
-.sidebar nav a:hover {
-  background-color: var(--accent);
-}
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
 
-.sidebar nav a .icon {
-  margin-right: 10px;
-  font-size: 1.2rem;
-  min-width: 24px;
-  text-align: center;
-}
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      transition: background-color 0.2s ease;
+    }
 
-.sidebar .toggle-btn {
-  display: block;
-  margin: 0 auto 1.5rem auto;
-  background: #003366;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  font-size: 1.2rem;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 80%;
-  transition: background 0.3s ease;
-}
+    .sidebar nav a:hover {
+      background-color: var(--accent);
+    }
+
+    .sidebar.collapsed nav a {
+      justify-content: center;
+    }
+
+    .sidebar .toggle-btn {
+      margin: 0 auto 1.5rem auto;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
 
 .sidebar .toggle-btn:hover {
-  background-color: #0056b3;
+  background-color: #2563eb;
 }
 
 .main {
@@ -359,7 +408,6 @@ tr.selected {
   margin-left: 80px;
 }
 
-/* Dark Mode Toggle */
 .dark-toggle {
   margin-top: 2rem;
   text-align: center;
@@ -407,7 +455,7 @@ tr.selected {
 }
 
 input:checked + .slider {
-  background-color: #333;
+  background-color: var(--dark);
 }
 
 input:checked + .slider:before {
@@ -415,7 +463,6 @@ input:checked + .slider:before {
   content: "🌙";
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -452,10 +499,12 @@ body.dark-mode .container {
   background-color: var(--bg-dark);
   color: var(--text-dark);
 }
-body.dark-mode tr.selected{
-  background-color: #2c3e50;
+
+body.dark-mode tr.selected {
+  background-color: var(--hover-dark);
   color: var(--text-dark);
 }
+
 body.dark-mode .modal,
 body.dark-mode #borrowModal,
 body.dark-mode #manage-modal {
@@ -483,31 +532,45 @@ body.dark-mode #manage-modal input {
   color: var(--text-dark);
   border: 1px solid #444;
 }
-
   </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="/images/logo.png" alt="Library Logo" class="logo">
+    <span class="label">Julita Public Library</span>
+  </div>
   <button class="toggle-btn" id="toggleSidebar">☰</button>
-  <h2>📚 <span class="label">Library</span></h2>
+
   <nav>
-    <a href="{{ route('dashboard') }}"><span class="icon">🏠</span><span class="label">Dashboard</span></a>
-    <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
-    <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
-    <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
+    <a href="{{ route('dashboard') }}">
+      <span class="icon">🏠</span>
+      <span class="label">Dashboard</span>
+    </a>
+    <a href="{{ route('books.index') }}">
+      <span class="icon">📘</span>
+      <span class="label">Manage Books</span>
+    </a>
+    <a href="{{ route('members.index') }}">
+      <span class="icon">👥</span>
+      <span class="label">Manage Members</span>
+    </a>
+    <a href="{{ route('transactions.index') }}">
+      <span class="icon">📃</span>
+      <span class="label">Transactions</span>
+    </a>
   </nav>
+
   <div class="dark-toggle">
     <label class="switch">
       <input type="checkbox" id="darkModeToggle">
       <span class="slider"></span>
     </label>
-    <div style="margin-top: 1rem;">
-      <a href="/logout" style="color: #fff; text-decoration: underline;">🚪 Logout</a>
-    </div>
   </div>
 </div>
+
 
 <!-- MAIN -->
 <div class="main" id="mainContent">
@@ -663,25 +726,3 @@ body.dark-mode #manage-modal input {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
------------  ------------ ----    ---- ----------   ------------ ---    ---  
-***********  ************ *****   **** ************ ************ ***    ***  
-----    ---  ----         ------  ---- --        -- ----         ---    ---  
-*********    ************ ************ **        ** ************ ***    ***  
----------    ------------ ------------ --        -- ------------ ---    ---  
-****  ****   ****         ****  ****** **        ** ****          ********   
-----   ----  ------------ ----   ----- ------------ ------------   ------    
-****    **** ************ ****    **** **********   ************    ****     
-                                                                             -->
