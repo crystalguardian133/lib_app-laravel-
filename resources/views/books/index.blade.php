@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>📚 Book Records | Ormoc City Library</title>
+  <title>📚 Book Records</title>
   <link rel="stylesheet" href="/css/books.css">
   <style>
 :root {
@@ -16,7 +16,6 @@
   --gray: #6b7280;
   --highlight: #d2e4ff;
   --bg-dark: #121212;
-  --text-dark: #e5e5e5;
 }
 
 body {
@@ -347,7 +346,6 @@ tr.selected {
   background-color: #0056b3;
 }
 
-/* MAIN CONTENT */
 .main {
   margin-left: 260px;
   padding: 2rem;
@@ -499,7 +497,6 @@ body.dark-mode #manage-modal input {
     <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
     <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
     <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
-    <a href="{{ route('computers.index') }}"><span class="icon">🖥️</span><span class="label">Computers</span></a>
   </nav>
   <div class="dark-toggle">
     <label class="switch">
@@ -648,6 +645,7 @@ body.dark-mode #manage-modal input {
 <script src="{{ asset('js/bookmanage.js') }}"></script>
 <script src="{{ asset('js/borrow.js') }}"></script>
 <script src="{{ asset('js/bookadd.js') }}"></script>
+<script src="{{ asset('js/sidebarcollapse.js')}}"></script>
 
 @if(session('duplicate'))
   <script>
@@ -665,3 +663,25 @@ body.dark-mode #manage-modal input {
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+-----------  ------------ ----    ---- ----------   ------------ ---    ---  
+***********  ************ *****   **** ************ ************ ***    ***  
+----    ---  ----         ------  ---- --        -- ----         ---    ---  
+*********    ************ ************ **        ** ************ ***    ***  
+---------    ------------ ------------ --        -- ------------ ---    ---  
+****  ****   ****         ****  ****** **        ** ****          ********   
+----   ----  ------------ ----   ----- ------------ ------------   ------    
+****    **** ************ ****    **** **********   ************    ****     
+                                                                             -->

@@ -247,6 +247,9 @@
       z-index: 1000;
       overflow: hidden;
     }
+    #chatbot-window-message-dark{
+      background-color: (--bg-dark);
+    }
 
     #chatbot-header {
       background-color: var(--primary);
@@ -307,8 +310,7 @@
     <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
     <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
     <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Manage Transactions</span></a>
-    <a href="{{ route('computers.index') }}"><span class="icon">🖥️</span><span class="label">Manage Computers</span></a>
-  </nav>
+    </nav>
   <div class="dark-toggle">
     <label class="switch">
       <input type="checkbox" id="darkModeToggle">
@@ -334,10 +336,10 @@
 <!-- Chatbot -->
 <div id="chatbot-button">💬</div>
 <div id="chatbot-window">
-  <div id="chatbot-header"><span>Library Assistant</span><button id="chatbot-close">×</button></div>
+  <div id="chatbot-header"><span>Chatbot</span><button id="chatbot-close">×</button></div>
   <div id="chatbot-messages"></div>
   <div id="chatbot-input">
-    <input type="text" id="chatbot-user-input" placeholder="Ask a question..." />
+    <input type="text" id="chatbot-user-input" placeholder="Ask me anything..." />
     <button id="chatbot-send">Send</button>
   </div>
 </div>
@@ -345,6 +347,7 @@
 <script>
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('mainContent');
+  const chatbot = document.getElementById('chatbot-window');
   const toggleBtn = document.getElementById('toggleSidebar');
   const darkToggle = document.getElementById('darkModeToggle');
 
