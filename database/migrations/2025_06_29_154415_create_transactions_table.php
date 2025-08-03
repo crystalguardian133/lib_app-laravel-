@@ -14,7 +14,7 @@ class CreateTransactionsTable extends Migration
             $table->unsignedBigInteger('book_id');
 
             $table->timestamp('borrowed_at')->useCurrent();
-            $table->dateTime('due_date');; 
+            $table->dateTime('due_date');
             $table->timestamps();
 
             // Foreign key constraints

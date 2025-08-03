@@ -6,313 +6,361 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>📚 Library Admin Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --primary: #1e3a8a;
-      --accent: #3b82f6;
-      --light: #f9fafb;
-      --dark: #1f2937;
-      --white: #ffffff;
-      --gray: #9ca3af;
-      --bg-dark: #0f172a;
-      --text-dark: #e5e7eb;
-      --hover-dark: #334155;
-    }
+:root {
+  --primary: #1e3a8a;
+  --accent: #3b82f6;
+  --light: #f9fafb;
+  --dark: #1f2937;
+  --white: #ffffff;
+  --gray: #9ca3af;
+  --bg-dark: #0f172a;
+  --text-dark: #e5e7eb;
+  --hover-dark: #334155;
+}
 
-    body {
-      margin: 0;
-      display: flex;
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background-color: var(--light);
-      color: var(--dark);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
+body {
+  margin: 0;
+  display: flex;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: var(--light);
+  color: var(--dark);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-    body.dark-mode {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
+body.dark-mode {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
 
-    .sidebar {
-      width: 240px;
-      background-color: var(--primary);
-      color: var(--white);
-      height: 100vh;
-      padding: 1.5rem 1rem;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      transition: width 0.3s ease;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-    }
+.sidebar {
+  width: 240px;
+  background-color: var(--primary);
+  color: var(--white);
+  height: 100vh;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+}
 
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 2rem;
-    }
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2rem;
+}
 
-    .sidebar-header .logo {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      border-radius: 4px;
-    }
+.sidebar-header .logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 4px;
+}
 
-    .sidebar.collapsed {
-      width: 60px;
-    }
+.sidebar.collapsed {
+  width: 60px;
+}
 
-    .sidebar.collapsed .label {
-      display: none;
-    }
+.sidebar.collapsed .label {
+  display: none;
+}
 
-    .sidebar.collapsed .sidebar-header {
-      justify-content: center;
-    }
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
 
-    .sidebar nav a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--white);
-      text-decoration: none;
-      padding: 10px 12px;
-      border-radius: 6px;
-      margin-bottom: 6px;
-      transition: background-color 0.2s ease;
-    }
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--white);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  transition: background-color 0.2s ease;
+}
 
-    .sidebar nav a:hover {
-      background-color: var(--accent);
-    }
+.sidebar nav a:hover {
+  background-color: var(--accent);
+}
 
-    .sidebar.collapsed nav a {
-      justify-content: center;
-    }
+.sidebar.collapsed nav a {
+  justify-content: center;
+}
 
-    .sidebar .toggle-btn {
-      margin: 0 auto 1.5rem auto;
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-    }
+.toggle-btn {
+  margin: 0 auto 1.5rem auto;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
 
-    .main {
-      margin-left: 260px;
-      padding: 2rem;
-      flex-grow: 1;
-      transition: margin-left 0.3s ease;
-    }
+.main {
+  margin-left: 260px;
+  padding: 2rem;
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+}
 
-    .main.full {
-      margin-left: 80px;
-    }
+.main.full {
+  margin-left: 80px;
+}
 
-    .heading {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
+.heading {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-    }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
 
-    .card {
-      background: var(--white);
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      transition: background-color 0.3s ease;
-    }
+.card.metric-spacing {
+  margin-top: 2rem;
+}
 
-    .card h3 {
-      font-size: 1rem;
-      color: var(--gray);
-      margin-bottom: 0.5rem;
-    }
+.card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease;
+}
 
-    .card .count {
-      font-size: 2rem;
-      font-weight: bold;
-    }
+.card h3 {
+  font-size: 1rem;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+}
 
-    body.dark-mode .card {
-      background-color: #1e293b;
-      color: var(--text-dark);
-    }
+.card .count {
+  font-size: 2rem;
+  font-weight: bold;
+}
 
-    footer {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: var(--gray);
-    }
+body.dark-mode .card {
+  background-color: #1e293b;
+  color: var(--text-dark);
+}
 
-    .dark-toggle {
-      margin-top: auto;
-      text-align: center;
-    }
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: var(--gray);
+}
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-      margin-top: 1rem;
-    }
+.dark-toggle {
+  margin-top: auto;
+  text-align: center;
+}
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  margin-top: 1rem;
+}
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 34px;
-    }
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
 
-    .slider:before {
-      position: absolute;
-      content: "🌞";
-      height: 22px;
-      width: 22px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 22px;
-      font-size: 13px;
-      transition: 0.4s;
-    }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
 
-    input:checked + .slider {
-      background-color: var(--dark);
-    }
+.slider:before {
+  position: absolute;
+  content: "🌞";
+  height: 22px;
+  width: 22px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 22px;
+  font-size: 13px;
+  transition: 0.4s;
+}
 
-    input:checked + .slider:before {
-      transform: translateX(24px);
-      content: "🌙";
-    }
+input:checked + .slider {
+  background-color: var(--dark);
+}
 
-    .dark-toggle a {
-      display: block;
-      margin-top: 1rem;
-      color: #e0e0e0;
-      font-size: 0.85rem;
-      text-decoration: underline;
-    }
+input:checked + .slider:before {
+  transform: translateX(24px);
+  content: "🌙";
+}
 
-    #chatbot-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      padding: 0.9rem 1rem;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      cursor: pointer;
-      z-index: 999;
-    }
+.dark-toggle a {
+  display: block;
+  margin-top: 1rem;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
 
-    #chatbot-window {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 320px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-      overflow: hidden;
-    }
+#chatbot-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 0.9rem 1rem;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 999;
+}
 
-    body.dark-mode #chatbot-window {
-      background-color: #1e293b;
-      color: var(--text-dark);
-      border: 1px solid #475569;
-    }
+#chatbot-window {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+}
 
-    #chatbot-header {
-      background-color: var(--primary);
-      color: white;
-      padding: 10px;
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+body.dark-mode #chatbot-window {
+  background-color: #1e293b;
+  color: var(--text-dark);
+  border: 1px solid #475569;
+}
 
-    #chatbot-messages {
-      height: 250px;
-      overflow-y: auto;
-      padding: 10px;
-      background-color: #f9f9f9;
-    }
+#chatbot-header {
+  background-color: var(--primary);
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    body.dark-mode #chatbot-messages {
-      background-color: #0f172a;
-    }
+#chatbot-messages {
+  height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
 
-    #chatbot-input {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-    }
+body.dark-mode #chatbot-messages {
+  background-color: #0f172a;
+}
 
-    #chatbot-user-input {
-      flex-grow: 1;
-      padding: 6px;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
+#chatbot-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
 
-    #chatbot-send {
-      margin-left: 5px;
-      padding: 6px 12px;
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+#chatbot-user-input {
+  flex-grow: 1;
+  padding: 6px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 60px;
-      }
-    }
+#chatbot-send {
+  margin-left: 5px;
+  padding: 6px 12px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+canvas {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+body.dark-mode canvas {
+  background-color: #1e293b;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 60px;
+  }
+}
+.card.collapsible-card h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.card-content {
+  margin-top: 0.5rem;
+  display: block; /* default visible */
+  transition: all 0.3s ease;
+}
   </style>
-
 </head>
 <body>
 <div class="sidebar" id="sidebar">
@@ -327,7 +375,6 @@
     <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
     <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
   </nav>
-  
   <div class="dark-toggle">
     <label class="switch">
       <input type="checkbox" id="darkModeToggle">
@@ -344,6 +391,55 @@
     <div class="card"><h3>Total Members</h3><div class="count">{{ $membersCount }}</div></div>
     <div class="card"><h3>Total Transactions</h3><div class="count">{{ $transactionsCount }}</div></div>
   </div>
+
+  <div class="chart-grid">
+    <div class="card">
+      <h3>📈 Transactions (Last 7 Days)</h3>
+      <canvas id="transactionsChart" height="120"></canvas>
+    </div>
+    <div class="card">
+      <h3>👣 Average Daily Visits (Past 7 Days)</h3>
+      <canvas id="visitsChart" height="120"></canvas>
+    </div>
+  </div>
+
+<div class="stats" style="margin-top: 2rem;">
+  <div class="card collapsible-card">
+    <h3>
+      📅 Today
+    </h3>
+    <div class="card-content">
+      <div class="count">{{ $dailyCount }}</div>
+      <p>📚 Books Added: {{ $booksToday }}</p>
+      <p>👤 Members Registered: {{ $membersToday }}</p>
+    </div>
+  </div>
+
+  <div class="card collapsible-card">
+    <h3>
+      📆 This Week
+    </h3>
+    <div class="card-content">
+      <div class="count">{{ $weeklyCount }}</div>
+      <p>📚 Books Added: {{ $booksThisWeek }}</p>
+      <p>👤 Members Registered: {{ $membersThisWeek }}</p>
+    </div>
+  </div>
+
+  <div class="card collapsible-card">
+    <h3>
+      📊 Lifetime
+    </h3>
+    <div class="card-content">
+      <div class="count">{{ $lifetimeCount }}</div>
+      <p>📚 Total Books: {{ $booksCount }}</p>
+      <p>👤 Total Members: {{ $membersCount }}</p>
+    </div>
+  </div>
+</div>
+
+
+
   <footer>&copy; {{ date('Y') }} Julita Public Library. All rights reserved.</footer>
 </div>
 
@@ -359,29 +455,11 @@
 </div>
 
 <script>
-  const sidebar = document.getElementById('sidebar');
-  const mainContent = document.getElementById('mainContent');
-  const toggleBtn = document.getElementById('toggleSidebar');
-  const darkToggle = document.getElementById('darkModeToggle');
-
-  toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('full');
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const dark = localStorage.getItem('darkMode') === 'true';
-    if (dark) {
-      document.body.classList.add('dark-mode');
-      darkToggle.checked = true;
-    }
-  });
-
-  darkToggle.addEventListener('change', function () {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', this.checked);
-  });
+  const chartData = @json($last7Days);
+  const visitsData = @json($visitsData);
 </script>
-<script src="js/chatbot.js"></script>
+<script src="{{ asset('js/dashb.js') }}"></script>
+<script src="{{ asset('js/chatbot.js') }}"></script>
+
 </body>
 </html>

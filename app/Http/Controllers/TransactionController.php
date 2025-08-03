@@ -6,28 +6,27 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Book;
 use App\Models\Member;
+use App\Models\BookReturn;
 
 class TransactionController extends Controller
 {
-    public function index()
+public function index()
 {
-    $transactions = Transaction::with(['member', 'book'])->orderBy('borrowed_at', 'desc')->get();
-    return view('transactions.index', compact('transactions'));
-   
-    $overdueMembers = Transaction::where('status', 'borrowed')
-    ->whereDate('due_date', '<', now())
-    ->with('member')
-    ->get()
-    ->pluck('member.name')
-    ->unique()
-    ->values();
+    $borrowed = Transaction::where('status', 'borrowed')
+        ->with(['member', 'book'])
+        ->orderBy('due_date')
+        ->get();
 
-return view('transactions.index', [
-    'transactions' => $transactions,
-    'overdueMembers' => $overdueMembers
-]);
+    $returned = Transaction::where('status', 'returned')
+        ->with(['member', 'book'])
+        ->orderByDesc('returned_at')
+        ->get();
+
+    return view('transactions.index', [
+        'borrowed' => $borrowed,
+        'returned' => $returned,
+    ]);
 }
-
     public function borrow(Request $request)
 {
     $validated = $request->validate([
@@ -61,20 +60,15 @@ return view('transactions.index', [
 public function returnBook($id)
 {
     $transaction = Transaction::findOrFail($id);
-
-    if ($transaction->status !== 'borrowed') {
-        return back()->with('error', 'This book is already returned.');
-    }
-
     $transaction->status = 'returned';
     $transaction->returned_at = now();
     $transaction->save();
 
-    // Restore book availability
     $transaction->book->increment('availability');
 
-    return back()->with('success', 'Book returned successfully.');
+    return redirect()->route('transactions.index')->with('success', 'Book returned successfully.');
 }
+
 
 
 }

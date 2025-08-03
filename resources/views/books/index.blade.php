@@ -66,8 +66,21 @@ nav a:hover {
   background-color: var(--accent);
 }
 
-.sidebar.collapsed nav a {
-  justify-content: center;
+.sidebar {
+  width: 240px;
+  background-color: var(--primary);
+  color: var(--white);
+  height: 100vh;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-header {
@@ -84,18 +97,37 @@ nav a:hover {
   border-radius: 4px;
 }
 
-.sidebar .toggle-btn {
-  margin: 0 auto 1.5rem auto;
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
+.sidebar.collapsed {
+  width: 60px;
 }
 
+.sidebar.collapsed .label {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--white);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar nav a:hover {
+  background-color: var(--accent);
+}
+
+.sidebar.collapsed nav a {
+  justify-content: center;
+}
 .container {
   width: 100%;
   margin: 0 auto;
@@ -159,6 +191,29 @@ table {
   border-collapse: separate;
   border-spacing: 0;
   min-width: 600px;
+}
+
+.table-wrapper {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.scrollable-body {
+  max-height: 400px; /* Adjust height if needed */
+  overflow-y: auto;
+  display: block;
+}
+
+.scrollable-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scrollable-body td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
 th, td {
@@ -571,40 +626,26 @@ body.dark-mode .time-input {
 <body>
 
 <!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
+<<div class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <img src="/images/logo.png" alt="Library Logo" class="logo">
     <span class="label">Julita Public Library</span>
   </div>
   <button class="toggle-btn" id="toggleSidebar">☰</button>
-
   <nav>
-    <a href="{{ route('dashboard') }}">
-      <span class="icon">🏠</span>
-      <span class="label">Dashboard</span>
-    </a>
-    <a href="{{ route('books.index') }}">
-      <span class="icon">📘</span>
-      <span class="label">Manage Books</span>
-    </a>
-    <a href="{{ route('members.index') }}">
-      <span class="icon">👥</span>
-      <span class="label">Manage Members</span>
-    </a>
-    <a href="{{ route('transactions.index') }}">
-      <span class="icon">📃</span>
-      <span class="label">Transactions</span>
-    </a>
+    <a href="{{ route('dashboard') }}"><span class="icon">🏠</span><span class="label">Dashboard</span></a>
+    <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
+    <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
+    <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
   </nav>
-
   <div class="dark-toggle">
     <label class="switch">
       <input type="checkbox" id="darkModeToggle">
       <span class="slider"></span>
     </label>
+    <a href="/logout">🚪 Logout</a>
   </div>
 </div>
-
 
 <!-- MAIN -->
 <div class="main" id="mainContent">
@@ -616,34 +657,46 @@ body.dark-mode .time-input {
       <button onclick="openAddBookModal()">➕ Add Book</button>
       <button onclick="borrowBooks()">📖 Borrow</button>
     </div>
+
     <form method="POST" action="{{ route('borrow.book') }}">
       @csrf
-      <table>
-        <thead>
-          <tr>
-            <th>Select</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Genre</th>
-            <th>Published Year</th>
-            <th>Available</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($books as $book)
-          <tr data-id="{{ $book->id }}">
-            <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
-            <td>{{ $book->title }}</td>
-            <td>{{ $book->author }}</td>
-            <td>{{ $book->genre }}</td>
-            <td>{{ $book->published_year }}</td>
-            <td>{{ $book->availability }}</td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Genre</th>
+              <th>Published Year</th>
+              <th>Available</th>
+            </tr>
+          </thead>
+        </table>
+
+        <div class="scrollable-body">
+          <table>
+            <tbody>
+              @foreach($books as $book)
+              <tr data-id="{{ $book->id }}">
+                <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
+                <td>{{ $book->title }}</td>
+                <td>{{ $book->author }}</td>
+                <td>{{ $book->genre }}</td>
+                <td>{{ $book->published_year }}</td>
+                <td>{{ $book->availability }}</td>
+              </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </form>
   </div>
+</div>
+                        
 
   <!-- ADD MODAL -->
   <div class="modal" id="addBookModal">
@@ -752,6 +805,7 @@ body.dark-mode .time-input {
 <script src="{{ asset('js/borrow.js') }}"></script>
 <script src="{{ asset('js/bookadd.js') }}"></script>
 <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
+<script src="{{ asset('js/dashb.js') }}"></script>
 
 @if(session('duplicate'))
   <script>

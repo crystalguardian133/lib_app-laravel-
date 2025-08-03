@@ -220,6 +220,41 @@ body.dark-mode .popup {
   background-color: #dc2626;
   color: var(--text-dark);
 }
+.styled-table-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.styled-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--primary);
+  color: white;
+  z-index: 1;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.styled-table tbody tr.overdue {
+  background-color: #fdecea;
+}
+
+body.dark-mode .styled-table tbody tr.overdue {
+  background-color: #7f1d1d;
+}
 
   </style>
 </head>
@@ -240,22 +275,24 @@ body.dark-mode .popup {
 
   <div class="main" id="mainContent">
     <div class="heading">📃 Borrowed Transactions</div>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Member</th>
-          <th>Book</th>
-          <th>Borrowed At</th>
-          <th>Due Date</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach ($transactions as $transaction)
+   <h2>📘 Borrowed Books</h2>
+<div class="styled-table-wrapper">
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Member</th>
+        <th>Book</th>
+        <th>Borrowed At</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($borrowed as $transaction)
         <tr 
-          data-id="{{ $transaction->id }}" 
+          data-id="{{ $transaction->id }}"
           data-member="{{ $transaction->member->name }}"
           data-book="{{ $transaction->book->title }}"
           class="{{ ($transaction->status === 'borrowed' && \Carbon\Carbon::parse($transaction->due_date)->isPast()) ? 'overdue' : '' }}"
@@ -267,16 +304,46 @@ body.dark-mode .popup {
           <td>{{ \Carbon\Carbon::parse($transaction->due_date)->format('M d, Y h:i A') }}</td>
           <td>{{ ucfirst($transaction->status) }}</td>
           <td>
-            @if ($transaction->status === 'borrowed')
-              <button class="submit" onclick="openReturnModal(this)">Return</button>
-            @else
-              Returned
-            @endif
+            <form action="{{ route('transactions.return', $transaction->id) }}" method="POST" style="display:inline;">
+  @csrf
+  <button type="submit" class="submit">Return</button>
+</form>
           </td>
         </tr>
-        @endforeach
-      </tbody>
-    </table>
+      @endforeach
+    </tbody>
+  </table>
+</div>
+
+<h2 style="margin-top: 3rem;">📦 Returned Books</h2>
+<div class="styled-table-wrapper">
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Member</th>
+        <th>Book</th>
+        <th>Borrowed At</th>
+        <th>Due Date</th>
+        <th>Returned At</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($returned as $transaction)
+        <tr>
+          <td>{{ $transaction->id }}</td>
+          <td>{{ $transaction->member->name }}</td>
+          <td>{{ $transaction->book->title }}</td>
+          <td>{{ \Carbon\Carbon::parse($transaction->borrowed_at)->format('M d, Y h:i A') }}</td>
+          <td>{{ \Carbon\Carbon::parse($transaction->due_date)->format('M d, Y h:i A') }}</td>
+          <td>{{ \Carbon\Carbon::parse($transaction->returned_at)->format('M d, Y h:i A') }}</td>
+          <td>{{ ucfirst($transaction->status) }}</td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
+</div>
   </div>
 
   <!-- Return Modal -->
