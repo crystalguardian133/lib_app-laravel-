@@ -57,3 +57,10 @@ Route::get('/timelog', [TimeLogController::class, 'index']);
 Route::get('/timelog/search', [TimeLogController::class, 'search']);
 Route::post('/timelog/time-in', [TimeLogController::class, 'timeIn']);
 Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);
+
+
+//Transactions Routes
+
+Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
+Route::post('/transactions/{id}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');

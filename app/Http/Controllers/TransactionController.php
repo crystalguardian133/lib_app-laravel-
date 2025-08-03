@@ -9,6 +9,25 @@ use App\Models\Member;
 
 class TransactionController extends Controller
 {
+    public function index()
+{
+    $transactions = Transaction::with(['member', 'book'])->orderBy('borrowed_at', 'desc')->get();
+    return view('transactions.index', compact('transactions'));
+   
+    $overdueMembers = Transaction::where('status', 'borrowed')
+    ->whereDate('due_date', '<', now())
+    ->with('member')
+    ->get()
+    ->pluck('member.name')
+    ->unique()
+    ->values();
+
+return view('transactions.index', [
+    'transactions' => $transactions,
+    'overdueMembers' => $overdueMembers
+]);
+}
+
     public function borrow(Request $request)
 {
     $validated = $request->validate([
@@ -39,5 +58,23 @@ class TransactionController extends Controller
 
     return back()->with('success', 'Borrowed books: ' . implode(', ', $borrowedBooks));
 }
+public function returnBook($id)
+{
+    $transaction = Transaction::findOrFail($id);
+
+    if ($transaction->status !== 'borrowed') {
+        return back()->with('error', 'This book is already returned.');
+    }
+
+    $transaction->status = 'returned';
+    $transaction->returned_at = now();
+    $transaction->save();
+
+    // Restore book availability
+    $transaction->book->increment('availability');
+
+    return back()->with('success', 'Book returned successfully.');
+}
+
 
 }

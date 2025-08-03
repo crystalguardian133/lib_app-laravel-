@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Autocomplete member name
   const memberInput = document.getElementById('memberName');
   const suggestionBox = document.getElementById('suggestionBox');
+  
 
   memberInput.addEventListener('input', () => {
     const query = memberInput.value.trim();
@@ -79,10 +80,11 @@ function closeBorrowModal() {
 function confirmBorrow() {
   const memberName = document.getElementById('memberName').value.trim();
   const dueDate = document.getElementById('dueDate').value;
+  const dueTime = document.getElementById('dueTime').value;
   const checkboxes = document.querySelectorAll('.book-checkbox:checked');
 
-  if (!memberName || !dueDate) {
-    alert("⚠️ Please fill in member name and due date.");
+  if (!memberName || !dueDate || !dueTime) {
+    alert("⚠️ Please fill in member name, due date, and due time.");
     return;
   }
 
@@ -93,6 +95,9 @@ function confirmBorrow() {
 
   const bookIds = Array.from(checkboxes).map(cb => cb.closest('tr').getAttribute('data-id'));
 
+  // Combine date + time into full ISO timestamp
+  const dueDateTime = `${dueDate}T${dueTime}:00`;
+
   fetch("/borrow", {
     method: "POST",
     headers: {
@@ -101,14 +106,11 @@ function confirmBorrow() {
     },
     body: JSON.stringify({
       member_name: memberName,
-      due_date: dueDate,
+      due_date: dueDateTime,
       book_ids: bookIds
     })
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Borrow failed");
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
       alert(data.message || "✅ Borrow successful!");
       location.reload();

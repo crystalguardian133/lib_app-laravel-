@@ -14,4 +14,13 @@ class Transaction extends Model
     'status',
     'returned_at',
 ];
+public function member()
+{
+    return $this->belongsTo(Member::class);
+}
+
+public function book()
+{
+    return $this->belongsTo(Book::class);
+}
 }

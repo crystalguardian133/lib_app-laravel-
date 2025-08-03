@@ -8,10 +8,10 @@ class AddStatusAndReturnedAtToTransactionsTable extends Migration
 {
     public function up()
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->string('status')->default('borrowed');
-            $table->timestamp('returned_at')->nullable();
-        });
+      Schema::table('transactions', function (Blueprint $table) {
+        $table->enum('status', ['borrowed', 'returned'])->default('borrowed');
+        $table->timestamp('returned_at')->nullable();
+    });
     }
 
     public function down()

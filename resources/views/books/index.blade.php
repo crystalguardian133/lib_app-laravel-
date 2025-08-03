@@ -201,15 +201,21 @@ tr.selected {
 }
 
 #suggestionBox {
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-top: 5px;
+  position: relative;
   max-height: 150px;
   overflow-y: auto;
-  position: absolute;
-  z-index: 10001;
-  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 4px;
+  font-size: 0.95rem;
+  z-index: 10;
+}
+
+body.dark-mode #suggestionBox {
+  background-color: #1e293b;
+  color: var(--text-dark);
+  border-color: #334155;
 }
 
 #suggestionBox .suggestion {
@@ -218,7 +224,13 @@ tr.selected {
 }
 
 #suggestionBox .suggestion:hover {
-  background: var(--highlight);
+  background-color: var(--highlight);
+  color: black;
+}
+
+body.dark-mode #suggestionBox .suggestion:hover {
+  background-color: var(--hover-dark);
+  color: white;
 }
 
 .modal, #borrowModal, #manage-modal {
@@ -532,6 +544,28 @@ body.dark-mode #manage-modal input {
   color: var(--text-dark);
   border: 1px solid #444;
 }
+.time-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+body.dark-mode .time-input {
+  background-color: #1e293b;
+  color: var(--text-dark);
+  border-color: #475569;
+}
+
+.time-hint {
+  font-size: 0.85rem;
+  color: var(--gray);
+  display: block;
+  margin-top: 0.25rem;
+}
+
   </style>
 </head>
 <body>
@@ -659,19 +693,28 @@ body.dark-mode #manage-modal input {
 
   <!-- BORROW MODAL -->
   <div class="modal" id="borrowModal">
-    <div class="modal-content borrow-modal-content">
-      <h3>📘 Borrow Selected Books</h3>
-      <label for="memberName">👤 Member Name</label>
-      <input type="text" id="memberName" autocomplete="off" placeholder="Start typing to search...">
-      <div id="suggestionBox"></div>
+  <div class="modal-content borrow-modal-content">
+    <h3>📘 Borrow Selected Books</h3>
+
+    <label for="memberName">👤 Member Name</label>
+    <input type="text" id="memberName" autocomplete="off" placeholder="Start typing to search...">
+    <div id="suggestionBox"></div>
+
+    <div class="date-time-group">
       <label for="dueDate">📅 Due Date</label>
       <input type="date" id="dueDate" />
-      <label>📚 Selected Books</label>
-      <ul id="selectedBooksList"></ul>
-      <div class="modal-buttons">
-        <button class="modal-btn cancel" onclick="closeBorrowModal()">Cancel</button>
-        <button class="modal-btn confirm" onclick="confirmBorrow()">Confirm</button>
-      </div>
+
+      <label for="dueTime">⏰ Due Time</label>
+      <input type="time" id="dueTime" class="time-input" />
+      <small class="time-hint">Use a 12-hour format (AM/PM visible in browser input)</small>
+    </div>
+
+    <label>📚 Selected Books</label>
+    <ul id="selectedBooksList"></ul>
+
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="closeBorrowModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="confirmBorrow()">Confirm</button>
     </div>
   </div>
 </div>
