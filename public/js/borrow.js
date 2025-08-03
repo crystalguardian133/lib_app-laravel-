@@ -97,19 +97,20 @@ function confirmBorrow() {
 
   // Combine date + time into full ISO timestamp
   const dueDateTime = `${dueDate}T${dueTime}:00`;
-
-  fetch("/borrow", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-    },
-    body: JSON.stringify({
-      member_name: memberName,
-      due_date: dueDateTime,
-      book_ids: bookIds
-    })
+  
+fetch("/borrow", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json", // 👈 This tells Laravel to return JSON
+    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+  },
+  body: JSON.stringify({
+    member_name: memberName,
+    due_date: dueDateTime,
+    book_ids: bookIds
   })
+})
     .then(res => res.json())
     .then(data => {
       alert(data.message || "✅ Borrow successful!");

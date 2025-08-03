@@ -21,7 +21,7 @@ class BorrowController extends Controller
     {
         $validated = $request->validate([
             'member_name' => 'required|string',
-            'due_date' => 'required|date|after_or_equal:now',
+            'due_date'    => 'required|date|after_or_equal:today',
             'book_ids'    => 'required|array|min:1',
             'book_ids.*'  => 'integer|exists:books,id'
         ]);
@@ -45,13 +45,13 @@ class BorrowController extends Controller
             }
 
             DB::table('transactions')->insert([
-    'member_id'   => $member->id,
-    'book_id'     => $book->id,
-    'borrowed_at' => now(),
-    'due_date'    => $validated['due_date'], // already full datetime
-    'created_at'  => now(),
-    'updated_at'  => now(),
-]);
+                'member_id'   => $member->id,
+                'book_id'     => $book->id,
+                'borrowed_at' => now(),
+                'due_date'    => $validated['due_date'],
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ]);
 
             $book->decrement('availability');
             $borrowedBooks[] = $book->title;
