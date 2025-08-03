@@ -620,7 +620,25 @@ body.dark-mode .time-input {
   display: block;
   margin-top: 0.25rem;
 }
-
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.modal-content {
+    background: var(--card-bg, #fff);
+    padding: 20px;
+    border-radius: 1rem;
+    text-align: center;
+    max-width: 90%;
+}
   </style>
 </head>
 <body>
@@ -661,37 +679,54 @@ body.dark-mode .time-input {
     <form method="POST" action="{{ route('borrow.book') }}">
       @csrf
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Select</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Genre</th>
-              <th>Published Year</th>
-              <th>Available</th>
-            </tr>
-          </thead>
-        </table>
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genre</th>
+        <th>Published Year</th>
+        <th>Available</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+  </table>
 
-        <div class="scrollable-body">
-          <table>
-            <tbody>
-              @foreach($books as $book)
-              <tr data-id="{{ $book->id }}">
-                <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
-                <td>{{ $book->title }}</td>
-                <td>{{ $book->author }}</td>
-                <td>{{ $book->genre }}</td>
-                <td>{{ $book->published_year }}</td>
-                <td>{{ $book->availability }}</td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <div class="scrollable-body">
+    <table>
+      <tbody>
+        @foreach($books as $book)
+        <tr data-id="{{ $book->id }}">
+          <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
+          <td>{{ $book->title }}</td>
+          <td>{{ $book->author }}</td>
+          <td>{{ $book->genre }}</td>
+          <td>{{ $book->published_year }}</td>
+          <td>{{ $book->availability }}</td>
+          <td id="qrCell-{{ $book->id }}">
+            @php
+              $qrPath = public_path('qrcode/books/book-' . $book->id . '.png');
+            @endphp
+
+            @if(!empty($book->qr_url))
+              <button onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')" class="btn btn-secondary">
+              📷 Show QR
+              </button>
+            @else
+              <button onclick="generateQr({{ $book->id }})" class="btn btn-outline btn-sm">
+                📷 Generate QR
+              </button>
+            @endif
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
     </form>
   </div>
@@ -771,6 +806,17 @@ body.dark-mode .time-input {
     </div>
   </div>
 </div>
+<div id="qrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:20px; border-radius:8px; text-align:center; max-width:90vw; position:relative;">
+    <h3 id="qrBookTitle" style="margin-bottom:10px;">QR Code</h3>
+    <img id="qrImage" src="" alt="QR Code" style="max-width:300px; margin-bottom:15px;" />
+    <div>
+      <a id="downloadLink" class="btn btn-success" style="margin-right:10px;">📥 Download</a>
+      <button onclick="closeQRModal()" class="btn btn-danger">❌ Close</button>
+    </div>
+  </div>
+</div>
 
 <script>
   const sidebar = document.getElementById('sidebar');
@@ -806,6 +852,8 @@ body.dark-mode .time-input {
 <script src="{{ asset('js/bookadd.js') }}"></script>
 <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
 <script src="{{ asset('js/dashb.js') }}"></script>
+<script src="{{ asset('js/qrgen.js') }}"></script>
+<script src="{{ asset('js/showqr.js') }}"></script>
 
 @if(session('duplicate'))
   <script>

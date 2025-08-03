@@ -34,6 +34,8 @@ Route::resource('books', BookController::class);
 Route::put('/books/{id}', [BookController::class, 'update']);
 Route::delete('/books/{id}', [BookController::class, 'destroy']);
 Route::post('/books', [BookController::class, 'store'])->name('books.store');
+Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
+
 
 
 //Member routes
@@ -45,6 +47,8 @@ Route::delete('/members/{id}', [MemberController::class, 'destroy']);
 Route::get('/api/members', function () {
     return \App\Models\Member::all();
 });
+
+Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
 //borrow system routes
 Route::post('/borrow', [BorrowController::class, 'borrow'])->name('borrow.book');
 Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
@@ -57,6 +61,7 @@ Route::get('/timelog', [TimeLogController::class, 'index']);
 Route::get('/timelog/search', [TimeLogController::class, 'search']);
 Route::post('/timelog/time-in', [TimeLogController::class, 'timeIn']);
 Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);
+Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
 
 
 //Transactions Routes

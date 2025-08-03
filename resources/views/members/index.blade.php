@@ -391,6 +391,17 @@ body.dark-mode .actions .delete {
             <td>{{ $member->contactnumber }}</td>
             <td>{{ $member->memberdate }}</td>
             <td>{{ $member->member_time }}</td>
+            <td>
+  @if(!empty($member->qr_url))
+    <button onclick="showMemberQRModal('{{ $member->name }}', '{{ $member->qr_url }}')" class="btn btn-secondary">
+      📷 Show QR
+    </button>
+  @else
+    <button onclick="generateQr({{ $member->id }})" class="btn btn-outline btn-sm">
+      📷 Generate QR
+    </button>
+  @endif
+</td>
           </tr>
           @endforeach
         </tbody>
@@ -427,6 +438,19 @@ body.dark-mode .actions .delete {
     </div></div>
   </div>
 
+  <div id="memberQrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:20px; border-radius:8px; text-align:center; max-width:90vw; position:relative;">
+    <h3 id="qrMemberTitle" style="margin-bottom:10px;">Member QR Code</h3>
+    <img id="qrMemberImage" src="" alt="QR Code" style="max-width:300px; margin-bottom:15px;" />
+    <div>
+      <a id="memberDownloadLink" class="btn btn-success" style="margin-right:10px;">📥 Download</a>
+      <button onclick="closeMemberQRModal()" class="btn btn-danger">❌ Close</button>
+    </div>
+  </div>
+</div>
+
+
   <script>
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -462,5 +486,6 @@ body.dark-mode .actions .delete {
   <script src="js/memberscript.js"></script>
   <script src="js/memberedit.js"></script>
   <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
+  <script src="{{ asset('js/showqr.js') }}"></script>
 </body>
 </html>

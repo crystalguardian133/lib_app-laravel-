@@ -7,6 +7,7 @@
   <title>🕒 Member Time Logs | Julita Leyte</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     :root {
       --primary: #1e3a8a;
@@ -401,7 +402,8 @@ body.dark-mode .actions .delete {
           <div id="suggestionBox"></div>
         </div>
         <button onclick="openRegisterModal()"><i class="fas fa-user-plus"></i> Register User</button>
-      </div>
+      <button onclick="openScanQRModal()" id="scanQRBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
+
 
       <table>
         <thead>
@@ -450,6 +452,17 @@ body.dark-mode .actions .delete {
       </div>
     </div>
   </div>
+  <div class="modal" id="scanQRModal">
+  <div class="modal-content" style="max-width: 500px;">
+    <h3>📷 Scan Member QR</h3>
+    <div id="qr-reader" style="width: 100%; height: auto;"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeScanQRModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
 
   <div class="corner-popup" id="popup" style="display:none;"></div>
 
@@ -480,5 +493,6 @@ body.dark-mode .actions .delete {
   <script src="{{ asset('js/timelog.js') }}"></script>
   <script src="{{ asset('js/memberscript.js') }}"></script>
   <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
+  <script src="{{ asset('js/scanqr.js')}}"></script>
 </body>
 </html>
