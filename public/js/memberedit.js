@@ -1,131 +1,117 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const checkboxes = document.querySelectorAll('.member-checkbox');
-  const editButton = document.getElementById('editBtn');
-
-  // Disable other checkboxes if one is checked
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-      const anyChecked = Array.from(checkboxes).some(c => c.checked);
-      checkboxes.forEach(c => {
-        if (!c.checked) c.disabled = anyChecked;
-      });
-    });
-  });
-
-  editButton.addEventListener('click', () => {
-    const selected = Array.from(checkboxes).filter(cb => cb.checked);
-
-    if (selected.length === 0) {
-      alert('⚠️ Please select a member to manage.');
+// Open the edit modal and load member info
+function openEditModal(memberId = null) {
+  if (!memberId) {
+    const selected = document.querySelector('input[name="memberCheckbox"]:checked');
+    if (!selected) {
+      alert("Please select a member to edit.");
       return;
     }
-
-    if (selected.length > 1) {
-      alert('⚠️ Please select only one member to manage at a time.');
-      return;
-    }
-
-    const row = selected[0].closest('tr');
-
-    const id = row.dataset.id;
-    const name = row.dataset.name;
-    const age = row.dataset.age;
-    const address = row.dataset.address;
-    const contact = row.dataset.contact;
-    const school = row.dataset.school;
-
-    // Fill modal fields
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-name').value = name;
-    document.getElementById('edit-age').value = age;
-    document.getElementById('edit-address').value = address;
-    document.getElementById('edit-contact').value = contact;
-    document.getElementById('edit-school').value = school;
-
-    document.getElementById('editModal').style.display = 'flex';
-  });
-});
-
-// Update Member
-function updateMember() {
-  const id = document.getElementById('edit-id').value;
-  const name = document.getElementById('edit-name').value;
-  const age = document.getElementById('edit-age').value;
-  const address = document.getElementById('edit-address').value;
-  const contact = document.getElementById('edit-contact').value;
-  const school = document.getElementById('edit-school').value;
-  const token = document.querySelector('meta[name="csrf-token"]').content;
-
-  if (!name || !age || !address || !contact) {
-    alert("⚠️ Please fill in all required fields.");
-    return;
+    memberId = selected.value;
   }
 
-  fetch(`/members/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': token
-    },
-    body: JSON.stringify({
-      name: name,
-      age: age,
-      address: address,
-      contactnumber: contact,
-      school: school
+  fetch(`/members/${memberId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to load member info");
+      return response.json();
     })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Server error");
-    return res.json();
-  })
-  .then(data => {
-    if (data.success) {
-      alert("✅ Member updated successfully.");
-      location.reload();
-    } else {
-      alert("⚠️ Update failed.");
-    }
-  })
-  .catch(err => {
-    console.error("Error:", err);
-    alert("🚫 Server error. See console.");
-  });
+    .then(data => {
+      document.getElementById("editMemberId").value = data.id;
+      document.getElementById("editFirstName").value = data.first_name || '';
+      document.getElementById("editMiddleName").value = data.middle_name || '';
+      document.getElementById("editLastName").value = data.last_name || '';
+      document.getElementById("editAge").value = data.age || '';
+      document.getElementById("editHouseNumber").value = data.house_number || '';
+      document.getElementById("editStreet").value = data.street || '';
+      document.getElementById("editBarangay").value = data.barangay || '';
+      document.getElementById("editMunicipality").value = data.municipality || '';
+      document.getElementById("editProvince").value = data.province || '';
+      document.getElementById("editContactNumber").value = data.contactnumber || '';
+      document.getElementById("editSchool").value = data.school || '';
+
+      // Show modal
+      document.getElementById("editModal").style.display = "flex";
+    })
+    .catch(err => {
+      console.error("Edit modal error:", err);
+      alert("❌ Failed to load member info.");
+    });
 }
 
-// Delete Member
-function deleteMember() {
-  const id = document.getElementById('edit-id').value;
-  const token = document.querySelector('meta[name="csrf-token"]').content;
+// Close the edit modal
+function closeEditModal() {
+  document.getElementById("editModal").style.display = "none";
+}
 
-  if (!confirm("🗑️ Are you sure you want to delete this member?")) return;
+// Handle form submit (update member)
+document.getElementById("editForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const memberId = document.getElementById("editMemberId").value;
+
+  const formData = {
+    firstName: document.getElementById("editFirstName").value.trim(),
+    middleName: document.getElementById("editMiddleName").value.trim() || null,
+    lastName: document.getElementById("editLastName").value.trim(),
+    age: document.getElementById("editAge").value.trim(),
+    houseNumber: document.getElementById("editHouseNumber").value.trim() || null,
+    street: document.getElementById("editStreet").value.trim() || null,
+    barangay: document.getElementById("editBarangay").value.trim(),
+    municipality: document.getElementById("editMunicipality").value.trim(),
+    province: document.getElementById("editProvince").value.trim(),
+    contactNumber: document.getElementById("editContactNumber").value.trim(),
+    school: document.getElementById("editSchool").value.trim() || null
+  };
+
+  fetch(`/members/${memberId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+    },
+    body: JSON.stringify(formData)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Update failed");
+      return response.json();
+    })
+    .then(data => {
+      alert("✅ Member updated successfully.");
+      closeEditModal();
+      location.reload();
+    })
+    .catch(error => {
+      console.error("Edit error:", error);
+      alert("🚫 Update failed. Check console for details.");
+    });
+});
+
+// Delete a member
+function deleteMember(id = null) {
+  if (!id) {
+    id = document.getElementById("editMemberId").value;
+  }
+
+  if (!confirm("Are you sure you want to delete this member?")) return;
 
   fetch(`/members/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'X-CSRF-TOKEN': token
+      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+      "Accept": "application/json"
     }
   })
-  .then(res => {
-    if (!res.ok) throw new Error("Failed to delete member.");
-    return res.json();
-  })
-  .then(data => {
-    alert("🗑️ Member deleted successfully.");
-    location.reload();
-  })
-  .catch(err => {
-    console.error("Error:", err);
-    alert("🚫 Failed to delete member. Check console.");
-  });
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to delete member");
+      return response.json();
+    })
+    .then(data => {
+      alert(data.message || "Member deleted successfully.");
+      closeEditModal();
+      location.reload();
+    })
+    .catch(error => {
+      console.error("Delete error:", error);
+      alert("🚫 Failed to delete member. Check console for details.");
+    });
 }
-
-// Close modal
-function closeEditModal() {
-  document.getElementById('editModal').style.display = 'none';
-}
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === "Escape") closeEditModal();
-  if (e.key === "Enter") updateMember();
-});

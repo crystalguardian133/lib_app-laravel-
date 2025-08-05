@@ -6,6 +6,7 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+
 class BookController extends Controller
 {
     public function index()
@@ -17,51 +18,66 @@ class BookController extends Controller
             $qrDirectory = public_path('qrcode/books/');
             $qrPath = $qrDirectory . $qrFileName;
 
-            // Ensure QR directory exists
             if (!file_exists($qrDirectory)) {
                 mkdir($qrDirectory, 0755, true);
             }
 
-            // Generate QR if not already generated
             if (!file_exists($qrPath)) {
                 $this->generateQrFile($book);
             }
 
-            // Add qr_url attribute to each book
             $book->qr_url = asset('qrcode/books/' . $qrFileName);
         }
 
         return view('books.index', compact('books'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'genre' => 'nullable|string|max:50',
-            'published_year' => 'required|integer|min:1000|max:3000',
-            'availability' => 'required|integer|min:0',
-        ]);
+   public function store(Request $request)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'author' => 'required|string|max:255',
+        'genre' => 'nullable|string|max:50',
+        'published_year' => 'required|integer|min:1000|max:3000',
+        'availability' => 'required|integer|min:0',
+        'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
+    ]);
 
-        // Optional duplicate check
-        $exists = Book::where('title', $validated['title'])
-                      ->where('author', $validated['author'])
-                      ->first();
+    // Create the book record first
+    $book = Book::create($validated);
 
-        if ($exists) {
-            return response()->json(['message' => 'Book already exists.'], 409);
+    // Handle cover upload if exists
+    if ($request->hasFile('cover')) {
+        $file = $request->file('cover');
+        $ext = $file->getClientOriginalExtension();
+        $fileName = 'book-' . $book->id . '.' . $ext;
+        $destination = public_path('cover');
+
+        // Make sure directory exists
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
         }
 
-        $book = Book::create($validated);
+        // Move file
+        $file->move($destination, $fileName);
 
-        // Generate QR code after creation
-        $this->generateQrFile($book);
+        // Save public URL in the DB
+        $book->cover_image = url('cover/' . $fileName);
+        $book->save();
+    }
 
-        return response()->json([
-            'message' => 'Book added successfully!',
-            'book' => $book
-        ], 201);
+    // Generate QR code
+    $this->generateQrFile($book);
+
+    return response()->json([
+        'message' => 'Book added successfully!',
+        'book' => $book
+    ], 201);
+}
+
+    public function show($id)
+    {
+        return response()->json(Book::findOrFail($id));
     }
 
     public function edit(Book $book)
@@ -69,58 +85,59 @@ class BookController extends Controller
         return view('books.edit', compact('book'));
     }
 
-    public function show($id)
-    {
-        return response()->json(Book::findOrFail($id));
-    }
-
     public function update(Request $request, $id)
     {
         $book = Book::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'genre' => 'required|string|max:100',
-            'published_year' => 'required|integer',
-            'availability' => 'required|integer'
+            'genre' => 'nullable|string|max:50',
+            'published_year' => 'required|integer|min:1000|max:3000',
+            'availability' => 'required|integer|min:0',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $book->update($request->only([
-            'title', 'author', 'published_year', 'genre', 'availability'
-        ]));
+        if ($request->hasFile('cover')) {
+            $file = $request->file('cover');
+            $filename = 'cover-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('cover'), $filename);
+            $validated['cover_image'] = 'cover/' . $filename;
+        }
+
+        $book->update($validated);
+        $this->generateQrFile($book);
 
         return response()->json(['success' => true, 'message' => 'Book updated']);
     }
-
-    private function generateQrFile(Book $book)
-{
-    $qrPath = public_path('qrcode/books/book-' . $book->id . '.png');
-    $book->qr_url = asset('qrcode/books/' . $qrFileName);
-
-    if (!file_exists(dirname($qrPath))) {
-        mkdir(dirname($qrPath), 0755, true);
-    }
-
-    if (!file_exists($qrPath)) {
-        $options = new QROptions([
-            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel' => QRCode::ECC_H, // high error correction
-            'scale' => 10,               // sharpness
-        ]);
-
-        $qrData = route('books.show', $book->id); // or any unique book string
-
-        (new QRCode($options))->render($qrData, $qrPath);
-    }
-
-    return $qrPath;
-}
-
 
     public function destroy($id)
     {
         Book::destroy($id);
         return response()->json(['success' => true, 'message' => 'Book deleted']);
+    }
+
+    private function generateQrFile(Book $book)
+    {
+        $qrFileName = 'book-' . $book->id . '.png';
+        $qrPath = public_path('qrcode/books/' . $qrFileName);
+
+        if (!file_exists(dirname($qrPath))) {
+            mkdir(dirname($qrPath), 0755, true);
+        }
+
+        if (!file_exists($qrPath)) {
+            $options = new QROptions([
+                'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+                'eccLevel' => QRCode::ECC_H,
+                'scale' => 10,
+            ]);
+
+            $qrData = route('books.show', $book->id); // QR code links to book details
+            (new QRCode($options))->render($qrData, $qrPath);
+        }
+
+        $book->qr_url = asset('qrcode/books/' . $qrFileName);
+        $book->save();
     }
 }

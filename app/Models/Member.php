@@ -12,9 +12,15 @@ class Member extends Model
 
     // Allow mass assignment for these fields
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'age',
-        'address',
+        'house_number',
+        'street',
+        'barangay',
+        'municipality',
+        'province',
         'contactnumber',
         'school',
         'memberdate',

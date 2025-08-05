@@ -10,13 +10,70 @@ use Illuminate\Support\Facades\DB;
 
 class BorrowController extends Controller
 {
-     public function search(Request $request)   
-    {
-    $query = $request->input('query');
-    $members = Member::where('name', 'LIKE', '%' . $query . '%')->pluck('name');
-    return response()->json($members);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'member_id' => 'required|integer|exists:members,id',
+        'book_ids'  => 'required|array',
+        'due_date'  => 'required|date|after_or_equal:today',
+    ]);
+
+    $member = Member::find($validated['member_id']);
+
+    foreach ($validated['book_ids'] as $bookId) {
+        $book = Book::find($bookId);
+
+        if (!$book || $book->availability <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "❌ Book with ID $bookId is unavailable.",
+            ], 400);
+        }
+
+        Transaction::create([
+            'member_id'   => $member->id,
+            'book_id'     => $bookId,
+            'borrow_date' => now(),
+            'due_date'    => $validated['due_date'],
+        ]);
+
+        $book->decrement('availability');
     }
 
+    return response()->json([
+        'success' => true,
+        'message' => '✅ Books successfully borrowed!',
+    ]);
+}
+
+    public function getMemberById($id)
+    {
+        $member = Member::find($id);
+        if (!$member) {
+            return response()->json(['error' => 'Member not found'], 404);
+        }
+
+        $fullName = trim("{$member->first_name} {$member->middle_name} {$member->last_name}");
+        $fullName = str_replace([' null', 'null '], '', $fullName);
+
+        return response()->json([
+            'name' => $fullName
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Generate full names dynamically
+        $members = Member::select(
+            DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name)) as name")
+        )
+        ->where(DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name))"), 'LIKE', '%' . $query . '%')
+        ->pluck('name');
+
+        return response()->json($members);
+    }
     public function borrow(Request $request)
     {
         $validated = $request->validate([
@@ -26,7 +83,11 @@ class BorrowController extends Controller
             'book_ids.*'  => 'integer|exists:books,id'
         ]);
 
-        $member = Member::where('name', $validated['member_name'])->first();
+        // ✅ Fix member lookup
+        $member = Member::where(
+            DB::raw("CONCAT_WS(' ', first_name, COALESCE(middle_name, ''), last_name)"),
+            $validated['member_name']
+        )->first();
 
         if (!$member) {
             return response()->json(['message' => '❌ Member not found.'], 404);

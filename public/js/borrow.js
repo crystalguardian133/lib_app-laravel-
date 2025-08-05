@@ -78,12 +78,12 @@ function closeBorrowModal() {
 }
 
 function confirmBorrow() {
-  const memberName = document.getElementById('memberName').value.trim();
+const memberId = document.getElementById('memberId').value;
   const dueDate = document.getElementById('dueDate').value;
   const dueTime = document.getElementById('dueTime').value;
   const checkboxes = document.querySelectorAll('.book-checkbox:checked');
 
-  if (!memberName || !dueDate || !dueTime) {
+  if (!memberId || !dueDate || !dueTime) {
     alert("⚠️ Please fill in member name, due date, and due time.");
     return;
   }
@@ -104,9 +104,9 @@ fetch("/borrow", {
     "Content-Type": "application/json",
     "Accept": "application/json", // 👈 This tells Laravel to return JSON
     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-  },
+  },  
   body: JSON.stringify({
-    member_name: memberName,
+    member_id: memberId,
     due_date: dueDateTime,
     book_ids: bookIds
   })

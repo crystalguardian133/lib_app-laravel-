@@ -401,7 +401,7 @@ body.dark-mode .actions .delete {
           <input type="text" id="memberInput" placeholder="Search member..." autocomplete="off">
           <div id="suggestionBox"></div>
         </div>
-        <button onclick="openRegisterModal()"><i class="fas fa-user-plus"></i> Register User</button>
+        
       <button onclick="openScanQRModal()" id="scanQRBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
 
 
