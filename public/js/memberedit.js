@@ -1,5 +1,7 @@
 // Open the edit modal and load member info
 function openEditModal(memberId = null) {
+document.getElementById("editModal").style.display = "block";
+
   if (!memberId) {
     const selected = document.querySelector('input[name="memberCheckbox"]:checked');
     if (!selected) {
@@ -29,7 +31,6 @@ function openEditModal(memberId = null) {
       document.getElementById("editSchool").value = data.school || '';
 
       // Show modal
-      document.getElementById("editModal").style.display = "flex";
     })
     .catch(err => {
       console.error("Edit modal error:", err);

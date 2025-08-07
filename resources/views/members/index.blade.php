@@ -1052,9 +1052,18 @@
             <label for="school">School/Institution</label>
             <input type="text" id="school" name="school">
           </div>
-        </div>
-      </div>
-
+        
+          <h3 class="section-title">
+            <i class="fas fa-camera"></i>
+            Upload Photo
+          </h3>
+         <div class="form-group">
+  <label for="photoInput">Upload Photo</label>
+  <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
+  <div style="margin-top: 10px;">
+    <img id="photoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+  </div>
+</div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
           <i class="fas fa-times"></i>
@@ -1262,10 +1271,12 @@ function closeCardPreviewModal() {
   </script>
   
   <!-- External Scripts -->
+  <script src="js/photoprev"></script>
   <script src="js/membersearch.js"></script>
   <script src="js/memberscript.js"></script>
   <script src="js/memberedit.js"></script>
   <script src="{{ asset('js/sidebarcollapse.js') }}"></script>
   <script src="{{ asset('js/showqr.js') }}"></script>
+  <script src="{{ asset('js/photoprev.js') }}"></script>
 </body>
 </html>

@@ -24,7 +24,8 @@ class Member extends Model
         'contactnumber',
         'school',
         'memberdate',
-        'member_time'
+        'member_time',
+        'photo'
     ];
 
     // Automatically cast date fields (optional)
