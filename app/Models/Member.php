@@ -31,5 +31,16 @@ class Member extends Model
     protected $casts = [
         'memberdate' => 'date',
     ];
+
+    public function getNameAttribute()
+{
+    $parts = [
+        $this->first_name,
+        $this->middle_name !== 'null' ? $this->middle_name : null,
+        $this->last_name
+    ];
+
+    return implode(' ', array_filter($parts));
+}
 }
 

@@ -14,8 +14,8 @@ class MemberController extends Controller
 {
     public function index()
     {   
-        $members = Member :: orderBy('created_at', 'desc')->get();
-        $members = Member::all();
+         $members = Member::latest()->get(); // or paginate()
+    return view('members.index', compact('members'));
 
         foreach ($members as $member) {
             $qrFile = 'member-' . $member->id . '.png';

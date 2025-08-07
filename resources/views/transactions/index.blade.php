@@ -298,7 +298,7 @@ body.dark-mode .styled-table tbody tr.overdue {
           class="{{ ($transaction->status === 'borrowed' && \Carbon\Carbon::parse($transaction->due_date)->isPast()) ? 'overdue' : '' }}"
         >
           <td>{{ $transaction->id }}</td>
-          <td>{{ $transaction->member->name }}</td>
+          <td>{{ $transaction->member?->name ?? 'Unknown' }}</td>
           <td>{{ $transaction->book->title }}</td>
           <td>{{ \Carbon\Carbon::parse($transaction->borrowed_at)->format('M d, Y h:i A') }}</td>
           <td>{{ \Carbon\Carbon::parse($transaction->due_date)->format('M d, Y h:i A') }}</td>

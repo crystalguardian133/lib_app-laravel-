@@ -7,7 +7,7 @@
     <title>📚 Book Records</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-    :root {
+:root {
     --primary: #1e3a8a;
     --accent: #3b82f6;
     --light: #f9fafb;
@@ -182,20 +182,50 @@
     transform: scale(1.03);
   }
 
-  .table-container {
-    overflow-x: auto;
-    overflow-y: auto;
-    max-height: 500px;
-    background: transparent;
-    width: 100%;
-  }
+  /* FIXED TABLE ALIGNMENT */
+.table-container {
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid var(--primary);
+}
 
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--light); /* Or dark background if in dark mode */
+  z-index: 1;
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.table-container tbody td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+  /* Single unified table with proper alignment */
   table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 600px;
+    table-layout: fixed; /* Force consistent column widths */
   }
+
+  /* Define specific column widths for alignment */
+  table th:nth-child(1), table td:nth-child(1) { width: 60px; }   /* Select */
+  table th:nth-child(2), table td:nth-child(2) { width: 80px; }   /* Cover */
+  table th:nth-child(3), table td:nth-child(3) { width: 200px; }  /* Title */
+  table th:nth-child(4), table td:nth-child(4) { width: 150px; }  /* Author */
+  table th:nth-child(5), table td:nth-child(5) { width: 120px; }  /* Genre */
+  table th:nth-child(6), table td:nth-child(6) { width: 120px; }  /* Published Year */
+  table th:nth-child(7), table td:nth-child(7) { width: 100px; }  /* Available */
+  table th:nth-child(8), table td:nth-child(8) { width: 140px; }  /* QR Code */
 
   .table-wrapper {
     width: 100%;
@@ -205,25 +235,60 @@
   }
 
   .scrollable-body {
-    max-height: 400px; /* Adjust height if needed */
+    max-height: 400px;
     overflow-y: auto;
+    overflow-x: auto; /* Allow horizontal scroll if needed */
     display: block;
   }
 
+  /* For the two-table structure (current) */
   .scrollable-body table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Match header table layout */
+    margin-top: 0; /* Remove any margin */
   }
 
+  /* Ensure both header and body tables have same column widths */
+  .table-container > table th:nth-child(1),
+  .scrollable-body table td:nth-child(1) { width: 60px; }
+  
+  .table-container > table th:nth-child(2),
+  .scrollable-body table td:nth-child(2) { width: 80px; }
+  
+  .table-container > table th:nth-child(3),
+  .scrollable-body table td:nth-child(3) { width: 200px; }
+  
+  .table-container > table th:nth-child(4),
+  .scrollable-body table td:nth-child(4) { width: 150px; }
+  
+  .table-container > table th:nth-child(5),
+  .scrollable-body table td:nth-child(5) { width: 120px; }
+  
+  .table-container > table th:nth-child(6),
+  .scrollable-body table td:nth-child(6) { width: 120px; }
+  
+  .table-container > table th:nth-child(7),
+  .scrollable-body table td:nth-child(7) { width: 100px; }
+  
+  .table-container > table th:nth-child(8),
+  .scrollable-body table td:nth-child(8) { width: 140px; }
+
   .scrollable-body td {
-    padding: 12px;
+    padding: 12px 16px; /* Match header padding */
     border-bottom: 1px solid #ddd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   th, td {
     padding: 12px 16px;
     border-bottom: 1px solid #ddd;
     text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   th {
@@ -387,69 +452,6 @@
     background-color: #dc2626;
   }
 
-      .sidebar {
-        width: 240px;
-        background-color: var(--primary);
-        color: var(--white);
-        height: 100vh;
-        padding: 1.5rem 1rem;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        transition: width 0.3s ease;
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-      }
-
-      .sidebar-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 2rem;
-      }
-
-      .sidebar-header .logo {
-        width: 36px;
-        height: 36px;
-        object-fit: contain;
-        border-radius: 4px;
-      }
-
-      .sidebar.collapsed {
-        width: 60px;
-      }
-
-      .sidebar.collapsed .label {
-        display: none;
-      }
-
-      .sidebar.collapsed .sidebar-header {
-        justify-content: center;
-      }
-
-      .sidebar nav a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--white);
-        text-decoration: none;
-        padding: 10px 12px;
-        border-radius: 6px;
-        margin-bottom: 6px;
-        transition: background-color 0.2s ease;
-      }
-
-      .sidebar nav a:hover {
-        background-color: var(--accent);
-      }
-
-      .sidebar.collapsed nav a {
-        justify-content: center;
-      }
-
       .sidebar .toggle-btn {
         margin: 0 auto 1.5rem auto;
         background: var(--accent);
@@ -534,13 +536,32 @@
     content: "🌙";
   }
 
+  /* Cover image styling */
+  table img.cover {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  /* Make sure images in table don't break layout */
+  .scrollable-body table td img {
+    max-width: 60px;
+    height: auto;
+    border-radius: 4px;
+  }
+
   @media (max-width: 768px) {
     .container {
       padding: 1rem;
     }
 
+    .table-container {
+      overflow-x: auto; /* Allow horizontal scroll on mobile */
+    }
+
     table {
-      min-width: 100%;
+      min-width: 800px; /* Prevent table from getting too compressed */
     }
   }
 
@@ -643,11 +664,90 @@
       text-align: center;
       max-width: 90%;
   }
-  table img.cover {
-    width: 60px;
-    height: 80px;
-    object-fit: cover;
-    }
+  .modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(3px);
+}
+
+.modal-box {
+  background-color: var(--light);
+  color: var(--dark);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.modal-body.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-image {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background-color: var(--light);
+}
+
+.btn-download {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.btn-download:hover {
+  background-color: var(--accent-light);
+}
+
+/* Dark mode support */
+body.dark-mode .modal-box {
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+body.dark-mode .qr-image {
+  background-color: var(--dark);
+  border-color: var(--accent-light);
+}
     </style>
   </head>
   <body>
@@ -682,58 +782,56 @@
           <button onclick="openBorrowModal()">📖 Borrow</button>
         </div>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Select</th>
-                <th>Cover</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Genre</th>
-                <th>Published Year</th>
-                <th>Available</th>
-                <th>QR Code</th>
-              </tr>
-            </thead>
-          </table>
-          <div class="scrollable-body">
-            <table>
-              <tbody>
-              @foreach($books as $book)
-              <tr data-id="{{ $book->id }}">
-    <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
-    <td>
-    @if($book->cover_image)
-    <img src="{{ $book->cover_image }}" width="60" />
-  @else
-    No Cover
-  @endif
-
-    </td>
-
-    <td>{{ $book->title }}</td>
-    <td>{{ $book->author }}</td>
-    <td>{{ $book->genre }}</td>
-    <td>{{ $book->published_year }}</td>
-    <td>{{ $book->availability }}</td>
-    <td id="qrCell-{{ $book->id }}">
-      @if(!empty($book->qr_url))
-        <button onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')" class="btn btn-secondary">
-          📷 Show QR
-        </button>
-      @else
-        <button onclick="generateQr({{ $book->id }})" class="btn btn-outline btn-sm">
-          📷 Generate QR
-        </button>
-      @endif
-    </td>
-  </tr>
-
-              @endforeach
-              </tbody>
-            </table>
-          </div>
+<div class="table-wrapper">
+  <table class="main-table">
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>Cover</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genre</th>
+        <th>Published Year</th>
+        <th>Available</th>
+        <th>QR Code</th>
+      </tr>
+    </thead>
+  </table>
+  <div class="scrollable-body">
+    <table class="main-table">
+      <tbody>
+        @foreach($books as $book)
+        <tr data-id="{{ $book->id }}">
+          <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
+          <td>
+            @if($book->cover_image)
+              <img src="{{ $book->cover_image }}" width="60" />
+            @else
+              No Cover
+            @endif
+          </td>
+          <td>{{ $book->title }}</td>
+          <td>{{ $book->author }}</td>
+          <td>{{ $book->genre }}</td>
+          <td>{{ $book->published_year }}</td>
+          <td>{{ $book->availability }}</td>
+          <td id="qrCell-{{ $book->id }}">
+            @if(!empty($book->qr_url))
+              <button onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')" class="btn btn-secondary">
+                📷 Show QR
+              </button>
+            @else
+              <button onclick="generateQr({{ $book->id }})" class="btn btn-outline btn-sm">
+                📷 Generate QR
+              </button>
+            @endif
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+</div>
         </div>
       </div>
     </div>
@@ -883,6 +981,23 @@
       </div>
     </div>
   </div>
+
+  <!-- Book QR Modal -->
+<div id="qrModal" class="modal-wrapper" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="qrBookTitle" class="modal-title">QR Code</h2>
+      <button class="modal-close" onclick="closeQRModal()">&times;</button>
+    </div>
+    <div class="modal-body center">
+      <img id="qrImage" src="" alt="QR Code" class="qr-image" />
+      <a id="downloadLink" href="#" download class="btn-download" target="_blank">
+        Download QR Code
+      </a>
+    </div>
+  </div>
+</div>
+
     <script src="{{ asset('js/borrow.js') }}"></script>
     <script src="{{ asset('js/qrgen.js') }}"></script>
     <script src="{{ asset('js/showqr.js') }}"></script>

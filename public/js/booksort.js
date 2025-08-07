@@ -1,56 +1,32 @@
-const table = document.getElementById('book-table');
-const headers = table.querySelectorAll('th');
-const tbody = table.querySelector('tbody');
-let sortStates = {};
+document.addEventListener("DOMContentLoaded", function () {
+  const headerTable = document.querySelectorAll(".main-table")[0];
+  const bodyTable = document.querySelectorAll(".main-table")[1];
+  if (!headerTable || !bodyTable) return;
 
-headers.forEach(th => {
-  const col = th.getAttribute('data-column');
-  sortStates[col] = 0; // 0: unsorted, 1: asc, 2: desc
+  const headers = headerTable.querySelectorAll("th");
 
-  th.addEventListener('click', () => {
-    // Reset all other headers
-    headers.forEach(h => {
-      if (h !== th) h.classList.remove('sort-asc', 'sort-desc');
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => {
+      sortTableByColumn(bodyTable, index);
+    });
+  });
+
+  function sortTableByColumn(table, columnIndex) {
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    const currentOrder = headerTable.dataset.sortOrder === "asc" ? "desc" : "asc";
+    headerTable.dataset.sortOrder = currentOrder;
+
+    rows.sort((a, b) => {
+      const aText = a.cells[columnIndex]?.textContent.trim() || "";
+      const bText = b.cells[columnIndex]?.textContent.trim() || "";
+      return currentOrder === "asc"
+        ? aText.localeCompare(bText, undefined, { numeric: true, sensitivity: "base" })
+        : bText.localeCompare(aText, undefined, { numeric: true, sensitivity: "base" });
     });
 
-    // Update state
-    sortStates[col] = (sortStates[col] + 1) % 3;
-    const state = sortStates[col];
-
-    th.classList.remove('sort-asc', 'sort-desc');
-    if (state === 1) th.classList.add('sort-asc');
-    else if (state === 2) th.classList.add('sort-desc');
-
-    // Sort rows
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    if (state === 0) {
-      rows.sort((a, b) => a.rowIndex - b.rowIndex); // default
-    } else {
-      rows.sort((a, b) => {
-        const A = a.children[col].textContent.trim().toLowerCase();
-        const B = b.children[col].textContent.trim().toLowerCase();
-        if (A < B) return state === 1 ? -1 : 1;
-        if (A > B) return state === 1 ? 1 : -1;
-        return 0;
-      });
-    }
-
-    // Re-append rows
-    rows.forEach(row => tbody.appendChild(row));
-  });
-});
-
-document.getElementById('search-input').addEventListener('input', function () {
-  const searchValue = this.value.toLowerCase();
-  const rows = document.querySelectorAll('table tbody tr');
-
-  rows.forEach(row => {
-    const title = row.cells[1].textContent.toLowerCase(); // 1 = title column
-    const author = row.cells[2].textContent.toLowerCase(); // optional: include more columns
-    if (title.includes(searchValue) || author.includes(searchValue)) {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
-    }
-  });
+    rows.forEach((row) => tbody.appendChild(row));
+  }
 });

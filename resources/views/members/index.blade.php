@@ -762,86 +762,88 @@
     </div>
 
     <!-- Members Table -->
-    <div class="table-container">
-      <table id="membersTable">
-        <thead>
+   <!-- Members Table -->
+<div class="table-container">
+  <table id="membersTable">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Address</th>
+        <th>Contact Number</th>
+        <th>School</th>
+        <th>Member Since</th>
+        <th>Computer Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="membersTableBody">
+      @if(isset($members) && $members->count())
+        @foreach ($members as $member)
           <tr>
-            <th>
-             
-            </th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Address</th>
-            <th>Contact Number</th>
-            <th>School</th>
-            <th>Member Since</th>
-            <th>Computer Time</th>
-            <th>Actions</th>
+            {{-- Name with checkbox --}}
+            <td>
+              <input type="checkbox" name="memberCheckbox" value="{{ $member->id }}" class="member-checkbox">
+            </td> 
+            <td>
+              {{ $member->first_name ?? '' }}
+              @if (!empty($member->middle_name) && $member->middle_name !== 'null')
+                {{ ' ' . $member->middle_name }}
+              @endif
+              {{ !empty($member->last_name) && $member->last_name !== 'null' ? ' ' . $member->last_name : '' }}
+            </td>
+
+            {{-- Age --}}
+            <td>{{ $member->age ?? '' }}</td>
+
+            {{-- Full Address --}}
+            <td>
+              {{ collect([
+                (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
+                (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
+                (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
+                (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
+                (!empty($member->province) && $member->province !== 'null') ? $member->province : null
+              ])->filter()->implode(', ') }}
+            </td>
+
+            {{-- Contact Number --}}
+            <td>{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '' }}</td>
+
+            {{-- School --}}
+            <td>{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '' }}</td>
+
+            {{-- Member Since --}}
+            <td>
+              @if (!empty($member->memberdate) && $member->memberdate !== 'null')
+                {{ \Carbon\Carbon::parse($member->memberdate)->format('F j, Y') }}
+              @endif
+            </td>
+
+            {{-- Computer Time --}}
+            <td>{{ (!empty($member->member_time) && $member->member_time !== 'null') ? $member->member_time . ' min' : '' }}</td>
+
+            {{-- Actions --}}
+            <td>
+              <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
+                class="btn btn-sm btn-success" 
+                target="_blank" 
+                title="Download ID Card">
+                <i class="fas fa-id-card"></i>
+              </a>
+            </td>
           </tr>
-        </thead>
-        <tbody id="membersTableBody">
-  @foreach ($members as $member)
-    <tr>
-      {{-- Name with checkbox --}}
-      <td>
-<input type="checkbox" name="memberCheckbox" value="{{ $member->id }} " class="member-checkbox">
-      </td> 
-      <td>
-        {{ $member->first_name ?? '' }}
-        @if (!empty($member->middle_name) && $member->middle_name !== 'null')
-          {{ ' ' . $member->middle_name }}
-        @endif
-        {{ !empty($member->last_name) && $member->last_name !== 'null' ? ' ' . $member->last_name : '' }}
-      </td>
+        @endforeach
+      @else
+        <tr>
+          <td colspan="9" style="text-align: center;">No members found.</td>
+        </tr>
+      @endif
+    </tbody>
+  </table>
+</div>
 
-      {{-- Age --}}
-      <td>{{ $member->age ?? '' }}</td>
-
-      {{-- Full Address --}}
-      <td>
-        {{ collect([
-          (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
-          (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
-          (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
-          (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
-          (!empty($member->province) && $member->province !== 'null') ? $member->province : null
-        ])->filter()->implode(', ') }}
-      </td>
-
-      {{-- Contact Number --}}
-      <td>{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '' }}</td>
-
-      {{-- School --}}
-      <td>{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '' }}</td>
-
-      {{-- Member Since --}}
-      <td>
-        @if (!empty($member->memberdate) && $member->memberdate !== 'null')
-          {{ \Carbon\Carbon::parse($member->memberdate)->format('F j, Y') }}
-        @else
-          {{-- blank --}}
-        @endif
-      </td>
-
-      {{-- Computer Time --}}
-      <td>{{ (!empty($member->member_time) && $member->member_time !== 'null') ? $member->member_time . ' min' : '' }}</td>
-
-      {{-- Actions --}}
-      <td>
-
-        <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
-          class="btn btn-sm btn-success" 
-          target="_blank" 
-          title="Download ID Card">
-          <i class="fas fa-id-card"></i>
-        </a>
-      </td>
-    </tr>
-  @endforeach
-</tbody>
-
-      </table>
-    </div>
   </div>
 
   <!-- Register Member Modal -->
@@ -1158,10 +1160,11 @@
         </div>
           
         <div class="modal-actions">
-          <button type="button" class="btn btn-danger" onclick="deleteMember({{ $member->id }})">
-            <i class="fas fa-trash"></i>
-            Delete Member
-          </button>
+          <button type="button" class="btn btn-danger" 
+    @if(!isset($member)) disabled @endif 
+    onclick="deleteMember({{ $member->id ?? 0 }})">
+    Delete
+</button>
           <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
             <i class="fas fa-times"></i>
             Cancel
