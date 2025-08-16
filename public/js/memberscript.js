@@ -28,7 +28,7 @@ function submitRegister() {
   const firstName = getTrimmedValue("#firstName");
   const middleName = getTrimmedValue("#middleName") || null;
   const lastName = getTrimmedValue("#lastName");
-  const age = modal.querySelector("#age")?.value || ''; // Don't trim numeric values
+  const age = modal.querySelector("#age")?.value || '';
   const houseNumber = getTrimmedValue("#houseNumber") || null;
   const street = getTrimmedValue("#street") || null;
   const barangay = getTrimmedValue("#barangay");
@@ -123,35 +123,11 @@ document.addEventListener('change', function (e) {
   }
 });
 
-// Modal open listener and key listeners
-document.addEventListener('DOMContentLoaded', function () {
-  const registerBtn = document.getElementById('registerBtn');
-  if (registerBtn) {
-    registerBtn.addEventListener('click', openRegisterModal);
-  }
-
-  document.addEventListener('keydown', function (e) {
-    const isRegisterOpen = document.getElementById("registerModal")?.style.display === "block";
-    const isJulitaOpen = document.getElementById("julitaRegisterModal")?.style.display === "block";
-
-    if (!isRegisterOpen && !isJulitaOpen) return;
-
-    if (e.key === "Escape") {
-      closeRegisterModal();
-      closeJulitaRegisterModal();
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      submitRegister();
-    }
-  });
-});
-
-// Optional export for testing
-window.testSubmit = submitRegister;
-
 // SORT FUNCTION
 document.addEventListener("DOMContentLoaded", function () {
   const table = document.getElementById("membersTable");
+  if (!table) return; // Guard clause
+
   const headers = table.querySelectorAll("th");
   const tableBody = table.querySelector("tbody");
   let sortDirection = true;
@@ -182,14 +158,52 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// SEARCH FUNCTION
-document.getElementById("memberSearchInput").addEventListener("input", function () {
-  const filter = this.value.toLowerCase();
-  const rows = document.querySelectorAll("#membersTable tbody tr");
+// SEARCH FUNCTION - Fixed ID to match HTML
+document.addEventListener("DOMContentLoaded", function() {
+  const searchInput = document.getElementById("searchInput"); // Corrected ID
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#membersTable tbody tr");
 
-  rows.forEach(row => {
-    const nameCell = row.cells[1]; // Name column
-    const name = nameCell.textContent.toLowerCase();
-    row.style.display = name.includes(filter) ? "" : "none";
+      rows.forEach(row => {
+        const nameCell = row.cells[0]; // Name column (adjusted for new table structure)
+        const addressCell = row.cells[2]; // Address column  
+        const contactCell = row.cells[3]; // Contact column
+        
+        const name = nameCell ? nameCell.textContent.toLowerCase() : '';
+        const address = addressCell ? addressCell.textContent.toLowerCase() : '';
+        const contact = contactCell ? contactCell.textContent.toLowerCase() : '';
+        
+        const shouldShow = name.includes(filter) || address.includes(filter) || contact.includes(filter);
+        row.style.display = shouldShow ? "" : "none";
+      });
+    });
+  }
+});
+
+// Modal open listener and key listeners
+document.addEventListener('DOMContentLoaded', function () {
+  const registerBtn = document.getElementById('registerBtn');
+  if (registerBtn) {
+    registerBtn.addEventListener('click', openRegisterModal);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    const isRegisterOpen = document.getElementById("registerModal")?.style.display === "block";
+    const isJulitaOpen = document.getElementById("julitaRegisterModal")?.style.display === "block";
+
+    if (!isRegisterOpen && !isJulitaOpen) return;
+
+    if (e.key === "Escape") {
+      closeRegisterModal();
+      closeJulitaRegisterModal();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      submitRegister();
+    }
   });
 });
+
+// Optional export for testing
+window.testSubmit = submitRegister;

@@ -54,6 +54,7 @@ Route::get('/members/{id}', [MemberController::class, 'show']);
 Route::put('/members/{id}', [MemberController::class, 'update']);
 Route::delete('/members/{id}', [MemberController::class, 'destroy']);
 
+
 // Optional API endpoint (REMOVE this if you want to use controller-based index)
 Route::get('/api/members', function () {
     return \App\Models\Member::all();

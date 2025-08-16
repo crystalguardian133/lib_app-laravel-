@@ -64,7 +64,7 @@
             flex-direction: column;
             box-shadow: 4px 0 20px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
-            z-index: 1000;
+            z-index: 2000;
             backdrop-filter: blur(10px);
         }
 
@@ -943,11 +943,6 @@
         <i class="fas fa-user-plus"></i>
         Register Member
       </button>
-      <button class="btn btn-secondary" onclick="openEditModal()" id="editBtn">
-        <i class="fas fa-edit"></i>
-        Edit Selected
-      </button>
-    </div>
 
     <!-- Members Table -->
    <!-- Members Table -->
@@ -955,7 +950,6 @@
   <table id="membersTable">
     <thead>
       <tr>
-        <th></th>
         <th>Name</th>
         <th>Age</th>
         <th>Address</th>
@@ -970,16 +964,15 @@
       @if(isset($members) && $members->count())
         @foreach ($members as $member)
           <tr>
-            {{-- Name with checkbox --}}
+            {{-- Name --}}
             <td>
-              <input type="checkbox" name="memberCheckbox" value="{{ $member->id }}" class="member-checkbox">
-            </td> 
-            <td>
-              {{ $member->first_name ?? '' }}
+              {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}
+              @if (!empty($member->first_name) && $member->first_name !== 'null')
+                {{ (!empty($member->last_name) && $member->last_name !== 'null') ? ', ' : '' }}{{ $member->first_name }}
+              @endif
               @if (!empty($member->middle_name) && $member->middle_name !== 'null')
                 {{ ' ' . $member->middle_name }}
               @endif
-              {{ !empty($member->last_name) && $member->last_name !== 'null' ? ' ' . $member->last_name : '' }}
             </td>
 
             {{-- Age --}}
@@ -1012,26 +1005,33 @@
             {{-- Computer Time --}}
             <td>{{ (!empty($member->member_time) && $member->member_time !== 'null') ? $member->member_time . ' min' : '' }}</td>
 
-            {{-- Actions --}}
+            {{-- Actions - Individual Edit and Download Buttons --}}
             <td>
-              <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
-                class="btn btn-sm btn-success" 
-                target="_blank" 
-                title="Download ID Card">
-                <i class="fas fa-id-card"></i>
-              </a>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                  <button 
+    class="btn btn-sm btn-primary editBtn" 
+    data-id="{{ $member->id }}">
+    Edit
+  </button>
+
+                <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
+                   class="btn btn-sm btn-success" 
+                   target="_blank" 
+                   title="Download ID Card">
+                  <i class="fas fa-id-card"></i>
+                </a>
+              </div>
             </td>
           </tr>
         @endforeach
       @else
         <tr>
-          <td colspan="9" style="text-align: center;">No members found.</td>
+          <td colspan="8" style="text-align: center;">No members found.</td>
         </tr>
       @endif
     </tbody>
   </table>
 </div>
-
   </div>
 
   <!-- Register Member Modal -->
@@ -1267,113 +1267,100 @@
 </div>
 
   <!-- Edit Member Modal -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-edit"></i>
-          Edit Member Information
-        </h2>
-        <button class="close-modal" onclick="closeEditModal()">
-          <i class="fas fa-times"></i>
-        </button>
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-edit"></i>
+        Edit Member Information
+      </h2>
+      <button class="close-modal" onclick="closeEditModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form id="editForm">
+      <input type="hidden" id="editMemberId" name="memberId">
+      
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editFirstName">First Name *</label>
+            <input type="text" id="editFirstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="editMiddleName">Middle Name</label>
+            <input type="text" id="editMiddleName" name="middleName">
+          </div>
+          <div class="form-group">
+            <label for="editLastName">Last Name *</label>
+            <input type="text" id="editLastName" name="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="editAge">Age *</label>
+            <input type="number" id="editAge" name="age" min="1" max="150" required>
+          </div>
+        </div>
       </div>
 
-      <form id="editForm">
-        <input type="hidden" id="editMemberId" name="memberId">
+      <!-- Address Information Section -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editHouseNumber">House Number</label>
+            <input type="text" id="editHouseNumber" name="houseNumber">
+          </div>
+          <div class="form-group">
+            <label for="editStreet">Street</label>
+            <input type="text" id="editStreet" name="street">
+          </div>
+          <div class="form-group">
+            <label for="editBarangay">Barangay *</label>
+            <input type="text" id="editBarangay" name="barangay" required>
+          </div>
+          <div class="form-group">
+            <label for="editMunicipality">Municipality/City *</label>
+            <input type="text" id="editMunicipality" name="municipality" required>
+          </div>
+          <div class="form-group">
+            <label for="editProvince">Province *</label>
+            <input type="text" id="editProvince" name="province" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-phone"></i> Contact Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editContactNumber">Contact Number *</label>
+            <input type="tel" id="editContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
+          </div>
+          <div class="form-group">
+            <label for="editSchool">School/Institution</label>
+            <input type="text" id="editSchool" name="school">
+          </div>
+        </div>
+      </div>
         
-        <!-- Personal Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-user"></i>
-            Personal Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editFirstName">First Name *</label>
-              <input type="text" id="editFirstName" name="firstName" required>
-            </div>
-            <div class="form-group">
-              <label for="editMiddleName">Middle Name</label>
-              <input type="text" id="editMiddleName" name="middleName">
-            </div>
-            <div class="form-group">
-              <label for="editLastName">Last Name *</label>
-              <input type="text" id="editLastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-              <label for="editAge">Age *</label>
-              <input type="number" id="editAge" name="age" min="1" max="150" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-map-marker-alt"></i>
-            Address Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editHouseNumber">House Number</label>
-              <input type="text" id="editHouseNumber" name="houseNumber">
-            </div>
-            <div class="form-group">
-              <label for="editStreet">Street</label>
-              <input type="text" id="editStreet" name="street">
-            </div>
-            <div class="form-group">
-              <label for="editBarangay">Barangay *</label>
-              <input type="text" id="editBarangay" name="barangay" required>
-            </div>
-            <div class="form-group">
-              <label for="editMunicipality">Municipality/City *</label>
-              <input type="text" id="editMunicipality" name="municipality" required>
-            </div>
-            <div class="form-group">
-              <label for="editProvince">Province *</label>
-              <input type="text" id="editProvince" name="province" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-phone"></i>
-            Contact Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editContactNumber">Contact Number *</label>
-              <input type="tel" id="editContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
-            </div>
-            <div class="form-group">
-              <label for="editSchool">School/Institution</label>
-              <input type="text" id="editSchool" name="school">
-            </div>
-          </div>
-        </div>
-          
-        <div class="modal-actions">
-          <button type="button" class="btn btn-danger" 
-    @if(!isset($member)) disabled @endif 
-    onclick="deleteMember({{ $member->id ?? 0 }})">
-    Delete
-</button>
-          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-            <i class="fas fa-times"></i>
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-danger" onclick="deleteMember()">
+          Delete
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- QR Code Modal -->
   <div class="qr-modal" id="qrModal">
