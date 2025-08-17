@@ -70,68 +70,189 @@
     background-color: var(--accent);
   }
 
-  .sidebar {
-    width: 240px;
-    background-color: var(--primary);
-    color: var(--white);
-    height: 100vh;
-    padding: 1.5rem 1rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: width 0.3s ease;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-  }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            height: 100vh;
+            padding: 1.5rem 1rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
 
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 2rem;
-  }
+        .sidebar.collapsed {
+            width: 70px;
+        }
 
-  .sidebar-header .logo {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    border-radius: 4px;
-  }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-  .sidebar.collapsed {
-    width: 60px;
-  }
+        .sidebar-header .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
 
-  .sidebar.collapsed .label {
-    display: none;
-  }
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
 
-  .sidebar.collapsed .sidebar-header {
-    justify-content: center;
-  }
+        .sidebar.collapsed .sidebar-header h3,
+        .sidebar.collapsed .label {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .sidebar nav a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--white);
-    text-decoration: none;
-    padding: 10px 12px;
-    border-radius: 6px;
-    margin-bottom: 6px;
-    transition: background-color 0.2s ease;
-  }
+        .toggle-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
-  .sidebar nav a:hover {
-    background-color: var(--accent);
-  }
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
 
-  .sidebar.collapsed nav a {
-    justify-content: center;
-  }
+        .sidebar nav {
+            flex: 1;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar nav a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar nav a:hover::before {
+            width: 100%;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(6px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .sidebar nav a.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .sidebar nav a .icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dark-toggle {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+            margin-bottom: 1rem;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.2);
+            transition: 0.4s;
+            border-radius: 34px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "🌞";
+            height: 24px;
+            width: 24px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            transition: 0.4s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            content: "🌙";
+        }
   .container {
     width: 100%;
     margin: 0 auto;
@@ -1047,6 +1168,7 @@ body.dark-mode .qr-image {
   <script src="{{ asset('js/booksort.js') }}"></script>
   <script src="{{ asset('js/bookmanage.js') }}"></script>
   <script src="{{ asset('js/borrow.js') }}"></script>
+  <script src="{{ asset('js/overdue.js') }}"></script>
   <script src="{{ asset('js/bookadd.js') }}"></script>
   <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
   <script src="{{ asset('js/dashb.js') }}"></script>

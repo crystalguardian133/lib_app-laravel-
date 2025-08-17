@@ -1535,6 +1535,7 @@ function closeCardPreviewModal() {
 </script>
 
 <!-- External Scripts - ONLY INCLUDE EACH ONCE -->
+<script src="{{ asset('js/overdue.js') }}"></script>
 <script src="{{ asset('js/photoprev.js') }}"></script>
 <script src="{{ asset('js/membersearch.js') }}"></script>
 <script src="{{ asset('js/memberscript.js') }}"></script>
