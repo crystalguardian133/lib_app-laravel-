@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
- <style>
+<style>
         :root {
             --primary: #4f46e5;
             --primary-dark: #3730a3;
@@ -48,6 +48,32 @@
         body.dark-mode {
             background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1426 100%);
             color: var(--text-dark);
+        }
+
+        #registerModal,
+        #julitaRegisterModal {
+            z-index: 1500;
+        }
+
+        /* Edit modal should have higher z-index */
+        #editModal {
+            z-index: 2000;
+        }
+
+        /* QR modal should have highest z-index */
+        .qr-modal {
+            z-index: 2500;
+        }
+
+        /* Make sure modal show state is properly defined */
+        .modal.show {
+            display: flex !important;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
         }
 
         /* Sidebar Styles */
@@ -421,6 +447,59 @@
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            min-width: auto;
+        }
+
+        .btn-sm .icon {
+            font-size: 0.875rem;
+        }
+
+        /* Bulk actions bar */
+        .bulk-actions {
+            background: rgba(79, 70, 229, 0.1);
+            border: 2px solid rgba(79, 70, 229, 0.2);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .bulk-actions.show {
+            display: flex;
+        }
+
+        .bulk-actions-text {
+            flex: 1;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        body.dark-mode .bulk-actions {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: rgba(6, 182, 212, 0.2);
+        }
+
+        body.dark-mode .bulk-actions-text {
+            color: var(--accent-light);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Table Styles */
         .table-container {
             background: rgba(255, 255, 255, 0.9);
@@ -466,10 +545,20 @@
             background: rgba(255,255,255,0.2);
         }
 
+        th:first-child {
+            width: 50px;
+            text-align: center;
+        }
+
         td {
             padding: 1.2rem;
             border-bottom: 1px solid rgba(0,0,0,0.05);
             transition: all 0.3s ease;
+        }
+
+        td:first-child {
+            text-align: center;
+            width: 50px;
         }
 
         body.dark-mode td {
@@ -486,11 +575,28 @@
             transform: translateX(2px);
         }
 
+        tbody tr.selected {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.1));
+        }
+
         body.dark-mode tbody tr:hover {
             background: rgba(255, 255, 255, 0.05);
         }
 
+        body.dark-mode tbody tr.selected {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
         .member-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* Select all checkbox */
+        #selectAll {
             width: 18px;
             height: 18px;
             cursor: pointer;
@@ -515,7 +621,7 @@
         }
 
         .modal.show {
-            display: flex;
+            display: flex !important;
             animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -805,7 +911,7 @@
             }
         }
 
-        @media (max-width: 768px) {
+ @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
@@ -854,6 +960,11 @@
             .page-title {
                 font-size: 2rem;
             }
+
+            .bulk-actions {
+                flex-direction: column;
+                text-align: center;
+            }
         }
 
         /* Animation Classes */
@@ -886,7 +997,7 @@
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;">📚</div>
+      <img src="/images/logo.png" alt="Logo" class="logo">
       <h3 class="label">Julita Public Library</h3>
     </div>
     
@@ -1009,10 +1120,10 @@
             <td>
               <div style="display: flex; gap: 8px; align-items: center;">
                   <button 
-    class="btn btn-sm btn-primary editBtn" 
-    data-id="{{ $member->id }}">
-    Edit
-  </button>
+                class="btn btn-sm btn-primary editBtn" 
+                data-id="{{ $member->id }}">
+                Edit
+                  </button>
 
                 <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
                    class="btn btn-sm btn-success" 
@@ -1034,7 +1145,7 @@
 </div>
   </div>
 
-  <!-- Register Member Modal -->
+<!-- Register Member Modal -->
   <div class="modal" id="registerModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1120,291 +1231,298 @@
             </div>
           </div>
         </div>
-
+        
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-camera"></i>
+            Upload Photo
+          </h3>
+          <div class="form-group">
+            <label for="photoInput">Upload Photo</label>
+            <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
+            <div style="margin-top: 10px;">
+              <img id="photoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+            </div>
+          </div>
+        </div>
+        
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
             <i class="fas fa-times"></i>
             Cancel
           </button>
-            <button type="button" class="btn btn-primary" onclick="submitRegister()">
+          <button type="button" class="btn btn-primary" onclick="submitRegister()">
             <i class="fas fa-save"></i>
             Register Member
-            </button>
+          </button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Julita Register Modal -->
   <div class="modal" id="julitaRegisterModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 class="modal-title">
-        <i class="fas fa-user-plus"></i>
-        Register Julita Resident
-      </h2>
-      <button class="close-modal" onclick="closeJulitaRegisterModal()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <form id="julitaRegisterForm">
-      <!-- Personal Information Section -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-user"></i>
-          Personal Information
-        </h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="firstName">First Name *</label>
-            <input type="text" id="firstName" name="firstName" required>
-          </div>
-          <div class="form-group">
-            <label for="middleName">Middle Name</label>
-            <input type="text" id="middleName" name="middleName">
-          </div>
-          <div class="form-group">
-            <label for="lastName">Last Name *</label>
-            <input type="text" id="lastName" name="lastName" required>
-          </div>
-          <div class="form-group">
-            <label for="age">Age *</label>
-            <input type="number" id="age" name="age" min="1" max="150" required>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <i class="fas fa-user-plus"></i>
+          Register Julita Resident
+        </h2>
+        <button class="close-modal" onclick="closeJulitaRegisterModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="julitaRegisterForm">
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-user"></i>
+            Personal Information
+          </h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="julitaFirstName">First Name *</label>
+              <input type="text" id="julitaFirstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+              <label for="julitaMiddleName">Middle Name</label>
+              <input type="text" id="julitaMiddleName" name="middleName">
+            </div>
+            <div class="form-group">
+              <label for="julitaLastName">Last Name *</label>
+              <input type="text" id="julitaLastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+              <label for="julitaAge">Age *</label>
+              <input type="number" id="julitaAge" name="age" min="1" max="150" required>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Address Information Section -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-map-marker-alt"></i>
-          Address Information
-        </h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="houseNumber">House Number</label>
-            <input type="text" id="houseNumber" name="houseNumber">
-          </div>
-          <div class="form-group">
-            <label for="street">Street</label>
-            <input type="text" id="street" name="street">
-          </div>
-          <div class="form-group">
-            <label for="barangay">Barangay *</label>
-            <select id="barangay" name="barangay" required>
-              <option value="" disabled selected>Select Barangay</option>
-              <option>Alegria</option>
-              <option>Balante</option>
-              <option>Bugho</option>
-              <option>Campina</option>
-              <option>Canwhaton</option>
-              <option>Caridad Norte</option>
-              <option>Caridad Sur</option>
-              <option>Cuatro de Agosto</option>
-              <option>Dita</option>
-              <option>Hinalaan</option>
-              <option>Hindang</option>
-              <option>Iniguihan</option>
-              <option>Macopa</option>
-              <option>San Andres</option>
-              <option>San Pablo</option>
-              <option>San Roque</option>
-              <option>Santo Niño</option>
-              <option>Sta. Cruz</option>
-              <option>Taglibas</option>
-              <option>Veloso</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="municipality">Municipality *</label>
-            <input type="text" id="municipality" name="municipality" value="Julita" readonly>
-          </div>
-          <div class="form-group">
-            <label for="province">Province *</label>
-            <input type="text" id="province" name="province" value="Leyte" readonly>
+        <!-- Address Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-map-marker-alt"></i>
+            Address Information
+          </h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="julitaHouseNumber">House Number</label>
+              <input type="text" id="julitaHouseNumber" name="houseNumber">
+            </div>
+            <div class="form-group">
+              <label for="julitaStreet">Street</label>
+              <input type="text" id="julitaStreet" name="street">
+            </div>
+            <div class="form-group">
+              <label for="julitaBarangay">Barangay *</label>
+              <select id="julitaBarangay" name="barangay" required>
+                <option value="" disabled selected>Select Barangay</option>
+                <option>Alegria</option>
+                <option>Balante</option>
+                <option>Bugho</option>
+                <option>Campina</option>
+                <option>Canwhaton</option>
+                <option>Caridad Norte</option>
+                <option>Caridad Sur</option>
+                <option>Cuatro de Agosto</option>
+                <option>Dita</option>
+                <option>Hinalaan</option>
+                <option>Hindang</option>
+                <option>Iniguihan</option>
+                <option>Macopa</option>
+                <option>San Andres</option>
+                <option>San Pablo</option>
+                <option>San Roque</option>
+                <option>Santo Niño</option>
+                <option>Sta. Cruz</option>
+                <option>Taglibas</option>
+                <option>Veloso</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="julitaMunicipality">Municipality *</label>
+              <input type="text" id="julitaMunicipality" name="municipality" value="Julita" readonly>
+            </div>
+            <div class="form-group">
+              <label for="julitaProvince">Province *</label>
+              <input type="text" id="julitaProvince" name="province" value="Leyte" readonly>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Contact Information Section -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-phone"></i>
-          Contact Information
-        </h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="contactNumber">Contact Number *</label>
-            <input type="tel" id="contactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
+        <!-- Contact Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-phone"></i>
+            Contact Information
+          </h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="julitaContactNumber">Contact Number *</label>
+              <input type="tel" id="julitaContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
+            </div>
+            <div class="form-group">
+              <label for="julitaSchool">School/Institution</label>
+              <input type="text" id="julitaSchool" name="school">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="school">School/Institution</label>
-            <input type="text" id="school" name="school">
-          </div>
+        </div>
         
+        <div class="form-section">
           <h3 class="section-title">
             <i class="fas fa-camera"></i>
             Upload Photo
           </h3>
-         <div class="form-group">
-  <label for="photoInput">Upload Photo</label>
-  <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
-  <div style="margin-top: 10px;">
-    <img id="photoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+          <div class="form-group">
+            <label for="julitaPhoto">Upload Photo</label>
+            <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-control" />
+            <div style="margin-top: 10px;">
+              <img id="julitaPhotoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" onclick="submitJulitaRegister()">
+            <i class="fas fa-save"></i>
+            Register Member
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
-          <i class="fas fa-times"></i>
-          Cancel
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitRegister()">
-          <i class="fas fa-save"></i>
-          Register Member
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
 
   <!-- Edit Member Modal -->
-<div class="modal" id="editModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 class="modal-title">
-        <i class="fas fa-edit"></i>
-        Edit Member Information
-      </h2>
-      <button class="close-modal" onclick="closeEditModal()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-
-    <form id="editForm">
-      <input type="hidden" id="editMemberId" name="memberId">
-      
-      <!-- Personal Information Section -->
-      <div class="form-section">
-        <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="editFirstName">First Name *</label>
-            <input type="text" id="editFirstName" name="firstName" required>
-          </div>
-          <div class="form-group">
-            <label for="editMiddleName">Middle Name</label>
-            <input type="text" id="editMiddleName" name="middleName">
-          </div>
-          <div class="form-group">
-            <label for="editLastName">Last Name *</label>
-            <input type="text" id="editLastName" name="lastName" required>
-          </div>
-          <div class="form-group">
-            <label for="editAge">Age *</label>
-            <input type="number" id="editAge" name="age" min="1" max="150" required>
-          </div>
-        </div>
-      </div>
-
-      <!-- Address Information Section -->
-      <div class="form-section">
-        <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="editHouseNumber">House Number</label>
-            <input type="text" id="editHouseNumber" name="houseNumber">
-          </div>
-          <div class="form-group">
-            <label for="editStreet">Street</label>
-            <input type="text" id="editStreet" name="street">
-          </div>
-          <div class="form-group">
-            <label for="editBarangay">Barangay *</label>
-            <input type="text" id="editBarangay" name="barangay" required>
-          </div>
-          <div class="form-group">
-            <label for="editMunicipality">Municipality/City *</label>
-            <input type="text" id="editMunicipality" name="municipality" required>
-          </div>
-          <div class="form-group">
-            <label for="editProvince">Province *</label>
-            <input type="text" id="editProvince" name="province" required>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contact Information Section -->
-      <div class="form-section">
-        <h3 class="section-title"><i class="fas fa-phone"></i> Contact Information</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="editContactNumber">Contact Number *</label>
-            <input type="tel" id="editContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
-          </div>
-          <div class="form-group">
-            <label for="editSchool">School/Institution</label>
-            <input type="text" id="editSchool" name="school">
-          </div>
-        </div>
-      </div>
-        
-      <div class="modal-actions">
-        <button type="button" class="btn btn-danger" onclick="deleteMember()">
-          Delete
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> Save Changes
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-  <!-- QR Code Modal -->
-  <div class="qr-modal" id="qrModal">
-    <div class="qr-content">
-      <h3 id="qrTitle">Member QR Code</h3>
-      <img id="qrImage" src="" alt="QR Code" style="display: none;">
-      <div style="margin-top: 1.5rem;">
-        <button class="btn btn-success" id="downloadQR" style="margin-right: 10px;">
-          <i class="fas fa-download"></i>
-          Download
-        </button>
-        <button class="btn btn-secondary" onclick="closeQRModal()">
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <i class="fas fa-edit"></i>
+          Edit Member Information
+        </h2>
+        <button class="close-modal" onclick="closeEditModal()">
           <i class="fas fa-times"></i>
-          Close
         </button>
       </div>
+
+      <form id="editForm">
+        <input type="hidden" id="editMemberId" name="memberId">
+        
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="editFirstName">First Name *</label>
+              <input type="text" id="editFirstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+              <label for="editMiddleName">Middle Name</label>
+              <input type="text" id="editMiddleName" name="middleName">
+            </div>
+            <div class="form-group">
+              <label for="editLastName">Last Name *</label>
+              <input type="text" id="editLastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+              <label for="editAge">Age *</label>
+              <input type="number" id="editAge" name="age" min="1" max="150" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information Section -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="editHouseNumber">House Number</label>
+              <input type="text" id="editHouseNumber" name="houseNumber">
+            </div>
+            <div class="form-group">
+              <label for="editStreet">Street</label>
+              <input type="text" id="editStreet" name="street">
+            </div>
+            <div class="form-group">
+              <label for="editBarangay">Barangay *</label>
+              <input type="text" id="editBarangay" name="barangay" required>
+            </div>
+            <div class="form-group">
+              <label for="editMunicipality">Municipality/City *</label>
+              <input type="text" id="editMunicipality" name="municipality" required>
+            </div>
+            <div class="form-group">
+              <label for="editProvince">Province *</label>
+              <input type="text" id="editProvince" name="province" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-phone"></i> Contact Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="editContactNumber">Contact Number *</label>
+              <input type="tel" id="editContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
+            </div>
+            <div class="form-group">
+              <label for="editSchool">School/Institution</label>
+              <input type="text" id="editSchool" name="school">
+            </div>
+          </div>
+        </div>
+          
+        <div class="modal-actions">
+          <button type="button" class="btn btn-danger" onclick="deleteMember()">
+            Delete
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-<div id="cardPreviewModal" class="modal" style="display: none;">
-  <div class="modal-content" style="width: 90%; max-width: 800px;">
-    <div class="modal-header">
-      <h2 class="modal-title">
-        <i class="fas fa-id-card"></i> Membership ID Card
-      </h2>
-      <button class="close-modal" onclick="closeCardPreviewModal()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
+<script>
+// Dark mode functionality
+const darkToggle = document.getElementById('darkModeToggle');
 
-    <div class="modal-body" style="text-align: center;">
-      <iframe id="cardPreviewFrame" src="" width="100%" height="500px" frameborder="0"></iframe>
-    </div>
+// Initialize dark mode on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const darkMode = localStorage.getItem('darkMode') === 'true';
+  if (darkMode) {
+    document.body.classList.add('dark-mode');
+    darkToggle.checked = true;
+  }
+});
 
-    <div class="modal-actions" style="text-align: right; margin-top: 10px;">
-      <a id="downloadCardBtn" href="#" download target="_blank" class="btn btn-success">
-        <i class="fas fa-download"></i> Download Card
-      </a>
-      <button onclick="closeCardPreviewModal()" class="btn btn-secondary">
-        <i class="fas fa-times"></i> Close
-      </button>
-    </div>
-  </div>
-</div>
-<script>function showCardPreviewModal(cardUrl) {
+// Dark mode toggle event listener
+darkToggle.addEventListener('change', function() {
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('darkMode', this.checked);
+});
+
+// Sidebar toggle functionality
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+const toggleBtn = document.getElementById('toggleSidebar');
+
+toggleBtn.addEventListener('click', function() {
+  sidebar.classList.toggle('collapsed');
+  mainContent.classList.toggle('collapsed');
+});
+
+// Card preview function
+function showCardPreviewModal(cardUrl) {
   document.getElementById("cardPreviewFrame").src = cardUrl;
   document.getElementById("downloadCardBtn").href = cardUrl;
   document.getElementById("cardPreviewModal").style.display = "block";
@@ -1415,43 +1533,14 @@ function closeCardPreviewModal() {
   document.getElementById("cardPreviewFrame").src = "";
 }
 </script>
-  <script>
-    // Dark mode functionality
-    const darkToggle = document.getElementById('darkModeToggle');
-    
-    // Initialize dark mode on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const darkMode = localStorage.getItem('darkMode') === 'true';
-      if (darkMode) {
-        document.body.classList.add('dark-mode');
-        darkToggle.checked = true;
-      }
-    });
 
-    // Dark mode toggle event listener
-    darkToggle.addEventListener('change', function() {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', this.checked);
-    });
+<!-- External Scripts - ONLY INCLUDE EACH ONCE -->
+<script src="{{ asset('js/photoprev.js') }}"></script>
+<script src="{{ asset('js/membersearch.js') }}"></script>
+<script src="{{ asset('js/memberscript.js') }}"></script>
+<script src="{{ asset('js/memberedit.js') }}"></script>
+<script src="{{ asset('js/sidebarcollapse.js') }}"></script>
+<script src="{{ asset('js/showqr.js') }}"></script>
 
-    // Sidebar toggle functionality
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.getElementById('toggleSidebar');
-
-    toggleBtn.addEventListener('click', function() {
-      sidebar.classList.toggle('collapsed');
-      mainContent.classList.toggle('collapsed');
-    });
-  </script>
-  
-  <!-- External Scripts -->
-  <script src="js/photoprev"></script>
-  <script src="js/membersearch.js"></script>
-  <script src="js/memberscript.js"></script>
-  <script src="js/memberedit.js"></script>
-  <script src="{{ asset('js/sidebarcollapse.js') }}"></script>
-  <script src="{{ asset('js/showqr.js') }}"></script>
-  <script src="{{ asset('js/photoprev.js') }}"></script>
 </body>
 </html>

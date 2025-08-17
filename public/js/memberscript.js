@@ -1,27 +1,71 @@
-// Open modal and auto-fill today's date
+// Fixed Register Modal Functions
 function openRegisterModal() {
+  // Close any other open modals first
+  closeAllModals();
+  
   const confirmJulita = confirm("Are you a Julita resident?\nClick OK for Yes, Cancel for No.");
 
   if (confirmJulita) {
-    document.getElementById("julitaRegisterModal").style.display = "block";
+    const modal = document.getElementById("julitaRegisterModal");
+    modal.classList.add("show");
+    modal.style.display = "flex";
+    document.body.classList.add("modal-open");
   } else {
-    document.getElementById("registerModal").style.display = "block";
+    const modal = document.getElementById("registerModal");
+    modal.classList.add("show");
+    modal.style.display = "flex";
+    document.body.classList.add("modal-open");
   }
 }
 
 function closeRegisterModal() {
-  document.getElementById("registerModal").style.display = "none";
+  const registerModal = document.getElementById("registerModal");
+  const julitaModal = document.getElementById("julitaRegisterModal");
+  
+  registerModal.classList.remove("show");
+  registerModal.style.display = "none";
+  
+  julitaModal.classList.remove("show");
+  julitaModal.style.display = "none";
+  
+  document.body.classList.remove("modal-open");
+  
+  // Clear forms
+  const registerForm = document.getElementById("registerForm");
+  const julitaForm = document.getElementById("julitaRegisterForm");
+  if (registerForm) registerForm.reset();
+  if (julitaForm) julitaForm.reset();
+  
+  // Clear photo previews
+  const previews = document.querySelectorAll("#photoPreview");
+  previews.forEach(preview => {
+    preview.src = "";
+    preview.style.display = "none";
+  });
 }
 
 function closeJulitaRegisterModal() {
-  document.getElementById("julitaRegisterModal").style.display = "none";
+  closeRegisterModal(); // Use the same close function
 }
 
-// Submit member registration form
+// Close all modals function
+function closeAllModals() {
+  const allModals = document.querySelectorAll(".modal");
+  allModals.forEach(modal => {
+    modal.classList.remove("show");
+    modal.style.display = "none";
+  });
+  document.body.classList.remove("modal-open");
+}
+
+// Submit member registration form - Updated to handle modal closing properly
 function submitRegister() {
-  const modal = document.getElementById("julitaRegisterModal").style.display === "block"
-    ? document.getElementById("julitaRegisterModal")
-    : document.getElementById("registerModal");
+  const julitaModal = document.getElementById("julitaRegisterModal");
+  const registerModal = document.getElementById("registerModal");
+  
+  // Determine which modal is open
+  const isJulitaOpen = julitaModal.classList.contains("show") || julitaModal.style.display === "flex";
+  const modal = isJulitaOpen ? julitaModal : registerModal;
 
   const getTrimmedValue = (selector) => modal.querySelector(selector)?.value?.trim() || '';
 
@@ -41,6 +85,7 @@ function submitRegister() {
   const memberdate = new Date().toISOString().split("T")[0];
   const member_time = 60;
 
+  // Validation
   if (
     firstName === '' || lastName === '' ||
     age === '' || isNaN(age) ||
@@ -50,6 +95,12 @@ function submitRegister() {
     alert("Please fill in all required fields.");
     return;
   }
+
+  // Show loading state
+  const submitBtn = modal.querySelector('button[onclick="submitRegister()"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+  submitBtn.disabled = true;
 
   const formData = new FormData();
   formData.append("firstName", firstName);
@@ -93,11 +144,17 @@ function submitRegister() {
     })
     .then(data => {
       alert(data.message || "✅ Member registered successfully.");
+      closeRegisterModal();
       location.reload();
     })
     .catch(err => {
       console.error("Registration failed:", err);
       alert("🚫 Registration failed: " + err.message);
+    })
+    .finally(() => {
+      // Restore button state
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     });
 }
 
@@ -105,7 +162,7 @@ function submitRegister() {
 document.addEventListener('change', function (e) {
   if (e.target && e.target.matches("#photo")) {
     const modal = e.target.closest(".modal");
-    const preview = modal?.querySelector("#photo-preview");
+    const preview = modal?.querySelector("#photoPreview");
     const file = e.target.files[0];
     if (preview) {
       if (file) {
@@ -126,7 +183,7 @@ document.addEventListener('change', function (e) {
 // SORT FUNCTION
 document.addEventListener("DOMContentLoaded", function () {
   const table = document.getElementById("membersTable");
-  if (!table) return; // Guard clause
+  if (!table) return;
 
   const headers = table.querySelectorAll("th");
   const tableBody = table.querySelector("tbody");
@@ -158,18 +215,18 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// SEARCH FUNCTION - Fixed ID to match HTML
+// SEARCH FUNCTION
 document.addEventListener("DOMContentLoaded", function() {
-  const searchInput = document.getElementById("searchInput"); // Corrected ID
+  const searchInput = document.getElementById("searchInput");
   if (searchInput) {
     searchInput.addEventListener("input", function () {
       const filter = this.value.toLowerCase();
       const rows = document.querySelectorAll("#membersTable tbody tr");
 
       rows.forEach(row => {
-        const nameCell = row.cells[0]; // Name column (adjusted for new table structure)
-        const addressCell = row.cells[2]; // Address column  
-        const contactCell = row.cells[3]; // Contact column
+        const nameCell = row.cells[0];
+        const addressCell = row.cells[2];
+        const contactCell = row.cells[3];
         
         const name = nameCell ? nameCell.textContent.toLowerCase() : '';
         const address = addressCell ? addressCell.textContent.toLowerCase() : '';
@@ -182,25 +239,44 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-// Modal open listener and key listeners
+// Enhanced Modal listeners
 document.addEventListener('DOMContentLoaded', function () {
-  const registerBtn = document.getElementById('registerBtn');
+  // Register button click handler
+  const registerBtn = document.querySelector('button[onclick="openRegisterModal()"]');
   if (registerBtn) {
-    registerBtn.addEventListener('click', openRegisterModal);
+    registerBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openRegisterModal();
+    });
   }
 
+  // Global key listeners
   document.addEventListener('keydown', function (e) {
-    const isRegisterOpen = document.getElementById("registerModal")?.style.display === "block";
-    const isJulitaOpen = document.getElementById("julitaRegisterModal")?.style.display === "block";
-
-    if (!isRegisterOpen && !isJulitaOpen) return;
+    const openModals = document.querySelectorAll('.modal.show');
+    
+    if (openModals.length === 0) return;
 
     if (e.key === "Escape") {
-      closeRegisterModal();
-      closeJulitaRegisterModal();
-    } else if (e.key === "Enter") {
       e.preventDefault();
-      submitRegister();
+      closeAllModals();
+    } else if (e.key === "Enter" && e.ctrlKey) {
+      e.preventDefault();
+      // Only submit if it's a register modal that's open
+      const isRegisterOpen = document.getElementById("registerModal").classList.contains("show");
+      const isJulitaOpen = document.getElementById("julitaRegisterModal").classList.contains("show");
+      
+      if (isRegisterOpen || isJulitaOpen) {
+        submitRegister();
+      }
+    }
+  });
+
+  // Click outside modal to close
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+      if (e.target.id === 'registerModal' || e.target.id === 'julitaRegisterModal') {
+        closeRegisterModal();
+      }
     }
   });
 });
