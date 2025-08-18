@@ -1388,7 +1388,7 @@
             <i class="fas fa-times"></i>
             Cancel
           </button>
-          <button type="button" class="btn btn-primary" onclick="submitJulitaRegister()">
+          <button type="button" class="btn btn-primary" onclick="submitRegister()">
             <i class="fas fa-save"></i>
             Register Member
           </button>

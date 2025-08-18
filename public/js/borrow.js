@@ -121,3 +121,70 @@ fetch("/borrow", {
       alert("🚫 Error borrowing books.");
     });
 }
+
+// Add utility function for formatting time
+function formatTimeWithAMPM(date) {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle midnight (0 hours)
+  
+  // Pad with leading zeros
+  const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  
+  return {
+    time: timeStr,
+    ampm: ampm
+  };
+}
+
+function openBorrowModal() {
+  const now = new Date();
+  const { time, ampm } = formatTimeWithAMPM(now);
+  
+  // Autofill the time input
+  const timeInput = document.getElementById('dueTime');
+  timeInput.value = time;
+  
+  // Update or create AM/PM indicator
+  let ampmIndicator = document.getElementById('ampmIndicator');
+  if (!ampmIndicator) {
+    ampmIndicator = document.createElement('span');
+    ampmIndicator.id = 'ampmIndicator';
+    ampmIndicator.style.marginLeft = '5px';
+    timeInput.parentNode.insertBefore(ampmIndicator, timeInput.nextSibling);
+  }
+  ampmIndicator.textContent = ampm;
+  
+  // Clear the member field and selected books list
+  let list = document.getElementById('selectedBooksList');
+  list.innerHTML = '';
+  document.getElementById('memberName').value = '';
+  
+  // Add selected books to the list
+  document.querySelectorAll('.book-checkbox:checked').forEach(cb => {
+    const tr = cb.closest('tr');
+    const id = tr.getAttribute('data-id');
+    const title = tr.children[2].innerText;
+    const li = document.createElement('li');
+    li.textContent = title;
+    li.setAttribute('data-id', id);
+    list.appendChild(li);
+  });
+  
+  document.getElementById('borrowModal').style.display = 'flex';
+}
+
+function closeBorrowModal() {
+  document.getElementById('borrowModal').style.display = 'none';
+  document.getElementById('selectedBooksList').innerHTML = '';
+  document.getElementById('memberName').value = '';
+  document.getElementById('dueDate').value = '';
+  const ampmIndicator = document.getElementById('ampmIndicator');
+  if (ampmIndicator) {
+    ampmIndicator.remove();
+  }
+}

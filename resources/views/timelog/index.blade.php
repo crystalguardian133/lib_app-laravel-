@@ -494,5 +494,6 @@ body.dark-mode .actions .delete {
   <script src="{{ asset('js/memberscript.js') }}"></script>
   <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
   <script src="{{ asset('js/scanqr.js')}}"></script>
+  <script src="{{ asset('js/overdue.js') }}"></script>
 </body>
 </html>

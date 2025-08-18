@@ -58,42 +58,68 @@ function closeAllModals() {
   document.body.classList.remove("modal-open");
 }
 
+// Add name formatting function
+function formatName(name) {
+  if (!name) return '';
+  
+  // Handle hyphenated names and apostrophes
+  return name.toLowerCase()
+    .split(/[\s-]/)
+    .map(part => {
+      // Special cases for prefixes and particles
+      const prefixes = ['de', 'del', 'dela', 'san', 'santa', 'das', 'dos', 'van', 'von', 'la'];
+      if (prefixes.includes(part.toLowerCase())) {
+        return part.toLowerCase();
+      }
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(' ')
+    .replace(/\s-\s/g, '-'); // Fix spacing around hyphens
+}
+
 // Submit member registration form - Updated to handle modal closing properly
 function submitRegister() {
   const julitaModal = document.getElementById("julitaRegisterModal");
   const registerModal = document.getElementById("registerModal");
   
-  // Determine which modal is open
   const isJulitaOpen = julitaModal.classList.contains("show") || julitaModal.style.display === "flex";
   const modal = isJulitaOpen ? julitaModal : registerModal;
 
-  const getTrimmedValue = (selector) => modal.querySelector(selector)?.value?.trim() || '';
+  const getTrimmedValue = (selectors) => {
+    if (typeof selectors === 'string') selectors = [selectors];
+    for (const selector of selectors) {
+      const element = modal.querySelector(selector);
+      if (element) return element.value.trim();
+    }
+    return '';
+  };
 
-  const firstName = getTrimmedValue("#firstName");
-  const middleName = getTrimmedValue("#middleName") || null;
-  const lastName = getTrimmedValue("#lastName");
-  const age = modal.querySelector("#age")?.value || '';
-  const houseNumber = getTrimmedValue("#houseNumber") || null;
-  const street = getTrimmedValue("#street") || null;
-  const barangay = getTrimmedValue("#barangay");
-  const municipality = getTrimmedValue("#municipality");
-  const province = getTrimmedValue("#province");
-  const contactNumber = getTrimmedValue("#contactNumber");
-  const school = getTrimmedValue("#school") || null;
-  const photoInput = modal.querySelector("#photo");
+  // Get form values
+  const formData = new FormData();
+  
+  // Required fields with name formatting
+  formData.append("firstName", formatName(getTrimmedValue(['#julitaFirstName', '#firstName'])));
+  formData.append("lastName", formatName(getTrimmedValue(['#julitaLastName', '#lastName'])));
+  formData.append("middleName", formatName(getTrimmedValue(['#julitaMiddleName', '#middleName'])) || "null");
+  formData.append("age", getTrimmedValue(['#julitaAge', '#age']));
+  formData.append("barangay", formatName(getTrimmedValue(['#julitaBarangay', '#barangay'])));
+  formData.append("municipality", formatName(getTrimmedValue(['#julitaMunicipality', '#municipality'])));
+  formData.append("province", formatName(getTrimmedValue(['#julitaProvince', '#province'])));
+  formData.append("contactNumber", getTrimmedValue(['#julitaContactNumber', '#contactNumber']));
 
-  const memberdate = new Date().toISOString().split("T")[0];
-  const member_time = 60;
+  // Optional fields - explicitly set to null if empty
+  formData.append("houseNumber", getTrimmedValue(['#julitaHouseNumber', '#houseNumber']) || "null");
+  formData.append("street", formatName(getTrimmedValue(['#julitaStreet', '#street'])) || "null");
+  formData.append("school", formatName(getTrimmedValue(['#julitaSchool', '#school'])) || "null");
 
-  // Validation
-  if (
-    firstName === '' || lastName === '' ||
-    age === '' || isNaN(age) ||
-    barangay === '' || municipality === '' ||
-    province === '' || contactNumber === ''
-  ) {
-    alert("Please fill in all required fields.");
-    return;
+  // Additional fields
+  formData.append("memberdate", new Date().toISOString().split("T")[0]);
+  formData.append("member_time", "60");
+
+  // Handle photo
+  const photoInput = modal.querySelector('#photo') || modal.querySelector('#julitaPhoto');
+  if (photoInput?.files[0]) {
+    formData.append("photo", photoInput.files[0]);
   }
 
   // Show loading state
@@ -102,65 +128,49 @@ function submitRegister() {
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
   submitBtn.disabled = true;
 
-  const formData = new FormData();
-  formData.append("firstName", firstName);
-  formData.append("middleName", middleName);
-  formData.append("lastName", lastName);
-  formData.append("age", age);
-  formData.append("houseNumber", houseNumber);
-  formData.append("street", street);
-  formData.append("barangay", barangay);
-  formData.append("municipality", municipality);
-  formData.append("province", province);
-  formData.append("contactNumber", contactNumber);
-  formData.append("school", school);
-  formData.append("memberdate", memberdate);
-  formData.append("member_time", member_time);
-
-  if (photoInput && photoInput.files.length > 0) {
-    formData.append("photo", photoInput.files[0]);
-  }
-
+  // Submit the form
   fetch("/members", {
     method: "POST",
     headers: {
-      "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'Accept': 'application/json'
     },
     body: formData
   })
-    .then(async response => {
-      const contentType = response.headers.get("content-type");
-      const text = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`Server error (${response.status}): ${text}`);
+  .then(async response => {
+    const data = await response.json();
+    
+    if (!response.ok) {
+      // Format validation errors nicely
+      if (data.errors) {
+        const errorMessages = Object.values(data.errors)
+          .flat()
+          .join('\n');
+        throw new Error(errorMessages);
       }
-
-      if (contentType && contentType.includes("application/json")) {
-        return JSON.parse(text);
-      } else {
-        throw new Error("Unexpected response: " + text);
-      }
-    })
-    .then(data => {
-      alert(data.message || "✅ Member registered successfully.");
-      closeRegisterModal();
-      location.reload();
-    })
-    .catch(err => {
-      console.error("Registration failed:", err);
-      alert("🚫 Registration failed: " + err.message);
-    })
-    .finally(() => {
-      // Restore button state
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-    });
+      throw new Error(data.message || 'Registration failed');
+    }
+    
+    return data;
+  })
+  .then(data => {
+    alert("✅ Member registered successfully!");
+    closeRegisterModal();
+    location.reload();
+  })
+  .catch(error => {
+    console.error("Registration error:", error);
+    alert("🚫 " + error.message);
+  })
+  .finally(() => {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  });
 }
 
-// Setup photo preview
+// Update photo preview event listener to handle both forms
 document.addEventListener('change', function (e) {
-  if (e.target && e.target.matches("#photo")) {
+  if (e.target && (e.target.matches("#photo") || e.target.matches("#julitaPhoto"))) {
     const modal = e.target.closest(".modal");
     const preview = modal?.querySelector("#photoPreview");
     const file = e.target.files[0];
