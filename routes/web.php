@@ -35,6 +35,7 @@ Route::post('/members', [MemberController::class, 'store'])->name('members.store
 Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
 Route::put('/members/{id}', [MemberController::class, 'update']);
 Route::delete('/members/{id}', [MemberController::class, 'destroy']);
+Route::resource('members', MemberController::class);
 
 // Borrow system routes
 Route::post('/borrow', [BorrowController::class, 'store'])->name('borrow.book');

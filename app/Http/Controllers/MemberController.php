@@ -140,6 +140,7 @@ class MemberController extends Controller
         $member->save();
 
         return response()->json([
+            'member' => $member,
             'success' => true,
             'message' => '✅ Member updated successfully'
         ]);
