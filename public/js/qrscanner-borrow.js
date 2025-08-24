@@ -71,28 +71,32 @@ function handleMemberQR(data) {
       return res.json();
     })
     .then(data => {
-      const nameParts = [
-        data.first_name,
-        (data.middle_name !== "null" && data.middle_name) ? data.middle_name : null,
-        (data.last_name !== "null" && data.last_name) ? data.last_name : null
-      ].filter(Boolean); // removes null/empty values
+  const nameParts = [
+    data.first_name,
+    (data.middle_name !== "null" && data.middle_name) ? data.middle_name : null,
+    (data.last_name !== "null" && data.last_name) ? data.last_name : null
+  ].filter(Boolean); // removes null/empty values
 
-      const fullName = nameParts.join(" ");
+  const fullName = nameParts.join(" ");
 
-      // Set full name in input (readonly)
-      document.getElementById('memberName').value = fullName;
-      document.getElementById('memberName').setAttribute('readonly', 'true');
-      document.getElementById('memberName').classList.add('readonly');
+  // Set full name in input (readonly)
+  const memberInput = document.getElementById('memberName');
+  memberInput.value = fullName;
+  memberInput.setAttribute('readonly', 'true');
+  memberInput.classList.add('readonly');
 
-      // Store member ID separately (to send in payload)
-      document.getElementById('memberId').value = data.id;
+  // Store member ID separately
+  document.getElementById('memberId').value = data.id;
 
-      // Hide suggestion box (if open)
-      document.getElementById('suggestionBox').innerHTML = '';
-      document.getElementById('suggestionBox').style.display = 'none';
+  // Hide suggestion box if it exists
+  const suggestionBox = document.getElementById('suggestionBox');
+  if (suggestionBox) {
+      suggestionBox.innerHTML = '';
+      suggestionBox.style.display = 'none';
+  }
 
-      showCornerPopup(`👤 Member: ${fullName}`);
-    })
+  showCornerPopup(`👤 Member: ${fullName}`);
+})
     .catch(err => {
       console.error("Fetch member error:", err);
       showCornerPopup("❌ Error fetching member");
@@ -121,31 +125,39 @@ function handleBookQR(data) {
     return;
   }
 
-  const checkbox = document.querySelector(`input[type="checkbox"][value="${bookId}"]`);
+  // Find checkbox by data-id or value
+  const checkbox = document.querySelector(`input.book-checkbox[data-id="${bookId}"]`) 
+                   || document.querySelector(`input.book-checkbox[value="${bookId}"]`);
 
-  if (checkbox && !checkbox.checked && !checkbox.disabled) {
-    checkbox.checked = true;
+  if (checkbox && !checkbox.disabled) {
+    if (!checkbox.checked) {
+      checkbox.checked = true;   // ✅ mark checkbox as checked
+    }
 
     const row = checkbox.closest('tr');
     const title = row.querySelector('td:nth-child(2)').textContent;
 
+    // Avoid duplicate in selectedBooksList
     const alreadyAdded = [...document.querySelectorAll('#selectedBooksList li')]
       .some(li => li.textContent.includes(title));
-    if (alreadyAdded) {
-      return showCornerPopup('⚠️ Book already selected');
+
+    if (!alreadyAdded) {
+      const listItem = document.createElement('li');
+      listItem.textContent = title;
+      listItem.setAttribute('data-id', bookId);
+      document.getElementById('selectedBooksList').appendChild(listItem);
+
+      showCornerPopup(`📚 Book added: ${title}`);
+    } else {
+      showCornerPopup('⚠️ Book already selected');
     }
-
-    const listItem = document.createElement('li');
-    listItem.textContent = title;
-    document.getElementById('selectedBooksList').appendChild(listItem);
-
-    showCornerPopup(`📚 Book added: ${title}`);
   } else if (checkbox && checkbox.disabled) {
     showCornerPopup("⚠️ No copies available.");
   } else {
-    showCornerPopup("❌ Book not found or already selected.");
+    showCornerPopup("❌ Book not found.");
   }
 }
+
 
 // Popup Notification (bottom-right)
 function showCornerPopup(message) {

@@ -239,7 +239,7 @@ class MemberController extends Controller
             ]))),
         ]);
     }
-    
+
     public function show($id)
 {
     $member = Member::findOrFail($id);
@@ -257,6 +257,16 @@ class MemberController extends Controller
     $fullName = trim("{$first} {$middle} {$last}");
 
     return response()->json($member);
+}
+public function overdueBooks()
+{
+    $member = auth()->user(); // Or however you identify the current member
+    // Example: get borrowed books where due_date < now()
+    $books = $member->borrowedBooks()
+        ->where('due_date', '<', now())
+        ->get(['title', 'due_date']);
+
+    return response()->json(['books' => $books]);
 }
 
 

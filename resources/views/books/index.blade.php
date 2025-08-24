@@ -616,7 +616,7 @@
         <span>🌙 Dark Mode</span>
         <label class="switch">
           <input type="checkbox" id="darkModeToggle">
-          <span class="slider"></span>
+ 
         </label>
       </div>
     </aside>
@@ -805,7 +805,12 @@
       </div>
       <div style="display: flex; gap: 10px; margin-top: 1rem;">
         <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
-          <i class="fas fa-qrcode"></i> Scan Member
+          <i class="fas fa-person"></i> Scan Member
+        </button>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 1rem;">
+        <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
+          <i class="fas fa-book"></i> Scan Books
         </button>
       </div>
     </div>
@@ -856,6 +861,7 @@
   <script src="{{ asset('js/borrow.js') }}"></script>
   <script src="{{ asset('js/qrgen.js') }}"></script>
   <script src="{{ asset('js/showqr.js') }}"></script>
+  <script src="{{ asset('js/overdue.js') }}"></script>
   <script src="{{ asset('js/qrscanner-borrow.js') }}"></script>
 
   <!-- Internal Modal Controls Only -->
@@ -950,42 +956,6 @@
       document.getElementById('qrModal').style.display = 'none';
     }
 
-    function borrowOne(id) {
-      const card = document.querySelector(`[data-id="${id}"]`);
-      selectedBooks = [{ id, title: card.dataset.title }];
-      updateSelectionUI();
-      openBorrowModal();
-    }
-
-    // --- QR Scanner ---
-    let html5QrcodeScanner = null;
-
-    function startQRScan(type) {
-      document.getElementById('qrScannerModal').style.display = 'flex';
-      setTimeout(() => {
-        if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(() => {});
-        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 }, false);
-        html5QrcodeScanner.render(
-          (decodedText) => {
-            document.getElementById('memberName').value = decodedText;
-            stopQRScan();
-          },
-          (err) => console.warn(err)
-        );
-      }, 500);
-    }
-
-    function stopQRScan() {
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.clear().then(() => {
-          html5QrcodeScanner = null;
-          document.getElementById('qrScannerModal').style.display = 'none';
-        }).catch(() => {});
-      } else {
-        document.getElementById('qrScannerModal').style.display = 'none';
-      }
-    }
-
     // --- Cover Preview ---
     function previewCover(event) {
       const file = event.target.files[0];
@@ -1024,6 +994,5 @@
       }
     });
   </script>
-
 </body>
 </html>

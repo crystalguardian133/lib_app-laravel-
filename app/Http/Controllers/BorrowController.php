@@ -123,4 +123,16 @@ public function store(Request $request)
             'borrowed_books' => $borrowedBooks
         ]);
     }
+    public function show($id)
+{
+    $member = Member::find($id);
+    if (!$member) return response()->json(['error' => 'Not found'], 404);
+
+    return response()->json([
+        'id' => $member->id,
+        'first_name' => $member->first_name,
+        'middle_name' => $member->middle_name,
+        'last_name' => $member->last_name,
+    ]);
+}
 }

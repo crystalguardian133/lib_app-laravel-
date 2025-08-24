@@ -30,6 +30,9 @@ Route::get('/transactions', [TransactionController::class, 'index'])->name('tran
 // Books Route
 Route::resource('books', BookController::class);
 Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
+// Overdue Routes
+Route::get('/members/overdue', [MemberController::class, 'overdueBooks']);
+
 
 // Member routes
 Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -43,6 +46,8 @@ Route::resource('members', MemberController::class);
 Route::post('/borrow', [BorrowController::class, 'store'])->name('borrow.book');
 Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
 Route::get('/members/search', [BorrowController::class, 'search']);
+Route::get('/members/{id}', [MemberController::class, 'show']);
+
 
 // Logging Routes 
 Route::get('/timelog', [TimeLogController::class, 'index']);
