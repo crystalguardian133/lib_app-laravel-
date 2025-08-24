@@ -14,3 +14,6 @@ Route::get('/members/{id}', function ($id) {
     }
     return response()->json(['name' => $member->name]);
 });
+
+// Fallback route
+Route::get('/members/{id}', [MemberController::class, 'apiShow']);

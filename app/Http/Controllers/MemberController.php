@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Illuminate\Support\Facades\URL; 
 
 class MemberController extends Controller
 {
@@ -201,22 +202,44 @@ class MemberController extends Controller
         return $qrPath;
     }
 
-    public function apiShow($id)
+
+    public function jsonShow($id)
     {
         $member = Member::find($id);
+
         if (!$member) {
-            return response()->json(['error' => 'Member not found'], 404);
+            return response()->json(['message' => 'Not found'], 404);
         }
 
         return response()->json([
-            'id'      => $member->id,
-            'name'    => $member->first_name . ' ' . $member->last_name,
-            'school'  => $member->school,
-            'contact' => $member->contactnumber
+            'id'           => $member->id,
+            'firstName'    => $member->firstName,
+            'middleName'   => $member->middleName,
+            'lastName'     => $member->lastName,
+            'age'          => $member->age,
+            'barangay'     => $member->barangay,
+            'municipality' => $member->municipality,
+            'province'     => $member->province,
+            'contactNumber'=> $member->contactNumber,
+            'memberdate'   => $member->memberdate,
+
+            // ✅ Photo URL or null
+            'photo' => $member->photo
+                ? URL::to('/resource/member_images/' . $member->photo)
+                : null,
+
+            // ✅ QR code URL (format: member-{id}.png)
+            'qr' => URL::to('/qrcode/members/member-' . $member->id . '.png'),
+
+            // ✅ Preformatted full name
+            'fullName' => trim(implode(' ', array_filter([
+                $member->firstName,
+                $member->middleName !== "null" ? $member->middleName : null,
+                $member->lastName,
+            ]))),
         ]);
     }
-
-
+    
     public function show($id)
 {
     $member = Member::findOrFail($id);

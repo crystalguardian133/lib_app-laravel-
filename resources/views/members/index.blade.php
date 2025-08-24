@@ -987,6 +987,129 @@
             animation: successFlash 0.5s ease-out;
         }
 
+.card-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 100; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.card-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 420px;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+
+.card-modal-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.card-modal-content .close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 22px;
+  cursor: pointer;
+}
+.card-layout {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.card {
+  width: 340px;  /* driver’s license size */
+  height: 216px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.card-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* overlay common */
+.overlay {
+  position: absolute;
+  color: #000;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+}
+
+
+/* Name above the "Member" text in template */
+/* Name: slightly above the middle of the card */
+.overlay.name {
+  position: absolute;
+  top: 100px;      /* adjust for your template height */
+  left: 37px;
+  right: 25px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Date: positioned beside "Membership Date :" text in template */
+.overlay.date {
+  position: absolute;
+  bottom: 43px;   /* near the bottom, adjust to match template */
+  left: 127px;    /* aligns next to pre-printed label */
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* Photo circle overlay */
+.overlay.photo {
+  position: absolute;
+  top: 42px;
+  right: 20px;
+  width: 141px;
+  height: 141px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+}
+
+.overlay.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* ensures it fills and stays centered */
+}
+
+/* QR square */
+.overlay.qr {
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+}
+
+.overlay.qr img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
         @keyframes successFlash {
             0% { background: rgba(16, 185, 129, 0.2); }
             100% { background: transparent; }
@@ -1055,7 +1178,6 @@
         Register Member
       </button>
 
-    <!-- Members Table -->
    <!-- Members Table -->
 <div class="table-container">
   <table id="membersTable">
@@ -1125,12 +1247,13 @@
                 Edit
                   </button>
 
-                <a href="{{ asset('card/member_' . $member->id . '.pdf') }}" 
-                   class="btn btn-sm btn-success" 
-                   target="_blank" 
-                   title="Download ID Card">
-                  <i class="fas fa-id-card"></i>
-                </a>
+<a href="javascript:void(0)" 
+   onclick="openCardModal({{ $member->id }})"
+   class="btn btn-sm btn-success" 
+   title="Download ID Card">
+  <i class="fas fa-download"></i>
+</a>
+
               </div>
             </td>
           </tr>
@@ -1397,6 +1520,41 @@
     </div>
   </div>
 
+<!-- Membership Card Preview Modal -->
+<div id="cardModal" class="card-modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCardModal()">&times;</span>
+
+    <h3>Membership Card Preview</h3>
+
+    <div id="card-container" class="card-layout">
+      <!-- Front -->
+<!-- Front -->
+<div class="card front" id="card-front">
+    <img src="{{ asset('card_temp/card-1.png') }}" class="card-bg">
+
+    <!-- Name (slightly above middle) -->
+    <div class="overlay name" id="card-name"></div>
+
+    <!-- Date (beside "Membership Date :" text) -->
+    <div class="overlay date" id="card-memberdate"></div>
+
+    <!-- Photo circle -->
+    <div class="overlay photo" id="card-photo"></div>
+</div>
+      <!-- Back -->
+      <div class="card back" id="card-back">
+        <img src="{{ asset('card_temp/card-2.png') }}" class="card-bg">
+
+        <!-- QR overlay -->
+        <div class="overlay qr" id="card-qr"></div>
+      </div>
+    </div>
+
+    <button onclick="downloadCard()">Download PNG</button>
+  </div>
+</div>
+
   <!-- Edit Member Modal -->
   <div class="modal" id="editModal">
     <div class="modal-content">
@@ -1542,6 +1700,9 @@ function closeCardPreviewModal() {
 <script src="{{ asset('js/memberedit.js') }}"></script>
 <script src="{{ asset('js/sidebarcollapse.js') }}"></script>
 <script src="{{ asset('js/showqr.js') }}"></script>
+<script src="{{ asset('js/card_gen.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 
 </body>
 </html>

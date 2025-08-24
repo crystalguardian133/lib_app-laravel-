@@ -8,6 +8,8 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\TimeLogController;
+use App\Http\Controllers\CardController;
+use App\Models\Member;
 
 // Redirect root to the dashboard
 Route::get('/', function () {
@@ -53,3 +55,43 @@ Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
 Route::post('/transactions/{id}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+
+//Card Generation Routess
+Route::get('/members/{id}/json', function ($id) {
+    $member = Member::find($id);
+
+    if (!$member) {
+        return response()->json(['message' => 'Not found'], 404);
+    }
+
+    // Handle null gracefully
+    $first  = $member->first_name ?: '';
+    $middle = $member->middle_name ?: '';
+    $last   = $member->last_name ?: '';
+
+    // Build formatted full name (skip nulls/blanks)
+    $middleInitial = $middle ? strtoupper(substr($middle, 0, 1)) . '.' : '';
+    $fullName = trim(preg_replace('/\s+/', ' ', "{$last}, {$first} {$middleInitial}"));
+
+    return response()->json([
+        'id'         => $member->id,
+        'firstName'  => $first,
+        'middleName' => $middle,
+        'lastName'   => $last,
+        'fullName'   => $fullName ?: '',
+        'age'        => $member->age ?? '',
+        'barangay'   => $member->barangay ?? '',
+        'municipality' => $member->municipality ?? '',
+        'province'   => $member->province ?? '',
+        'contactNumber' => $member->contact_number ?? '',
+        'memberdate' => $member->memberdate 
+                        ? \Carbon\Carbon::parse($member->memberdate)->format('Y-m-d') 
+                        : '',
+        'photo'      => $member->photo 
+                        ? URL::to('/resource/member_images/' . $member->photo) 
+                        : '',
+        'qr'         => URL::to('/qrcode/members/member-' . $member->id . '.png'),
+    ]);
+});
+
+

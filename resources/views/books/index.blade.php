@@ -1,1256 +1,1029 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>📚 Book Records</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --accent: #06b6d4;
-            --accent-light: #67e8f9;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --white: #ffffff;
-            --gray: #64748b;
-            --gray-light: #f1f5f9;
-            --bg-dark: #0f172a;
-            --text-dark: #e2e8f0;
-            --hover-dark: #1e293b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --highlight: #e0e7ff;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>📘 Julita Library | Bookshelf</title>
 
-        /* Updated base styles */
-        body {
-            background: linear-gradient(135deg, var(--light) 0%, #f0f9ff 100%);
-            font-family: 'Inter', sans-serif;
-        }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        body.dark-mode {
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1426 100%);
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--shadow);
-            padding: 2rem;
-            margin: 2rem;
-        }
-
-        body.dark-mode .container {
-            background: rgba(30, 41, 59, 0.9);
-            border-color: rgba(51, 65, 85, 0.3);
-        }
-
-        /* Updated table styles */
-        .table-wrapper {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        body.dark-mode .table-wrapper {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: rgba(51, 65, 85, 0.3);
-        }
-
-        /* Updated button styles */
-        .top-controls button {
-            background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .top-controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
-        }
-
-        /* Existing styles... */
-        body {
-            margin: 0;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            display: flex;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        body.dark-mode {
-            background-color: var(--bg-dark);
-            color: var(--text-dark);
-        }
-
-        header {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        header h1 {
-            font-size: 1.5rem;
-        }
-        #memberName.readonly {
-        background-color: #eee;
-        cursor: not-allowed;
-        }
-
-        nav a {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            transition: background-color 0.2s ease;
-            justify-content: flex-start;
-        }
-
-        nav a:hover {
-            background-color: var(--accent);
-        }
-
-                .sidebar {
-                    width: 260px;
-                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                    color: white;
-                    height: 100vh;
-                    padding: 1.5rem 1rem;
-                    position: fixed;
-                    left: 0;
-                    top: 0;
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-                    transition: all 0.3s ease;
-                    z-index: 2000;
-                    backdrop-filter: blur(10px);
-                }
-
-                .sidebar.collapsed {
-                    width: 70px;
-                }
-
-                .sidebar-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    margin-bottom: 2rem;
-                    padding-bottom: 1rem;
-                    border-bottom: 1px solid rgba(255,255,255,0.1);
-                }
-
-                .sidebar-header .logo {
-                    width: 40px;
-                    height: 40px;
-                    background: var(--accent);
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 20px;
-                    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
-                }
-
-                .sidebar-header h3 {
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    opacity: 1;
-                    transition: opacity 0.3s;
-                }
-
-                .sidebar.collapsed .sidebar-header h3,
-                .sidebar.collapsed .label {
-                    opacity: 0;
-                    pointer-events: none;
-                }
-
-                .toggle-btn {
-                    background: rgba(255,255,255,0.1);
-                    color: white;
-                    border: none;
-                    padding: 12px;
-                    font-size: 1.1rem;
-                    border-radius: 12px;
-                    cursor: pointer;
-                    margin-bottom: 1.5rem;
-                    transition: all 0.2s;
-                    backdrop-filter: blur(10px);
-                    border: 1px solid rgba(255,255,255,0.1);
-                }
-
-                .toggle-btn:hover {
-                    background: rgba(255,255,255,0.2);
-                    transform: translateY(-1px);
-                }
-
-                .sidebar nav {
-                    flex: 1;
-                }
-
-                .sidebar nav a {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    color: rgba(255,255,255,0.9);
-                    text-decoration: none;
-                    padding: 14px 16px;
-                    border-radius: 12px;
-                    margin-bottom: 8px;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                .sidebar nav a::before {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 0;
-                    height: 100%;
-                    background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
-                    transition: width 0.3s ease;
-                }
-
-                .sidebar nav a:hover::before {
-                    width: 100%;
-                }
-
-                .sidebar nav a:hover {
-                    background: rgba(255,255,255,0.1);
-                    color: white;
-                    transform: translateX(6px);
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                }
-
-                .sidebar nav a.active {
-                    background: var(--accent);
-                    color: white;
-                    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
-                }
-
-                .sidebar nav a .icon {
-                    font-size: 1.2rem;
-                    width: 20px;
-                    text-align: center;
-                }
-
-                .dark-toggle {
-                    margin-top: auto;
-                    padding-top: 1rem;
-                    border-top: 1px solid rgba(255,255,255,0.1);
-                }
-
-                .switch {
-                    position: relative;
-                    display: inline-block;
-                    width: 52px;
-                    height: 28px;
-                    margin-bottom: 1rem;
-                }
-
-                .switch input {
-                    opacity: 0;
-                    width: 0;
-                    height: 0;
-                }
-
-                .slider {
-                    position: absolute;
-                    cursor: pointer;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(255,255,255,0.2);
-                    transition: 0.4s;
-                    border-radius: 34px;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-                }
-
-                .slider:before {
-                    position: absolute;
-                    content: "🌞";
-                    height: 24px;
-                    width: 24px;
-                    left: 2px;
-                    bottom: 2px;
-                    background-color: white;
-                    border-radius: 50%;
-                    text-align: center;
-                    line-height: 24px;
-                    font-size: 12px;
-                    transition: 0.4s;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                }
-
-                input:checked + .slider {
-                    background-color: var(--accent);
-                }
-
-                input:checked + .slider:before {
-                    transform: translateX(24px);
-                    content: "🌙";
-                }
-        .container {
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-sizing: border-box;
-        }
-
-        h2 {
-            text-align: center;
-            color: var(--primary);
-        }
-
-        .top-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .top-controls input {
-            padding: 8px 12px;
-            width: 80%;
-            max-width: 400px;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .top-controls button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 8px 16px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-        }
-
-        .top-controls button:hover {
-            background-color: #1e40af;
-            transform: scale(1.03);
-        }
-
-        /* FIXED TABLE ALIGNMENT */
-    .table-container {
-      max-height: 500px;
-      overflow-y: auto;
-      border: 1px solid var(--primary);
+  <style>
+    :root {
+      --primary: #5b21b6;
+      --accent: #0891b2;
+      --light: #f9fafb;
+      --dark: #0f172a;
+      --gray: #6b7280;
+      --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      --modal-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --gap: 1.5rem;
     }
 
-    .table-container table {
-      width: 100%;
-      border-collapse: collapse;
+    * {
+      box-sizing: border-box;
     }
 
-    .table-container thead th {
+    body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      background: #f3f4f6;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    body.dark-mode {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    /* Layout */
+    .app-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      padding: 1.5rem;
       position: sticky;
       top: 0;
-      background-color: var(--light); /* Or dark background if in dark mode */
-      z-index: 1;
-      text-align: left;
-      padding: 0.5rem;
-      border-bottom: 1px solid #ccc;
+      height: 100vh;
+      overflow-y: auto;
     }
 
-    .table-container tbody td {
-      padding: 0.5rem;
-      border-bottom: 1px solid #ddd;
+    body.dark-mode .sidebar {
+      background: #1e293b;
+      border-color: #334155;
     }
 
-        /* Single unified table with proper alignment */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed; /* Force consistent column widths */
-        }
-
-        /* Define specific column widths for alignment */
-        table th:nth-child(1), table td:nth-child(1) { width: 60px; }   /* Select */
-        table th:nth-child(2), table td:nth-child(2) { width: 80px; }   /* Cover */
-        table th:nth-child(3), table td:nth-child(3) { width: 200px; }  /* Title */
-        table th:nth-child(4), table td:nth-child(4) { width: 150px; }  /* Author */
-        table th:nth-child(5), table td:nth-child(5) { width: 120px; }  /* Genre */
-        table th:nth-child(6), table td:nth-child(6) { width: 120px; }  /* Published Year */
-        table th:nth-child(7), table td:nth-child(7) { width: 100px; }  /* Available */
-        table th:nth-child(8), table td:nth-child(8) { width: 140px; }  /* QR Code */
-
-        .table-wrapper {
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .scrollable-body {
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: auto; /* Allow horizontal scroll if needed */
-            display: block;
-        }
-
-        /* For the two-table structure (current) */
-        .scrollable-body table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Match header table layout */
-            margin-top: 0; /* Remove any margin */
-        }
-
-        /* Ensure both header and body tables have same column widths */
-        .table-container > table th:nth-child(1),
-        .scrollable-body table td:nth-child(1) { width: 60px; }
-        
-        .table-container > table th:nth-child(2),
-        .scrollable-body table td:nth-child(2) { width: 80px; }
-        
-        .table-container > table th:nth-child(3),
-        .scrollable-body table td:nth-child(3) { width: 200px; }
-        
-        .table-container > table th:nth-child(4),
-        .scrollable-body table td:nth-child(4) { width: 150px; }
-        
-        .table-container > table th:nth-child(5),
-        .scrollable-body table td:nth-child(5) { width: 120px; }
-        
-        .table-container > table th:nth-child(6),
-        .scrollable-body table td:nth-child(6) { width: 120px; }
-        
-        .table-container > table th:nth-child(7),
-        .scrollable-body table td:nth-child(7) { width: 100px; }
-        
-        .table-container > table th:nth-child(8),
-        .scrollable-body table td:nth-child(8) { width: 140px; }
-
-        .scrollable-body td {
-            padding: 12px 16px; /* Match header padding */
-            border-bottom: 1px solid #ddd;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        th {
-            background-color: var(--primary);
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            cursor: pointer;
-        }
-
-        th.sort-asc::after {
-            content: " \25B2";
-        }
-
-        th.sort-desc::after {
-            content: " \25BC";
-        }
-
-        tr.selected {
-            background-color: var(--highlight);
-        }
-
-        .corner-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #e53935;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-
-        #suggestionBox {
-            position: relative;
-            max-height: 150px;
-            overflow-y: auto;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-top: 4px;
-            font-size: 0.95rem;
-            z-index: 10;
-        }
-
-        body.dark-mode #suggestionBox {
-            background-color: #1e293b;
-            color: var(--text-dark);
-            border-color: #334155;
-        }
-
-        #suggestionBox .suggestion {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-
-        #suggestionBox .suggestion:hover {
-            background-color: var(--highlight);
-            color: black;
-        }
-
-        body.dark-mode #suggestionBox .suggestion:hover {
-            background-color: var(--hover-dark);
-            color: white;
-        }
-
-        .modal, #borrowModal, #manage-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            z-index: 9999;
-            width: 90%;
-            max-width: 500px;
-            box-sizing: border-box;
-        }
-
-        .modal h3, #borrowModal h3, #manage-modal h3 {
-            margin-top: 0;
-            color: var(--primary);
-            text-align: center;
-            font-size: 1.25rem;
-        }
-
-        .modal label,
-        #borrowModal label,
-        #manage-modal label {
-            display: block;
-            margin-top: 10px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .modal input,
-        #borrowModal input,
-        #manage-modal input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-            background-color: #f9f9f9;
-        }
-
-        .modal-buttons,
-        .modal-btn,
-        #manage-modal .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            gap: 0.5rem;
-        }
-
-        .modal-btn,
-        #manage-modal .actions button {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .modal-btn.cancel {
-            background-color: #e5e7eb;
-            color: #374151;
-        }
-
-        .modal-btn.confirm,
-        #manage-modal .actions .submit {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .modal-btn.confirm:hover,
-        #manage-modal .actions .submit:hover {
-            background-color: #2563eb;
-        }
-
-        .modal-btn.cancel:hover,
-        #manage-modal .actions .cancel:hover {
-            background-color: #d1d5db;
-        }
-
-        #manage-modal .actions .cancel {
-            background-color: #6b7280;
-            color: white;
-        }
-
-        #manage-modal .actions .submit.delete {
-            background-color: #dc2626;
-        }
-
-            .sidebar .toggle-btn {
-                margin: 0 auto 1.5rem auto;
-                background: var(--accent);
-                color: white;
-                border: none;
-                padding: 8px 12px;
-                font-size: 1rem;
-                border-radius: 6px;
-                cursor: pointer;
-                width: 100%;
-            }
-
-        .sidebar .toggle-btn:hover {
-            background-color: #2563eb;
-        }
-
-        .main {
-            margin-left: 260px;
-            padding: 2rem;
-            flex-grow: 1;
-            transition: margin-left 0.3s ease;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .main.full {
-            margin-left: 80px;
-        }
-
-        .dark-toggle {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 52px;
-            height: 28px;
-            margin-top: 1rem;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #888;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "🌞";
-            height: 24px;
-            width: 24px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: 0.4s;
-            text-align: center;
-            line-height: 24px;
-            font-size: 14px;
-        }
-
-        input:checked + .slider {
-            background-color: var(--dark);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(24px);
-            content: "🌙";
-        }
-
-        /* Cover image styling */
-        table img.cover {
-            width: 60px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        /* Make sure images in table don't break layout */
-        .scrollable-body table td img {
-            max-width: 60px;
-            height: auto;
-            border-radius: 4px;
-        }
-
-        @media (max-width: 768px) {
-          .container {
-            padding: 1rem;
-          }
-
-          .table-container {
-            overflow-x: auto; /* Allow horizontal scroll on mobile */
-          }
-
-          table {
-            min-width: 800px; /* Prevent table from getting too compressed */
-          }
-        }
-
-        @media (max-width: 600px) {
-          table, thead, tbody, th, td, tr {
-            display: block;
-          }
-
-          th {
-            display: none;
-          }
-
-          td {
-            position: relative;
-            padding-left: 50%;
-          }
-
-          td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 15px;
-            font-weight: bold;
-          }
-        }
-
-        body.dark-mode .container {
-          background-color: var(--bg-dark);
-          color: var(--text-dark);
-        }
-
-        body.dark-mode tr.selected {
-          background-color: var(--hover-dark);
-          color: var(--text-dark);
-        }
-
-        body.dark-mode .modal,
-        body.dark-mode #borrowModal,
-        body.dark-mode #manage-modal {
-          background-color: #1e1e1e;
-          color: var(--text-dark);
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-        }
-
-        body.dark-mode .modal h3,
-        body.dark-mode #borrowModal h3,
-        body.dark-mode #manage-modal h3 {
-          color: var(--accent);
-        }
-
-        body.dark-mode .modal label,
-        body.dark-mode #borrowModal label,
-        body.dark-mode #manage-modal label {
-          color: var(--text-dark);
-        }
-
-        body.dark-mode .modal input,
-        body.dark-mode #borrowModal input,
-        body.dark-mode #manage-modal input {
-          background-color: #2b2b2b;
-          color: var(--text-dark);
-          border: 1px solid #444;
-        }
-        .time-input {
-            width: 100%;
-            padding: 0.5rem;
-            margin-top: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        body.dark-mode .time-input {
-            background-color: #1e293b;
-            color: var(--text-dark);
-            border-color: #475569;
-        }
-
-        .time-hint {
-            font-size: 0.85rem;
-            color: var(--gray);
-            display: block;
-            margin-top: 0.25rem;
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.75);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        .modal-content {
-            background: var(--card-bg, #fff);
-            padding: 20px;
-            border-radius: 1rem;
-            text-align: center;
-            max-width: 90%;
-        }
-        .modal-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        height: 100vh;
-        width: 100vw;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(3px);
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
     }
 
-    .modal-box {
-      background-color: var(--light);
-      color: var(--dark);
-      border-radius: 12px;
-      padding: 1.5rem;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      color: var(--gray);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-item.active {
+      background: rgba(126, 34, 206, 0.1);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: var(--primary);
+    }
+
+    body.dark-mode .nav-item:hover {
+      background: #334155;
+    }
+
+    /* Dark Mode Toggle */
+    .dark-mode-toggle {
+      margin-top: 2rem;
+      padding: 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+
+    .switch {
       position: relative;
-      transition: all 0.3s ease;
+      width: 58px;
+      height: 32px;
     }
 
-    .modal-header {
+    .switch input {
+      opacity: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, #d1d5db, #9ca3af);
+      border-radius: 32px;
+      transition: 0.3s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 26px;
+      width: 26px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(90deg, #7e22ce, #5b21b6);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Main */
+    main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Sticky Header Controls */
+    .page-controls {
+      position: sticky;
+      top: 0;
+      background: rgba(243, 244, 246, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 1rem 0;
+      margin-bottom: var(--gap);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    body.dark-mode .page-controls {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Search */
+    .search-bar {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 1rem;
+      background: white;
+      margin: 1rem 0 0;
+    }
+
+    body.dark-mode .search-bar {
+      background: #1e293b;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    /* Book Grid */
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--gap);
+      margin-bottom: 2rem;
+    }
+
+    .book-card {
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: var(--transition);
+    }
+
+    body.dark-mode .book-card {
+      background: #1e293b;
+    }
+
+    .book-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .book-cover {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .book-info {
+      padding: 1.2rem;
+    }
+
+    .book-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .book-meta {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-bottom: 0.75rem;
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-qr, .btn-borrow {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-qr {
+      background: #f3e8ff;
+      color: var(--primary);
+    }
+
+    .btn-borrow {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    /* MODALS - Styled Like Book Cards */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--modal-shadow);
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark-mode .modal-card {
+      background: #1e293b;
+    }
+
+    .modal-header {
+      padding: 1.2rem 1.2rem 0.8rem;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .modal-title {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 600;
     }
 
     .modal-close {
-      background: transparent;
+      background: none;
       border: none;
       font-size: 1.5rem;
-      color: inherit;
+      color: white;
       cursor: pointer;
-    }
-
-    .modal-body.center {
+      width: 36px;
+      height: 36px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      justify-content: center;
+      border-radius: 50%;
     }
 
+    .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    body.dark-mode .form-group label {
+      color: #e2e8f0;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.2);
+    }
+
+    body.dark-mode .form-control {
+      background: #0f172a;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    body.dark-mode .modal-footer {
+      border-top-color: #334155;
+    }
+
+    /* Add/Edit Modal - Book-Style Layout */
+    .edit-modal-cover {
+      width: 100%;
+      height: 200px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    /* QR Modal */
     .qr-image {
       width: 200px;
       height: 200px;
-      object-fit: contain;
       border: 2px solid var(--accent);
-      border-radius: 8px;
-      background-color: var(--light);
-    }
-
-    .btn-download {
-      padding: 0.5rem 1rem;
-      background-color: var(--accent);
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      transition: background-color 0.2s ease;
-    }
-    .btn-download:hover {
-      background-color: var(--accent-light);
-    }
-
-    /* Dark mode support */
-    body.dark-mode .modal-box {
-      background-color: var(--dark);
-      color: var(--light);
+      border-radius: 16px;
+      margin: 1rem auto;
+      display: block;
+      background: white;
     }
 
     body.dark-mode .qr-image {
-      background-color: var(--dark);
-      border-color: var(--accent-light);
+      background: #0f172a;
     }
-    </style>
-  </head>
-  <body>
-    <<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <img src="/images/logo.png" alt="Library Logo" class="logo">
-      <span class="label">Julita Public Library</span>
-    </div>
-    <button class="toggle-btn" id="toggleSidebar">☰</button>
-    <nav>
-      <a href="{{ route('dashboard') }}"><span class="icon">🏠</span><span class="label">Dashboard</span></a>
-      <a href="{{ route('books.index') }}"><span class="icon">📘</span><span class="label">Manage Books</span></a>
-      <a href="{{ route('members.index') }}"><span class="icon">👥</span><span class="label">Manage Members</span></a>
-      <a href="{{ route('transactions.index') }}"><span class="icon">📃</span><span class="label">Transactions</span></a>
-    </nav>
-    <div class="dark-toggle">
-      <label class="switch">
-        <input type="checkbox" id="darkModeToggle">
-        <span class="slider"></span>
-      </label>
-      <a href="/logout">🚪 Logout</a>
-    </div>
-  </div>
 
-    <div class="main" id="mainContent">
-      <div class="container">
-        <h2>📚 Book Records</h2>
-        <div class="top-controls">
-          <input type="text" id="search-input" placeholder="Search by title..." />
-          <button onclick="manageBooks()">⚙️ Edit</button>
-          <button onclick="openAddBookModal()">➕ Add Book</button>
-          <button onclick="openBorrowModal()">📖 Borrow</button>
+    .btn-download {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    /* Selection Mode Bar */
+    .selection-mode {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      padding: 1rem 2rem;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .book-card.selected {
+      outline: 4px solid var(--accent);
+    }
+    /* Cover Preview Area - Large, drag & drop, clickable */
+.cover-preview-area {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px dashed var(--gray-light);
+}
+
+.cover-preview-area.drag-over {
+  border-color: var(--accent);
+  background-color: rgba(8, 145, 178, 0.1);
+  transform: scale(1.02);
+}
+
+.cover-preview-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  transition: all 0.3s ease;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+.cover-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#cover-upload-icon {
+  font-size: 3.5rem;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  color: var(--accent);
+}
+
+#cover-preview-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: var(--gray);
+}
+
+#cover-preview-text small {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
+/* Toast Notifications */
+.toast {
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+  max-width: 300px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.toast-info {
+  background: var(--accent);
+}
+
+.toast-success {
+  background: var(--success);
+}
+
+.toast-warning {
+  background: var(--warning);
+}
+
+.toast-error {
+  background: var(--danger);
+}
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fas fa-book"></i> Julita Library
+      </div>
+      <nav class="nav-menu">
+        <a href="{{ route('dashboard') }}" class="nav-item"><i class="fas fa-th"></i> Dashboard</a>
+        <a href="{{ route('books.index') }}" class="nav-item active"><i class="fas fa-book"></i> Books</a>
+        <a href="{{ route('members.index') }}" class="nav-item"><i class="fas fa-users"></i> Members</a>
+        <a href="{{ route('transactions.index') }}" class="nav-item"><i class="fas fa-file-alt"></i> Transactions</a>
+      </nav>
+      <div class="dark-mode-toggle">
+        <span>🌙 Dark Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main>
+      <div class="page-controls">
+        <div class="page-header">
+          <h1 class="page-title">📚 Your Collection</h1>
+          <div class="actions">
+            <button class="btn btn-outline" onclick="enterSelectionMode()">
+              <i class="fas fa-check-square"></i> Select
+            </button>
+            <button class="btn btn-primary" onclick="openAddBookModal()">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
         </div>
+        <input
+          type="text"
+          class="search-bar"
+          placeholder="🔍 Search by title, author, or genre..."
+          id="searchInput"
+        />
+      </div>
 
-<div class="table-wrapper">
-  <table class="main-table">
-    <thead>
-      <tr>
-        <th>Select</th>
-        <th>Cover</th>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Genre</th>
-        <th>Published Year</th>
-        <th>Available</th>
-        <th>QR Code</th>
-      </tr>
-    </thead>
-  </table>
-  <div class="scrollable-body">
-    <table class="main-table">
-      <tbody>
+      <!-- Book Grid -->
+      <div class="book-grid" id="bookGrid">
         @foreach($books as $book)
-        <tr data-id="{{ $book->id }}">
-          <td><input type="checkbox" class="book-checkbox" value="{{ $book->id }}"></td>
-          <td>
-            @if($book->cover_image)
-              <img src="{{ $book->cover_image }}" width="60" />
-            @else
-              No Cover
-            @endif
-          </td>
-          <td>{{ $book->title }}</td>
-          <td>{{ $book->author }}</td>
-          <td>{{ $book->genre }}</td>
-          <td>{{ $book->published_year }}</td>
-          <td>{{ $book->availability }}</td>
-          <td id="qrCell-{{ $book->id }}">
-            @if(!empty($book->qr_url))
-              <button onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')" class="btn btn-secondary">
-                📷 Show QR
-              </button>
-            @else
-              <button onclick="generateQr({{ $book->id }})" class="btn btn-outline btn-sm">
-                📷 Generate QR
-              </button>
-            @endif
-          </td>
-        </tr>
+        <div class="book-card" data-id="{{ $book->id }}" data-title="{{ $book->title }}" data-author="{{ $book->author }}">
+          <img src="{{ $book->cover_image ?? '/images/no-cover.png' }}" alt="Cover" class="book-cover">
+          <div class="book-info">
+            <h3 class="book-title">{{ $book->title }}</h3>
+            <div class="book-meta">
+              <div>by {{ $book->author }}</div>
+              <div>{{ $book->genre }} • {{ $book->published_year }}</div>
+              <div><strong>Available:</strong> {{ $book->availability > 0 ? 'Yes' : 'No' }}</div>
+            </div>
+            <div class="book-actions">
+              @if(!empty($book->qr_url))
+                <button class="btn-qr" onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')">QR</button>
+              @else
+                <button class="btn-qr" onclick="generateQr({{ $book->id }})">Gen</button>
+              @endif
+              <button class="btn-borrow" onclick="borrowOne({{ $book->id }})">Borrow</button>
+            </div>
+          </div>
+        </div>
         @endforeach
-      </tbody>
-    </table>
-  </div>
-</div>
-        </div>
       </div>
-    </div>
+    </main>
+  </div>
 
-    <!-- Borrow Modal (same as your existing) -->
-  <!-- BORROW MODAL -->
-  <div class="modal" id="borrowModal">
-  <div class="modal-content borrow-modal-content">
-    <h3>📘 Borrow Selected Books</h3>
-
-    <!-- MEMBER -->
-    <label for="memberName">👤 Member Name</label>
-    <input type="text" id="memberName" placeholder="Scan QR code to fill" readonly>
-
-    <!-- DUE DATE & TIME -->
-    <div class="date-time-group">
-      <label for="dueDate">📅 Due Date</label>
-      <input type="date" id="dueDate" />
-      <label for="dueTime">⏰ Due Time</label>
-      <input type="time" id="dueTime" class="time-input" />
-      <small class="time-hint">Use a 12-hour format (AM/PM visible in browser input)</small>
-    </div>
-
-    <!-- SELECTED BOOKS -->
-    <label>📚 Selected Books</label>
-    <ul id="selectedBooksList"></ul>
-
-    <!-- QR BUTTONS -->
-    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-      <button type="button" onclick="startQRScan('member')" class="btn btn-outline-secondary">📷 Scan Member QR</button>
-      <button type="button" onclick="startQRScan('book')" class="btn btn-outline-secondary">📷 Scan Book QR</button>
-    </div>
-
-    <!-- QR SCANNER MODAL -->
-    <div id="qrScannerModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:20px; z-index:9999; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2);">
-      <h5>Scan QR Code</h5>
-      <div id="qr-reader" style="width:300px;"></div>
-      <button type="button" onclick="stopQRScan()" class="btn btn-danger mt-2">Cancel</button>
-    </div>
-
-    <!-- MODAL BUTTONS -->
-    <div class="modal-buttons">
-      <button class="modal-btn cancel" onclick="closeBorrowModal()">Cancel</button>
-      <button class="modal-btn confirm" onclick="confirmBorrow()">Confirm</button>
+  <!-- Selection Mode Bar -->
+  <div class="selection-mode" id="selectionBar" style="display:none;">
+    <span id="selectedCount">0 books selected</span>
+    <div>
+      <button class="btn btn-outline" style="color:white;" onclick="exitSelectionMode()">Cancel</button>
+      <button class="btn btn-light" style="background:white; color:var(--accent);" onclick="openBorrowModal()">Borrow</button>
+      <button class="btn btn-light" id="editButton" style="background:white; color:#7e22ce; display:none;" onclick="openEditModal()">
+        <i class="fas fa-edit"></i> Edit
+      </button>
     </div>
   </div>
-</div>
 
-
-    <!-- ADD MODAL -->
-      <div class="modal" id="addBookModal">
-      <div class="modal-content borrow-modal-content">
-    <form id="addBookForm" enctype="multipart/form-data">
-    @csrf
-    <label for="title">📖 Title</label>
-    <input type="text" id="title" name="title" required>
-
-    <label for="author">✍️ Author</label>
-    <input type="text" id="author" name="author" required>
-
-    <label for="genre">📖 Genre</label>
-    <input type="text" id="genre" name="genre">
-
-    <label for="published_year">📅 Published Year</label>
-    <input type="number" id="published_year" name="published_year" required>
-
-    <label for="availability">📦 Availability</label>
-    <input type="number" id="availability" name="availability" min="0" required>
-
-    <!-- 📷 Cover Upload -->
-    <label for="cover_image">🖼️ Upload Cover Image</label>
-    <div style="display:flex; align-items:center; gap:1rem;">
-  <input type="file" name="cover" id="cover" accept="image/*" onchange="previewCover(event)">
-    </div>
-
-    <div id="coverPreview" style="margin-top:10px;"></div>
-
-    <div class="modal-buttons">
-      <button type="button" class="modal-btn cancel" onclick="closeAddBookModal()">Cancel</button>
-      <button type="submit" class="modal-btn confirm">Add Book</button>
-    </div>
-  </form>
-  </div>
+  <!-- ADD BOOK MODAL (Styled Like Book Card) -->
+  <div class="modal" id="addBookModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Add New Book</h3>
+        <button class="modal-close" onclick="closeAddBookModal()">&times;</button>
       </div>
-  >
-
-    <!-- MANAGE MODAL -->
-    <div class="modal" id="manage-modal">
-      <div class="modal-content">
-        <h3>Edit Book Information</h3>
-        <label for="edit-title">Title</label>
-        <input type="text" id="edit-title">
-        <label for="edit-author">Author</label>
-        <input type="text" id="edit-author">
-        <label for="edit-genre">Genre</label>
-        <input type="text" id="edit-genre">
-        <label for="edit-published-year">Published Year</label>
-        <input type="number" id="edit-published-year">
-        <label for="edit-availability">Availability</label>
-        <input type="number" id="edit-availability">
-        <div class="actions">
-          <button class="cancel" onclick="closeModal()">Cancel</button>
-          <button class="submit" onclick="saveChanges()">Save Changes</button>
-          <button class="submit" onclick="deleteBook()" style="background:#dc3545;">Delete</button>
-        </div>
+      <div class="modal-body">
+        <form id="addBookForm" enctype="multipart/form-data">
+          @csrf
+          <div class="edit-modal-cover">🖼️ Upload Cover</div>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" name="author" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Genre</label>
+            <input type="text" name="genre" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Published Year</label>
+            <input type="number" name="published_year" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Availability</label>
+            <input type="number" name="availability" class="form-control" required min="0">
+          </div>
+          <div class="form-group">
+            <label>Upload Cover</label>
+            <input type="file" name="cover" accept="image/*" onchange="previewCover(event)" class="form-control">
+          </div>
+        </form>
       </div>
-    </div>
-
-  <!-- BORROW MODAL -->
-  <div class="modal" id="borrowModal">
-    <div class="modal-content borrow-modal-content">
-      <h3>📘 Borrow Selected Books</h3>
-
-      <label for="memberName">👤 Member Name</label>
-      <input type="text" id="memberName" autocomplete="off" placeholder="Start typing to search...">
-      <div id="suggestionBox"></div>
-      <input type="hidden" id="memberId" />
-
-
-      <div class="date-time-group">
-        <label for="dueDate">📅 Due Date</label>
-        <input type="date" id="dueDate" />
-        <label for="dueTime">⏰ Due Time</label>
-        <input type="time" id="dueTime" class="time-input" />
-        <small class="time-hint">Use a 12-hour format (AM/PM visible in browser input)</small>
-      </div>
-
-      <label>📚 Selected Books</label>
-      <ul id="selectedBooksList"></ul>
-
-      <!-- QR Buttons -->
-      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <button type="button" onclick="startQRScan('member')" class="btn btn-outline-secondary">📷 Scan Member QR</button>
-        <button type="button" onclick="startQRScan('book')" class="btn btn-outline-secondary">📷 Scan Book QR</button>
-      </div>
-
-      <!-- QR Scanner Modal -->
-      <div id="qrScannerModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:20px; z-index:9999; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2);">
-        <h5>Scan QR Code</h5>
-        <div id="qr-reader" style="width:300px;"></div>
-        <button type="button" onclick="stopQRScan()" class="btn btn-danger mt-2">Cancel</button>
-      </div>
-
-      <div class="modal-buttons">
-        <button class="modal-btn cancel" onclick="closeBorrowModal()">Cancel</button>
-        <button class="modal-btn confirm" onclick="confirmBorrow()">Confirm</button>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeAddBookModal()">Cancel</button>
+        <button class="btn btn-primary" form="addBookForm" type="submit">Add Book</button>
       </div>
     </div>
   </div>
 
-  <!-- Book QR Modal -->
-<div id="qrModal" class="modal-wrapper" style="display: none;">
-  <div class="modal-box">
+<!-- EDIT MODAL (Enhanced with Drag & Drop Cover) -->
+<div class="modal" id="manage-modal">
+  <div class="modal-card">
     <div class="modal-header">
-      <h2 id="qrBookTitle" class="modal-title">QR Code</h2>
-      <button class="modal-close" onclick="closeQRModal()">&times;</button>
+      <h3 class="modal-title">✏️ Edit Book</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
-    <div class="modal-body center">
-      <img id="qrImage" src="" alt="QR Code" class="qr-image" />
-      <a id="downloadLink" href="#" download class="btn-download" target="_blank">
-        Download QR Code
-      </a>
+    <div class="modal-body">
+      <!-- Cover Preview - Large Drag & Drop Zone -->
+      <div class="cover-preview-area" id="cover-preview-area">
+        <div class="cover-preview-content" id="cover-preview-content">
+          <i class="fas fa-cloud-upload-alt" id="cover-upload-icon"></i>
+          <p id="cover-preview-text">Click or drag image here<br><small>Supports JPG, PNG (max 5MB)</small></p>
+          <input type="file" id="cover-input" accept="image/*" class="cover-input">
+        </div>
+      </div>
+      
+      <!-- Form fields -->
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="edit-title" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" id="edit-author" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Genre</label>
+        <input type="text" id="edit-genre" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Published Year</label>
+        <input type="number" id="edit-published-year" class="form-control" min="1000" max="2099" required>
+      </div>
+      <div class="form-group">
+        <label>Availability</label>
+        <input type="number" id="edit-availability" class="form-control" required min="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="delete-button">Delete</button>
+      <button class="btn btn-primary" onclick="saveChanges()" id="save-button">
+        <i class="fas fa-save"></i> Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+=
+<!-- BORROW MODAL -->
+<div class="modal" id="borrowModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">📦 Borrow Books</h3>
+      <button class="modal-close" onclick="closeBorrowModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>👤 Member Name</label>
+        <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill" readonly>
+        <input type="hidden" id="memberId">
+      </div>
+      <div class="form-group">
+        <label>📅 Due Date</label>
+        <input type="date" id="dueDate" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>⏰ Due Time</label>
+        <input type="time" id="dueTime" class="form-control" value="<?= date('H:i') ?>">
+        <small class="time-hint" style="display:block; margin-top:5px; color:var(--gray); font-size:0.85rem;">
+          Default time set to end of day (11:59 PM)
+        </small>
+      </div>
+      <div class="form-group">
+        <label>📚 Selected Books</label>
+        <ul id="selectedBooksList"></ul>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 1rem;">
+        <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
+          <i class="fas fa-qrcode"></i> Scan Member
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeBorrowModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBorrow()">Confirm</button>
+    </div>
+  </div>
+</div>
+<!-- QR SCANNER MODAL (Fixed) -->
+<div class="modal" id="qrScannerModal">
+  <div class="modal-card" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">📷 Scan QR Code</h3>
+      <button class="modal-close" onclick="stopQRScan()">&times;</button>
+    </div>
+    <div class="modal-body scanner-body">
+      <div id="qr-reader" style="width: 100%; min-height: 250px;"></div>
+      <div id="qr-scanner-error" class="error-message hidden"></div>
+      <p class="scanner-instructions">
+        Point your camera at the QR code
+      </p>
     </div>
   </div>
 </div>
 
-    <script src="{{ asset('js/borrow.js') }}"></script>
-    <script src="{{ asset('js/qrgen.js') }}"></script>
-    <script src="{{ asset('js/showqr.js') }}"></script>
-    <script>
-      function openBorrowModal(){
-        let list = document.getElementById('selectedBooksList');
-        list.innerHTML = '';
-        document.querySelectorAll('.book-checkbox:checked').forEach(cb => {
-          const tr = cb.closest('tr');
-          const id = tr.getAttribute('data-id');
-          const title = tr.children[2].innerText;
-          const li = document.createElement('li');
-          li.textContent = title;
-          li.setAttribute('data-id', id);
-          list.appendChild(li);
-        });
-        document.getElementById('borrowModal').style.display='flex';
-      }
-    </script>
-    <script>
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const darkToggle = document.getElementById('darkModeToggle');
-    const container = document.getElementById('container')
+<!-- Toast Notifications -->
+<div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-      mainContent.classList.toggle('full');
+  <!-- QR MODAL -->
+  <div class="modal" id="qrModal">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="qrModalTitle" class="modal-title">QR Code</h3>
+        <button class="modal-close" onclick="closeQRModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <img id="qrImage" class="qr-image" src="" alt="QR">
+        <a id="downloadLink" class="btn-download" download>📥 Download QR</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
+  <script src="{{ asset('js/bookadd.js') }}"></script>
+  <script src="{{ asset('js/bookmanage.js') }}"></script>
+  <script src="{{ asset('js/borrow.js') }}"></script>
+  <script src="{{ asset('js/qrgen.js') }}"></script>
+  <script src="{{ asset('js/showqr.js') }}"></script>
+  <script src="{{ asset('js/qrscanner-borrow.js') }}"></script>
+
+  <!-- Internal Modal Controls Only -->
+  <script>
+    let selectedBooks = [];
+
+    // --- Selection Mode ---
+    function enterSelectionMode() {
+      document.getElementById('selectionBar').style.display = 'flex';
+      document.querySelectorAll('.book-card').forEach(card => {
+        card.onclick = () => toggleSelection(card);
+      });
+    }
+
+    function exitSelectionMode() {
+      document.getElementById('selectionBar').style.display = 'none';
+      document.querySelectorAll('.book-card').forEach(card => {
+        card.onclick = null;
+      });
+      document.querySelectorAll('.book-card.selected').forEach(c => c.classList.remove('selected'));
+      selectedBooks = [];
+      updateSelectionUI();
+    }
+
+    function toggleSelection(card) {
+      const id = card.dataset.id;
+      const title = card.dataset.title;
+      const index = selectedBooks.findIndex(b => b.id == id);
+
+      if (index === -1) {
+        selectedBooks.push({ id, title });
+        card.classList.add('selected');
+      } else {
+        selectedBooks.splice(index, 1);
+        card.classList.remove('selected');
+      }
+      updateSelectionUI();
+    }
+
+    function updateSelectionUI() {
+  const count = selectedBooks.length;
+  document.getElementById('selectedCount').textContent = `${count} book(s) selected`;
+
+  const editBtn = document.getElementById('editButton');
+  editBtn.style.display = count === 1 ? 'inline-flex' : 'none';
+}
+
+    // --- Open Modals ---
+    function openAddBookModal() {
+      document.getElementById('addBookModal').style.display = 'flex';
+    }
+
+    function closeAddBookModal() {
+      document.getElementById('addBookModal').style.display = 'none';
+    }
+
+    function openEditModal() {
+      const book = selectedBooks[0];
+      document.getElementById('edit-title').value = book.title;
+      document.getElementById('edit-author').value = book.author;
+      // You can set other fields too
+      document.getElementById('editBookModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editBookModal').style.display = 'none';
+    }
+
+    function openBorrowModal() {
+      const list = document.getElementById('selectedBooksList');
+      list.innerHTML = '';
+      selectedBooks.forEach(book => {
+        const li = document.createElement('li');
+        li.textContent = book.title;
+        list.appendChild(li);
+      });
+      document.getElementById('borrowModal').style.display = 'flex';
+    }
+
+    function closeBorrowModal() {
+      document.getElementById('borrowModal').style.display = 'none';
+    }
+
+    function showQRModal(title, url) {
+      document.getElementById('qrModalTitle').textContent = title;
+      document.getElementById('qrImage').src = url;
+      document.getElementById('downloadLink').href = url;
+      document.getElementById('qrModal').style.display = 'flex';
+    }
+
+    function closeQRModal() {
+      document.getElementById('qrModal').style.display = 'none';
+    }
+
+    function borrowOne(id) {
+      const card = document.querySelector(`[data-id="${id}"]`);
+      selectedBooks = [{ id, title: card.dataset.title }];
+      updateSelectionUI();
+      openBorrowModal();
+    }
+
+    // --- QR Scanner ---
+    let html5QrcodeScanner = null;
+
+    function startQRScan(type) {
+      document.getElementById('qrScannerModal').style.display = 'flex';
+      setTimeout(() => {
+        if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(() => {});
+        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 }, false);
+        html5QrcodeScanner.render(
+          (decodedText) => {
+            document.getElementById('memberName').value = decodedText;
+            stopQRScan();
+          },
+          (err) => console.warn(err)
+        );
+      }, 500);
+    }
+
+    function stopQRScan() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear().then(() => {
+          html5QrcodeScanner = null;
+          document.getElementById('qrScannerModal').style.display = 'none';
+        }).catch(() => {});
+      } else {
+        document.getElementById('qrScannerModal').style.display = 'none';
+      }
+    }
+
+    // --- Cover Preview ---
+    function previewCover(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.querySelector('.edit-modal-cover').style.backgroundImage = `url(${e.target.result})`;
+          document.querySelector('.edit-modal-cover').style.backgroundSize = 'cover';
+          document.querySelector('.edit-modal-cover').style.backgroundPosition = 'center';
+          document.querySelector('.edit-modal-cover').style.color = 'transparent';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // --- Search ---
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.book-card').forEach(card => {
+        const title = card.dataset.title.toLowerCase();
+        const author = card.dataset.author.toLowerCase();
+        card.style.display = (title.includes(term) || author.includes(term)) ? 'block' : 'none';
+      });
+    });
+
+    // --- Dark Mode ---
+    document.getElementById('darkModeToggle').addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode', this.checked);
+      localStorage.setItem('darkMode', this.checked);
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      const dark = localStorage.getItem('darkMode') === 'true';
-      if (dark) {
+      if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');
-        darkToggle.checked = true;
+        document.getElementById('darkModeToggle').checked = true;
       }
     });
-
-    darkToggle.addEventListener('change', function () {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', this.checked);
-    });
   </script>
-  <script src="{{ asset('js/checkboxscriptmulti.js') }}"></script>
-  <script src="{{ asset('js/checkboxscriptsingle.js') }}"></script>
-  <script src="{{ asset('js/booksort.js') }}"></script>
-  <script src="{{ asset('js/bookmanage.js') }}"></script>
-  <script src="{{ asset('js/borrow.js') }}"></script>
-  <script src="{{ asset('js/overdue.js') }}"></script>
-  <script src="{{ asset('js/bookadd.js') }}"></script>
-  <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
-  <script src="{{ asset('js/dashb.js') }}"></script>
-  <script src="{{ asset('js/qrgen.js') }}"></script>
-  <script src="{{ asset('js/showqr.js') }}"></script>
-  <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
-  <script src="{{ asset('js/qrscanner-borrow.js') }}"></script>
-  @if(session('duplicate'))
-    <script>
-      showCornerPopup("Book already exists");
-      resetAddBookModal();
-    </script>
-  @endif
 
-  @if(session('success'))
-    <script>
-      showCornerPopup("Book added successfully!");
-      closeAddBookModal();
-    </script>
-  @endif
-  </body>
-  </html>
+</body>
+</html>
