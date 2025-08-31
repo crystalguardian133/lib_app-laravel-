@@ -18,6 +18,7 @@
       --light: #f9fafb;
       --dark: #0f172a;
       --gray: #6b7280;
+      --gray-light: #d1d5db;
       --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
       --modal-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
       --radius: 16px;
@@ -35,6 +36,7 @@
       background: #f3f4f6;
       color: var(--dark);
       line-height: 1.6;
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
     body.dark-mode {
@@ -64,6 +66,7 @@
       top: 0;
       height: 100vh;
       overflow-y: auto;
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     body.dark-mode .sidebar {
@@ -114,7 +117,7 @@
       background: #334155;
     }
 
-    /* Dark Mode Toggle */
+    /* Dark Mode Toggle - Enhanced Slider */
     .dark-mode-toggle {
       margin-top: 2rem;
       padding: 1rem 0;
@@ -126,41 +129,93 @@
 
     .switch {
       position: relative;
-      width: 58px;
-      height: 32px;
+      width: 68px;
+      height: 36px;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     .switch input {
       opacity: 0;
+      width: 0;
+      height: 0;
     }
 
     .slider {
       position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, #fbbf24, #d97706);
+      border-radius: 36px;
+      transition: background 0.3s ease;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(90deg, #d1d5db, #9ca3af);
-      border-radius: 32px;
-      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
     }
 
-    .slider:before {
-      content: "";
+    body.dark-mode .slider {
+      background: linear-gradient(90deg, #3730a3, #1e1b4b);
+    }
+
+    .slider-thumb {
       position: absolute;
-      height: 26px;
-      width: 26px;
-      left: 3px;
-      bottom: 3px;
+      width: 30px;
+      height: 30px;
       background: white;
       border-radius: 50%;
-      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
     }
 
-    input:checked + .slider {
-      background: linear-gradient(90deg, #7e22ce, #5b21b6);
+    .icon-sun, .icon-moon {
+      position: absolute;
+      font-size: 0.95rem;
+      transition: opacity 0.3s ease;
     }
 
-    input:checked + .slider:before {
-      transform: translateX(26px);
+    .icon-sun {
+      opacity: 1;
+    }
+
+    .icon-moon {
+      opacity: 0;
+    }
+
+    /* Unchecked = thumb at left */
+    input:not(:checked) + .slider .slider-thumb {
+      transform: translateX(0);
+    }
+
+    /* Checked = thumb slides to right */
+    input:checked + .slider .slider-thumb {
+      transform: translateX(32px);
+    }
+
+    /* Hide sun, show moon in dark mode */
+    input:checked + .slider .icon-sun {
+      opacity: 0;
+    }
+
+    input:checked + .slider .icon-moon {
+      opacity: 1;
+    }
+
+    #modeLabel {
+      font-weight: 500;
+      color: var(--gray);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode #modeLabel {
+      color: #e2e8f0;
     }
 
     /* Main */
@@ -182,6 +237,7 @@
       margin-bottom: var(--gap);
       border-radius: var(--radius);
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: background 0.3s ease;
     }
 
     body.dark-mode .page-controls {
@@ -217,6 +273,7 @@
       font-weight: 500;
       cursor: pointer;
       border: none;
+      transition: var(--transition);
     }
 
     .btn-primary {
@@ -244,6 +301,7 @@
       font-size: 1rem;
       background: white;
       margin: 1rem 0 0;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
     body.dark-mode .search-bar {
@@ -325,7 +383,7 @@
       color: #15803d;
     }
 
-    /* MODALS - Styled Like Book Cards */
+    /* MODALS */
     .modal {
       display: none;
       position: fixed;
@@ -411,6 +469,7 @@
       border: 1px solid #d1d5db;
       border-radius: 8px;
       font-size: 1rem;
+      transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
     }
 
     .form-control:focus {
@@ -436,7 +495,7 @@
       border-top-color: #334155;
     }
 
-    /* Add/Edit Modal - Book-Style Layout */
+    /* Edit Modal Cover Preview */
     .edit-modal-cover {
       width: 100%;
       height: 200px;
@@ -450,30 +509,96 @@
       margin-bottom: 1rem;
     }
 
-    /* QR Modal */
-    .qr-image {
-      width: 200px;
-      height: 200px;
-      border: 2px solid var(--accent);
-      border-radius: 16px;
-      margin: 1rem auto;
+    /* Cover Preview Area - Drag & Drop */
+    .cover-preview-area {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px dashed var(--gray-light);
+    }
+
+    .cover-preview-area.drag-over {
+      border-color: var(--accent);
+      background-color: rgba(8, 145, 178, 0.1);
+      transform: scale(1.02);
+    }
+
+    .cover-preview-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      transition: all 0.3s ease;
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .cover-input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    #cover-upload-icon {
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      color: var(--accent);
+    }
+
+    #cover-preview-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      color: var(--gray);
+    }
+
+    #cover-preview-text small {
       display: block;
-      background: white;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 8px;
     }
 
-    body.dark-mode .qr-image {
-      background: #0f172a;
-    }
-
-    .btn-download {
-      display: inline-block;
-      padding: 10px 20px;
-      background: var(--accent);
-      color: white;
-      text-decoration: none;
+    /* Toast Notifications */
+    .toast {
+      padding: 12px 20px;
+      margin-bottom: 10px;
       border-radius: 8px;
-      margin-top: 1rem;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+      max-width: 300px;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .toast-info { background: var(--accent); }
+    .toast-success { --success: #15803d; background: var(--success); }
+    .toast-warning { --warning: #d97706; background: var(--warning); }
+    .toast-error { --danger: #b91c1c; background: var(--danger); }
 
     /* Selection Mode Bar */
     .selection-mode {
@@ -495,107 +620,6 @@
     .book-card.selected {
       outline: 4px solid var(--accent);
     }
-    /* Cover Preview Area - Large, drag & drop, clickable */
-.cover-preview-area {
-  width: 100%;
-  height: 400px;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px dashed var(--gray-light);
-}
-
-.cover-preview-area.drag-over {
-  border-color: var(--accent);
-  background-color: rgba(8, 145, 178, 0.1);
-  transform: scale(1.02);
-}
-
-.cover-preview-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--gray);
-  transition: all 0.3s ease;
-  background-size: cover;
-  background-position: center;
-  text-align: center;
-  padding: 1rem;
-}
-
-.cover-input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-}
-
-#cover-upload-icon {
-  font-size: 3.5rem;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
-  color: var(--accent);
-}
-
-#cover-preview-text {
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  color: var(--gray);
-}
-
-#cover-preview-text small {
-  display: block;
-  font-size: 0.85rem;
-  opacity: 0.7;
-  margin-top: 8px;
-}
-
-/* Toast Notifications */
-.toast {
-  padding: 12px 20px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
-  max-width: 300px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-.toast-info {
-  background: var(--accent);
-}
-
-.toast-success {
-  background: var(--success);
-}
-
-.toast-warning {
-  background: var(--warning);
-}
-
-.toast-error {
-  background: var(--danger);
-}
   </style>
 </head>
 <body>
@@ -613,11 +637,16 @@
         <a href="{{ route('transactions.index') }}" class="nav-item"><i class="fas fa-file-alt"></i> Transactions</a>
       </nav>
       <div class="dark-mode-toggle">
-        <span>🌙 Dark Mode</span>
-        <label class="switch">
+        <label class="switch" title="Toggle Dark Mode">
           <input type="checkbox" id="darkModeToggle">
- 
+          <span class="slider">
+            <span class="slider-thumb">
+              <span class="icon-sun">🌞</span>
+              <span class="icon-moon">🌙</span>
+            </span>
+          </span>
         </label>
+        <span id="modeLabel">Light Mode</span>
       </div>
     </aside>
 
@@ -682,7 +711,7 @@
     </div>
   </div>
 
-  <!-- ADD BOOK MODAL (Styled Like Book Card) -->
+  <!-- ADD BOOK MODAL -->
   <div class="modal" id="addBookModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -726,119 +755,114 @@
     </div>
   </div>
 
-<!-- EDIT MODAL (Enhanced with Drag & Drop Cover) -->
-<div class="modal" id="manage-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3 class="modal-title">✏️ Edit Book</h3>
-      <button class="modal-close" onclick="closeModal()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <!-- Cover Preview - Large Drag & Drop Zone -->
-      <div class="cover-preview-area" id="cover-preview-area">
-        <div class="cover-preview-content" id="cover-preview-content">
-          <i class="fas fa-cloud-upload-alt" id="cover-upload-icon"></i>
-          <p id="cover-preview-text">Click or drag image here<br><small>Supports JPG, PNG (max 5MB)</small></p>
-          <input type="file" id="cover-input" accept="image/*" class="cover-input">
+  <!-- EDIT MODAL -->
+  <div class="modal" id="manage-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Book</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="cover-preview-area" id="cover-preview-area">
+          <div class="cover-preview-content" id="cover-preview-content">
+            <i class="fas fa-cloud-upload-alt" id="cover-upload-icon"></i>
+            <p id="cover-preview-text">Click or drag image here<br><small>Supports JPG, PNG (max 5MB)</small></p>
+            <input type="file" id="cover-input" accept="image/*" class="cover-input">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="edit-title" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Author</label>
+          <input type="text" id="edit-author" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <input type="text" id="edit-genre" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Published Year</label>
+          <input type="number" id="edit-published-year" class="form-control" min="1000" max="2099" required>
+        </div>
+        <div class="form-group">
+          <label>Availability</label>
+          <input type="number" id="edit-availability" class="form-control" required min="0">
         </div>
       </div>
-      
-      <!-- Form fields -->
-      <div class="form-group">
-        <label>Title</label>
-        <input type="text" id="edit-title" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label>Author</label>
-        <input type="text" id="edit-author" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label>Genre</label>
-        <input type="text" id="edit-genre" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>Published Year</label>
-        <input type="number" id="edit-published-year" class="form-control" min="1000" max="2099" required>
-      </div>
-      <div class="form-group">
-        <label>Availability</label>
-        <input type="number" id="edit-availability" class="form-control" required min="0">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-danger" id="delete-button">Delete</button>
-      <button class="btn btn-primary" onclick="saveChanges()" id="save-button">
-        <i class="fas fa-save"></i> Save Changes
-      </button>
-    </div>
-  </div>
-</div>
-=
-<!-- BORROW MODAL -->
-<div class="modal" id="borrowModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h3 class="modal-title">📦 Borrow Books</h3>
-      <button class="modal-close" onclick="closeBorrowModal()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>👤 Member Name</label>
-        <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill" readonly>
-        <input type="hidden" id="memberId">
-      </div>
-      <div class="form-group">
-        <label>📅 Due Date</label>
-        <input type="date" id="dueDate" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>⏰ Due Time</label>
-        <input type="time" id="dueTime" class="form-control" value="<?= date('H:i') ?>">
-        <small class="time-hint" style="display:block; margin-top:5px; color:var(--gray); font-size:0.85rem;">
-          Default time set to end of day (11:59 PM)
-        </small>
-      </div>
-      <div class="form-group">
-        <label>📚 Selected Books</label>
-        <ul id="selectedBooksList"></ul>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 1rem;">
-        <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
-          <i class="fas fa-person"></i> Scan Member
-        </button>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 1rem;">
-        <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
-          <i class="fas fa-book"></i> Scan Books
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-danger" id="delete-button">Delete</button>
+        <button class="btn btn-primary" onclick="saveChanges()" id="save-button">
+          <i class="fas fa-save"></i> Save Changes
         </button>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeBorrowModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmBorrow()">Confirm</button>
-    </div>
   </div>
-</div>
-<!-- QR SCANNER MODAL (Fixed) -->
-<div class="modal" id="qrScannerModal">
-  <div class="modal-card" style="max-width: 400px;">
-    <div class="modal-header">
-      <h3 class="modal-title">📷 Scan QR Code</h3>
-      <button class="modal-close" onclick="stopQRScan()">&times;</button>
-    </div>
-    <div class="modal-body scanner-body">
-      <div id="qr-reader" style="width: 100%; min-height: 250px;"></div>
-      <div id="qr-scanner-error" class="error-message hidden"></div>
-      <p class="scanner-instructions">
-        Point your camera at the QR code
-      </p>
-    </div>
-  </div>
-</div>
 
-<!-- Toast Notifications -->
-<div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+  <!-- BORROW MODAL -->
+  <div class="modal" id="borrowModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">📦 Borrow Books</h3>
+        <button class="modal-close" onclick="closeBorrowModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>👤 Member Name</label>
+          <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill" readonly>
+          <input type="hidden" id="memberId">
+        </div>
+        <div class="form-group">
+          <label>📅 Due Date</label>
+          <input type="date" id="dueDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>⏰ Due Time</label>
+          <input type="time" id="dueTime" class="form-control" value="<?= date('H:i') ?>">
+          <small class="time-hint" style="display:block; margin-top:5px; color:var(--gray); font-size:0.85rem;">
+            Default time set to end of day (11:59 PM)
+          </small>
+        </div>
+        <div class="form-group">
+          <label>📚 Selected Books</label>
+          <ul id="selectedBooksList"></ul>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 1rem;">
+          <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
+            <i class="fas fa-person"></i> Scan Member
+          </button>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 1rem;">
+          <button type="button" class="btn btn-outline" onclick="startQRScan('book')">
+            <i class="fas fa-book"></i> Scan Books
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeBorrowModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmBorrow()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR SCANNER MODAL -->
+  <div class="modal" id="qrScannerModal">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📷 Scan QR Code</h3>
+        <button class="modal-close" onclick="stopQRScan()">&times;</button>
+      </div>
+      <div class="modal-body scanner-body">
+        <div id="qr-reader" style="width: 100%; min-height: 250px;"></div>
+        <div id="qr-scanner-error" class="error-message hidden"></div>
+        <p class="scanner-instructions">
+          Point your camera at the QR code
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- QR MODAL -->
   <div class="modal" id="qrModal">
@@ -854,6 +878,9 @@
     </div>
   </div>
 
+  <!-- Toast Notifications -->
+  <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
   <!-- SCRIPTS -->
   <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
   <script src="{{ asset('js/bookadd.js') }}"></script>
@@ -864,9 +891,29 @@
   <script src="{{ asset('js/overdue.js') }}"></script>
   <script src="{{ asset('js/qrscanner-borrow.js') }}"></script>
 
-  <!-- Internal Modal Controls Only -->
+  <!-- Internal Modal Controls -->
   <script>
     let selectedBooks = [];
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const modeLabel = document.getElementById('modeLabel');
+
+    // Detect system preference
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedMode = localStorage.getItem('darkMode');
+    const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
+
+    // Apply mode
+    document.body.classList.toggle('dark-mode', isDark);
+    darkModeToggle.checked = isDark;
+    modeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+
+    // Toggle dark mode
+    darkModeToggle.addEventListener('change', () => {
+      const isChecked = darkModeToggle.checked;
+      document.body.classList.toggle('dark-mode', isChecked);
+      localStorage.setItem('darkMode', isChecked);
+      modeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
+    });
 
     // --- Selection Mode ---
     function enterSelectionMode() {
@@ -902,14 +949,12 @@
     }
 
     function updateSelectionUI() {
-  const count = selectedBooks.length;
-  document.getElementById('selectedCount').textContent = `${count} book(s) selected`;
+      const count = selectedBooks.length;
+      document.getElementById('selectedCount').textContent = `${count} book(s) selected`;
+      document.getElementById('editButton').style.display = count === 1 ? 'inline-flex' : 'none';
+    }
 
-  const editBtn = document.getElementById('editButton');
-  editBtn.style.display = count === 1 ? 'inline-flex' : 'none';
-}
-
-    // --- Open Modals ---
+    // --- Modals ---
     function openAddBookModal() {
       document.getElementById('addBookModal').style.display = 'flex';
     }
@@ -922,12 +967,11 @@
       const book = selectedBooks[0];
       document.getElementById('edit-title').value = book.title;
       document.getElementById('edit-author').value = book.author;
-      // You can set other fields too
-      document.getElementById('editBookModal').style.display = 'flex';
+      document.getElementById('manage-modal').style.display = 'flex';
     }
 
-    function closeEditModal() {
-      document.getElementById('editBookModal').style.display = 'none';
+    function closeModal() {
+      document.getElementById('manage-modal').style.display = 'none';
     }
 
     function openBorrowModal() {
@@ -962,10 +1006,11 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = e => {
-          document.querySelector('.edit-modal-cover').style.backgroundImage = `url(${e.target.result})`;
-          document.querySelector('.edit-modal-cover').style.backgroundSize = 'cover';
-          document.querySelector('.edit-modal-cover').style.backgroundPosition = 'center';
-          document.querySelector('.edit-modal-cover').style.color = 'transparent';
+          const cover = document.querySelector('.edit-modal-cover');
+          cover.style.backgroundImage = `url(${e.target.result})`;
+          cover.style.backgroundSize = 'cover';
+          cover.style.backgroundPosition = 'center';
+          cover.style.color = 'transparent';
         };
         reader.readAsDataURL(file);
       }
@@ -979,19 +1024,6 @@
         const author = card.dataset.author.toLowerCase();
         card.style.display = (title.includes(term) || author.includes(term)) ? 'block' : 'none';
       });
-    });
-
-    // --- Dark Mode ---
-    document.getElementById('darkModeToggle').addEventListener('change', () => {
-      document.body.classList.toggle('dark-mode', this.checked);
-      localStorage.setItem('darkMode', this.checked);
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('darkModeToggle').checked = true;
-      }
     });
   </script>
 </body>

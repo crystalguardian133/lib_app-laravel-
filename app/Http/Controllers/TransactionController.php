@@ -69,6 +69,22 @@ public function returnBook($id)
     return redirect()->route('transactions.index')->with('success', 'Book returned successfully.');
 }
 
+public function overdue()
+{
+    $overdue = Transaction::where('status', 'borrowed')
+        ->where('due_date', '<', now())
+        ->with(['member', 'book'])
+        ->get();
+
+    return response()->json([
+        'books' => $overdue->map(fn($t) => [
+            'title' => $t->book->title ?? 'Unknown',
+            'due_date' => $t->due_date->format('Y-m-d'),
+            'member' => $t->member->name ?? 'Unknown'
+        ])
+    ]);
+}
+
 
 
 }

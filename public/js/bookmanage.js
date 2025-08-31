@@ -1,6 +1,13 @@
+// === GLOBAL STATE ===
 let selectedBookId = null;
 let hasUnsavedChanges = false;
 let originalBookData = null;
+
+// === EXPOSE FUNCTIONS TO GLOBAL SCOPE (Critical for onclick="...") ===
+window.manageBooks = manageBooks;
+window.saveChanges = saveChanges;
+window.deleteBook = deleteBook;
+window.closeModal = closeModal;
 
 /**
  * Opens the edit modal with pre-filled book data
@@ -27,7 +34,7 @@ function manageBooks() {
   const bookData = extractBookData(card);
   
   // Store original data for unsaved changes check
-  originalBookData = {...bookData};
+  originalBookData = { ...bookData };
   hasUnsavedChanges = false;
   
   // Fill modal with book data
@@ -111,7 +118,8 @@ function updateCoverPreview(imageUrl) {
     uploadIcon.style.display = "none";
     previewText.textContent = "Click or drag to change image";
     previewText.style.color = "rgba(255, 255, 255, 0.85)";
-    previewText.querySelector('small')?.remove();
+    const small = previewText.querySelector('small');
+    if (small) small.remove();
   }
 }
 
@@ -286,17 +294,19 @@ function showToast(message, type = "info") {
   `;
   
   const container = document.getElementById('toast-container');
-  container.appendChild(toast);
-  
-  // Auto-remove after delay
-  setTimeout(() => {
-    toast.classList.add('toast-hide');
+  if (container) {
+    container.appendChild(toast);
+    
+    // Auto-remove after delay
     setTimeout(() => {
-      if (container.contains(toast)) {
-        container.removeChild(toast);
-      }
-    }, 500);
-  }, 3000);
+      toast.classList.add('toast-hide');
+      setTimeout(() => {
+        if (container.contains(toast)) {
+          container.removeChild(toast);
+        }
+      }, 500);
+    }, 3000);
+  }
 }
 
 /**
@@ -312,9 +322,9 @@ function saveChanges() {
   const formData = new FormData();
   
   // Get form values
-  formData.append("title", document.getElementById("edit-title").value);
-  formData.append("author", document.getElementById("edit-author").value);
-  formData.append("genre", document.getElementById("edit-genre").value);
+  formData.append("title", document.getElementById("edit-title").value.trim());
+  formData.append("author", document.getElementById("edit-author").value.trim());
+  formData.append("genre", document.getElementById("edit-genre").value.trim());
   formData.append("published_year", document.getElementById("edit-published-year").value);
   formData.append("availability", document.getElementById("edit-availability").value);
   formData.append("_method", "PUT"); // Laravel method spoofing
@@ -341,20 +351,21 @@ function saveChanges() {
   .then(response => {
     if (!response.ok) {
       return response.json().then(err => { 
-        throw new Error(err.message || "Failed to save changes."); 
+        throw new Error(err.message || "Failed to save changes.");
       });
     }
     return response.json();
   })
   .then(data => {
-    showToast("Book updated successfully!", "success");
+    showToast("✅ Book updated successfully!", "success");
+    hasUnsavedChanges = false;
     setTimeout(() => {
       location.reload();
     }, 1000);
   })
   .catch(err => {
     console.error("Save error:", err);
-    showToast(`Error: ${err.message}`, "error");
+    showToast(`❌ Error: ${err.message}`, "error");
     
     // Restore button state
     setTimeout(() => {
@@ -368,21 +379,42 @@ function saveChanges() {
  * Deletes the selected book with confirmation
  */
 function deleteBook() {
+  console.log("✅ deleteBook() called");
+
   if (!selectedBookId) {
-    showToast("No book selected for deletion.", "error");
+    console.error("❌ selectedBookId is missing:", selectedBookId);
+    showToast("No book selected.", "error");
+    return;
+  }
+  console.log("🟢 selectedBookId =", selectedBookId);
+
+  const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+  console.log("🔍 Found meta tag:", tokenMeta);
+  
+  if (!tokenMeta) {
+    console.error("❌ CSRF meta tag not found! Add: <meta name='csrf-token' content='{{ csrf_token() }}'>");
+    showToast("Security error: token missing.", "error");
     return;
   }
 
-  const confirmDelete = confirm("Are you sure you want to delete this book? This action cannot be undone.");
-  if (!confirmDelete) return;
+  const token = tokenMeta.content;
+  console.log("🔐 CSRF Token =", token);
+  if (!token) {
+    console.error("❌ CSRF token is empty!");
+    showToast("CSRF token is empty.", "error");
+    return;
+  }
 
-  const token = document.querySelector('meta[name="csrf-token"]').content;
   const deleteButton = document.getElementById("delete-button");
-  const originalText = deleteButton.innerHTML;
-  
-  // Show loading state
-  deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-  deleteButton.disabled = true;
+  console.log("🖱️ Delete button:", deleteButton);
+  if (deleteButton) {
+    const original = deleteButton.innerHTML;
+    deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    deleteButton.disabled = true;
+  }
+
+  // ✅ If you see all logs above → we should see fetch
+  console.log("🚀 About to fetch DELETE request...");
 
   fetch(`/books/${selectedBookId}`, {
     method: "DELETE",
@@ -392,53 +424,52 @@ function deleteBook() {
     }
   })
   .then(response => {
-    if (!response.ok) {
-      return response.json().then(err => { 
-        throw new Error(err.message || "Failed to delete book."); 
-      });
-    }
+    console.log("📬 Response received:", response);
+    if (!response.ok) throw new Error("Delete failed");
     return response.json();
   })
-  .then(() => {
-    showToast("Book deleted successfully!", "success");
+  .then(data => {
+    console.log("✅ Success:", data);
+    showToast("Deleted!", "success");
     closeModal();
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
+    setTimeout(() => location.reload(), 800);
   })
   .catch(err => {
-    console.error("Delete error:", err);
+    console.error("🔥 Final error:", err);
     showToast(`Error: ${err.message}`, "error");
-    
-    // Restore button state
-    setTimeout(() => {
-      deleteButton.innerHTML = originalText;
+    if (deleteButton) {
+      deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
       deleteButton.disabled = false;
-    }, 300);
-  });
-}
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Setup event listeners
-  document.getElementById('editButton')?.addEventListener('click', manageBooks);
-  
-  // Setup modal close on backdrop click
-  document.getElementById('manage-modal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('manage-modal')) {
-      closeModal();
     }
   });
+}
+// === Initialize when DOM is ready ===
+document.addEventListener('DOMContentLoaded', () => {
+  // Attach edit button click
+  const editButton = document.getElementById('editButton');
+  if (editButton) {
+    editButton.addEventListener('click', manageBooks);
+  }
+
+  // Close modal on backdrop click
+  const modal = document.getElementById('manage-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  }
   
-  // Setup keyboard shortcuts
+  // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
-    // ESC to close modal
-    if (e.key === 'Escape' && document.getElementById('manage-modal').style.display === 'flex') {
+    // ESC to close
+    if (e.key === 'Escape' && modal && window.getComputedStyle(modal).display === 'flex') {
       closeModal();
     }
     
     // CTRL + S to save
-    if (e.ctrlKey && e.key === 's' && document.getElementById('manage-modal').style.display === 'flex') {
+    if (e.ctrlKey && e.key === 's' && modal && window.getComputedStyle(modal).display === 'flex') {
       e.preventDefault();
       saveChanges();
     }

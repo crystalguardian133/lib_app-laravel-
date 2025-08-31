@@ -19,6 +19,11 @@ Route::get('/', function () {
 // Admin dashboard route
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+//TEST
+Route::get('/notifications/overdue', function () {
+    return view('overdue');
+})->name('notifications.overdue');
+
 // Chatbot API route
 Route::post('/chatbot/message', [ChatbotController::class, 'send']);
 
@@ -32,6 +37,8 @@ Route::resource('books', BookController::class);
 Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
 // Overdue Routes
 Route::get('/members/overdue', [MemberController::class, 'overdueBooks']);
+Route::put('/books/{id}', [BookController::class, 'update']);
+Route::delete('/books/{id}', [BookController::class, 'destroy']);
 
 
 // Member routes
@@ -60,6 +67,7 @@ Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
 Route::post('/transactions/{id}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+Route::get('/transactions/overdue', [TransactionController::class, 'overdue'])->name('transactions.overdue');
 
 //Card Generation Routess
 Route::get('/members/{id}/json', function ($id) {

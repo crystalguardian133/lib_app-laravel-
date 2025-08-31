@@ -1700,6 +1700,7 @@ function closeCardPreviewModal() {
 <script src="{{ asset('js/memberedit.js') }}"></script>
 <script src="{{ asset('js/sidebarcollapse.js') }}"></script>
 <script src="{{ asset('js/showqr.js') }}"></script>
+<script src="{{ asset('js/qrgen.js') }}"></script>
 <script src="{{ asset('js/card_gen.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
