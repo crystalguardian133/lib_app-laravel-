@@ -756,8 +756,6 @@
     document.getElementById('chatbot-close').addEventListener('click', () => {
         chatbotWindow.style.display = 'none';
     });
- 
-
     
 document.addEventListener('DOMContentLoaded', async () => {
     const toast = document.getElementById('overdueToast');

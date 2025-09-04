@@ -95,57 +95,61 @@ class MemberController extends Controller
 
     }
 
-    public function update(Request $request, $id)
-    {
-        $member = Member::find($id);
+public function update(Request $request, $id)
+{
+    $member = Member::findOrFail($id);
 
-        if (!$member) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Member not found'
-            ], 404);
+    // validate camelCase inputs
+    $validated = $request->validate([
+        'firstName'     => 'required|string|max:255',
+        'middleName'    => 'nullable|string|max:255',
+        'lastName'      => 'required|string|max:255',
+        'age'           => 'required|integer|min:1|max:150',
+        'houseNumber'   => 'nullable|string|max:255',
+        'street'        => 'nullable|string|max:255',
+        'barangay'      => 'required|string|max:255',
+        'municipality'  => 'required|string|max:255',
+        'province'      => 'required|string|max:255',
+        'contactNumber' => 'required|string|max:20',
+        'school'        => 'nullable|string|max:255',
+        'photo'         => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+    ]);
+
+    // map camelCase → snake_case
+    $data = [
+        'first_name'   => $validated['firstName'],
+        'middle_name'  => $validated['middleName'] ?? null,
+        'last_name'    => $validated['lastName'],
+        'age'          => $validated['age'],
+        'house_number' => $validated['houseNumber'] ?? null,
+        'street'       => $validated['street'] ?? null,
+        'barangay'     => $validated['barangay'],
+        'municipality' => $validated['municipality'],
+        'province'     => $validated['province'],
+        'contactnumber'=> $validated['contactNumber'],
+        'school'       => $validated['school'] ?? null,
+    ];
+
+    // handle photo
+    if ($request->hasFile('photo')) {
+        if ($member->photo && file_exists(storage_path('app/public/member_photos/' . $member->photo))) {
+            unlink(storage_path('app/public/member_photos/' . $member->photo));
         }
 
-        $validated = $request->validate([
-            'firstName'     => 'required|string|max:100',
-            'middleName'    => 'nullable|string|max:100',
-            'lastName'      => 'required|string|max:100',
-            'age'           => 'required|integer|min:1|max:150',
-            'houseNumber'   => 'required|string|max:50',
-            'street'        => 'required|string|max:100',
-            'barangay'      => 'required|string|max:100',
-            'municipality'  => 'required|string|max:100',
-            'province'      => 'required|string|max:100',
-            'contactNumber' => 'required|string|max:15',
-            'school'        => 'nullable|string|max:255',
-            'photo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-        ]);
-
-        $member->first_name   = $validated['firstName'];
-        $member->middle_name  = $validated['middleName'];
-        $member->last_name    = $validated['lastName'];
-        $member->age          = $validated['age'];
-        $member->house_number = $validated['houseNumber'];
-        $member->street       = $validated['street'];
-        $member->barangay     = $validated['barangay'];
-        $member->municipality = $validated['municipality'];
-        $member->province     = $validated['province'];
-        $member->contactnumber = $validated['contactNumber'];
-        $member->school       = $validated['school'];
-
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('member_photos', 'public');
-            $member->photo = $photoPath;
-        }
-
-        $member->save();
-
-        return response()->json([
-            'member' => $member,
-            'success' => true,
-            'message' => '✅ Member updated successfully'
-        ]);
+        $photoName = time() . '.' . $request->photo->extension();
+        $request->photo->storeAs('public/member_photos', $photoName);
+        $data['photo'] = $photoName;
     }
+
+    $member->update($data);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Member updated successfully!',
+        'member'  => $member
+    ]);
+}
+
 
     public function destroy($id)
     {

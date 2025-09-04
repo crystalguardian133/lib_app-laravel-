@@ -67,6 +67,66 @@
       object-fit: contain;
       border-radius: 4px;
     }
+    /* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--danger);
+    color: white;
+    padding: 16px;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--modal-shadow);
+    z-index: 2000;
+    max-width: 380px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-content {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.toast-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.toast-text strong {
+    display: block;
+    margin-top: 4px;
+}
+
+.toast-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -4px;
+}
+
+.toast-close:hover {
+    background: rgba(255,255,255,0.3);
+}
 
     .sidebar.collapsed {
       width: 60px;
@@ -384,6 +444,11 @@ body.dark-mode .actions .delete {
       <span class="label">Julita Public Library</span>
     </div>
     <button class="toggle-btn" id="toggleSidebar">☰</button>
+
+                <a href="{{ route('dashboard') }}" class="active">
+                <span class="icon">🏠</span>
+                <span class="label">Dashboard</span>
+            </a>
     <div class="dark-toggle">
       <label class="switch">
         <input type="checkbox" id="darkModeToggle">
@@ -392,6 +457,17 @@ body.dark-mode .actions .delete {
       <a href="/logout" style="display:block; margin-top:1rem; color:white;">🚪 Logout</a>
     </div>
   </div>
+  <!-- Overdue Toast Notification -->
+<div id="overdueToast" class="toast-notification">
+    <div class="toast-content">
+        <div class="toast-icon">⚠️</div>
+        <div class="toast-text">
+            <strong>Overdue Alert!</strong><br>
+            <span id="toastMessage">Loading...</span>
+        </div>
+        <button id="closeToast" class="toast-close">×</button>
+    </div>
+</div>
 
   <div class="main" id="mainContent">
     <div class="container">

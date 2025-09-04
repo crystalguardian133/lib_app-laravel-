@@ -31,6 +31,7 @@ Route::post('/chatbot/message', [ChatbotController::class, 'send']);
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/members', [MemberController::class, 'index'])->name('members.index');
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/timelog', [TimeLogController::class, 'index'])->name('timelog.index');
 
 // Books Route
 Route::resource('books', BookController::class);

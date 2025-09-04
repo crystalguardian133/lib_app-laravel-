@@ -266,25 +266,25 @@ class EditModalHandler {
      * @param {Object} data - Form data
      * @returns {Promise<Object>} Response data
      */
-    async sendUpdateRequest(data) {
-        const memberId = data.memberId;
-        delete data.memberId; // Remove from data object
+async sendUpdateRequest(data) {
+    const memberId = data.memberId;
+    delete data.memberId;
 
-        const response = await fetch(`/members/${memberId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(data)
-        });
+    const formData = new FormData(this.form); // picks up all inputs + file
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    // add method override for Laravel
+    formData.append('_method', 'PUT');
 
-        return await response.json();
-    }
+    const response = await fetch(`/members/${memberId}`, {
+        method: 'POST', // Laravel will treat as PUT
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData
+    });
+
+    return await response.json();
+}
 
     /**
      * Update the table row with new data
