@@ -2,9 +2,7 @@
 services:
 - type: web
   name: lib_app-laravel-
-  runtime: node
   env: php
-  repo: https://github.com/crystalguardian133/lib_app-laravel-
   plan: free
   envVars:
   - key: VITE_APP_NAME
