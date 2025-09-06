@@ -620,6 +620,23 @@
     .book-card.selected {
       outline: 4px solid var(--accent);
     }
+    #cover-preview-area {
+  position: relative;
+  width: 100%;
+}
+
+#cover-preview-content {
+  font-weight: 500;
+}
+
+#cover-upload-icon {
+  color: var(--accent);
+  transition: color 0.3s ease;
+}
+
+#cover-preview-content:hover #cover-upload-icon {
+  color: var(--primary);
+}
   </style>
 </head>
 <body>
@@ -721,8 +738,13 @@
       <div class="modal-body">
         <form id="addBookForm" enctype="multipart/form-data">
           @csrf
-          <div class="edit-modal-cover">🖼️ Upload Cover</div>
-          <div class="form-group">
+<div id="cover-preview-area">
+  <div id="cover-preview-content">
+    <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
+    <p id="cover-preview-text">Click or drag image here...</p>
+    <input type="file" id="cover-input" class="cover-input">
+  </div>
+</div>          <div class="form-group">
             <label>Title</label>
             <input type="text" name="title" class="form-control" required>
           </div>
@@ -741,10 +763,6 @@
           <div class="form-group">
             <label>Availability</label>
             <input type="number" name="availability" class="form-control" required min="0">
-          </div>
-          <div class="form-group">
-            <label>Upload Cover</label>
-            <input type="file" name="cover" accept="image/*" onchange="previewCover(event)" class="form-control">
           </div>
         </form>
       </div>
