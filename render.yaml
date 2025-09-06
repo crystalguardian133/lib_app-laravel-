@@ -3,6 +3,7 @@ services:
 - type: web
   name: lib_app-laravel-
   runtime: node
+  env: php
   repo: https://github.com/crystalguardian133/lib_app-laravel-
   plan: free
   envVars:
@@ -106,8 +107,17 @@ services:
     sync: false
   - key: APP_NAME
     sync: false
+  - key: APP_ENV
+    value: production
+  - key: APP_DEBUG
+    value: false
+  - key: APP_KEY
+    generateValue: true
   region: singapore
-  buildCommand: npm install; npm run build
-  startCommand: yarn start
+  buildCommand:
+      composer install --no-dev --optimize-autoloader
+      npm install && npm run build
+      php artisan migrate --force
+  startCommand: php artisan serve --host 0.0.0.0 --port 10000
   autoDeployTrigger: commit
 version: "1"
