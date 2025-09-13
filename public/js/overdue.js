@@ -1,76 +1,140 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const toast = document.getElementById('overdueToast');
-    const toastMessage = document.getElementById('toastMessage');
-    const closeBtn = document.getElementById('closeToast');
+    const overdueToast = document.getElementById('overdueToast');
+    const dueSoonToast = document.getElementById('dueSoonToast');
+    const closeOverdue = document.getElementById('closeOverdue');
+    const closeDueSoon = document.getElementById('closeDueSoon');
 
-    if (!toast || !toastMessage || !closeBtn) {
-        console.error("Toast elements missing");
+    if (!overdueToast || !dueSoonToast) {
+        console.warn('Toast elements not found. Skipping.');
         return;
     }
 
-    closeBtn.addEventListener('click', () => {
-        toast.classList.remove('show');
-    });
+    // Hide initially
+    overdueToast.classList.add('toast-hidden');
+    dueSoonToast.classList.add('toast-hidden');
 
     try {
-        const response = await fetch('/transactions/overdue', {
+        const response = await fetch('/api/notifications/overdue', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
             }
         });
 
-        if (!response.ok) throw new Error('Failed to load data');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
-        const count = data.books.length;
+        const overdueList = Array.isArray(data.overdue) ? data.overdue : [];
+        const dueSoonList = Array.isArray(data.dueSoon) ? data.dueSoon : [];
 
-        if (count === 0) return; // No toast if nothing overdue
+        // Group by member (only relevant books)
+        const groupByMember = (books) =>
+            books.reduce((acc, { member, title }) => {
+                acc[member] = acc[member] || [];
+                acc[member].push(title);
+                return acc;
+            }, {});
 
-        // Group books by member
-        const memberBooks = {};
-        data.books.forEach(book => {
-            if (!memberBooks[book.member]) {
-                memberBooks[book.member] = [];
-            }
-            memberBooks[book.member].push(book.title);
-        });
+        const overdueByMember = groupByMember(overdueList);
+        const dueSoonByMember = groupByMember(dueSoonList);
 
-        const memberNames = Object.keys(memberBooks);
-        const memberCount = memberNames.length;
+        // Helper: Build summary message
+        const buildSummary = (grouped, isOverdue) => {
+            const count = Object.keys(grouped).length;
 
-        let message = '';
-
-        if (memberCount === 1) {
-            const member = memberNames[0];
-            const books = memberBooks[member];
-            const bookCount = books.length;
-
-            if (bookCount === 1) {
-                // "John Doe had borrowed The Great Gatsby, and is overdue."
-                message = `<strong>${member}</strong> had borrowed <strong>${books[0]}</strong>, and is overdue.`;
+            if (count === 1) {
+                const member = Object.keys(grouped)[0];
+                const books = grouped[member];
+                const verb = isOverdue ? 'overdue' : 'due soon';
+                const bookText = books.length === 1
+                    ? 'a book'
+                    : `<strong>${books.length}</strong> books`;
+                return `<strong>${member}</strong> has ${bookText} ${verb}.`;
             } else {
-                // "John Doe had borrowed 2 books, and are overdue."
-                message = `<strong>${member}</strong> had borrowed <strong>${bookCount} book${bookCount > 1 ? 's' : ''}</strong>, and is overdue.`;
+                const type = isOverdue ? 'overdue' : 'due soon';
+                return `<strong>${count} member${count > 1 ? 's' : ''}</strong> have books ${type}.`;
             }
-        } else {
-            // "2 member(s) had overdue book(s)."
-            message = `<strong>${memberCount} member${memberCount > 1 ? 's' : ''}</strong> had overdue book${count > 1 ? 's' : ''}.`;
+        };
+
+        // Helper: Format full details
+        const formatDetails = (grouped) => {
+            return Object.entries(grouped)
+                .map(([member, titles]) => `
+                    <div>
+                        <strong>${member}:</strong>
+                        <ul style="margin:4px 0; padding-left:18px; font-size:0.9rem;">
+                            ${titles.map(t => `<li>${t}</li>`).join('')}
+                        </ul>
+                    </div>
+                `)
+                .join('');
+        };
+
+        // === Show Overdue Toast ===
+        if (overdueList.length > 0) {
+            document.getElementById('overdueSummary').innerHTML =
+                buildSummary(overdueByMember, true);
+            document.getElementById('overdueDetails').innerHTML =
+                formatDetails(overdueByMember);
+
+            // Toggle expand
+            overdueToast.querySelector('.toast-text').onclick = (e) => {
+                if (e.target.closest('.toast-close')) return;
+                const d = document.getElementById('overdueDetails');
+                d.style.display = d.style.display === 'none' ? 'block' : 'none';
+            };
+
+            overdueToast.classList.remove('toast-hidden', 'show');
+            overdueToast.classList.add('toast-overdue', 'show');
         }
 
-        // Update and show toast
-        toastMessage.innerHTML = message;
-        toast.classList.add('show');
+        // === Show Due Soon Toast ===
+        if (dueSoonList.length > 0) {
+            document.getElementById('dueSoonSummary').innerHTML =
+                buildSummary(dueSoonByMember, false);
+            document.getElementById('dueSoonDetails').innerHTML =
+                formatDetails(dueSoonByMember);
 
-        // Auto-dismiss after 10 seconds
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 10000);
+            // Toggle expand
+            dueSoonToast.querySelector('.toast-text').onclick = (e) => {
+                if (e.target.closest('.toast-close')) return;
+                const d = document.getElementById('dueSoonDetails');
+                d.style.display = d.style.display === 'none' ? 'block' : 'none';
+            };
+
+            dueSoonToast.classList.remove('toast-hidden', 'show');
+            dueSoonToast.classList.add('toast-warning', 'show');
+        }
+
+        // Close buttons
+        closeOverdue?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            overdueToast.classList.remove('show');
+            setTimeout(() => overdueToast.classList.add('toast-hidden'), 300);
+        });
+
+        closeDueSoon?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dueSoonToast.classList.remove('show');
+            setTimeout(() => dueSoonToast.classList.add('toast-hidden'), 300);
+        });
+
+        // Auto-dismiss after 12 seconds
+        if (!overdueToast.classList.contains('toast-hidden')) {
+            setTimeout(() => {
+                overdueToast.classList.remove('show');
+                setTimeout(() => overdueToast.classList.add('toast-hidden'), 300);
+            }, 12000);
+        }
+
+        if (!dueSoonToast.classList.contains('toast-hidden')) {
+            setTimeout(() => {
+                dueSoonToast.classList.remove('show');
+                setTimeout(() => dueSoonToast.classList.add('toast-hidden'), 300);
+            }, 12000);
+        }
+
     } catch (err) {
-        console.error('Overdue notification error:', err);
-        // Optional fallback
-        // toastMessage.innerHTML = "⚠️ Could not load overdue books.";
-        // toast.style.background = 'var(--warning)';
-        // toast.classList.add('show');
+        console.error('[Toast] Error:', err.message);
     }
 });

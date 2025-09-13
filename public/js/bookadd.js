@@ -5,7 +5,37 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const formData = new FormData(form);
+    // Create FormData and manually append all fields including file
+    const formData = new FormData();
+    
+    // Add all regular form fields
+    const formElements = form.elements;
+    for (let i = 0; i < formElements.length; i++) {
+      const element = formElements[i];
+      
+      if (element.name && element.type !== 'file') {
+        formData.append(element.name, element.value);
+      }
+    }
+    
+    // Specifically handle the cover file input
+    const coverInput = document.getElementById('cover-input');
+    if (coverInput && coverInput.files && coverInput.files[0]) {
+      console.log('Adding cover file to FormData:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+      formData.append('cover', coverInput.files[0]);
+    } else {
+      console.log('No cover file selected');
+    }
+
+    // Debug: Log all FormData entries
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`${key}: [File] ${value.name} (${value.size} bytes)`);
+      } else {
+        console.log(`${key}: ${value}`);
+      }
+    }
 
     try {
       const response = await fetch('/books', {
@@ -13,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
           'Accept': 'application/json',
+          // Note: Don't set Content-Type header when sending FormData with files
         },
         body: formData,
       });
@@ -72,8 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateCoverPreview(file) {
     if (!file) return;
 
-    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-      showCornerPopup('Only JPG and PNG images are allowed.');
+    if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
+      showCornerPopup('Only JPG, PNG, and GIF images are allowed.');
       return;
     }
 
@@ -99,10 +130,22 @@ document.addEventListener('DOMContentLoaded', () => {
     coverInput.click();
   });
 
-  // Handle file selection
+  // Handle file selection - FIXED VERSION
   coverInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    if (file) updateCoverPreview(file);
+    if (file) {
+      console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+      updateCoverPreview(file);
+      
+      // Verify the file is still in the input after preview update
+      setTimeout(() => {
+        if (coverInput.files && coverInput.files[0]) {
+          console.log('File confirmed in input:', coverInput.files[0].name);
+        } else {
+          console.log('WARNING: File not found in input after preview update');
+        }
+      }, 100);
+    }
   });
 
   // Prevent default drag behaviors
@@ -134,11 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
     coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
   });
 
+  // Fixed drag and drop handler
   coverPreviewArea.addEventListener('drop', (e) => {
     coverPreviewArea.style.transform = '';
     coverPreviewArea.style.boxShadow = '';
+    coverPreviewContent.style.backgroundColor = '#f9fafb';
+    coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
+    
     const files = e.dataTransfer.files;
     if (files.length) {
+      // Manually set the file to the input element
+      const dt = new DataTransfer();
+      dt.items.add(files[0]);
+      coverInput.files = dt.files;
+      
+      console.log('File dropped and set to input:', files[0].name);
       updateCoverPreview(files[0]);
     }
   });
@@ -150,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
     coverPreviewContent.style.color = '';
     uploadIcon.style.opacity = '1';
     previewText.style.opacity = '1';
-    previewText.innerHTML = 'Click or drag image here<br><small>Supports JPG, PNG (max 5MB)</small>';
+    previewText.innerHTML = 'Click or drag image here<br><small>Supports JPG, PNG, GIF (max 5MB)</small>';
     coverInput.value = '';
     coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
     coverPreviewArea.style.transform = '';

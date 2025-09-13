@@ -262,16 +262,4 @@ public function update(Request $request, $id)
 
     return response()->json($member);
 }
-public function overdueBooks()
-{
-    $member = auth()->user(); // Or however you identify the current member
-    // Example: get borrowed books where due_date < now()
-    $books = $member->borrowedBooks()
-        ->where('due_date', '<', now())
-        ->get(['title', 'due_date']);
-
-    return response()->json(['books' => $books]);
-}
-
-
 }

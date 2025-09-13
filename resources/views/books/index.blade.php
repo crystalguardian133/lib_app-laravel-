@@ -13,7 +13,7 @@
 
   <style>
     :root {
-      --primary: #5b21b6;
+      --primary: #2fb9eb;
       --accent: #0891b2;
       --light: #f9fafb;
       --dark: #0f172a;
@@ -528,20 +528,20 @@
       transform: scale(1.02);
     }
 
-    .cover-preview-content {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray);
-      transition: all 0.3s ease;
-      background-size: cover;
-      background-position: center;
-      text-align: center;
-      padding: 1rem;
-    }
+#cover-preview-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--gray);
+  font-size: 1rem;
+  text-align: center;
+  background-color: #f9fafb;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease;
+}
 
     .cover-input {
       position: absolute;
@@ -689,32 +689,36 @@
         />
       </div>
 
-      <!-- Book Grid -->
-      <div class="book-grid" id="bookGrid">
-        @foreach($books as $book)
-        <div class="book-card" data-id="{{ $book->id }}" data-title="{{ $book->title }}" data-author="{{ $book->author }}">
-          <img src="{{ $book->cover_image ?? '/images/no-cover.png' }}" alt="Cover" class="book-cover">
-          <div class="book-info">
-            <h3 class="book-title">{{ $book->title }}</h3>
-            <div class="book-meta">
-              <div>by {{ $book->author }}</div>
-              <div>{{ $book->genre }} • {{ $book->published_year }}</div>
-              <div><strong>Available:</strong> {{ $book->availability > 0 ? 'Yes' : 'No' }}</div>
-            </div>
-            <div class="book-actions">
-              @if(!empty($book->qr_url))
-                <button class="btn-qr" onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')">QR</button>
-              @else
-                <button class="btn-qr" onclick="generateQr({{ $book->id }})">Gen</button>
-              @endif
-              <button class="btn-borrow" onclick="borrowOne({{ $book->id }})">Borrow</button>
-            </div>
-          </div>
+<div class="book-grid" id="bookGrid">
+  @foreach($books as $book)
+    <div class="book-card"
+         data-id="{{ $book->id }}"
+         data-title="{{ $book->title }}"
+         data-author="{{ $book->author }}"
+         data-genre="{{ $book->genre }}"
+         data-published-year="{{ $book->published_year }}"
+         data-availability="{{ $book->availability }}"
+         data-cover-image="{{ $book->cover_image ?? '' }}">
+      <img src="{{ $book->cover_image ?? '/images/no-cover.png' }}" alt="Cover" class="book-cover">
+      <div class="book-info">
+        <h3 class="book-title">{{ $book->title }}</h3>
+        <div class="book-meta">
+          <div>by {{ $book->author }}</div>
+          <div>{{ $book->genre }} • {{ $book->published_year }}</div>
+          <div><strong>Available:</strong> {{ $book->availability > 0 ? 'Yes' : 'No' }}</div>
         </div>
-        @endforeach
+        <div class="book-actions">
+          @if(!empty($book->qr_url))
+            <button class="btn-qr" onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')">QR</button>
+          @else
+            <button class="btn-qr" onclick="generateQr({{ $book->id }})">Gen</button>
+          @endif
+          <button class="btn-borrow" onclick="borrowOne({{ $book->id }})">Borrow</button>
+        </div>
       </div>
-    </main>
-  </div>
+    </div>
+  @endforeach
+</div>
 
   <!-- Selection Mode Bar -->
   <div class="selection-mode" id="selectionBar" style="display:none;">

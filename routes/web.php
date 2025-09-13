@@ -36,10 +36,12 @@ Route::get('/timelog', [TimeLogController::class, 'index'])->name('timelog.index
 // Books Route
 Route::resource('books', BookController::class);
 Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
+
 // Overdue Routes
-Route::get('/members/overdue', [MemberController::class, 'overdueBooks']);
 Route::put('/books/{id}', [BookController::class, 'update']);
 Route::delete('/books/{id}', [BookController::class, 'destroy']);
+Route::get('/api/notifications/overdue', [BorrowController::class, 'getOverdueAndDueSoon'])
+    ->name('api.notifications.overdue');
 
 
 // Member routes

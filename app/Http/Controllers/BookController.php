@@ -32,57 +32,111 @@ class BookController extends Controller
         return view('books.index', compact('books'));
     }
 
-   public function store(Request $request)
+public function store(Request $request)
 {
+    // Debug: Log the request data
+    \Log::info('Book creation request data:', $request->all());
+    \Log::info('Files in request:', $request->allFiles());
+
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'author' => 'required|string|max:255',
         'genre' => 'nullable|string|max:50',
         'published_year' => 'required|integer|min:1000|max:3000',
         'availability' => 'required|integer|min:0',
-        'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
+        'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120' // 5MB to match your JS
     ]);
 
-    // Create the book record first
-    $book = Book::create($validated);
+    // Remove cover from validated data to avoid mass assignment issues
+    $bookData = collect($validated)->except('cover')->toArray();
+    
+    try {
+        // Create the book record first
+        $book = Book::create($bookData);
+        \Log::info('Book created with ID: ' . $book->id);
 
-    // Handle cover upload if exists
-    if ($request->hasFile('cover')) {
-        $file = $request->file('cover');
-        $ext = $file->getClientOriginalExtension();
-        $fileName = 'book-' . $book->id . '.' . $ext;
-        $destination = public_path('cover');
+        // Handle cover upload if exists
+        if ($request->hasFile('cover')) {
+            \Log::info('Cover file detected');
+            
+            $file = $request->file('cover');
+            
+            // Additional file validation
+            if (!$file->isValid()) {
+                \Log::error('Invalid file upload');
+                return response()->json(['error' => 'Invalid file upload'], 400);
+            }
 
-        // Make sure directory exists
-        if (!file_exists($destination)) {
-            mkdir($destination, 0755, true);
+            $originalName = $file->getClientOriginalName();
+            $ext = $file->getClientOriginalExtension();
+            $fileName = 'book-' . $book->id . '-' . time() . '.' . $ext;
+            $destination = public_path('cover');
+
+            \Log::info('Attempting to upload: ' . $originalName . ' as ' . $fileName);
+
+            // Make sure directory exists
+            if (!file_exists($destination)) {
+                if (!mkdir($destination, 0755, true)) {
+                    \Log::error('Failed to create cover directory');
+                    return response()->json(['error' => 'Failed to create upload directory'], 500);
+                }
+                \Log::info('Created cover directory');
+            }
+
+            // Check if directory is writable
+            if (!is_writable($destination)) {
+                \Log::error('Cover directory is not writable: ' . $destination);
+                return response()->json(['error' => 'Upload directory is not writable'], 500);
+            }
+
+            // Move file to destination
+            if ($file->move($destination, $fileName)) {
+                // Verify the file was actually moved
+                $fullPath = $destination . '/' . $fileName;
+                if (file_exists($fullPath)) {
+                    // Save the relative path in the database
+                    $book->cover_image = 'cover/' . $fileName;
+                    if ($book->save()) {
+                        \Log::info('Cover uploaded and saved successfully: ' . $fileName);
+                        \Log::info('Database updated with cover_image: ' . $book->cover_image);
+                    } else {
+                        \Log::error('Failed to save cover_image to database');
+                    }
+                } else {
+                    \Log::error('File was not found after move operation');
+                }
+            } else {
+                \Log::error('Failed to move uploaded file to: ' . $destination . '/' . $fileName);
+                return response()->json(['error' => 'Failed to save uploaded file'], 500);
+            }
+        } else {
+            \Log::info('No cover file in request');
         }
 
-        // Move file
-        $file->move($destination, $fileName);
+        // Generate QR code
+        $this->generateQrFile($book);
 
-        // Save public URL in the DB
-        $book->cover_image = url('cover/' . $fileName);
-        $book->save();
+        // Refresh the model to get all updated data
+        $book = $book->fresh();
+        
+        return response()->json([
+            'message' => 'Book added successfully!',
+            'book' => $book
+        ], 201);
+
+    } catch (\Exception $e) {
+        \Log::error('Error creating book: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'error' => 'Failed to create book: ' . $e->getMessage()
+        ], 500);
     }
-
-    // Generate QR code
-    $this->generateQrFile($book);
-
-    return response()->json([
-        'message' => 'Book added successfully!',
-        'book' => $book
-    ], 201);
 }
 
     public function show($id)
     {
         return response()->json(Book::findOrFail($id));
-    }
-
-    public function edit(Book $book)
-    {
-        return view('books.edit', compact('book'));
     }
 
     public function update(Request $request, $id)

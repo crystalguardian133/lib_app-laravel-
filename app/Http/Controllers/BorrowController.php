@@ -134,5 +134,46 @@ public function store(Request $request)
         'middle_name' => $member->middle_name,
         'last_name' => $member->last_name,
     ]);
+}   
+public function getOverdueAndDueSoon()
+{
+    $now = now();
+    $inThreeDays = now()->addDays(3)->endOfDay();
+
+    $activeTransactions = \App\Models\Transaction::with(['member', 'book'])
+        ->where('status', 'borrowed')
+        ->get();
+
+    $overdue = [];
+    $dueSoon = [];
+
+    foreach ($activeTransactions as $t) {
+        try {
+            $dueDate = \Illuminate\Support\Carbon::parse($t->due_date);
+        } catch (\Exception $e) {
+            continue;
+        }
+
+        if ($dueDate->lessThan($now)) {
+            $overdue[] = $t;
+        } elseif ($dueDate->lessThanOrEqualTo($inThreeDays)) {
+            $dueSoon[] = $t;
+        }
+    }
+
+    $format = function ($items) {
+        return collect($items)->map(function ($t) {
+            $m = $t->member;
+            $name = $m ? trim("$m->first_name $m->middle_name $m->last_name") : 'Unknown Member';
+            $title = $t->book?->title ?? 'Unknown Title';
+
+            return ['member' => $name, 'title' => $title];
+        });
+    };
+
+    return response()->json([
+        'overdue' => $format($overdue),
+        'dueSoon'  => $format($dueSoon),
+    ]);
 }
 }
