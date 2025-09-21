@@ -72,8 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const coverPreviewArea = document.getElementById('cover-preview-area');
   const coverInput = document.getElementById('cover-input');
   const coverPreviewContent = document.getElementById('cover-preview-content');
-  const uploadIcon = document.getElementById('cover-upload-icon');
-  const previewText = document.getElementById('cover-preview-text');
 
   // Make it a giant rectangle
   Object.assign(coverPreviewArea.style, {
@@ -100,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     transition: 'background-color 0.3s ease',
   });
 
+  // FIXED: Complete content replacement instead of background image overlay
   function updateCoverPreview(file) {
     if (!file) return;
 
@@ -115,12 +114,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reader = new FileReader();
     reader.onload = function (e) {
-      coverPreviewContent.style.backgroundImage = `url(${e.target.result})`;
-      coverPreviewContent.style.backgroundSize = 'cover';
-      coverPreviewContent.style.backgroundPosition = 'center';
-      coverPreviewContent.style.color = 'transparent';
-      uploadIcon.style.opacity = '0';
-      previewText.style.opacity = '0';
+      // FIXED: Completely replace the content instead of using background image
+      coverPreviewContent.innerHTML = `
+        <img src="${e.target.result}" alt="Book Cover Preview" style="
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          object-fit: contain;
+        ">
+        <p style="
+          position: absolute;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.8rem;
+          margin: 0;
+          max-width: 90%;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        ">${file.name}</p>
+      `;
+      
+      // Update the container styles
+      coverPreviewContent.style.position = 'relative';
+      coverPreviewContent.style.backgroundColor = '#f1f5f9';
+      coverPreviewArea.style.borderColor = 'var(--primary, #2fb9eb)';
+      coverPreviewArea.style.borderStyle = 'solid';
     };
     reader.readAsDataURL(file);
   }
@@ -196,16 +223,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Reset cover preview
+  // FIXED: Reset cover preview with complete content replacement
   window.resetCoverPreview = function () {
-    coverPreviewContent.style.backgroundImage = '';
+    // Reset the innerHTML completely
+    coverPreviewContent.innerHTML = `
+      <i id="cover-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted, #6b7280); margin-bottom: 12px;"></i>
+      <p id="cover-preview-text" style="color: var(--text-muted, #6b7280); margin: 0; font-weight: 500; font-size: 1.1rem;">
+        Click or drag image here...
+      </p>
+      <small style="color: var(--text-muted, #6b7280); margin-top: 8px; display: block;">
+        Supports JPG, PNG, GIF (max 5MB)
+      </small>
+    `;
+    
+    // Reset styles
     coverPreviewContent.style.backgroundColor = '#f9fafb';
-    coverPreviewContent.style.color = '';
-    uploadIcon.style.opacity = '1';
-    previewText.style.opacity = '1';
-    previewText.innerHTML = 'Click or drag image here<br><small>Supports JPG, PNG, GIF (max 5MB)</small>';
+    coverPreviewContent.style.position = '';
     coverInput.value = '';
     coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
+    coverPreviewArea.style.borderStyle = 'dashed';
     coverPreviewArea.style.transform = '';
     coverPreviewArea.style.boxShadow = '';
   };

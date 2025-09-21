@@ -18,6 +18,11 @@ Route::get('/', function () {
 
 // Admin dashboard route
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard/books-data', [AdminController::class, 'getBooksData'])->name('dashboard.books-data');
+Route::get('/dashboard/members-data', [AdminController::class, 'getMembersData'])->name('dashboard.members-data');
+Route::get('/dashboard/borrowers-data', [AdminController::class, 'getBorrowersData'])->name('dashboard.borrowers-data');
+Route::get('/dashboard/weekly-data', [AdminController::class, 'getWeeklyData'])->name('dashboard.weekly-data');
+Route::get('/dashboard/recent-members', [AdminController::class, 'getRecentMembers'])->name('dashboard.recent-members');
 
 //TEST
 Route::get('/notifications/overdue', function () {
@@ -59,8 +64,7 @@ Route::get('/members/search', [BorrowController::class, 'search']);
 Route::get('/members/{id}', [MemberController::class, 'show']);
 
 
-// Logging Routes 
-Route::get('/timelog', [TimeLogController::class, 'index']);
+// Logging Routes
 Route::get('/timelog/search', [TimeLogController::class, 'search']);
 Route::post('/timelog/time-in', [TimeLogController::class, 'timeIn']);
 Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);

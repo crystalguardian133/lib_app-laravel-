@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>📃 Transactions | Julita Public Library</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+@extends('layouts.app')
+@section('title', '📃 Transactions | Julita Public Library')
+@section('page_title', '📃 Borrowed Transactions')
+@push('head')
   <style>
     :root {
       --primary: #1e3a8a;
@@ -257,24 +253,9 @@ body.dark-mode .styled-table tbody tr.overdue {
 }
 
   </style>
-</head>
-<body>
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <img src="/images/logo.png" alt="Logo" class="logo">
-      <span class="label">Julita Library</span>
-    </div>
-    <button class="toggle-btn" id="toggleSidebar">☰</button>
-    <nav>
-      <a href="{{ route('dashboard') }}">🏠 <span class="label">Dashboard</span></a>
-      <a href="{{ route('books.index') }}">📘 <span class="label">Books</span></a>
-      <a href="{{ route('members.index') }}">👥 <span class="label">Members</span></a>
-      <a href="{{ route('transactions.index') }}">📃 <span class="label">Transactions</span></a>
-    </nav>
-  </div>
+@endpush
 
-  <div class="main" id="mainContent">
-    <div class="heading">📃 Borrowed Transactions</div>
+@section('content')
    <h2>📘 Borrowed Books</h2>
 <div class="styled-table-wrapper">
   <table class="styled-table">
@@ -344,8 +325,6 @@ body.dark-mode .styled-table tbody tr.overdue {
     </tbody>
   </table>
 </div>
-  </div>
-
   <!-- Return Modal -->
   <div class="modal" id="returnModal">
     <div class="modal-content">
@@ -361,6 +340,7 @@ body.dark-mode .styled-table tbody tr.overdue {
   <p><strong>⏰ Overdue Alert:</strong></p>
   <ul id="overdueList"></ul>
 </div>
+@push('scripts')
   <script>
     // Sidebar + Dark Mode Logic
     document.addEventListener('DOMContentLoaded', () => {
@@ -384,6 +364,6 @@ body.dark-mode .styled-table tbody tr.overdue {
       }
     });
   </script>
-  <script src="js/bookreturn.js"></script>
-</body>
-</html>
+  <script src="{{ asset('js/bookreturn.js') }}"></script>
+@endpush
+@endsection

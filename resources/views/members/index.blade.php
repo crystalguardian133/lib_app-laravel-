@@ -281,21 +281,24 @@
         /* Main Content */
         .main {
             margin-left: 260px;
-            padding: 2rem;
+            padding: 1.5rem;
             min-height: 100vh;
             transition: margin-left 0.3s ease;
+            overflow-x: hidden;
+            max-width: calc(100vw - 260px);
         }
 
         .main.collapsed {
             margin-left: 70px;
+            max-width: calc(100vw - 70px);
         }
 
         .page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 2rem;
-            padding: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
@@ -328,9 +331,9 @@
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             align-items: center;
-            padding: 1.5rem;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
@@ -346,7 +349,8 @@
         .search-box {
             position: relative;
             flex: 1;
-            min-width: 300px;
+            min-width: 250px;
+            max-width: 400px;
         }
 
         .search-box input {
@@ -441,16 +445,95 @@
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
         .btn-danger {
             background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
         .btn-sm {
             padding: 8px 16px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             min-width: auto;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-sm::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-sm:hover::before {
+            left: 100%;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-buttons .btn:active {
+            transform: translateY(0px) scale(1.02);
+        }
+
+        .action-buttons .btn i {
+            margin-right: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .action-buttons .btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .action-buttons .btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .action-buttons .btn:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .action-buttons .btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
         .btn-sm .icon {
@@ -505,10 +588,29 @@
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
-            overflow: hidden;
+            overflow-x: auto;
             box-shadow: var(--shadow-lg);
             border: 1px solid rgba(255, 255, 255, 0.2);
             margin-top: 1rem;
+            position: relative;
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
 
         body.dark-mode .table-container {
@@ -519,6 +621,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 800px;
         }
 
         thead {
@@ -527,12 +630,13 @@
         }
 
         th {
-            padding: 1.2rem;
+            padding: 1rem 0.75rem;
             text-align: left;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             letter-spacing: 0.5px;
             position: relative;
+            white-space: nowrap;
         }
 
         th::after {
@@ -546,19 +650,93 @@
         }
 
         th:first-child {
-            width: 50px;
-            text-align: center;
+            width: 200px;
+            min-width: 180px;
+        }
+
+        th:nth-child(2) {
+            width: 80px;
+            min-width: 60px;
+        }
+
+        th:nth-child(3) {
+            width: 250px;
+            min-width: 200px;
+        }
+
+        th:nth-child(4) {
+            width: 150px;
+            min-width: 120px;
+        }
+
+        th:nth-child(5) {
+            width: 200px;
+            min-width: 150px;
+        }
+
+        th:nth-child(6) {
+            width: 140px;
+            min-width: 120px;
+        }
+
+        th:nth-child(7) {
+            width: 120px;
+            min-width: 100px;
+        }
+
+        th:nth-child(8) {
+            width: 120px;
+            min-width: 100px;
         }
 
         td {
-            padding: 1.2rem;
+            padding: 1rem 0.75rem;
             border-bottom: 1px solid rgba(0,0,0,0.05);
             transition: all 0.3s ease;
+            vertical-align: top;
+            word-wrap: break-word;
         }
 
         td:first-child {
+            text-align: left;
+            width: 200px;
+            min-width: 180px;
+        }
+
+        td:nth-child(2) {
+            width: 80px;
+            min-width: 60px;
             text-align: center;
-            width: 50px;
+        }
+
+        td:nth-child(3) {
+            width: 250px;
+            min-width: 200px;
+        }
+
+        td:nth-child(4) {
+            width: 150px;
+            min-width: 120px;
+        }
+
+        td:nth-child(5) {
+            width: 200px;
+            min-width: 150px;
+        }
+
+        td:nth-child(6) {
+            width: 140px;
+            min-width: 120px;
+        }
+
+        td:nth-child(7) {
+            width: 120px;
+            min-width: 100px;
+        }
+
+        td:nth-child(8) {
+            width: 120px;
+            min-width: 100px;
         }
 
         body.dark-mode td {
@@ -926,6 +1104,7 @@
             .main {
                 margin-left: 0;
                 padding: 1rem;
+                max-width: 100vw;
             }
 
             .modal {
@@ -951,10 +1130,31 @@
             .top-controls {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 0.75rem;
             }
 
             .search-box {
                 min-width: auto;
+                max-width: none;
+            }
+
+            .table-container {
+                margin-top: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 0.75rem;
             }
 
             .page-title {
@@ -1130,7 +1330,7 @@
     
     <nav>
       <a href="/dashboard">
-        <span class="icon">🏠</span>
+        <span class="icon">🏠</span>s2
         <span class="label">Dashboard</span>
       </a>
       <a href="/books">
@@ -1240,11 +1440,12 @@
 
             {{-- Actions - Individual Edit and Download Buttons --}}
             <td>
-              <div style="display: flex; gap: 8px; align-items: center;">
+              <div class="action-buttons">
                   <button 
                 class="btn btn-sm btn-primary editBtn" 
-                data-id="{{ $member->id }}">
-                Edit
+                data-id="{{ $member->id }}"
+                title="Edit Member">
+                <i class="fas fa-edit"></i> Edit
                   </button>
 
 <a href="javascript:void(0)" 
@@ -1690,6 +1891,97 @@ function closeCardPreviewModal() {
   document.getElementById("cardPreviewModal").style.display = "none";
   document.getElementById("cardPreviewFrame").src = "";
 }
+
+// Add missing openCardModal function
+function openCardModal(memberId) {
+  console.log('Opening card modal for member ID:', memberId);
+  
+  // Create a simple modal for card generation
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+    ">
+      <h3 style="margin-bottom: 1rem; color: #333;">📄 Generate ID Card</h3>
+      <p style="margin-bottom: 1.5rem; color: #666;">Generate ID card for member ID: ${memberId}</p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button onclick="this.closest('.modal').remove()" style="
+          padding: 8px 16px;
+          background: #6b7280;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        ">Cancel</button>
+        <button onclick="generateCard(${memberId})" style="
+          padding: 8px 16px;
+          background: #10b981;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        ">Generate Card</button>
+      </div>
+    </div>
+  `;
+  
+  modal.className = 'modal';
+  document.body.appendChild(modal);
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+function generateCard(memberId) {
+  // This would typically generate and download the card
+  alert(`Card generated for member ID: ${memberId}`);
+  document.querySelector('.modal').remove();
+}
+
+// Ensure buttons work properly
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Members page JavaScript loaded successfully');
+  
+  // Test if edit buttons are being found
+  const editButtons = document.querySelectorAll('.editBtn');
+  console.log('Found edit buttons:', editButtons.length);
+  
+  // Add click event listeners to edit buttons as backup
+  editButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const memberId = this.getAttribute('data-id');
+      console.log('Edit button clicked for member ID:', memberId);
+      
+      // Let the existing memberedit.js handle the functionality
+      // This is just a backup to ensure the button is clickable
+    });
+  });
+});
+
 </script>
 
 <!-- External Scripts - ONLY INCLUDE EACH ONCE -->
