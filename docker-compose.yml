@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  laravel.test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lib_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - laravel
+    ports:
+      - "9000:9000"
+
+  web:
+    image: nginx:alpine
+    container_name: laravel_web
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - laravel.test
+    networks:
+      - laravel
+
+  db:
+    image: postgres:15
+    container_name: laravel_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cap_db
+      POSTGRES_USER: suroot
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - sail-pgsql:/var/lib/postgresql/data
+    networks:
+      - laravel
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U suroot -d cap_db"]
+      interval: 5s
+      retries: 10
+      timeout: 5s
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  sail-pgsql:
+    driver: local
