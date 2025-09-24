@@ -101,56 +101,6 @@
     --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
   }
 
-  /* Additional dark mode styles */
-  body.dark-mode .sidebar {
-    background: rgba(20, 20, 20, 0.9);
-    border-right-color: rgba(255, 255, 255, 0.1);
-  }
-
-  body.dark-mode .card {
-    background: rgba(30, 30, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  body.dark-mode .btn-outline {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--text-secondary);
-  }
-
-  body.dark-mode .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-
-  body.dark-mode .data-table th {
-    background: rgba(20, 20, 20, 0.8);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-
-  body.dark-mode .data-table td {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
-  }
-
-  body.dark-mode .data-table tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  body.dark-mode .form-control {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(71, 85, 105, 0.5);
-    color: var(--text-primary);
-  }
-
-  body.dark-mode .form-control:focus {
-    background: rgba(30, 41, 59, 1);
-    border-color: var(--accent);
-  }
-
-  body.dark-mode .form-control:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
   /* Global Reset */
   * {
     box-sizing: border-box;
@@ -163,36 +113,11 @@
     background: linear-gradient(135deg, var(--background), #f1f5f9);
     color: var(--text-primary);
     line-height: 1.6;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease-in-out;
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    position: relative;
-  }
-
-  /* Dark mode transition overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 9999;
-  }
-
-  body.dark-mode::before {
-    opacity: 1;
-  }
-
-  /* Animated elements during transition */
-  body.dark-mode-transition * {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
   }
 
   body.dark-mode {
@@ -215,9 +140,8 @@
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-lg);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition);
     color: var(--text-primary);
-    transform: translateZ(0);
   }
 
   .sidebar.collapsed {
@@ -375,66 +299,15 @@
     border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition);
+  }
+
+  .switch {
     position: relative;
-    border-radius: var(--radius);
-  }
-
-  .dark-toggle::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--glass-bg);
-    border-radius: var(--radius);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: -1;
-  }
-
-  body.dark-mode .dark-toggle::before {
-    opacity: 1;
-  }
-
-  /* Animated label */
-  #darkModeLabel {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
-  }
-
-  .morphing-toggle {
-    background: var(--glass-bg);
-    border: 2px solid var(--border);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+    width: 60px;
+    height: 34px;
     margin-right: 12px;
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    box-shadow: var(--shadow);
-  }
-
-  .morphing-toggle:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
-  }
-
-  body.dark-mode .morphing-toggle:hover {
-    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.3);
-  }
-
-  .morphing-toggle:active {
-    transform: scale(0.95);
   }
 
   .switch input {
@@ -443,212 +316,58 @@
     height: 0;
   }
 
-  .morphing-symbol {
-    font-size: 24px;
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    display: block;
-    transform-origin: center;
-    position: relative;
-    z-index: 2;
-    opacity: 1;
-  }
-
-  /* Base symbol styles */
-  .morphing-symbol::before,
-  .morphing-symbol::after {
+  .slider {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    border-radius: 34px;
+    transition: var(--transition);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  /* Sun symbol - only visible in light mode */
-  .morphing-symbol::before {
+  .slider:before {
     content: "☀️";
-    opacity: 1;
-    z-index: 2;
-    display: block;
-  }
-
-  /* Crescent moon symbol - only visible in dark mode */
-  .morphing-symbol::after {
-    content: "🌙";
-    opacity: 0;
-    z-index: 1;
-    display: none;
-  }
-
-  /* Dark mode - hide sun, show moon */
-  .morphing-toggle.dark-mode .morphing-symbol::before {
-    opacity: 0 !important;
-    display: none !important;
-  }
-
-  .morphing-toggle.dark-mode .morphing-symbol::after {
-    opacity: 1 !important;
-    display: block !important;
-    z-index: 2;
-  }
-
-  /* Light mode - show sun, hide moon */
-  .morphing-toggle:not(.dark-mode) .morphing-symbol::before {
-    opacity: 1 !important;
-    display: block !important;
-    z-index: 2;
-  }
-
-  .morphing-toggle:not(.dark-mode) .morphing-symbol::after {
-    opacity: 0 !important;
-    display: none !important;
-  }
-
-  /* Ensure symbol is always visible */
-  .morphing-toggle .morphing-symbol {
-    opacity: 1 !important;
-  }
-
-  /* Ensure crescent elements are positioned relative to the symbol */
-  .morphing-toggle .morphing-symbol::before,
-  .morphing-toggle .morphing-symbol::after {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-  }
-
-  /* Show pseudo-elements for morphing symbols */
-  .morphing-toggle .morphing-symbol::before,
-  .morphing-toggle .morphing-symbol::after {
-    display: block;
-  }
-
-  /* Morphing animation for sun to crescent moon */
-  .morphing-toggle.dark-mode .morphing-symbol {
-    transform: rotate(180deg) scale(0.8);
-    animation: morphToCrescentMoon 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  .morphing-toggle:not(.dark-mode) .morphing-symbol {
-    animation: morphToSun 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  @keyframes morphToCrescentMoon {
-    0% {
-      transform: rotate(0deg) scale(1);
-    }
-    20% {
-      transform: rotate(36deg) scale(0.95);
-    }
-    40% {
-      transform: rotate(72deg) scale(0.9);
-    }
-    60% {
-      transform: rotate(108deg) scale(0.85);
-    }
-    80% {
-      transform: rotate(144deg) scale(0.8);
-    }
-    100% {
-      transform: rotate(180deg) scale(0.8);
-    }
-  }
-
-  @keyframes morphToSun {
-    0% {
-      transform: rotate(180deg) scale(0.8);
-    }
-    20% {
-      transform: rotate(144deg) scale(0.8);
-    }
-    40% {
-      transform: rotate(108deg) scale(0.85);
-    }
-    60% {
-      transform: rotate(72deg) scale(0.9);
-    }
-    80% {
-      transform: rotate(36deg) scale(0.95);
-    }
-    100% {
-      transform: rotate(0deg) scale(1);
-    }
-  }
-
-  /* Background morphing effect */
-  .morphing-toggle::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+    height: 28px;
+    width: 28px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: var(--transition-spring);
+    box-shadow: var(--shadow);
   }
 
-  .morphing-toggle.dark-mode::before {
-    width: 80px;
-    height: 80px;
-    opacity: 0.1;
+  input:checked + .slider {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   }
 
-  /* Dark mode styling for the morphing toggle */
-  body.dark-mode .morphing-toggle {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: var(--primary);
-    box-shadow: var(--shadow), 0 0 20px rgba(99, 102, 241, 0.2);
-  }
-
-  /* Ensure crescent moon is properly visible */
-  .morphing-toggle.dark-mode .morphing-symbol {
-    opacity: 1 !important;
+  input:checked + .slider:before {
+    transform: translateX(26px);
+    content: "🌙";
   }
 
   /* Main Content */
   .main {
     margin-left: 280px;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
     flex-grow: 1;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition);
     min-width: calc(100% - 280px);
     animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transform: translateZ(0);
   }
 
   .main.full {
     margin-left: 80px;
     min-width: calc(100% - 80px);
-  }
-
-  /* Dashboard Content */
-  .dashboard-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 8px;
-  }
-
-  .dashboard-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .dashboard-content::-webkit-scrollbar-thumb {
-    background: var(--text-muted);
-    border-radius: 8px;
-  }
-
-  .dashboard-content::-webkit-scrollbar-track {
-    background: var(--border-light);
   }
 
   .heading {
@@ -662,19 +381,11 @@
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .dashboard-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: var(--spacing-xl);
-    animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
   /* Stats Cards */
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--spacing);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-lg);
     margin-top: var(--spacing);
   }
 
@@ -684,15 +395,11 @@
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    overflow: visible;
+    overflow: hidden;
     box-shadow: var(--glass-shadow);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: var(--spacing);
+    transition: var(--transition-spring);
+    padding: var(--spacing-lg);
     position: relative;
-    transform: scale(0.95);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
   }
 
   .card::before {
@@ -707,34 +414,14 @@
     transition: var(--transition);
   }
 
-  .card:hover {
-    transform: scale(1) !important;
-    box-shadow: var(--shadow-xl), var(--shadow-glow) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
-    z-index: 10 !important;
-  }
-
   .card:hover::before {
     opacity: 1;
   }
 
-  /* Simplified hover system - ensure buttons work properly */
-  .card-actions-inline .btn {
-    position: relative;
-    z-index: 3;
-    pointer-events: auto;
-  }
-
-  /* Ensure card hover works properly */
   .card:hover {
-    transform: scale(1) !important;
-    box-shadow: var(--shadow-xl), var(--shadow-glow) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
-    z-index: 10 !important;
-  }
-
-  .card:hover::before {
-    opacity: 1;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: rgba(99, 102, 241, 0.3);
   }
 
   .card h3 {
@@ -756,7 +443,6 @@
     line-height: 1.2;
   }
 
-
   .card-header {
     display: flex;
     align-items: center;
@@ -768,83 +454,11 @@
     margin: 0;
   }
 
-  /* New header layout with title and buttons side by side */
-  .card-header-with-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    width: 100%;
-    position: relative;
-    z-index: 2;
-  }
-
-  .card-header-with-buttons h3 {
-    margin: 0;
-    flex: 1;
-  }
-
-  .card-actions-inline {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 3;
-  }
-
-  /* Ensure buttons don't break card hover */
-  .card-actions-inline .btn {
-    position: relative;
-    z-index: 4;
-  }
-
   .card-actions {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    align-items: center;
   }
-
-  /* Ensure buttons don't break card hover */
-  .card-actions .btn {
-    flex-shrink: 0;
-  }
-
-  /* Bottom positioned action buttons */
-  .card-actions-bottom {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: auto;
-    padding-top: var(--spacing-sm);
-    position: relative;
-    z-index: 3;
-  }
-
-  .card-actions-bottom .btn {
-    position: relative;
-    z-index: 4;
-    pointer-events: auto;
-  }
-
-  /* Stats Overview Card */
-  .stats-overview-card {
-    cursor: default;
-  }
-
-  .stats-subcard {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-  }
-
-  .stats-subcard:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    background: rgba(99, 102, 241, 0.05);
-    border-color: rgba(99, 102, 241, 0.2);
-  }
-
 
   .btn {
     padding: 8px 12px;
@@ -863,56 +477,6 @@
   .btn-sm {
     padding: 6px 10px;
     font-size: 0.8rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-sm::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .btn-sm:hover::before {
-    left: 100%;
-  }
-
-  .btn-sm:hover {
-    transform: translateY(-2px) scale(1.05) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    background-color: rgba(99, 102, 241, 0.1) !important;
-  }
-
-  .btn-sm:active {
-    transform: translateY(0px) scale(1.02);
-  }
-
-  .btn-sm:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-
-  .btn-sm:focus:not(:focus-visible) {
-    outline: none;
-  }
-
-  .btn-sm:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
-
-  .btn-sm i {
-    transition: transform 0.2s ease;
-  }
-
-  .btn-sm:hover i {
-    transform: scale(1.1);
   }
 
   .btn-primary {
@@ -928,7 +492,7 @@
 
   .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-    transform: translateY(-2px) scale(1.05);
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
   }
 
@@ -942,8 +506,7 @@
     background: var(--glass-bg);
     color: var(--primary);
     border-color: var(--primary);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
   }
 
   /* Modal Styles */
@@ -1050,7 +613,7 @@
 
   body.dark-mode .modal-content {
     background: rgba(15, 23, 42, 0.95);
-    color: var(--text-primary);
+    color: var(--text-dark);
     border-color: rgba(51, 65, 85, 0.3);
   }
 
@@ -1658,52 +1221,24 @@
     to { transform: translateY(0); opacity: 1; }
   }
 
-  @keyframes darkModePulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
-    }
-    70% {
-      box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
-    }
-  }
-
-  @keyframes slideInFromTop {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Dark mode transition animation */
-  .dark-mode-transition {
-    animation: darkModePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
   /* Responsive Design */
   @media (max-width: 768px) {
     .sidebar {
       width: 80px;
       padding: var(--spacing);
     }
-
+    
     .sidebar-header .label,
     .sidebar nav a .label {
       display: none !important;
     }
-
+    
     .main, .main.full {
       margin-left: 80px;
       min-width: calc(100% - 80px);
       padding: var(--spacing-lg);
     }
-
+    
     #chatbot-window {
       width: calc(100vw - 32px);
       left: 16px;
@@ -1711,51 +1246,21 @@
       bottom: 90px;
       border-radius: var(--radius-md);
     }
-
+    
     #chatbot-button {
       bottom: 16px;
       right: 16px;
       width: 56px;
       height: 56px;
     }
-
-    .chart-grid {
+    
+    .chart-grid, .stats {
       grid-template-columns: 1fr;
     }
-
-    .stats {
-      grid-template-columns: 1fr;
-    }
-
+    
     .heading {
       font-size: 1.75rem;
     }
-
-    /* Improved mobile card responsiveness */
-    .card {
-      min-height: 120px;
-    }
-
-    .card-actions-bottom {
-      justify-content: center;
-      margin-top: var(--spacing-sm);
-    }
-
-    .card-actions-bottom .btn {
-      flex: 1;
-      max-width: 120px;
-    }
-
-    .card .count {
-      text-align: center;
-      margin-top: 8px;
-    }
-
-
-    .stats-subcard {
-      min-height: 80px;
-    }
-
   }
 
   @media (max-width: 480px) {
@@ -1792,172 +1297,99 @@
             </a>
             <a href="{{ route('books.index') }}">
                 <span class="icon">📘</span>
-                <span class="label">Books</span>
+                <span class="label">Manage Books</span>
             </a>
             <a href="{{ route('members.index') }}">
                 <span class="icon">👥</span>
-                <span class="label">Members</span>
+                <span class="label">Manage Members</span>
             </a>
-            <a href="{{ route('timelog.index') }}">
+            <a href="{{ route('transactions.index') }}">
                 <span class="icon">📃</span>
-                <span class="label">Member Time-in/out</span>
+                <span class="label">Transactions</span>
             </a>
         </nav>
         <div class="dark-toggle">
-            <button id="darkModeToggle" class="morphing-toggle" type="button">
-                <span class="morphing-symbol">☀️</span>
-            </button>
-            <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light</span>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
             <a href="/logout" style="color: var(--gray); text-decoration: none; margin-left: 6px;">🚪 Logout</a>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main" id="mainContent">
-        <div class="dashboard-title" style="position: sticky; top: 0; z-index: 100; background: transparent; padding: 1rem 0; margin: -1rem 0 1rem 0;">DASHBOARD</div>
-        <div class="dashboard-content">
+        <div class="heading">DASHBOARD</div>
 
         <!-- Stats Cards -->
         <div class="stats">
-            <div class="card" id="booksCard">
+            <div class="card">
                 <div class="card-header">
                     <h3>Books</h3>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-primary" onclick="openAddBookModal()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="openBooksTable()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="count">{{ $booksCount }}</div>
-                <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openAddBookModal()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="openBooksTable()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
             </div>
-            <div class="card" id="membersCard">
+            <div class="card">
                 <div class="card-header">
                     <h3>Members</h3>
+                    <div class="card-actions-member">
+                        <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()">
+                            <i class="fas fa-plus"></>
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="openMembersTable()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="count">{{ $membersCount }}</div>
-                <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="openMembersTable()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
+            </div>
+            <div class="card">
+                <h3>Total Transactions</h3>
+                <div class="count">{{ $transactionsCount }}</div>
             </div>
         </div>
 
-        <!-- Combined Borrowers Table and Weekly Chart -->
-        <div class="card" style="margin-top: 2rem; display: flex; flex-direction: column;">
-            <div class="card-header">
-                <h3>📚 Borrower List</h3>
-                <div class="card-actions">
-                    <select id="borrowersFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterBorrowers(this.value)">
-                        <option value="all">All Borrowers</option>
-                        <option value="today">Today</option>
-                        <option value="weekly">This Week</option>
-                    </select>
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <div class="card">
+                <h3>📈 Transactions (Last 7 Days)</h3>
+                <canvas id="transactionsChart" height="120"></canvas>
+            </div>
+            <div class="card">
+                <h3>👣 Average Daily Visits (Past 7 Days)</h3>
+                <canvas id="visitsChart" height="120"></canvas>
             </div>
         </div>
 
-            <!-- Borrowers Table -->
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <!-- Search Bar -->
-                <div style="padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius) var(--radius) 0 0; border: 1px solid var(--border); border-bottom: none;">
-                    <div style="position: relative;">
-                        <input type="text" id="borrowerSearch" placeholder="Search borrowers..." style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-elevated); color: var(--text-primary); font-size: 0.85rem; transition: var(--transition);" onkeyup="searchBorrowers(this.value)">
-                        <i class="fas fa-search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
-            </div>
-        </div>
-
-                <!-- Table Container -->
-                <div style="overflow-y: auto; max-height: 250px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius);">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Title</th>
-                                <th>Borrowed Date</th>
-                                <th>Due Date</th>
-                                <th>Returned At</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="borrowersTableBody">
-                            <tr>
-                                <td colspan="7" class="loading">Loading borrowers...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Time-based Statistics -->
+        <div class="stats" style="margin-top: 2rem;">
+            <div class="card">
+                <h3>📅 Today</h3>
+                <div class="count">{{ $dailyCount }}</div>
+                <p>📚 Books Added: {{ $booksToday }}</p>
+                <p>👤 Members Registered: {{ $membersToday }}</p>
             </div>
 
-            <!-- Weekly Chart -->
-            <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                    <h4 style="margin: 0; color: var(--text-primary); font-size: 0.9rem; font-weight: 600;">📈 Borrower Statistics</h4>
-                    <div style="display: flex; gap: 6px;">
-                        <select id="monthFilter" class="form-control" style="width: auto; padding: 3px 6px; font-size: 0.75rem;" onchange="updateWeeklyChart()">
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                        <select id="yearFilter" class="form-control" style="width: auto; padding: 3px 6px; font-size: 0.75rem;" onchange="updateWeeklyChart()">
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="position: relative; height: 150px;">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
+            <div class="card">
+                <h3>📆 This Week</h3>
+                <div class="count">{{ $weeklyCount }}</div>
+                <p>📚 Books Added: {{ $booksThisWeek }}</p>
+                <p>👤 Members Registered: {{ $membersThisWeek }}</p>
             </div>
 
-        <!-- Consolidated Statistics with Line Graph -->
-        <div class="card stats-overview-card" style="margin-top: 2rem; display: flex; flex-direction: column;">
-            <div class="card-header">
-                <h3>📊 Statistics Overview</h3>
-                <div class="card-actions">
-                    <select id="statsFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterStats(this.value)">
-                        <option value="lifetime">Lifetime</option>
-                        <option value="today">Today</option>
-                        <option value="weekly">This Week</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.5rem;">
-                <!-- Stats Numbers -->
-                <div id="statsDisplay" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                    <div class="count" id="mainCount" style="font-size: 2.5rem; margin-bottom: 0.25rem;">{{ $lifetimeCount }}</div>
-                    <p id="mainLabel" style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary);">Total Transactions</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="stats-subcard" style="text-align: center; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div class="count" style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="booksCount">{{ $booksCount }}</div>
-                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">Books</p>
-                        </div>
-                        <div class="stats-subcard" style="text-align: center; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <div class="count" style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="membersCount">{{ $membersCount }}</div>
-                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">Members</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Line Graph -->
-                <div style="position: relative; height: 250px;">
-                    <canvas id="statsChart"></canvas>
-                </div>
+            <div class="card">
+                <h3>📊 Lifetime</h3>
+                <div class="count">{{ $lifetimeCount }}</div>
+                <p>📚 Total Books: {{ $booksCount }}</p>
+                <p>👤 Total Members: {{ $membersCount }}</p>
             </div>
         </div>
 
@@ -1965,7 +1397,6 @@
         <footer style="margin-top: 3rem; text-align: center; color: var(--gray); font-size: 0.9rem;">
             &copy; {{ date('Y') }} Julita Public Library. All rights reserved.
         </footer>
-        </div>
     </div>
 
     <!-- Chatbot -->
@@ -2425,9 +1856,8 @@
 
     <!-- Scripts -->
     <script>
-        const weeklyData = @json($weeklyData);
+        const chartData = @json($last7Days);
         const visitsData = @json($visitsData);
-        const borrowersData = @json($borrowers);
     </script>
     <script src="{{ asset('js/dashb.js') }}"></script>
     <script src="{{ asset('js/chatbot.js') }}"></script>
@@ -2442,7 +1872,6 @@
         
         // Function to open register modal with Julita resident confirmation
         function openJulitaRegisterModal() {
-            console.log('openJulitaRegisterModal called');
             // Close any other open modals first
             closeAllModals();
             
@@ -2450,24 +1879,14 @@
 
             if (confirmJulita) {
                 const modal = document.getElementById("julitaRegisterModal");
-                if (modal) {
-                    modal.classList.add("show");
-                    modal.style.display = "flex";
-                    document.body.classList.add("modal-open");
-                    console.log('Julita modal opened');
-                } else {
-                    console.error('julitaRegisterModal element not found');
-                }
+                modal.classList.add("show");
+                modal.style.display = "flex";
+                document.body.classList.add("modal-open");
             } else {
                 const modal = document.getElementById("registerModal");
-                if (modal) {
-                    modal.classList.add("show");
-                    modal.style.display = "flex";
-                    document.body.classList.add("modal-open");
-                    console.log('Register modal opened');
-                } else {
-                    console.error('registerModal element not found');
-                }
+                modal.classList.add("show");
+                modal.style.display = "flex";
+                document.body.classList.add("modal-open");
             }
         }
         
@@ -2502,7 +1921,21 @@
         main.classList.toggle('full');
     });
 
-    // Dark mode toggle initialization will be moved to DOMContentLoaded
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    if (darkModeToggle) {
+        // Apply saved preference on load
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+        // Update on toggle
+        darkModeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode', darkModeToggle.checked);
+            localStorage.setItem('darkMode', darkModeToggle.checked);
+        });
+    }
 
     const chatbotWindow = document.getElementById('chatbot-window');
     const chatbotButton = document.getElementById('chatbot-button');
@@ -2531,15 +1964,8 @@
     }
 
     function openMembersTable() {
-        console.log('openMembersTable called');
-        const modal = document.getElementById('membersTableModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            loadMembersData();
-            console.log('Members table modal opened');
-        } else {
-            console.error('membersTableModal element not found');
-        }
+        document.getElementById('membersTableModal').style.display = 'flex';
+        loadMembersData();
     }
 
     function closeMembersTable() {
@@ -2612,316 +2038,6 @@
             document.getElementById('membersTableBody').innerHTML = '<tr><td colspan="6" class="loading">Error loading members</td></tr>';
         }
     }
-
-    // Store original borrowers data for search
-    let originalBorrowersData = [];
-
-    // Load borrowers data on page load
-    function loadBorrowersData() {
-        const tbody = document.getElementById('borrowersTableBody');
-        tbody.innerHTML = '';
-        
-        if (borrowersData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
-            return;
-        }
-        
-        // Store original data for search
-        originalBorrowersData = [...borrowersData];
-        
-        displayBorrowersData(borrowersData);
-    }
-
-    // Display borrowers data in table
-    function displayBorrowersData(data) {
-        const tbody = document.getElementById('borrowersTableBody');
-        tbody.innerHTML = '';
-        
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
-            return;
-        }
-        
-        data.forEach(borrower => {
-            const fullName = [borrower.member.first_name, borrower.member.middle_name, borrower.member.last_name]
-                .filter(name => name && name !== 'null')
-                .join(' ');
-            
-            const borrowedDate = new Date(borrower.borrowed_at).toLocaleDateString();
-            const dueDate = new Date(borrower.due_date).toLocaleDateString();
-            const returnedAt = borrower.returned_at ? new Date(borrower.returned_at).toLocaleDateString() : '-';
-            
-            const statusBadge = borrower.returned_at ? 
-                '<span style="color: #10b981; font-weight: 600;">Returned</span>' : 
-                '<span style="color: #f59e0b; font-weight: 600;">Active</span>';
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${borrower.id}</td>
-                <td>${fullName}</td>
-                <td>${borrower.book.title}</td>
-                <td>${borrowedDate}</td>
-                <td>${dueDate}</td>
-                <td>${returnedAt}</td>
-                <td>${statusBadge}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-
-    // Search borrowers function
-    function searchBorrowers(searchTerm) {
-        if (!searchTerm.trim()) {
-            displayBorrowersData(originalBorrowersData);
-            return;
-        }
-        
-        const filteredData = originalBorrowersData.filter(borrower => {
-            const fullName = [borrower.member.first_name, borrower.member.middle_name, borrower.member.last_name]
-                .filter(name => name && name !== 'null')
-                .join(' ')
-                .toLowerCase();
-            
-            const bookTitle = borrower.book.title.toLowerCase();
-            const searchLower = searchTerm.toLowerCase();
-            
-            return fullName.includes(searchLower) || 
-                   bookTitle.includes(searchLower) ||
-                   borrower.id.toString().includes(searchLower);
-        });
-        
-        displayBorrowersData(filteredData);
-    }
-
-    // Filter borrowers by date range
-    async function filterBorrowers(filter) {
-        try {
-            const response = await fetch(`{{ route("dashboard.borrowers-data") }}?filter=${filter}`);
-            const borrowers = await response.json();
-            
-            // Update original data for search
-            originalBorrowersData = [...borrowers];
-            
-            // Clear search input
-            document.getElementById('borrowerSearch').value = '';
-            
-            // Display filtered data
-            displayBorrowersData(borrowers);
-        } catch (error) {
-            console.error('Error loading borrowers:', error);
-            document.getElementById('borrowersTableBody').innerHTML = '<tr><td colspan="7" class="loading">Error loading borrowers</td></tr>';
-        }
-    }
-
-    // Update weekly chart based on month/year selection
-    async function updateWeeklyChart() {
-        const month = document.getElementById('monthFilter').value;
-        const year = document.getElementById('yearFilter').value;
-        
-        try {
-            const response = await fetch(`{{ route("dashboard.weekly-data") }}?month=${month}&year=${year}`);
-            const data = await response.json();
-            
-            // Update the chart with new data
-            if (window.weeklyChart) {
-                window.weeklyChart.data.labels = data.map(item => item.week);
-                window.weeklyChart.data.datasets[0].data = data.map(item => item.count);
-                window.weeklyChart.update();
-            }
-        } catch (error) {
-            console.error('Error updating weekly chart:', error);
-        }
-    }
-
-    // Stats data for different time periods
-    const statsData = {
-        lifetime: {
-            mainCount: {{ $lifetimeCount }},
-            mainLabel: 'Total Transactions',
-            booksCount: {{ $booksCount }},
-            membersCount: {{ $membersCount }},
-            chartData: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                books: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {{ $booksCount }}],
-                members: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {{ $membersCount }}]
-            }
-        },
-        today: {
-            mainCount: {{ $dailyCount }},
-            mainLabel: 'Today\'s Transactions',
-            booksCount: {{ $booksToday }},
-            membersCount: {{ $membersToday }},
-            chartData: {
-                labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
-                books: [0, {{ $booksToday }}, 0, 0, 0, 0],
-                members: [0, {{ $membersToday }}, 0, 0, 0, 0]
-            }
-        },
-        weekly: {
-            mainCount: {{ $weeklyCount }},
-            mainLabel: 'This Week\'s Transactions',
-            booksCount: {{ $booksThisWeek }},
-            membersCount: {{ $membersThisWeek }},
-            chartData: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                books: [0, 0, 0, 0, 0, 0, {{ $booksThisWeek }}],
-                members: [0, 0, 0, 0, 0, 0, {{ $membersThisWeek }}]
-            }
-        }
-    };
-
-    // Filter stats by time period
-    function filterStats(period) {
-        const data = statsData[period];
-        
-        // Update main count and label
-        document.getElementById('mainCount').textContent = data.mainCount;
-        document.getElementById('mainLabel').textContent = data.mainLabel;
-        document.getElementById('booksCount').textContent = data.booksCount;
-        document.getElementById('membersCount').textContent = data.membersCount;
-        
-        // Update chart
-        if (window.statsChart) {
-            window.statsChart.data.labels = data.chartData.labels;
-            window.statsChart.data.datasets[0].data = data.chartData.books;
-            window.statsChart.data.datasets[1].data = data.chartData.members;
-            window.statsChart.update();
-        }
-    }
-
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Dashboard page loaded');
-
-        // Initialize dark mode toggle with retry mechanism
-        function initializeDarkModeToggle() {
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                console.log('Dark mode toggle found and initialized');
-
-                // Apply saved preference on load
-                const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-                if (savedDarkMode) {
-                    document.body.classList.add('dark-mode');
-                    darkModeToggle.classList.add('dark-mode');
-                    console.log('Applied dark mode on load');
-                } else {
-                    console.log('Applied light mode on load');
-                }
-
-                console.log('Initial toggle classes:', darkModeToggle.classList.toString());
-
-                // Update label text on load
-                const label = document.getElementById('darkModeLabel');
-                if (label) {
-                    label.textContent = savedDarkMode ? 'Dark' : 'Light';
-                }
-
-                // Update on toggle
-                const handleToggle = () => {
-                    const isDarkMode = !document.body.classList.contains('dark-mode');
-
-                    // Add transition class for animation
-                    document.body.classList.add('dark-mode-transition');
-
-                    // Toggle dark mode
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                    darkModeToggle.classList.toggle('dark-mode', isDarkMode);
-                    localStorage.setItem('darkMode', isDarkMode);
-
-                    // Debug logging
-                    console.log('Toggle classes:', darkModeToggle.classList.toString());
-                    console.log('Symbol before opacity:', window.getComputedStyle(darkModeToggle.querySelector('.morphing-symbol::before')).opacity);
-                    console.log('Symbol after opacity:', window.getComputedStyle(darkModeToggle.querySelector('.morphing-symbol::after')).opacity);
-
-                    // Update label text
-                    const labelElement = document.getElementById('darkModeLabel');
-                    if (labelElement) {
-                        labelElement.textContent = isDarkMode ? 'Dark' : 'Light';
-                    }
-
-                    // Add pulse animation to toggle button
-                    darkModeToggle.style.animation = 'darkModePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-
-                    // Remove transition class and animation after animation completes
-                    setTimeout(() => {
-                        document.body.classList.remove('dark-mode-transition');
-                        darkModeToggle.style.animation = '';
-                    }, 650);
-
-                    // Debug logging
-                    console.log('Dark mode toggled:', isDarkMode);
-                    console.log('Body classes:', document.body.classList.toString());
-                };
-
-                darkModeToggle.addEventListener('click', handleToggle);
-
-                console.log('Initial state: dark mode =', savedDarkMode);
-                return true;
-            } else {
-                console.log('Dark mode toggle not found, retrying...');
-                return false;
-            }
-        }
-
-        // Try to initialize immediately
-        if (!initializeDarkModeToggle()) {
-            // If not found, try again after a short delay
-            setTimeout(() => {
-                if (!initializeDarkModeToggle()) {
-                    // Final attempt after DOM is fully loaded
-                    setTimeout(initializeDarkModeToggle, 100);
-                }
-            }, 50);
-        }
-
-        // Make dark mode toggle function globally available for testing
-        window.testDarkModeToggle = function() {
-            const toggle = document.getElementById('darkModeToggle');
-            const label = document.getElementById('darkModeLabel');
-            console.log('Testing dark mode toggle:');
-            console.log('Toggle element:', toggle);
-            console.log('Toggle has dark-mode class:', toggle ? toggle.classList.contains('dark-mode') : 'N/A');
-            console.log('Label element:', label);
-            console.log('Label text:', label ? label.textContent : 'N/A');
-            console.log('Body classes:', document.body.classList.toString());
-
-            if (toggle) {
-                // Manually trigger the toggle
-                toggle.click();
-                console.log('Manual toggle completed');
-            }
-        };
-
-        // Load all borrowers data by default
-        loadBorrowersData();
-
-        // Set current month as default
-        const currentMonth = new Date().getMonth() + 1;
-        document.getElementById('monthFilter').value = currentMonth;
-
-        // Set current year as default
-        const currentYear = new Date().getFullYear();
-        document.getElementById('yearFilter').value = currentYear;
-
-        // Initialize stats with lifetime data (default)
-        filterStats('lifetime');
-
-        // Set borrowers filter to show all by default
-        document.getElementById('borrowersFilter').value = 'all';
-
-        // Test if member card buttons are working
-        const memberCardButtons = document.querySelectorAll('.card .btn');
-        console.log('Found member card buttons:', memberCardButtons.length);
-
-        // Add click event listeners as backup
-        memberCardButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                console.log('Button clicked:', this.onclick?.toString());
-            });
-        });
-
-    });
 </script>
 </body>
 </html>
