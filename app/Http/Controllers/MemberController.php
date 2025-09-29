@@ -244,22 +244,27 @@ public function update(Request $request, $id)
         ]);
     }
 
-    public function show($id)
-{
-    $member = Member::findOrFail($id);
-
-    if (!$member) {
-        return response()->json(['error' => 'Member not found'], 404);
+    public function apiShow($id)
+    {
+        return $this->show($id);
     }
 
-    // Ensure null values are replaced with empty strings
-    $first = $member->first_name ?? '';
-    $middle = $member->middle_name ?? '';
-    $last = $member->last_name ?? '';
+    public function show($id)
+    {
+        $member = Member::findOrFail($id);
 
-    // Remove extra spaces if middle name is empty
-    $fullName = trim("{$first} {$middle} {$last}");
+        if (!$member) {
+            return response()->json(['error' => 'Member not found'], 404);
+        }
 
-    return response()->json($member);
-}
+        // Ensure null values are replaced with empty strings
+        $first = $member->first_name ?? '';
+        $middle = $member->middle_name ?? '';
+        $last = $member->last_name ?? '';
+
+        // Remove extra spaces if middle name is empty
+        $fullName = trim("{$first} {$middle} {$last}");
+
+        return response()->json($member);
+    }
 }

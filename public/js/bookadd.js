@@ -302,7 +302,10 @@ let qrScanner;
 
 function startQRScan(type) {
   const modal = document.getElementById('qrScannerModal');
-  modal.style.display = 'flex';
+  if (modal) {
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+  }
 
   qrScanner = new Html5Qrcode("qr-reader");
 
@@ -310,29 +313,168 @@ function startQRScan(type) {
     { facingMode: "environment" },
     { fps: 10, qrbox: 250 },
     async (decodedText) => {
-      stopQRScan();
+      console.log('🎯 QR Code detected:', decodedText);
+      console.log('🔄 Stopping scanner and closing modal...');
+
+      // Stop scanner first
+      if (qrScanner) {
+        try {
+          await qrScanner.stop();
+          console.log('✅ Scanner stopped');
+        } catch (err) {
+          console.error('❌ Error stopping scanner:', err);
+        }
+      }
+
+      // Close modal immediately
+      const modal = document.getElementById('qrScannerModal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        console.log('✅ qrScannerModal closed');
+      } else {
+        console.error('❌ qrScannerModal element not found');
+      }
+
+      // Reset scanner instance
+      qrScanner = null;
 
       if (type === 'member') {
         try {
-          const res = await fetch(`/api/lookup-member?qr=${encodeURIComponent(decodedText)}`);
-          const data = await res.json();
-          if (data && data.name) {
-            document.getElementById('memberName').value = data.name;
-            document.getElementById('memberId').value = data.id;
-            showCornerPopup(`Member: ${data.name}`);
+          // Extract member ID from QR code URL (e.g., http://localhost:8000/members/1)
+          let memberId = null;
+          try {
+            const url = new URL(decodedText);
+            const parts = url.pathname.split('/');
+            if (parts[1] === 'members' && parts[2]) {
+              memberId = parts[2];
+            }
+          } catch {
+            memberId = decodedText.split('/').pop();
+          }
+
+          if (!memberId || isNaN(memberId)) {
+            showCornerPopup("Invalid member QR code format");
+            return;
+          }
+
+          console.log('📋 Extracted member ID:', memberId);
+
+          // Use the existing web route /members/{id}
+          const res = await fetch(`/members/${memberId}`);
+          const member = await res.json();
+
+          if (member && member.id) {
+            // Build full name from member data
+            const nameParts = [
+              member.first_name,
+              (member.middle_name && member.middle_name !== 'null') ? member.middle_name : null,
+              (member.last_name && member.last_name !== 'null') ? member.last_name : null
+            ].filter(Boolean);
+
+            const fullName = nameParts.join(' ');
+
+            document.getElementById('memberName').value = fullName;
+            document.getElementById('memberId').value = member.id;
+            showCornerPopup(`✅ Member: ${fullName}`);
+
+            // Close QR scanner modal immediately after successful scan
+            stopQRScan();
           } else {
-            showCornerPopup("Member not found");
+            showCornerPopup("❌ Member not found");
           }
         } catch (err) {
-          showCornerPopup("Error fetching member");
+          console.error('Error fetching member:', err);
+          showCornerPopup("❌ Error fetching member");
         }
       } else if (type === 'book') {
-        const bookCard = document.querySelector(`.book-card[data-qr="${decodedText}"]`);
-        if (bookCard) {
-          toggleSelection(bookCard);
-          showCornerPopup("Book selected via QR");
-        } else {
-          showCornerPopup("Book not found");
+        try {
+          // Extract book ID from QR code URL (e.g., http://localhost:8000/books/1)
+          let bookId = null;
+          try {
+            const url = new URL(decodedText);
+            const parts = url.pathname.split('/');
+            if (parts[1] === 'books' && parts[2]) {
+              bookId = parts[2];
+            }
+          } catch {
+            // Handle different QR code formats
+            const match = decodedText.match(/book-(\d+)/);
+            if (match) {
+              bookId = match[1];
+            } else {
+              bookId = decodedText.split('/').pop();
+            }
+          }
+
+          if (!bookId || isNaN(bookId)) {
+            showCornerPopup("❌ Invalid book QR code format");
+            return;
+          }
+
+          console.log('📚 Extracted book ID:', bookId);
+
+          // Find the book row in the table
+          const bookRow = document.querySelector(`tr[data-id="${bookId}"]`);
+          if (!bookRow) {
+            showCornerPopup("❌ Book not found in library");
+            return;
+          }
+
+          // Check if book is already selected (prevent duplication)
+          const existingSelection = document.querySelector(`#selectedBooksList li[data-id="${bookId}"]`);
+          if (existingSelection) {
+            showCornerPopup("⚠️ Book already selected");
+            stopQRScan();
+            return;
+          }
+
+          // Check book availability
+          const availability = parseInt(bookRow.dataset.availability);
+          if (isNaN(availability) || availability <= 0) {
+            showCornerPopup("❌ Book is not available");
+            return;
+          }
+
+          // Get book title
+          const bookTitle = bookRow.dataset.title || 'Unknown Title';
+
+          // Add book to selection visually
+          const selectedBooksList = document.getElementById('selectedBooksList');
+          if (selectedBooksList) {
+            const li = document.createElement('li');
+            li.textContent = bookTitle;
+            li.setAttribute('data-id', bookId);
+            li.style.cssText = 'padding: 8px 0; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.className = 'btn btn-sm btn-danger';
+            removeBtn.style.cssText = 'margin-left: 10px; padding: 4px 8px;';
+            removeBtn.onclick = () => {
+              li.remove();
+              bookRow.classList.remove('selected');
+              updateConfirmButtonState();
+            };
+
+            li.appendChild(removeBtn);
+            selectedBooksList.appendChild(li);
+          }
+
+          // Mark book as selected in the table
+          bookRow.classList.add('selected');
+
+          showCornerPopup(`✅ Added: ${bookTitle}`);
+
+          // Update confirm button state
+          updateConfirmButtonState();
+
+          // Close QR scanner modal immediately after successful scan
+          stopQRScan();
+
+        } catch (err) {
+          console.error('Error processing book QR:', err);
+          showCornerPopup("❌ Error processing book");
         }
       }
     },
@@ -347,10 +489,50 @@ function startQRScan(type) {
 }
 
 function stopQRScan() {
+  console.log('🛑 Stopping QR scanner...');
+
+  // First, immediately close the modal
+  const modal = document.getElementById('qrScannerModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    console.log('✅ qrScannerModal closed immediately');
+  } else {
+    console.error('❌ qrScannerModal element not found');
+  }
+
+  // Then try to stop the scanner instance if it exists
   if (qrScanner) {
     qrScanner.stop().then(() => {
-      document.getElementById('qrScannerModal').style.display = 'none';
+      console.log('✅ QR Scanner stopped successfully');
       qrScanner = null;
-    }).catch(console.error);
+    }).catch(err => {
+      console.error('❌ Error stopping QR scanner:', err);
+      qrScanner = null;
+    });
+  } else {
+    console.log('ℹ️ No QR scanner instance to stop');
+  }
+}
+
+// Update confirm button state for borrow modal
+function updateConfirmButtonState() {
+  const memberName = document.getElementById('memberName');
+  const confirmBtn = document.getElementById('confirmBorrowBtn');
+  const selectedBooksList = document.getElementById('selectedBooksList');
+
+  if (memberName && confirmBtn && selectedBooksList) {
+    const hasMember = memberName.value.trim() !== '';
+    const hasBooks = selectedBooksList.children.length > 0;
+
+    confirmBtn.disabled = !hasMember || !hasBooks;
+
+    if (!hasMember) {
+      confirmBtn.innerHTML = '<i class="fas fa-user"></i> Select Member First';
+    } else if (!hasBooks) {
+      confirmBtn.innerHTML = '<i class="fas fa-book"></i> Add Books to Borrow';
+    } else {
+      confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm Borrow';
+    }
   }
 }

@@ -59,6 +59,7 @@ Route::resource('members', MemberController::class);
 
 // Borrow system routes
 Route::post('/borrow', [BorrowController::class, 'store'])->name('borrow.book');
+Route::post('/borrow/process', [BorrowController::class, 'borrow'])->name('borrow.process');
 Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
 Route::get('/members/search', [BorrowController::class, 'search']);
 Route::get('/members/{id}', [MemberController::class, 'show']);

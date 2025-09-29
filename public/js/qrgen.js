@@ -1,34 +1,61 @@
+window.generateQr = generateQr;
+
 function generateQr(bookId) {
-  const cell = document.getElementById('qrCell-' + bookId);
-  cell.innerHTML = '⏳ Generating...';
+  const row = document.querySelector(`tr[data-id="${bookId}"]`);
+  if (!row) {
+    showToast('Book not found', 'error');
+    return;
+  }
+
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  if (!token) {
+    showToast('CSRF token missing', 'error');
+    return;
+  }
+
+  // Show loading state
+  const button = row.querySelector('.btn[onclick*="generateQr"]');
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gen';
+  button.disabled = true;
 
   fetch(`/books/${bookId}/generate-qr`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json', // ✅ Ensure Laravel returns JSON
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    },
-    body: JSON.stringify({ book_id: bookId }) // ✅ send payload
-  })
-  .then(async res => {
-    if (!res.ok) {
-      let text = await res.text();
-      throw new Error(text || 'Failed to generate QR');
+      'X-CSRF-TOKEN': token,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
     }
-    return res.json();
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('Failed to generate QR');
+    return response.json();
   })
   .then(data => {
     if (data.qr_url) {
-      cell.innerHTML = `
-        <button onclick="showQRModal('${data.title ?? 'Book'}', '${data.qr_url}')" 
-                class="btn btn-secondary">📷 Show QR</button>`;
+      // Update the row data
+      row.dataset.qrUrl = data.qr_url;
+
+      // Update the button to show QR instead of Gen
+      const qrButton = row.querySelector('.btn[onclick*="generateQr"]');
+      if (qrButton) {
+        qrButton.innerHTML = '<i class="fas fa-qrcode"></i>';
+        qrButton.setAttribute('onclick', `showQRModal('${row.dataset.title}', '${data.qr_url}')`);
+        qrButton.title = 'View QR Code';
+      }
+
+      showToast('QR code generated successfully', 'success');
     } else {
-      cell.innerHTML = '<span style="color:red">⚠️ QR not generated</span>';
+      throw new Error('No QR URL received');
     }
   })
-  .catch(err => {
-    console.error("QR generation error:", err);
-    cell.innerHTML = '<span style="color:red">❌ Failed</span>';
+  .catch(error => {
+    console.error('QR generation error:', error);
+    showToast('Failed to generate QR code', 'error');
+  })
+  .finally(() => {
+    // Reset button state
+    button.innerHTML = originalText;
+    button.disabled = false;
   });
 }

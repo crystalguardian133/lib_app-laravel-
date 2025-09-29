@@ -1,3 +1,5 @@
+window.showQRModal = showQRModal;
+
 function showQRModal(title, qrUrl) {
     const modal = document.getElementById('qrModal');
     const modalTitle = document.getElementById('qrBookTitle');
@@ -23,6 +25,8 @@ function showQRModal(title, qrUrl) {
         modal.style.display = 'flex';
     }, 100); // small delay helps the browser repaint
 }
+window.closeQRModal = closeQRModal;
+
 function closeQRModal() {
     document.getElementById('qrModal').style.display = 'none';
 }

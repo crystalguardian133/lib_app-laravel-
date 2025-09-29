@@ -359,7 +359,10 @@ async sendUpdateRequest(data) {
             if (data.success) {
                 this.showSuccess('Member deleted successfully!');
                 this.removeTableRow(memberId);
-                setTimeout(() => this.closeEditModal(), 1500);
+                setTimeout(() => {
+                    this.closeEditModal();
+                    location.reload();
+                }, 1500);
             } else {
                 this.showError(data.message || 'Failed to delete member');
             }
