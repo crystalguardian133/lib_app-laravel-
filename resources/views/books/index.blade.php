@@ -1165,10 +1165,140 @@
             <i class="fas fa-person"></i> Scan Member
           </button>
         </div>
+<<<<<<< Updated upstream
         <div style="display: flex; gap: 10px; margin-top: 1rem;">
           <button type="button" class="btn btn-outline" onclick="startQRScan('book')">
             <i class="fas fa-book"></i> Scan Books
           </button>
+=======
+    </div>
+
+    <!-- BORROW MODAL -->
+    <div class="modal" id="borrowModal" style="z-index: 999999900 !important;">
+        <div class="modal-content" style="max-width: 900px !important;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-hand-holding"></i>
+                    Borrow Books
+                </h3>
+                <button class="close-modal" onclick="closeBorrowModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Member Information Section -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Member Information
+                    </h4>
+                    <div class="form-group">
+                        <label for="memberName">Member Name</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed; flex: 1;" onchange="if (typeof window.updateConfirmButtonState === 'function') { window.updateConfirmButtonState(); }">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="clearMemberInfo()" title="Clear member information">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" id="memberId">
+                        <small style="display:block; margin-top:5px; color:var(--text-muted); font-size:0.8rem;">
+                            <i class="fas fa-info-circle"></i> This field is automatically filled when you scan a member QR code
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Borrow Details Section -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Borrow Details
+                    </h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input type="date" id="dueDate" class="form-control">
+                            <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
+                                Only working days (Mon-Fri, excluding holidays) are available, including today if it's a working day
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueTime">Due Time</label>
+                            <!-- Custom Precise Time Picker -->
+                            <div id="customTimePicker" class="custom-time-picker" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                                <select id="dueHour" class="form-control" style="flex: 1; max-width: 80px;">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                                <span style="color: var(--text-secondary);">:</span>
+                                <select id="dueMinute" class="form-control" style="flex: 1; max-width: 80px;">
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                                <select id="dueAmPm" class="form-control" style="flex: 1; max-width: 80px;">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
+                            <!-- Hidden input to store the actual time value -->
+                            <input type="hidden" id="dueTime" name="dueTime">
+                            <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
+                                Select hour, minute, and AM/PM precisely
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Books Section -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-book"></i>
+                        Selected Books
+                    </h4>
+                    <div class="form-group">
+                        <ul id="selectedBooksList" style="list-style: none; padding: 0; max-height: 150px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px; background: var(--glass-bg); min-height: 50px;"></ul>
+                        <small style="display:block; margin-top:5px; color:var(--text-muted); font-size:0.8rem;">
+                            <i class="fas fa-info-circle"></i> Books will appear here when selected
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-qrcode"></i>
+                        Quick Actions
+                    </h4>
+                    <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                        <button type="button" class="btn btn-primary" onclick="showQRScannerModal('member')" style="flex: 1;">
+                            <i class="fas fa-qrcode"></i> Scan Member QR
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="showQRScannerModal('book')" style="flex: 1;">
+                            <i class="fas fa-qrcode"></i> Scan Books
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeBorrowModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-primary" id="confirmBorrowBtn" disabled>
+                    <i class="fas fa-qrcode"></i> Scan Member
+                </button>
+            </div>
+>>>>>>> Stashed changes
         </div>
       </div>
       <div class="modal-footer">
@@ -1220,6 +1350,7 @@
   <script src="{{ asset('js/qrgen.js') }}"></script>
   <script src="{{ asset('js/showqr.js') }}"></script>
   <script src="{{ asset('js/overdue.js') }}"></script>
+<<<<<<< Updated upstream
   <script src="{{ asset('js/qrscanner-borrow.js') }}"></script>
 
   <!-- Internal Modal Controls -->
@@ -1357,5 +1488,691 @@
       });
     });
   </script>
+=======
+
+    <script>
+        // Global variables
+        let currentBookId = null;
+        let isSelectionMode = false;
+        // selectedBooks is declared in borrow.js - use that global variable
+
+        // Dark mode functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeLabel = document.getElementById('darkModeLabel');
+
+            // Detect system preference
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedMode = localStorage.getItem('darkMode');
+            const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
+
+            // Apply mode
+            document.body.classList.toggle('dark-mode', isDark);
+            darkModeToggle.checked = isDark;
+            darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+
+            // Toggle dark mode
+            darkModeToggle.addEventListener('change', () => {
+                const isChecked = darkModeToggle.checked;
+                document.body.classList.toggle('dark-mode', isChecked);
+                localStorage.setItem('darkMode', isChecked);
+                darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
+
+                // Add transition class for smooth animation
+                document.body.classList.add('dark-mode-transition');
+                setTimeout(() => {
+                    document.body.classList.remove('dark-mode-transition');
+                }, 600);
+            });
+
+            // Initialize cover upload functionality
+            initializeCoverUpload();
+            initializeEditCoverUpload();
+
+            // Set default due date and time using Philippine timezone and business days
+            function calculatePhilippineBusinessDueDate() {
+                // Use Philippine timezone directly (this is more reliable)
+                const now = new Date();
+                const philippineTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Manila"}));
+
+                // Start from current date for due date calculation (including today)
+                const startDate = new Date(philippineTime);
+
+                // Calculate 10 working days (Monday to Friday, excluding weekends)
+                // Include today if it's a working day
+                let workingDaysCount = 0;
+                let currentDate = new Date(startDate);
+
+                while (workingDaysCount < 10) {
+                    // Check if it's a weekday (Monday = 1, Friday = 5)
+                    const dayOfWeek = currentDate.getDay();
+                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                        workingDaysCount++;
+                    }
+
+                    // Move to next day
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                return {
+                    date: currentDate.toISOString().split('T')[0],
+                    time: '23:59' // End of day
+                };
+            }
+
+            // Set current date as default (user can change it)
+            const today = new Date(philippineTime);
+            const currentDate = today.toISOString().split('T')[0];
+            document.getElementById('dueDate').value = currentDate;
+
+            // Set current time as default
+            const currentHour = today.getHours();
+            const currentMinute = Math.floor(today.getMinutes() / 15) * 15; // Round to nearest 15 minutes
+            const hour12 = currentHour === 0 ? 12 : currentHour > 12 ? currentHour - 12 : currentHour;
+            const ampm = currentHour >= 12 ? 'PM' : 'AM';
+            const minuteStr = currentMinute.toString().padStart(2, '0');
+
+            // Set time picker values
+            document.getElementById('dueHour').value = hour12.toString();
+            document.getElementById('dueMinute').value = minuteStr;
+            document.getElementById('dueAmPm').value = ampm;
+            document.getElementById('dueTime').value = `${currentHour.toString().padStart(2, '0')}:${minuteStr}`;
+
+            // Initialize search functionality
+            initializeSearch();
+
+            // Initialize confirm button state - use the one from borrow.js
+            if (typeof window.updateConfirmButtonState === 'function') {
+                window.updateConfirmButtonState();
+            }
+
+            // Add event listeners for selected books list changes
+            const selectedBooksList = document.getElementById('selectedBooksList');
+            if (selectedBooksList) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (typeof window.updateConfirmButtonState === 'function') {
+                            window.updateConfirmButtonState();
+                        }
+                    });
+                });
+                observer.observe(selectedBooksList, { childList: true });
+            }
+        });
+
+        // Search functionality
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const tableBody = document.getElementById('booksTableBody');
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                rows.forEach(row => {
+                    const title = row.dataset.title?.toLowerCase() || '';
+                    const author = row.dataset.author?.toLowerCase() || '';
+                    const genre = row.dataset.genre?.toLowerCase() || '';
+                    
+                    const matches = title.includes(searchTerm) || 
+                                   author.includes(searchTerm) || 
+                                   genre.includes(searchTerm);
+                    
+                    row.style.display = matches ? '' : 'none';
+                });
+            });
+        }
+
+        // Cover upload functionality for Add Book Modal
+        function initializeCoverUpload() {
+            const coverPreviewArea = document.getElementById('cover-preview-area');
+            const coverInput = document.getElementById('cover-input');
+            const coverPreviewContent = document.getElementById('cover-preview-content');
+            
+            if (coverPreviewArea && coverInput) {
+                coverPreviewArea.addEventListener('click', () => coverInput.click());
+                
+                coverInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            coverPreviewContent.innerHTML = `
+                                <img src="${e.target.result}" alt="Cover Preview" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                                <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                                <small style="color: var(--text-muted);">Click to change</small>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+
+        // Cover upload functionality for Edit Book Modal
+        function initializeEditCoverUpload() {
+            const editCoverPreviewArea = document.getElementById('edit-cover-preview-area');
+            const editCoverInput = document.getElementById('edit-cover-input');
+            const editCoverPreviewContent = document.getElementById('edit-cover-preview-content');
+            
+            if (editCoverPreviewArea && editCoverInput) {
+                editCoverPreviewArea.addEventListener('click', () => editCoverInput.click());
+                
+                editCoverInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            editCoverPreviewContent.innerHTML = `
+                                <img src="${e.target.result}" alt="Cover Preview" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                                <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                                <small style="color: var(--text-muted);">Click to change</small>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+
+        // Clear member information
+        function clearMemberInfo() {
+            const memberName = document.getElementById('memberName');
+            const memberId = document.getElementById('memberId');
+
+            if (memberName) {
+                memberName.value = '';
+                memberName.style.backgroundColor = 'var(--surface-elevated)';
+                memberName.style.cursor = 'not-allowed';
+            }
+
+            if (memberId) {
+                memberId.value = '';
+            }
+
+            // Use the function from borrow.js
+            if (typeof window.updateConfirmButtonState === 'function') {
+                window.updateConfirmButtonState();
+            }
+        }
+
+        // Modal functions
+        function openAddBookModal() {
+            const modal = document.getElementById('addBookModal');
+            modal.classList.add('show');
+            modal.style.display = 'flex';
+        }
+
+        function closeAddBookModal() {
+            const modal = document.getElementById('addBookModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('addBookForm').reset();
+                // Reset cover preview
+                const coverPreviewContent = document.getElementById('cover-preview-content');
+                coverPreviewContent.innerHTML = `
+                    <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
+                    <p id="cover-preview-text">Click or drag image here...</p>
+                    <small style="color: var(--text-muted); margin-top: 8px; display: block;">
+                        Supports JPG, PNG, GIF (max 5MB)
+                    </small>
+                    <input type="file" id="cover-input" class="cover-input" accept="image/*">
+                `;
+                initializeCoverUpload();
+            }, 300);
+        }
+
+        function editBook(bookId) {
+            // Use the external script function
+            if (typeof window.manageBooks === 'function') {
+                // Clear any existing selections
+                document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
+                // Select the specific row
+                const row = document.querySelector(`tr[data-id="${bookId}"]`);
+                if (row) {
+                    row.classList.add('selected');
+                    // Set global variable for external script
+                    window.selectedBookId = bookId;
+                    window.manageBooks();
+                }
+            } else {
+                showToast('Edit functionality not available', 'error');
+            }
+        }
+
+
+        function showDeleteConfirmation(bookId) {
+            const row = document.querySelector(`tr[data-id="${bookId}"]`);
+            if (!row) return;
+
+            const bookTitle = row.dataset.title || 'Unknown Book';
+
+            if (confirm(`Are you sure you want to delete "${bookTitle}"? This action cannot be undone.`)) {
+                // Remove the row immediately for better UX
+                row.remove();
+
+                // Show success message
+                showToast(`Book "${bookTitle}" deleted successfully`, 'success');
+
+                // Check if table is empty and show appropriate message
+                const tableBody = document.getElementById('booksTableBody');
+                if (tableBody.children.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                                <p>No books found. Add your first book to get started!</p>
+                                <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
+                                    <i class="fas fa-plus"></i> Add Book
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentBookId = null;
+            }, 300);
+        }
+
+        function closeEditBookModal() {
+            // Use the external script function
+            if (typeof window.closeModal === 'function') {
+                // Call the external close modal function
+                window.closeModal();
+            } else {
+                // Fallback: basic modal closing
+                const modal = document.getElementById('manage-modal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        // Reset any unsaved changes flags
+                        window.hasUnsavedChanges = false;
+                        window.selectedBookId = null;
+                    }, 300);
+                }
+            }
+        }
+
+
+
+
+        // QR Code functions - use external script
+        function generateQr(bookId) {
+            // Use the external script function
+            if (typeof window.generateQr === 'function') {
+                // Call the external QR generation function
+                window.generateQr(bookId);
+            } else {
+                showToast('QR generation functionality not available', 'error');
+            }
+        }
+
+        function showQRModal(bookTitle, qrUrl) {
+            document.getElementById('qrBookTitleDisplay').textContent = bookTitle;
+            document.getElementById('qrImage').src = qrUrl;
+            document.getElementById('qrCodeContainer').style.display = 'block';
+            document.getElementById('qrPlaceholder').style.display = 'none';
+            
+            const modal = document.getElementById('qrModal');
+            modal.classList.add('show');
+            modal.style.display = 'flex';
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('qrCodeContainer').style.display = 'none';
+                document.getElementById('qrPlaceholder').style.display = 'block';
+            }, 300);
+        }
+
+        function downloadQR() {
+            const qrImage = document.getElementById('qrImage');
+            const link = document.createElement('a');
+            link.download = 'book-qr-code.png';
+            link.href = qrImage.src;
+            link.click();
+            showToast('QR Code downloaded', 'success');
+        }
+
+        function printQR() {
+            const qrImage = document.getElementById('qrImage');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head><title>Print QR Code</title></head>
+                <body style="text-align: center; padding: 20px;">
+                    <h2>${document.getElementById('qrBookTitleDisplay').textContent}</h2>
+                    <img src="${qrImage.src}" style="max-width: 300px;">
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Borrow functions - use external script
+
+
+        // Selection mode functions
+        function enterSelectionMode() {
+            isSelectionMode = true;
+            selectedBooks = [];
+            
+            // Add checkboxes to table
+            const table = document.getElementById('booksTable');
+            const headerRow = table.querySelector('thead tr');
+            const checkboxHeader = document.createElement('th');
+            checkboxHeader.innerHTML = '<input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">';
+            checkboxHeader.className = 'checkbox-cell';
+            headerRow.insertBefore(checkboxHeader, headerRow.firstChild);
+            
+            // Add checkboxes to each row
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const checkboxCell = document.createElement('td');
+                checkboxCell.className = 'checkbox-cell';
+                checkboxCell.innerHTML = `<input type="checkbox" class="book-checkbox" value="${row.dataset.id}" onchange="toggleBookSelection(this)">`;
+                row.insertBefore(checkboxCell, row.firstChild);
+            });
+            
+            // Show selection bar
+            document.getElementById('selectionBar').style.display = 'flex';
+            updateSelectedCount();
+        }
+
+        function exitSelectionMode() {
+            isSelectionMode = false;
+            selectedBooks = [];
+            
+            // Remove checkboxes
+            const table = document.getElementById('booksTable');
+            const checkboxHeaders = table.querySelectorAll('.checkbox-cell');
+            checkboxHeaders.forEach(cell => cell.remove());
+            
+            // Hide selection bar
+            document.getElementById('selectionBar').style.display = 'none';
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const bookCheckboxes = document.querySelectorAll('.book-checkbox');
+            
+            bookCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                toggleBookSelection(checkbox);
+            });
+        }
+
+        function toggleBookSelection(checkbox) {
+            const bookId = parseInt(checkbox.value);
+            
+            if (checkbox.checked) {
+                if (!selectedBooks.includes(bookId)) {
+                    selectedBooks.push(bookId);
+                    checkbox.closest('tr').classList.add('selected');
+                }
+            } else {
+                const index = selectedBooks.indexOf(bookId);
+                if (index > -1) {
+                    selectedBooks.splice(index, 1);
+                    checkbox.closest('tr').classList.remove('selected');
+                }
+            }
+            
+            updateSelectedCount();
+            updateSelectAllCheckbox();
+        }
+
+        function updateSelectedCount() {
+            const count = selectedBooks.length;
+            document.getElementById('selectedCount').textContent = `${count} book${count !== 1 ? 's' : ''} selected`;
+            
+            // Show/hide edit button based on selection
+            const editButton = document.getElementById('editButton');
+            if (count === 1) {
+                editButton.style.display = 'inline-flex';
+            } else {
+                editButton.style.display = 'none';
+            }
+        }
+
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const bookCheckboxes = document.querySelectorAll('.book-checkbox');
+            const checkedBoxes = document.querySelectorAll('.book-checkbox:checked');
+            
+            if (checkedBoxes.length === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (checkedBoxes.length === bookCheckboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        function selectAllBooks() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            selectAllCheckbox.checked = true;
+            toggleSelectAll();
+        }
+
+        function unselectAllBooks() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            selectAllCheckbox.checked = false;
+            toggleSelectAll();
+        }
+
+        function openEditModal() {
+            if (selectedBooks.length === 1) {
+                editBook(selectedBooks[0]);
+            }
+        }
+
+
+        // QR Scanner functions are now handled by qrscanner-borrow.js
+
+        // Form submission handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Book Form
+            const addBookForm = document.getElementById('addBookForm');
+            if (addBookForm) {
+                addBookForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const title = formData.get('title');
+                    const author = formData.get('author');
+                    const genre = formData.get('genre') || 'General';
+                    const year = formData.get('published_year');
+                    const availability = formData.get('availability');
+                    
+                    // Simulate adding book to table
+                    const tableBody = document.getElementById('booksTableBody');
+                    const newId = Date.now(); // Simple ID generation
+                    
+                    const newRow = document.createElement('tr');
+                    newRow.dataset.id = newId;
+                    newRow.dataset.title = title;
+                    newRow.dataset.author = author;
+                    newRow.dataset.genre = genre;
+                    newRow.dataset.publishedYear = year;
+                    newRow.dataset.availability = availability;
+                    newRow.dataset.coverImage = '';
+                    
+                    newRow.innerHTML = `
+                        <td>
+                            <img src="/images/no-cover.png" alt="Cover" class="book-cover-small">
+                        </td>
+                        <td style="font-weight: 600; color: var(--text-primary);" title="${title}">${title}</td>
+                        <td title="${author}">${author}</td>
+                        <td title="${genre}">
+                            <span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
+                                ${genre}
+                            </span>
+                        </td>
+                        <td title="${year}">${year}</td>
+                        <td title="${availability > 0 ? 'Available' : 'Out of Stock'}">
+                            <span class="status-badge ${availability > 0 ? 'status-available' : 'status-unavailable'}">
+                                ${availability > 0 ? 'Available' : 'Out of Stock'}
+                            </span>
+                        </td>
+                        <td title="${availability} copies">
+                            <strong style="color: var(--text-primary);">${availability}</strong> copies
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline btn-sm" onclick="window.generateQr(${newId})" title="Generate QR Code">
+                                    <i class="fas fa-qrcode"></i> Gen
+                                </button>
+                                <button class="btn btn-success btn-sm" onclick="window.borrowOne(${newId})" title="Borrow Book">
+                                    <i class="fas fa-hand-holding"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="window.editBook(${newId})" title="Edit Book">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="window.deleteBook(${newId})" title="Delete Book">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    // Remove "no books found" message if it exists
+                    const noBooks = tableBody.querySelector('.loading');
+                    if (noBooks && noBooks.parentElement) {
+                        noBooks.parentElement.remove();
+                    }
+                    
+                    tableBody.appendChild(newRow);
+                    
+                    showToast('Book added successfully', 'success');
+                    closeAddBookModal();
+                });
+            }
+
+            // Edit Book Form
+            const editBookForm = document.getElementById('editBookForm');
+            if (editBookForm) {
+                editBookForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (!currentBookId) return;
+                    
+                    const formData = new FormData(this);
+                    const title = formData.get('title');
+                    const author = formData.get('author');
+                    const genre = formData.get('genre') || 'General';
+                    const year = formData.get('published_year');
+                    const availability = formData.get('availability');
+                    
+                    // Update the row
+                    const row = document.querySelector(`tr[data-id="${currentBookId}"]`);
+                    if (row) {
+                        row.dataset.title = title;
+                        row.dataset.author = author;
+                        row.dataset.genre = genre;
+                        row.dataset.publishedYear = year;
+                        row.dataset.availability = availability;
+                        
+                        // Update the displayed content
+                        const cells = row.querySelectorAll('td');
+                        cells[1].textContent = title;
+                        cells[1].title = title;
+                        cells[2].textContent = author;
+                        cells[2].title = author;
+                        cells[3].innerHTML = `
+                            <span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
+                                ${genre}
+                            </span>
+                        `;
+                        cells[3].title = genre;
+                        cells[4].textContent = year;
+                        cells[4].title = year;
+                        cells[5].innerHTML = `
+                            <span class="status-badge ${availability > 0 ? 'status-available' : 'status-unavailable'}">
+                                ${availability > 0 ? 'Available' : 'Out of Stock'}
+                            </span>
+                        `;
+                        cells[5].title = availability > 0 ? 'Available' : 'Out of Stock';
+                        cells[6].innerHTML = `<strong style="color: var(--text-primary);">${availability}</strong> copies`;
+                        cells[6].title = `${availability} copies`;
+                    }
+                    
+                    showToast('Book updated successfully', 'success');
+                    closeEditBookModal();
+                });
+            }
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal') && e.target.id !== 'qrScannerModal') {
+                const modal = e.target;
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+            // Handle QR scanner modal click outside
+            if (e.target.id === 'qrScannerModal') {
+                if (typeof window.closeQRScanner === 'function') {
+                    window.closeQRScanner();
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC to close modals
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    const closeButton = openModal.querySelector('.close-modal');
+                    if (closeButton) {
+                        closeButton.click();
+                    }
+                }
+                
+                // Exit selection mode
+                if (isSelectionMode) {
+                    exitSelectionMode();
+                }
+            }
+            
+            // Ctrl/Cmd + A to select all in selection mode
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a' && isSelectionMode) {
+                e.preventDefault();
+                selectAllBooks();
+            }
+        });
+    </script>
+>>>>>>> Stashed changes
 </body>
 </html>

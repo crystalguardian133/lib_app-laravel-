@@ -83,14 +83,49 @@ public function store(Request $request)
             'book_ids.*'  => 'integer|exists:books,id'
         ]);
 
-        // ✅ Fix member lookup
-        $member = Member::where(
-            DB::raw("CONCAT_WS(' ', first_name, COALESCE(middle_name, ''), last_name)"),
-            $validated['member_name']
-        )->first();
+        // ✅ Enhanced member lookup with multiple strategies
+        $memberName = trim($validated['member_name']);
+
+        // Strategy 1: Use model's name attribute (recommended)
+        $member = Member::where('first_name', 'LIKE', '%' . $memberName . '%')
+                       ->orWhere('last_name', 'LIKE', '%' . $memberName . '%')
+                       ->orWhere(DB::raw("CONCAT_WS(' ', first_name, COALESCE(middle_name, ''), last_name)"), 'LIKE', '%' . $memberName . '%')
+                       ->first();
+
+        // Strategy 2: If no match, try partial name matching
+        if (!$member) {
+            $nameParts = explode(' ', $memberName);
+            if (count($nameParts) >= 2) {
+                $firstName = $nameParts[0];
+                $lastName = $nameParts[count($nameParts) - 1];
+
+                $member = Member::where('first_name', 'LIKE', '%' . $firstName . '%')
+                               ->where('last_name', 'LIKE', '%' . $lastName . '%')
+                               ->first();
+            }
+        }
+
+        // Strategy 3: If still no match, try case-insensitive search
+        if (!$member) {
+            $member = Member::where(DB::raw('LOWER(first_name)'), 'LIKE', '%' . strtolower($memberName) . '%')
+                           ->orWhere(DB::raw('LOWER(last_name)'), 'LIKE', '%' . strtolower($memberName) . '%')
+                           ->first();
+        }
 
         if (!$member) {
-            return response()->json(['message' => '❌ Member not found.'], 404);
+            // Get all members for debugging (remove in production)
+            $allMembers = Member::select('first_name', 'middle_name', 'last_name')->get();
+            return response()->json([
+                'message' => '❌ Member not found.',
+                'searched_name' => $memberName,
+                'available_members' => $allMembers->map(function($m) {
+                    return [
+                        'name' => trim($m->first_name . ' ' . ($m->middle_name ?? '') . ' ' . $m->last_name),
+                        'first_name' => $m->first_name,
+                        'last_name' => $m->last_name
+                    ];
+                })
+            ], 404);
         }
 
         $borrowedBooks = [];

@@ -37,6 +37,7 @@
             padding: 0;
         }
 
+<<<<<<< Updated upstream
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, var(--light) 0%, #f0f9ff 100%);
@@ -44,6 +45,84 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             min-height: 100vh;
         }
+=======
+  /* Additional dark mode styles */
+  body.dark-mode .sidebar {
+    background: rgba(20, 20, 20, 0.9);
+    border-right-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .card {
+    background: rgba(30, 30, 30, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .btn-outline {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+  }
+  body.dark-mode .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  body.dark-mode .data-table th {
+    background: rgba(20, 20, 20, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .data-table td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .data-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-primary);
+  }
+  body.dark-mode .form-control:focus {
+    background: rgba(30, 41, 59, 1);
+    border-color: var(--accent);
+  }
+  body.dark-mode .form-control:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  body {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--background), #f1f5f9);
+    color: var(--text-primary);
+    line-height: 1.6;
+    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+  /* Dark mode transition overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+  }
+  body.dark-mode::before {
+    opacity: 1;
+  }
+  /* Animated elements during transition */
+  body.dark-mode-transition * {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+  }
+  body.dark-mode {
+    background: linear-gradient(135deg, #121212, #1a1a1a);
+  }
+>>>>>>> Stashed changes
 
         body.dark-mode {
             background: linear-gradient(135deg, var(--bg-dark) 0%, #0c1426 100%);
@@ -288,10 +367,35 @@
             max-width: calc(100vw - 260px);
         }
 
+<<<<<<< Updated upstream
         .main.collapsed {
             margin-left: 70px;
             max-width: calc(100vw - 70px);
         }
+=======
+  body {
+    overflow: hidden;
+  }
+
+  .dashboard-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Page Header */
+  .page-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing);
+  }
+>>>>>>> Stashed changes
 
         .page-header {
             display: flex;
@@ -461,84 +565,6 @@
             box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
         }
 
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            min-width: auto;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-sm::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-sm:hover::before {
-            left: 100%;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons .btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .action-buttons .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .action-buttons .btn:active {
-            transform: translateY(0px) scale(1.02);
-        }
-
-        .action-buttons .btn i {
-            margin-right: 4px;
-            transition: transform 0.2s ease;
-        }
-
-        .action-buttons .btn:hover i {
-            transform: scale(1.1);
-        }
-
-        .action-buttons .btn:focus {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        .action-buttons .btn:focus:not(:focus-visible) {
-            outline: none;
-        }
-
-        .action-buttons .btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        .btn-sm .icon {
-            font-size: 0.875rem;
-        }
 
         /* Bulk actions bar */
         .bulk-actions {
@@ -569,7 +595,7 @@
         }
 
         body.dark-mode .bulk-actions-text {
-            color: var(--accent-light);
+            color: var(--accent);
         }
 
         @keyframes slideDown {
@@ -583,6 +609,7 @@
             }
         }
 
+<<<<<<< Updated upstream
         /* Table Styles */
         .table-container {
             background: rgba(255, 255, 255, 0.9);
@@ -594,6 +621,25 @@
             margin-top: 1rem;
             position: relative;
         }
+=======
+  /* Table Styles */
+  .table-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow: auto;
+    box-shadow: var(--glass-shadow);
+    margin-top: var(--spacing);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1;
+    height: calc(100vh - 220px);
+    max-height: calc(100vh - 200px);
+  }
+>>>>>>> Stashed changes
 
         .table-container::-webkit-scrollbar {
             height: 8px;
@@ -624,6 +670,7 @@
             min-width: 800px;
         }
 
+<<<<<<< Updated upstream
         thead {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -638,6 +685,24 @@
             position: relative;
             white-space: nowrap;
         }
+=======
+  .data-table th {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 8px 6px;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+>>>>>>> Stashed changes
 
         th::after {
             content: '';
@@ -650,45 +715,41 @@
         }
 
         th:first-child {
-            width: 200px;
-            min-width: 180px;
+            width: 180px;
+            min-width: 160px;
         }
 
         th:nth-child(2) {
-            width: 80px;
-            min-width: 60px;
+            width: 70px;
+            min-width: 50px;
         }
 
         th:nth-child(3) {
-            width: 250px;
-            min-width: 200px;
+            width: 220px;
+            min-width: 180px;
         }
 
         th:nth-child(4) {
-            width: 150px;
-            min-width: 120px;
+            width: 130px;
+            min-width: 110px;
         }
 
         th:nth-child(5) {
-            width: 200px;
-            min-width: 150px;
+            width: 180px;
+            min-width: 140px;
         }
 
         th:nth-child(6) {
-            width: 140px;
-            min-width: 120px;
+            width: 90px;
+            min-width: 70px;
         }
 
         th:nth-child(7) {
-            width: 120px;
-            min-width: 100px;
+            width: 90px;
+            min-width: 70px;
         }
 
-        th:nth-child(8) {
-            width: 120px;
-            min-width: 100px;
-        }
-
+<<<<<<< Updated upstream
         td {
             padding: 1rem 0.75rem;
             border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -696,6 +757,20 @@
             vertical-align: top;
             word-wrap: break-word;
         }
+=======
+  .data-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    vertical-align: middle;
+    text-align: center;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+>>>>>>> Stashed changes
 
         td:first-child {
             text-align: left;
@@ -725,18 +800,13 @@
         }
 
         td:nth-child(6) {
-            width: 140px;
-            min-width: 120px;
+            width: 100px;
+            min-width: 80px;
         }
 
         td:nth-child(7) {
-            width: 120px;
-            min-width: 100px;
-        }
-
-        td:nth-child(8) {
-            width: 120px;
-            min-width: 100px;
+            width: 100px;
+            min-width: 80px;
         }
 
         body.dark-mode td {
@@ -835,7 +905,7 @@
 
         body.dark-mode .modal-content {
             background: rgba(15, 23, 42, 0.95);
-            color: var(--text-dark);
+            color: var(--text-primary);
             border-color: rgba(51, 65, 85, 0.3);
         }
 
@@ -865,7 +935,7 @@
         }
 
         body.dark-mode .modal-title {
-            color: var(--accent-light);
+            color: var(--accent);
         }
 
         .close-modal {
@@ -907,7 +977,7 @@
         }
 
         body.dark-mode .section-title {
-            color: var(--accent-light);
+            color: var(--accent);
             border-bottom-color: rgba(255,255,255,0.1);
         }
 
@@ -930,7 +1000,7 @@
         }
 
         body.dark-mode .form-group label {
-            color: var(--text-dark);
+            color: var(--text-primary);
         }
 
         .form-group input,
@@ -980,8 +1050,8 @@
         }
 
         body.dark-mode .form-group select option {
-            background: var(--bg-dark);
-            color: var(--text-dark);
+            background: var(--surface);
+            color: var(--text-primary);
         }
 
         .modal-actions {
@@ -1061,7 +1131,7 @@
 
         body.dark-mode .qr-content {
             background: rgba(15, 23, 42, 0.95);
-            color: var(--text-dark);
+            color: var(--text-primary);
             border-color: rgba(51, 65, 85, 0.3);
         }
 
@@ -1072,7 +1142,7 @@
         }
 
         body.dark-mode .qr-content h3 {
-            color: var(--accent-light);
+            color: var(--accent);
         }
 
         .qr-content img {
@@ -1150,6 +1220,7 @@
             .action-buttons {
                 flex-direction: column;
                 gap: 4px;
+                align-items: center;
             }
 
             .btn-sm {
@@ -1159,6 +1230,10 @@
 
             .page-title {
                 font-size: 2rem;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
             .bulk-actions {
@@ -1190,16 +1265,18 @@
 .card-modal {
   display: none;
   position: fixed;
-  z-index: 1000;
-  left: 100; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
   justify-content: center;
   align-items: center;
 }
 
 .card-modal-content {
-  background: #fff;
+  background: white;
   padding: 20px;
   border-radius: 12px;
   width: 420px;
@@ -1207,17 +1284,19 @@
   box-shadow: 0 6px 18px rgba(0,0,0,0.3);
 }
 
-.card-modal-content h2 {
+.card-modal-content h3 {
   text-align: center;
   margin-bottom: 20px;
 }
 
 .card-modal-content .close {
   position: absolute;
-  top: 10px; right: 15px;
+  top: 10px;
+  right: 15px;
   font-size: 22px;
   cursor: pointer;
 }
+
 .card-layout {
   display: flex;
   gap: 20px;
@@ -1226,8 +1305,8 @@
 }
 
 .card {
-  width: 340px;  /* driver’s license size */
-  height: 216px;
+  width: 337.5px;  /* Philippine driver's license width */
+  height: 212.5px; /* Philippine driver's license height */
   position: relative;
   border-radius: 12px;
   overflow: hidden;
@@ -1248,12 +1327,10 @@
   pointer-events: none;
 }
 
-
-/* Name above the "Member" text in template */
-/* Name: slightly above the middle of the card */
+/* Name overlay */
 .overlay.name {
   position: absolute;
-  top: 100px;      /* adjust for your template height */
+  top: 100px;
   left: 37px;
   right: 25px;
   text-align: left;
@@ -1263,15 +1340,14 @@
   color: #fff;
 }
 
-/* Date: positioned beside "Membership Date :" text in template */
+/* Date overlay */
 .overlay.date {
   position: absolute;
-  bottom: 43px;   /* near the bottom, adjust to match template */
-  left: 127px;    /* aligns next to pre-printed label */
-  font-size: 13px;
+  bottom: 43px;
+  left: 127px;
+  font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
-  font-size: 12px;
   color: #fff;
 }
 
@@ -1293,7 +1369,7 @@
 .overlay.photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* ensures it fills and stays centered */
+  object-fit: cover;
 }
 
 /* QR square */
@@ -1310,93 +1386,166 @@
   height: 100%;
   object-fit: contain;
 }
+<<<<<<< Updated upstream
         @keyframes successFlash {
             0% { background: rgba(16, 185, 129, 0.2); }
             100% { background: transparent; }
         }
+=======
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes successFlash {
+    0% { background: rgba(16, 185, 129, 0.2); }
+    100% { background: transparent; }
+  }
+
+  /* Tooltip Styles */
+  .member-tooltip {
+    position: absolute;
+    background: var(--surface-elevated);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: nowrap;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+    min-width: 300px;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+
+  body.dark-mode .member-tooltip {
+    background: rgba(15, 23, 42, 0.95);
+    border-color: rgba(51, 65, 85, 0.3);
+  }
+
+  .member-tooltip.show {
+    opacity: 1;
+  }
+
+  .member-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--glass-border);
+  }
+
+  body.dark-mode .member-tooltip::before {
+    border-bottom-color: rgba(51, 65, 85, 0.3);
+  }
+>>>>>>> Stashed changes
     </style>
 </head>
 <body>
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="/images/logo.png" alt="Logo" class="logo">
-      <h3 class="label">Julita Public Library</h3>
+      <img src="/images/logo.png" alt="Library Logo" class="logo">
+      <span class="label">Julita Public Library</span>
     </div>
-    
-    <button class="toggle-btn" id="toggleSidebar" disabled>
-      <i class="fas fa-bars"></i>
-    </button>
-    
     <nav>
-      <a href="/dashboard">
-        <span class="icon">🏠</span>s2
+      <a href="{{ route('dashboard') }}" data-label="Dashboard">
+        <span class="icon"><i class="fas fa-home"></i></span>
         <span class="label">Dashboard</span>
       </a>
-      <a href="/books">
-        <span class="icon">📘</span>
-        <span class="label">Manage Books</span>
+      <a href="{{ route('books.index') }}" data-label="Books">
+        <span class="icon"><i class="fas fa-book"></i></span>
+        <span class="label">Books</span>
       </a>
-      <a href="/members" class="active">
-        <span class="icon">👥</span>
-        <span class="label">Manage Members</span>
+      <a href="{{ route('members.index') }}" class="active" data-label="Members">
+        <span class="icon"><i class="fas fa-users"></i></span>
+        <span class="label">Members</span>
       </a>
+<<<<<<< Updated upstream
       <a href="/transactions">
         <span class="icon">📃</span>
         <span class="label">Transactions</span>
+=======
+      <a href="{{ route('timelog.index') }}" data-label="Member Time-in/out">
+        <span class="icon"><i class="fas fa-user-clock"></i></span>
+        <span class="label">Member Time-in/out</span>
+>>>>>>> Stashed changes
       </a>
     </nav>
-    
     <div class="dark-toggle">
-      <label class="switch">
+      <label class="switch" title="Toggle Dark Mode">
         <input type="checkbox" id="darkModeToggle">
-        <span class="slider"></span>
+        <span class="slider">
+          <span class="slider-thumb">
+            <span class="icon-sun">🌞</span>
+            <span class="icon-moon">🌙</span>
+          </span>
+        </span>
       </label>
-      <a href="/logout" class="logout-link">
-        <span>🚪</span>
-        <span class="label">Logout</span>
-      </a>
+      <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light Mode</span>
     </div>
   </div>
 
   <!-- Main Content -->
   <div class="main" id="mainContent">
-    <div class="page-header">
-      <h1 class="page-title">
-        <span>👥</span>
-        Registered Members
-      </h1>
-    </div>
-
-    <div class="top-controls">
-      <div class="search-box">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" placeholder="Search members by name, address, or contact...">
+    <div class="dashboard-content">
+      <div class="page-header">
+        <div class="page-header-content">
+          <div class="page-header-left">
+            <div class="dashboard-title" style="position: sticky; top: 0; z-index: 100; background: transparent; padding: 1rem 0; margin: -1rem 0 1rem 0;">
+              REGISTERED MEMBERS
+            </div>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="openRegisterModal()">
-        <i class="fas fa-user-plus"></i>
-        Register Member
-      </button>
 
-   <!-- Members Table -->
-<div class="table-container">
-  <table id="membersTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Age</th>
-        <th>Address</th>
-        <th>Contact Number</th>
-        <th>School</th>
-        <th>Member Since</th>
-        <th>Computer Time</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+      <!-- Table Controls -->
+      <div class="table-controls" style="display: flex; flex-direction: row; gap: 1rem; align-items: center; margin-bottom: 1rem; padding: 1rem; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); box-shadow: var(--glass-shadow);">
+        <div class="search-container" style="flex: 1; max-width: 100%;">
+          <input type="text" id="searchInput" class="search-bar" placeholder="Search members by name, address, or contact..." style="width: 100%; min-width: 400px;">
+        </div>
+        <div class="register-button-container">
+          <button class="btn btn-primary" onclick="openRegisterModal()">
+            <i class="fas fa-user-plus"></i>
+            Register Member
+          </button>
+        </div>
+      </div>
+
+      <!-- Members Table -->
+      <div class="table-container">
+      <table id="membersTable" class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Contact Number</th>
+            <th>School</th>
+            <th>Member Since</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
     <tbody id="membersTableBody">
       @if(isset($members) && $members->count())
         @foreach ($members as $member)
-          <tr>
+          <tr data-member-info="Name: {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}{{ (!empty($member->first_name) && $member->first_name !== 'null') ? ((!empty($member->last_name) && $member->last_name !== 'null') ? ', ' : '') . $member->first_name : '' }}{{ (!empty($member->middle_name) && $member->middle_name !== 'null') ? ' ' . $member->middle_name : '' }} | Age: {{ $member->age ?? '' }} | Address: {{ collect([(!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null, (!empty($member->street) && $member->street !== 'null') ? $member->street : null, (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null, (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null, (!empty($member->province) && $member->province !== 'null') ? $member->province : null])->filter()->implode(', ') }} | Contact: {{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '' }} | School: {{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '' }} | Member Since: {{ (!empty($member->memberdate) && $member->memberdate !== 'null') ? \Carbon\Carbon::parse($member->memberdate)->format('F j, Y') : '' }}">
             {{-- Name --}}
             <td>
               {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}
@@ -1435,9 +1584,6 @@
               @endif
             </td>
 
-            {{-- Computer Time --}}
-            <td>{{ (!empty($member->member_time) && $member->member_time !== 'null') ? $member->member_time . ' min' : '' }}</td>
-
             {{-- Actions - Individual Edit and Download Buttons --}}
             <td>
               <div class="action-buttons">
@@ -1461,12 +1607,13 @@
         @endforeach
       @else
         <tr>
-          <td colspan="8" style="text-align: center;">No members found.</td>
+          <td colspan="7" style="text-align: center;">No members found.</td>
         </tr>
       @endif
-    </tbody>
-  </table>
-</div>
+      </tbody>
+    </table>
+  </div>
+    </div>
   </div>
 
 <!-- Register Member Modal -->
@@ -1852,136 +1999,318 @@
     </div>
   </div>
 <script>
-// Dark mode functionality
-const darkToggle = document.getElementById('darkModeToggle');
-
-// Initialize dark mode on page load
+// Initialize page functionality
 document.addEventListener('DOMContentLoaded', function() {
-  const darkMode = localStorage.getItem('darkMode') === 'true';
-  if (darkMode) {
-    document.body.classList.add('dark-mode');
-    darkToggle.checked = true;
-  }
-});
+  console.log('Members page loaded successfully');
 
-// Dark mode toggle event listener
-darkToggle.addEventListener('change', function() {
-  document.body.classList.toggle('dark-mode');
-  localStorage.setItem('darkMode', this.checked);
-});
+  // Initialize dark mode toggle
+  initializeDarkModeToggle();
 
-// Sidebar toggle functionality
-const sidebar = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const toggleBtn = document.getElementById('toggleSidebar');
+  // Initialize search functionality
+  initializeSearch();
 
-toggleBtn.addEventListener('click', function() {
-  sidebar.classList.toggle('collapsed');
-  mainContent.classList.toggle('collapsed');
-});
+  // Initialize modal functions
+  initializeModals();
 
-// Card preview function
-function showCardPreviewModal(cardUrl) {
-  document.getElementById("cardPreviewFrame").src = cardUrl;
-  document.getElementById("downloadCardBtn").href = cardUrl;
-  document.getElementById("cardPreviewModal").style.display = "block";
-}
+  // Initialize tooltip functionality
+  initializeTooltips();
 
-function closeCardPreviewModal() {
-  document.getElementById("cardPreviewModal").style.display = "none";
-  document.getElementById("cardPreviewFrame").src = "";
-}
-
-// Add missing openCardModal function
-function openCardModal(memberId) {
-  console.log('Opening card modal for member ID:', memberId);
-  
-  // Create a simple modal for card generation
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3000;
-  `;
-  
-  modal.innerHTML = `
-    <div style="
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      max-width: 400px;
-      width: 90%;
-    ">
-      <h3 style="margin-bottom: 1rem; color: #333;">📄 Generate ID Card</h3>
-      <p style="margin-bottom: 1.5rem; color: #666;">Generate ID card for member ID: ${memberId}</p>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <button onclick="this.closest('.modal').remove()" style="
-          padding: 8px 16px;
-          background: #6b7280;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        ">Cancel</button>
-        <button onclick="generateCard(${memberId})" style="
-          padding: 8px 16px;
-          background: #10b981;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        ">Generate Card</button>
-      </div>
-    </div>
-  `;
-  
-  modal.className = 'modal';
-  document.body.appendChild(modal);
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      modal.remove();
-    }
-  });
-}
-
-function generateCard(memberId) {
-  // This would typically generate and download the card
-  alert(`Card generated for member ID: ${memberId}`);
-  document.querySelector('.modal').remove();
-}
-
-// Ensure buttons work properly
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Members page JavaScript loaded successfully');
-  
-  // Test if edit buttons are being found
+  // Test if edit buttons are working
   const editButtons = document.querySelectorAll('.editBtn');
   console.log('Found edit buttons:', editButtons.length);
-  
+
   // Add click event listeners to edit buttons as backup
   editButtons.forEach(button => {
     button.addEventListener('click', function(e) {
       e.preventDefault();
       const memberId = this.getAttribute('data-id');
       console.log('Edit button clicked for member ID:', memberId);
-      
+
       // Let the existing memberedit.js handle the functionality
       // This is just a backup to ensure the button is clickable
     });
   });
 });
 
+// Dark mode toggle functionality
+function initializeDarkModeToggle() {
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const darkModeLabel = document.getElementById('darkModeLabel');
+
+  if (!darkModeToggle) {
+    console.error('Dark mode toggle not found');
+    return;
+  }
+
+  // Apply saved preference on load
+  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = savedDarkMode !== null ? savedDarkMode : prefersDarkMode;
+
+  document.body.classList.toggle('dark-mode', isDark);
+  darkModeToggle.checked = isDark;
+  if (darkModeLabel) {
+    darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+  }
+
+  // Toggle dark mode
+  darkModeToggle.addEventListener('change', function() {
+    const isChecked = this.checked;
+    document.body.classList.toggle('dark-mode', isChecked);
+    localStorage.setItem('darkMode', isChecked);
+    if (darkModeLabel) {
+      darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
+    }
+  });
+
+  console.log('Dark mode toggle initialized');
+}
+
+// Search functionality
+function initializeSearch() {
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const tableBody = document.getElementById('membersTableBody');
+      const rows = tableBody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        if (row.cells.length > 1) { // Skip "No members found" row
+          const name = row.cells[0].textContent.toLowerCase();
+          const address = row.cells[2].textContent.toLowerCase();
+          const contact = row.cells[3].textContent.toLowerCase();
+
+          const matches = name.includes(searchTerm) ||
+                         address.includes(searchTerm) ||
+                         contact.includes(searchTerm);
+
+          row.style.display = matches ? '' : 'none';
+        }
+      });
+    });
+  }
+}
+
+// Modal functions
+function initializeModals() {
+  // These functions should be handled by external JS files
+  // but we'll add basic functionality as backup
+  window.openRegisterModal = window.openRegisterModal || function() {
+    console.log('Opening register modal');
+    const modal = document.getElementById('registerModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+    }
+  };
+
+  window.closeRegisterModal = window.closeRegisterModal || function() {
+    console.log('Closing register modal');
+    const modal = document.getElementById('registerModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+    }
+  };
+
+  window.openCardModal = window.openCardModal || function(memberId) {
+    console.log('Opening card modal for member ID:', memberId);
+
+    // Create a simple modal for card generation
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    `;
+
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+      ">
+        <h3 style="margin-bottom: 1rem; color: #333;">📄 Generate ID Card</h3>
+        <p style="margin-bottom: 1.5rem; color: #666;">Generate ID card for member ID: ${memberId}</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button onclick="this.closest('div').parentNode.remove()" style="
+            padding: 8px 16px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          ">Cancel</button>
+          <button onclick="generateCard(${memberId})" style="
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          ">Generate Card</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  };
+
+  window.generateCard = window.generateCard || function(memberId) {
+    // This would typically generate and download the card
+    alert(`Card generated for member ID: ${memberId}`);
+    document.querySelector('div[style*="z-index: 3000"]').remove();
+  };
+}
+
+// Tooltip functionality with 3-second delay
+function initializeTooltips() {
+  const tableBody = document.getElementById('membersTableBody');
+  const tooltip = document.createElement('div');
+  tooltip.className = 'member-tooltip';
+  document.body.appendChild(tooltip);
+
+  let hoverTimer = null;
+  let currentRow = null;
+
+  if (tableBody) {
+    tableBody.addEventListener('mouseover', function(e) {
+      const row = e.target.closest('tr');
+      if (row && row.hasAttribute('data-member-info')) {
+        currentRow = row;
+        hoverTimer = setTimeout(() => {
+          showTooltip(row, e);
+        }, 3000); // 3-second delay
+      }
+    });
+
+    tableBody.addEventListener('mouseout', function(e) {
+      const row = e.target.closest('tr');
+      if (row && row.hasAttribute('data-member-info')) {
+        clearTimeout(hoverTimer);
+        hideTooltip();
+        currentRow = null;
+      }
+    });
+
+    // Hide tooltip when mouse moves
+    document.addEventListener('mousemove', function(e) {
+      if (currentRow && !currentRow.contains(e.target) && !tooltip.contains(e.target)) {
+        clearTimeout(hoverTimer);
+        hideTooltip();
+        currentRow = null;
+      }
+    });
+  }
+
+  function showTooltip(row, event) {
+    const memberInfo = row.getAttribute('data-member-info');
+
+    // Format as vertical list
+    const formattedInfo = memberInfo
+      .split(' | ')
+      .map(item => `<div style="margin-bottom: 4px; padding: 2px 0;">${item}</div>`)
+      .join('');
+
+    tooltip.innerHTML = formattedInfo;
+    tooltip.classList.add('show');
+
+    // Position tooltip
+    const rect = row.getBoundingClientRect();
+    tooltip.style.left = event.pageX + 10 + 'px';
+    tooltip.style.top = event.pageY - 10 + 'px';
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove('show');
+  }
+}
+
+// Global function to close all modals
+function closeAllModals() {
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  });
+  document.body.classList.remove('modal-open');
+}
+
+// Function to open register modal with Julita resident confirmation
+function openJulitaRegisterModal() {
+  console.log('openJulitaRegisterModal called');
+  closeAllModals();
+
+  const confirmJulita = confirm("Are you a Julita resident?\nClick OK for Yes, Cancel for No.");
+  if (confirmJulita) {
+    const modal = document.getElementById("julitaRegisterModal");
+    if (modal) {
+      modal.classList.add("show");
+      modal.style.display = "flex";
+      document.body.classList.add("modal-open");
+      console.log('Julita modal opened');
+    } else {
+      console.error('julitaRegisterModal element not found');
+    }
+  } else {
+    const modal = document.getElementById("registerModal");
+    if (modal) {
+      modal.classList.add("show");
+      modal.style.display = "flex";
+      document.body.classList.add("modal-open");
+      console.log('Register modal opened');
+    } else {
+      console.error('registerModal element not found');
+    }
+  }
+}
+
+// Function to close register modal
+function closeRegisterModal() {
+  const registerModal = document.getElementById("registerModal");
+  const julitaModal = document.getElementById("julitaRegisterModal");
+  if (registerModal) {
+    registerModal.classList.remove("show");
+    registerModal.style.display = "none";
+  }
+  if (julitaModal) {
+    julitaModal.classList.remove("show");
+    julitaModal.style.display = "none";
+  }
+  document.body.classList.remove("modal-open");
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal')) {
+    e.target.classList.remove('show');
+    e.target.style.display = 'none';
+    document.body.classList.remove('modal-open');
+  }
+});
+
+console.log('Members page JavaScript initialized');
 </script>
 
 <!-- External Scripts - ONLY INCLUDE EACH ONCE -->

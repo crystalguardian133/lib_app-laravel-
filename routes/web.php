@@ -71,10 +71,25 @@ Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);
 Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
 
 // Transactions Routes
+Route::get('/transactions', function () {
+    return redirect()->route('dashboard');
+});
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
 Route::post('/transactions/{id}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
 Route::get('/transactions/overdue', [TransactionController::class, 'overdue'])->name('transactions.overdue');
+
+// Debug route for time comparison
+Route::get('/debug/time', function () {
+    return response()->json([
+        'server_time' => now()->toISOString(),
+        'timezone' => config('app.timezone'),
+        'laravel_time' => now()->toDateTimeString(),
+        'php_timezone' => date_default_timezone_get(),
+        'server_date' => now()->toDateString(),
+        'timestamp' => now()->timestamp
+    ]);
+});
 
 //Card Generation Routess
 Route::get('/members/{id}/json', function ($id) {

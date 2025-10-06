@@ -296,6 +296,7 @@ function showCornerPopup(message) {
     popup.style.display = 'none';
   }, 3000);
 }
+<<<<<<< Updated upstream
 
 // === QR Scanner ===
 let qrScanner;
@@ -354,3 +355,5 @@ function stopQRScan() {
     }).catch(console.error);
   }
 }
+=======
+>>>>>>> Stashed changes

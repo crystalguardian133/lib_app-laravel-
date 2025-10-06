@@ -366,4 +366,5 @@ body.dark-mode .styled-table tbody tr.overdue {
   </script>
   <script src="{{ asset('js/bookreturn.js') }}"></script>
 @endpush
+<script> window.location.href = "{{route('dashboard')}}";</script>
 @endsection

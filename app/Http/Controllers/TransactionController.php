@@ -66,7 +66,7 @@ public function returnBook($id)
 
     $transaction->book->increment('availability');
 
-    return redirect()->route('transactions.index')->with('success', 'Book returned successfully.');
+    return redirect()->route('dashboard')->with('success', 'Book returned successfully.');
 }
 
 public function overdue()

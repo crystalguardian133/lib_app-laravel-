@@ -1,17 +1,40 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const overdueToast = document.getElementById('overdueToast');
-    const dueSoonToast = document.getElementById('dueSoonToast');
-    const closeOverdue = document.getElementById('closeOverdue');
-    const closeDueSoon = document.getElementById('closeDueSoon');
+     const overdueToast = document.getElementById('overdueToast');
+     const dueSoonToast = document.getElementById('dueSoonToast');
+     const connectionStatus = document.getElementById('connection-status');
+     const closeOverdue = document.getElementById('closeOverdue');
+     const closeDueSoon = document.getElementById('closeDueSoon');
 
-    if (!overdueToast || !dueSoonToast) {
-        console.warn('Toast elements not found. Skipping.');
-        return;
-    }
+     if (!overdueToast || !dueSoonToast) {
+         console.warn('Toast elements not found. Skipping.');
+         return;
+     }
 
-    // Hide initially
-    overdueToast.classList.add('toast-hidden');
-    dueSoonToast.classList.add('toast-hidden');
+     // Hide initially
+     overdueToast.classList.add('toast-hidden');
+     dueSoonToast.classList.add('toast-hidden');
+
+     // Helper function to show connection status for overdue notifications
+     function showOverdueStatus(message, isOverdue = true) {
+         if (connectionStatus) {
+             connectionStatus.textContent = message;
+             connectionStatus.className = isOverdue ? 'connected' : 'connected';
+             connectionStatus.style.display = 'block';
+
+             // Add specific class for overdue styling
+             if (isOverdue) {
+                 connectionStatus.classList.add('overdue-alert');
+             } else {
+                 connectionStatus.classList.add('due-soon-alert');
+             }
+
+             // Auto-hide after 8 seconds
+             setTimeout(() => {
+                 connectionStatus.style.display = 'none';
+                 connectionStatus.className = '';
+             }, 8000);
+         }
+     }
 
     try {
         const response = await fetch('/api/notifications/overdue', {
@@ -70,14 +93,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .join('');
         };
 
-        // === Show Overdue Toast ===
+        // === Show Overdue Notifications ===
         if (overdueList.length > 0) {
-            document.getElementById('overdueSummary').innerHTML =
-                buildSummary(overdueByMember, true);
-            document.getElementById('overdueDetails').innerHTML =
-                formatDetails(overdueByMember);
+            const overdueSummary = buildSummary(overdueByMember, true);
 
-            // Toggle expand
+            // Show in connection status area with urgent styling
+            showOverdueStatus(`🔴 ${overdueSummary}`, true);
+
+            // Also show in toast for detailed view
+            document.getElementById('overdueSummary').innerHTML = overdueSummary;
+            document.getElementById('overdueDetails').innerHTML = formatDetails(overdueByMember);
+
             overdueToast.querySelector('.toast-text').onclick = (e) => {
                 if (e.target.closest('.toast-close')) return;
                 const d = document.getElementById('overdueDetails');
@@ -88,14 +114,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             overdueToast.classList.add('toast-overdue', 'show');
         }
 
-        // === Show Due Soon Toast ===
+        // === Show Due Soon Notifications ===
         if (dueSoonList.length > 0) {
-            document.getElementById('dueSoonSummary').innerHTML =
-                buildSummary(dueSoonByMember, false);
-            document.getElementById('dueSoonDetails').innerHTML =
-                formatDetails(dueSoonByMember);
+            const dueSoonSummary = buildSummary(dueSoonByMember, false);
 
-            // Toggle expand
+            // Show in connection status area with warning styling
+            showOverdueStatus(`🟡 ${dueSoonSummary}`, false);
+
+            // Also show in toast for detailed view
+            document.getElementById('dueSoonSummary').innerHTML = dueSoonSummary;
+            document.getElementById('dueSoonDetails').innerHTML = formatDetails(dueSoonByMember);
+
             dueSoonToast.querySelector('.toast-text').onclick = (e) => {
                 if (e.target.closest('.toast-close')) return;
                 const d = document.getElementById('dueSoonDetails');

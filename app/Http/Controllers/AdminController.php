@@ -13,6 +13,10 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    public function dash_home(){
+        return view('dashboard');
+    }
+    
     public function dashboard()
 {
     $booksCount = Book::count();

@@ -260,6 +260,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Julita register button click handler (dashboard)
+  const julitaRegisterBtn = document.getElementById('openJulitaRegisterBtn');
+  if (julitaRegisterBtn) {
+    julitaRegisterBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openRegisterModal(); // This will show the confirmation dialog and open the appropriate modal
+    });
+  }
+
   // Global key listeners
   document.addEventListener('keydown', function (e) {
     const openModals = document.querySelectorAll('.modal.show');

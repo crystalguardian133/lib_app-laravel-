@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -18,8 +18,12 @@
     --accent-dark: #0891b2;
     --success: #10b981;           /* Green */
     --warning: #f59e0b;           /* Amber */
+<<<<<<< Updated upstream
     --danger: #ef4444;            /* Red */
 
+=======
+  --danger: #ef4444;            /* Red */
+>>>>>>> Stashed changes
     /* Neutral Scale */
     --white: #ffffff;
     --gray-50: #f8fafc;
@@ -219,12 +223,21 @@
     color: var(--text-primary);
     transform: translateZ(0);
   }
+<<<<<<< Updated upstream
 
   .sidebar.collapsed {
     width: 80px;
     padding: var(--spacing);
   }
 
+=======
+  /* Light mode sidebar */
+  body:not(.dark-mode) .sidebar {
+    background: var(--glass-bg);
+    border-right: 1px solid var(--glass-border);
+    color: #1a1a1a;
+  }
+>>>>>>> Stashed changes
   .sidebar-header {
     display: flex;
     align-items: center;
@@ -954,16 +967,30 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 2000;
     justify-content: center;
     align-items: center;
+    padding: var(--spacing);
   }
 
   .modal.show {
     display: flex !important;
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: modalFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
   }
 
   @keyframes fadeIn {
@@ -1038,14 +1065,40 @@
   .modal-content {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 2.5rem;
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    transform: scale(0.9);
+  }
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.6;
+  }
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8) translateY(40px);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      filter: blur(0px);
+    }
   }
 
   body.dark-mode .modal-content {
@@ -1059,21 +1112,32 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid rgba(0,0,0,0.05);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    position: relative;
   }
 
   body.dark-mode .modal-header {
     border-bottom-color: rgba(255,255,255,0.1);
   }
+<<<<<<< Updated upstream
 
+=======
+  .modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--primary), transparent);
+    opacity: 0.3;
+  }
+>>>>>>> Stashed changes
   .modal-title {
     font-size: 1.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1085,24 +1149,46 @@
 
   .modal-close, .close-modal {
     background: rgba(0,0,0,0.05);
-    border: none;
-    font-size: 1.5rem;
-    color: var(--gray);
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 1.2rem;
+    color: var(--text-muted);
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: var(--transition);
-    width: 40px;
-    height: 40px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-close::before, .close-modal::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--primary);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translate(-50%, -50%);
+    z-index: -1;
   }
 
   .modal-close:hover, .close-modal:hover {
-    background: rgba(0,0,0,0.1);
-    color: var(--primary);
-    transform: scale(1.1);
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 15px rgba(47, 185, 235, 0.3);
+  }
+  .modal-close:hover::before, .close-modal:hover::before {
+    width: 100%;
+    height: 100%;
   }
 
   .modal-body {
@@ -1115,21 +1201,49 @@
     gap: 1rem;
     margin-top: 2.5rem;
     padding-top: 2rem;
-    border-top: 2px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0,0,0,0.08);
+    position: relative;
   }
 
   body.dark-mode .modal-actions {
     border-top-color: rgba(255,255,255,0.1);
   }
+<<<<<<< Updated upstream
 
+=======
+  .modal-actions::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.4;
+  }
+>>>>>>> Stashed changes
   .modal-actions .btn {
     min-width: 140px;
     justify-content: center;
     animation: slideInFromLeft 0.5s ease-out;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(47, 185, 235, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   .modal-actions .btn:nth-child(2) {
     animation: slideInFromRight 0.5s ease-out;
+    background: linear-gradient(135deg, var(--success), #059669) !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+  }
+  .modal-actions .btn:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 8px 25px rgba(47, 185, 235, 0.4) !important;
+  }
+  .modal-actions .btn:nth-child(2):hover {
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
   }
 
   .form-section {
@@ -1243,24 +1357,65 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
   }
+<<<<<<< Updated upstream
 
+=======
+  .btn-cancel {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    min-width: 120px;
+  }
+  .btn-cancel:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+  }
+  .btn-confirm {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    min-width: 120px;
+  }
+  .btn-confirm:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  }
+>>>>>>> Stashed changes
   #cover-preview-area {
-    border: 2px dashed #d1d5db;
+    border: 3px dashed #d1d5db;
     border-radius: 16px;
     padding: 2rem;
     text-align: center;
     transition: all 0.3s ease;
     cursor: pointer;
-    background: rgba(249, 250, 251, 0.5);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     animation: bounceIn 0.8s ease-out;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
 
   #cover-preview-area:hover {
     border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
+    border-width: 3px;
+    background: rgba(255, 255, 255, 0.95);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+    outline: 3px solid rgba(47, 185, 235, 0.3);
+    outline-offset: 3px;
   }
 
   #cover-preview-content {
@@ -1293,13 +1448,18 @@
   }
 
   body.dark-mode #cover-preview-area {
-    background: rgba(30, 41, 59, 0.3);
+    background: rgba(255, 255, 255, 0.9);
     border-color: rgba(71, 85, 105, 0.5);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
 
   body.dark-mode #cover-preview-area:hover {
-    background: rgba(6, 182, 212, 0.1);
+    background: rgba(255, 255, 255, 0.95);
     border-color: var(--accent);
+    border-width: 3px;
+    outline: 3px solid rgba(6, 182, 212, 0.3);
+    outline-offset: 3px;
   }
 
   /* Table Styles */
@@ -1597,6 +1757,27 @@
     border-left-color: var(--accent);
   }
 
+<<<<<<< Updated upstream
+=======
+  /* Enhanced Overdue Toast Styling using Connection Status Design */
+  .toast-notification.toast-overdue {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+    color: white;
+    border-left: 4px solid var(--danger);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), overduePulse 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes overduePulse {
+    0% {
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3), 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    100% {
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5), 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+  }
+>>>>>>> Stashed changes
   .toast-content {
     display: flex;
     align-items: center;
@@ -1685,7 +1866,131 @@
   .dark-mode-transition {
     animation: darkModePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
+<<<<<<< Updated upstream
 
+=======
+  /* ✨ Glassmorphism Enforcement & Modal Exclusion */
+  /* Apply glass to all intended elements */
+  .sidebar,
+  .main,
+  .card,
+  .table-container,
+  .dashboard-content,
+  #chatbot-window,
+  .stats-overview-card,
+  .form-control,
+  .btn-outline,
+  .data-table th,
+  .data-table td {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+  }
+  /* Dark mode tweaks for form controls */
+  body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.6) !important;
+  }
+  /* ❌ EXCLUDE MODALS AND TOASTS FROM GLASS STYLING */
+  .modal,
+  .modal *,
+  .modal-content,
+  .modal-card,
+  .toast-notification,
+  .toast-notification * {
+    background: unset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: unset !important;
+    box-shadow: unset !important;
+  }
+  /* But restore intended modal styles */
+  .modal-content,
+  .modal-card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-radius: 24px !important;
+  }
+  body.dark-mode .modal-content,
+  body.dark-mode .modal-card {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Enhanced Modal Animations */
+  .modal-content {
+    animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+
+  /* Modal Hover Effects */
+  .modal-content:hover {
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Better Modal Focus Styles */
+  .modal.show .modal-content {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.2), 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* Responsive Modal Design */
+  @media (max-width: 768px) {
+    .modal {
+      padding: var(--spacing-sm);
+      align-items: flex-end;
+    }
+    .modal-content {
+      max-width: 100% !important;
+      width: 100% !important;
+      max-height: 85vh !important;
+      border-radius: 20px 20px 0 0 !important;
+      padding: 1.5rem !important;
+      margin-bottom: 0 !important;
+      animation: modalSlideUpMobile 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    @keyframes modalSlideUpMobile {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .modal-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+    }
+    .modal-actions {
+      flex-direction: column-reverse;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    .modal-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Enhanced Modal Animations */
+  .modal-content {
+    animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+
+  /* Modal Hover Effects */
+  .modal-content:hover {
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Better Modal Focus Styles */
+  .modal.show .modal-content {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.2), 0 25px 50px rgba(0, 0, 0, 0.25) !important;
+  }
+>>>>>>> Stashed changes
   /* Responsive Design */
   @media (max-width: 768px) {
     .sidebar {
@@ -1839,7 +2144,7 @@
                 </div>
                 <div class="count">{{ $membersCount }}</div>
                 <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()">
+                    <button class="btn btn-sm btn-primary" id="openJulitaRegisterBtn">
                         <i class="fas fa-plus"></i>
                     </button>
                     <button class="btn btn-sm btn-outline" onclick="openMembersTable()">
@@ -1967,6 +2272,30 @@
         </footer>
         </div>
     </div>
+<<<<<<< Updated upstream
+=======
+    <!-- Connection Status Box -->
+    <div id="connection-status" style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface-elevated);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        padding: 12px 20px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        font-size: 0.9rem;
+        font-weight: 600;
+        z-index: 2500;
+        display: none;
+        transition: var(--transition);
+    "></div>
+
+>>>>>>> Stashed changes
 
     <!-- Chatbot -->
     <button id="chatbot-button">💬</button>
@@ -2387,6 +2716,56 @@
         </div>
     </div>
 
+<<<<<<< Updated upstream
+=======
+    <!-- BORROW MODAL -->
+    <div class="modal" id="borrowModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Borrow Books</h3>
+                <button class="close-modal" onclick="closeBorrowModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Member Name</label>
+                    <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill" readonly>
+                    <input type="hidden" id="memberId">
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="dueDate" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Due Time</label>
+                    <input type="time" id="dueTime" class="form-control">
+                    <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
+                        Default time set to end of day (11:59 PM)
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>Selected Books</label>
+                    <ul id="selectedBooksList" style="list-style: none; padding: 0;"></ul>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                    <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
+                        <i class="fas fa-user"></i> Scan Member
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="startQRScan('book')">
+                        <i class="fas fa-book"></i> Scan Books
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeBorrowModal()">Cancel</button>
+                <button class="btn btn-primary" id="confirmBorrowBtn" disabled>
+                    <i class="fas fa-qrcode"></i> Scan Member
+                </button>
+            </div>
+        </div>
+    </div>
+>>>>>>> Stashed changes
     <!-- MEMBERS TABLE MODAL -->
     <div class="modal" id="membersTableModal" style="display: none;">
         <div class="modal-content" style="max-width: 900px;">
@@ -2422,7 +2801,50 @@
             </div>
         </div>
     </div>
+<<<<<<< Updated upstream
 
+=======
+    <!-- RETURN BOOK MODAL -->
+    <div class="modal" id="returnModal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 1.5rem;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-undo"></i>
+                    Return Book
+                </h3>
+                <button class="close-modal" onclick="closeReturnModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <p style="font-size: 1rem; margin-bottom: 0.75rem;">
+                        <strong>Book:</strong> <span id="modalBook"></span>
+                    </p>
+                    <p style="font-size: 1rem; margin-bottom: 0.75rem;">
+                        <strong>Member:</strong> <span id="modalMember"></span>
+                    </p>
+                    <div style="background: var(--glass-bg); padding: 0.75rem; border-radius: var(--radius-sm); margin: 0.75rem 0;">
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                            Are you sure you want to return this book? This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeReturnModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-confirm" onclick="confirmReturn()">
+                    <i class="fas fa-check"></i>
+                    Confirm Return
+                </button>
+            </div>
+        </div>
+    </div>
+>>>>>>> Stashed changes
     <!-- Scripts -->
     <script>
         const weeklyData = @json($weeklyData);
@@ -2434,7 +2856,12 @@
     <script src="{{ asset('js/overdue.js') }}" defer></script>
     <script src="{{ asset('js/bookadd.js') }}"></script>
     <script src="{{ asset('js/memberscript.js') }}"></script>
+<<<<<<< Updated upstream
     
+=======
+    <script src="{{ asset('js/bookreturn.js') }}"></script>
+    <script src=""
+>>>>>>> Stashed changes
     <script>
         // Member date and time are automatically filled by the backend
 
@@ -2507,10 +2934,18 @@
     const chatbotWindow = document.getElementById('chatbot-window');
     const chatbotButton = document.getElementById('chatbot-button');
     const chatbotClose = document.getElementById('chatbot-close');
+<<<<<<< Updated upstream
 
     // Open chatbot
+=======
+    // Toggle chatbot window
+>>>>>>> Stashed changes
     chatbotButton?.addEventListener('click', () => {
-        chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
+        if (chatbotWindow.style.display === 'flex') {
+            chatbotWindow.style.display = 'none';
+        } else {
+            chatbotWindow.style.display = 'flex';
+        }
     });
 
     // Close chatbot
@@ -2650,12 +3085,29 @@
             const borrowedDate = new Date(borrower.borrowed_at).toLocaleDateString();
             const dueDate = new Date(borrower.due_date).toLocaleDateString();
             const returnedAt = borrower.returned_at ? new Date(borrower.returned_at).toLocaleDateString() : '-';
+<<<<<<< Updated upstream
             
             const statusBadge = borrower.returned_at ? 
                 '<span style="color: #10b981; font-weight: 600;">Returned</span>' : 
                 '<span style="color: #f59e0b; font-weight: 600;">Active</span>';
             
+=======
+            // Create action button for active loans, status for returned
+            let actionColumn = '';
+            if (borrower.returned_at) {
+                actionColumn = '<span style="color: #10b981; font-weight: 600;">Returned</span>';
+            } else {
+                actionColumn = `<button class="btn btn-sm btn-primary" onclick="openReturnModal(this)">
+                    <i class="fas fa-undo"></i> Return
+                </button>`;
+            }
+
+>>>>>>> Stashed changes
             const row = document.createElement('tr');
+            row.setAttribute('data-id', borrower.id);
+            row.setAttribute('data-book', borrower.book.title);
+            row.setAttribute('data-member', fullName);
+
             row.innerHTML = `
                 <td>${borrower.id}</td>
                 <td>${fullName}</td>
@@ -2663,7 +3115,7 @@
                 <td>${borrowedDate}</td>
                 <td>${dueDate}</td>
                 <td>${returnedAt}</td>
-                <td>${statusBadge}</td>
+                <td>${actionColumn}</td>
             `;
             tbody.appendChild(row);
         });
