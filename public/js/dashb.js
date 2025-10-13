@@ -12,16 +12,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Dark mode setup
   const isDark = localStorage.getItem('darkMode') === 'true';
+  const darkModeLabel = document.getElementById('darkModeLabel');
+
   if (isDark) {
     document.body.classList.add('dark-mode');
     darkToggle.checked = true;
+    darkModeLabel.textContent = 'Dark Mode';
+  } else {
+    darkModeLabel.textContent = 'Light Mode';
   }
 
   // Dark mode toggle listener
   darkToggle?.addEventListener('change', function () {
     document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', this.checked);
+    const isCurrentlyDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isCurrentlyDark);
+    darkModeLabel.textContent = isCurrentlyDark ? 'Dark Mode' : 'Light Mode';
+
+    // Add visual feedback for testing
+    console.log('Dark mode toggled:', isCurrentlyDark ? 'ON' : 'OFF');
+    console.log('Label updated to:', darkModeLabel.textContent);
+    console.log('Body class list:', document.body.classList.toString());
   });
+
+  // Make dark mode functions globally available for testing
+  window.testDarkMode = function() {
+    console.log('=== DARK MODE TEST ===');
+    console.log('Current dark mode state:', document.body.classList.contains('dark-mode'));
+    console.log('Toggle element:', darkToggle);
+    console.log('Label element:', darkModeLabel);
+    console.log('LocalStorage value:', localStorage.getItem('darkMode'));
+    console.log('Toggle checked:', darkToggle?.checked);
+    console.log('Label text:', darkModeLabel?.textContent);
+  };
 
   // Chart Data
   const weeklyCtx = document.getElementById('weeklyChart')?.getContext('2d');

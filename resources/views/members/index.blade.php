@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>👥 Members | Julita Public Library</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
   :root {
@@ -72,74 +72,28 @@
     --spacing-2xl: 2.5rem;
   }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-  /* Additional dark mode styles */
-  body.dark-mode .sidebar {
-    background: rgba(20, 20, 20, 0.9);
-    border-right-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .card {
-    background: rgba(30, 30, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .btn-outline {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--text-secondary);
-  }
-  body.dark-mode .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-  body.dark-mode .data-table th {
-    background: rgba(20, 20, 20, 0.8);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .data-table td {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
-  }
-  body.dark-mode .data-table tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  body.dark-mode .form-control {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(71, 85, 105, 0.5);
-    color: var(--text-primary);
-  }
-  body.dark-mode .form-control:focus {
-    background: rgba(30, 41, 59, 1);
-    border-color: var(--accent);
-  }
-  body.dark-mode .form-control:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-  /* Global Reset */
-  * {
+  /* Modern CSS Reset */
+  *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
+
   body {
     font-family: 'Outfit', 'Inter', sans-serif;
     background: linear-gradient(135deg, var(--background), #f1f5f9);
     color: var(--text-primary);
     line-height: 1.6;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.4s ease, color 0.4s ease;
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    position: relative;
   }
 
-  /* 🌙 DARK MODE - With Dark Gray Background */
+  /* Dark Mode */
   body.dark-mode {
-    --background: #121212;          /* Sleek dark gray */
+    --background: #121212;
     --surface: rgba(30, 30, 30, 0.8);
     --surface-elevated: rgba(40, 40, 40, 0.85);
     --text-primary: var(--gray-100);
@@ -147,42 +101,16 @@
     --text-muted: var(--gray-400);
     --border: rgba(255, 255, 255, 0.1);
     --border-light: rgba(255, 255, 255, 0.05);
-    /* Glassmorphism for dark gray */
     --glass-bg: rgba(40, 40, 40, 0.4);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-    --glass-blur: blur(10px);
-    /* Stronger glow to pop on neutral dark */
-    --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
   }
 
-        #registerModal,
-        #julitaRegisterModal {
-            z-index: 1500;
-        }
+  body.dark-mode {
+    background: linear-gradient(135deg, #121212, #1a1a1a);
+  }
 
-        /* Edit modal should have higher z-index */
-        #editModal {
-            z-index: 2000;
-        }
-
-        /* QR modal should have highest z-index */
-        .qr-modal {
-            z-index: 2500;
-        }
-
-        /* Make sure modal show state is properly defined */
-        .modal.show {
-            display: flex !important;
-            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Prevent body scroll when modal is open */
-        body.modal-open {
-            overflow: hidden;
-        }
-
-  /* Sidebar */
+  /* Sidebar Styles */
   .sidebar {
     width: 280px;
     background: #1a1a1a;
@@ -195,89 +123,52 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     color: #ffffff;
-    transform: translateZ(0);
-    /* Glassmorphism */
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
   }
-  /* Light mode sidebar */
+
   body:not(.dark-mode) .sidebar {
     background: var(--glass-bg);
     border-right: 1px solid var(--glass-border);
     color: #1a1a1a;
   }
-  body:not(.dark-mode) .sidebar .label {
-    color: #1a1a1a;
-  }
-
-        .sidebar.collapsed {
-            width: 70px;
-        }
 
   .sidebar-header {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: var(--spacing-xl);
-    transition: var(--transition);
   }
-  .sidebar-header .logo {
+
+  .sidebar-logo {
     width: 40px;
     height: 40px;
     object-fit: contain;
     border-radius: var(--radius);
-    transition: var(--transition-spring);
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
   }
-  .sidebar-header .logo:hover {
-    transform: scale(1.05) rotate(2deg);
-  }
-  .label {
+
+  .sidebar-title {
     font-weight: 700;
     font-size: 1.1rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    transition: var(--transition);
   }
 
-        .sidebar.collapsed .sidebar-header h3,
-        .sidebar.collapsed .label {
-            opacity: 0;
-            pointer-events: none;
-        }
+  .sidebar-nav {
+    flex: 1;
+  }
 
-        .toggle-btn {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 1.1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-            transition: all 0.2s;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+  .nav-item {
+    margin-bottom: var(--spacing-xs);
+  }
 
-        .toggle-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
-        }
-
-        .sidebar nav {
-            flex: 1;
-        }
-
-  /* Nav Links */
-  .sidebar nav a {
+  .nav-link {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -287,47 +178,470 @@
     border-radius: 12px;
     transition: all 0.3s ease;
     font-weight: 500;
-    position: relative;
-    margin-bottom: 8px;
-    font-size: 14px;
   }
-  .sidebar nav a:hover {
+
+  .nav-link:hover {
     background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
     color: #ffffff;
     transform: translateX(6px);
-    box-shadow: var(--shadow-md);
   }
-  .sidebar nav a.active {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
-    font-weight: 600;
-    border-left: 3px solid #3b82f6;
-  }
-  .sidebar nav a .icon {
-    width: 20px;
-    text-align: center;
-    font-size: 18px;
-  }
-  /* Light mode navigation */
-  body:not(.dark-mode) .sidebar nav a {
-    color: rgba(0, 0, 0, 0.8);
-  }
-  body:not(.dark-mode) .sidebar nav a:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    color: #1a1a1a;
-    box-shadow: var(--shadow-md);
-  }
-  body:not(.dark-mode) .sidebar nav a.active {
+
+  .nav-link.active {
     background: rgba(59, 130, 246, 0.15);
     color: #3b82f6;
     border-left: 3px solid #3b82f6;
   }
 
-  /* Dark Mode Toggle - Simple Slider Design */
+  .sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg) 0;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Main Content */
+  .main {
+    margin-left: 280px;
+    padding: var(--spacing-lg);
+    min-height: 100vh;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  /* Members Management Header */
+  .members-management-header {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-shadow);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+  }
+
+  .members-management-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+
+  .collection-info {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .management-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  /* Members Content Container (matching books page) */
+  .members-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .members-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .members-content::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+  }
+
+  .members-content::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+  }
+
+  .search-container {
+    position: relative;
+  }
+
+  .page-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    margin-top: 0;
+  }
+
+  .search-input {
+    width: 300px;
+    padding: 14px 18px 14px 45px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    height: 48px;
+    transition: var(--transition);
+    position: relative;
+  }
+
+  .search-input:focus {
+    max-width: 380px;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow-md);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: 14px var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    height: 48px;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .stat-card {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .stat-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: rgba(99, 102, 241, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.25rem;
+  }
+
+  /* Table Styles */
+  .table-container {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    max-height: 70vh;
+  }
+
+  .table-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    max-height: 70vh;
+    overflow: auto;
+    min-width: fit-content;
+  }
+
+  .table-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+  }
+
+  .table-wrapper::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th {
+    background: var(--surface);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: left;
+    padding: var(--spacing-lg);
+    border-bottom: 2px solid var(--border);
+    border-right: none;
+    position: sticky;
+    top: 0;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+
+  .data-table th:last-child {
+    border-right: none;
+  }
+
+  /* Dark mode table header */
+  body.dark-mode .data-table th {
+    background: rgba(20, 20, 20, 0.95);
+    border-bottom-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Dark mode members content */
+  body.dark-mode .members-content {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Dark mode members management header */
+  body.dark-mode .members-management-header {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .data-table td {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    vertical-align: middle;
+    border-right: none;
+  }
+
+  .data-table td:last-child {
+    border-right: none;
+  }
+
+  /* Dark mode table cells */
+  body.dark-mode .data-table td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .data-table tr:hover {
+    background: var(--surface);
+  }
+
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-container {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+  }
+
+  .modal-overlay.active .modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .modal-header {
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .modal-close {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-muted);
+  }
+
+  .modal-close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+
+  .modal-body {
+    padding: var(--spacing-xl);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    padding: var(--spacing-xl);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+  }
+
+  /* Form Styles */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .form-input {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: var(--transition-fast);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  /* Dark Mode Toggle - Exact Copy from Dashboard */
   .dark-toggle {
     margin-top: auto;
     display: flex;
@@ -418,24 +732,294 @@
     opacity: 1;
   }
 
-        .logout-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            padding: 8px;
-            border-radius: 8px;
-        }
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
 
-        .logout-link:hover {
-            color: white;
-            background: rgba(255,255,255,0.1);
-        }
+    .main {
+      margin-left: 0;
+    }
 
-  /* Main Content */
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .members-management-header {
+      margin-bottom: var(--spacing);
+    }
+
+    .members-management-content {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--spacing-lg);
+    }
+
+    .management-controls {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: stretch;
+    }
+
+    .page-controls {
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      align-items: stretch;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .search-container {
+      max-width: none;
+      margin-right: 0;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .data-table {
+      font-size: 0.75rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: var(--spacing-md) var(--spacing-sm);
+    }
+  }
+
+  /* Notification Styles */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    z-index: 3000;
+    min-width: 300px;
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .notification-success {
+    border-left: 4px solid var(--success);
+  }
+
+  .notification-error {
+    border-left: 4px solid var(--danger);
+  }
+
+  .notification-info {
+    border-left: 4px solid var(--primary);
+  }
+
+  .notification-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+  }
+
+  .notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+  }
+
+  .notification-close:hover {
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Button Small Styles */
+  .btn-sm {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.75rem;
+  }
+
+  /* Status Badge */
+  .status-badge {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  /* Loading States */
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Sidebar - Matching Dashboard */
+  .sidebar {
+    width: 280px;
+    background: #1a1a1a;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-lg);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #ffffff;
+    transform: translateZ(0);
+    /* Glassmorphism */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Light mode sidebar */
+  body:not(.dark-mode) .sidebar {
+    background: var(--glass-bg);
+    border-right: 1px solid var(--glass-border);
+    color: #1a1a1a;
+  }
+  body:not(.dark-mode) .sidebar .label {
+    color: #1a1a1a;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--spacing-xl);
+    transition: var(--transition);
+  }
+  .sidebar-header .logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: var(--radius);
+    transition: var(--transition-spring);
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+  }
+  .sidebar-header .logo:hover {
+    transform: scale(1.05) rotate(2deg);
+  }
+  .label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: var(--transition);
+  }
+
+  /* Nav Links - Matching Dashboard */
+  .sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 14px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .sidebar nav a:hover {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: #ffffff;
+    transform: translateX(6px);
+    box-shadow: var(--shadow-md);
+  }
+  .sidebar nav a.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    font-weight: 600;
+    border-left: 3px solid #3b82f6;
+  }
+  .sidebar nav a .icon {
+    width: 20px;
+    text-align: center;
+    font-size: 18px;
+  }
+  /* Light mode navigation */
+  body:not(.dark-mode) .sidebar nav a {
+    color: rgba(0, 0, 0, 0.8);
+  }
+  body:not(.dark-mode) .sidebar nav a:hover {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: #1a1a1a;
+    box-shadow: var(--shadow-md);
+  }
+  body:not(.dark-mode) .sidebar nav a.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border-left: 3px solid #3b82f6;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Main Content - Matching Dashboard */
   .main {
     margin-left: 280px;
     padding: var(--spacing-lg);
@@ -455,339 +1039,259 @@
     box-shadow: var(--glass-shadow);
   }
 
-  /* Page Header */
-  .page-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: var(--spacing-xl);
-    flex-wrap: wrap;
-    gap: var(--spacing);
-  }
-
-  .page-header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-  }
-
-  .page-header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  /* Page Title */
-  .dashboard-title {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: transparent;
-    padding: 1rem 0;
-    margin: -1rem 0 1rem 0;
+  .page-title {
     font-size: 2rem;
     font-weight: 800;
     color: var(--primary);
+    margin-bottom: var(--spacing-xl);
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .page-controls {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
+  .dashboard-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--spacing-xl);
+    animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Search Bar */
-  .search-bar {
-    width: 300px;
-    padding: 12px 16px 12px 40px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .main-body {
+    flex: 1;
+    padding: var(--spacing-2xl);
+  }
+
+  /* Dashboard Content - Matching Dashboard */
+  .dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: var(--transition);
-    position: relative;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-sm) 0;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
 
-  .search-container {
-    position: relative;
-  }
-
-  .search-container::before {
-    content: '\f002';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    z-index: 1;
-  }
-
-  .search-bar:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  }
-
-  /* Buttons */
+  /* Modern Buttons */
   .btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-spring);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
     text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
     position: relative;
     overflow: hidden;
   }
 
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .btn:hover::before {
-    left: 100%;
+  .btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: var(--primary);
     color: white;
     box-shadow: var(--shadow);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px) scale(1.05);
+    background: var(--primary-dark);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-lg);
   }
 
-  .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
   }
 
-  .btn-outline:hover {
-    background: var(--glass-bg);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn-sm {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-
-  .btn-danger {
-    background: linear-gradient(135deg, var(--danger), #dc2626);
-    color: white;
-    box-shadow: var(--shadow);
-  }
-
-  .btn-danger:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
+  .btn-secondary:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
   }
 
   .btn-success {
-    background: linear-gradient(135deg, var(--success), #059669);
+    background: var(--success);
     color: white;
     box-shadow: var(--shadow);
   }
 
   .btn-success:hover {
-    transform: translateY(-2px) scale(1.05);
+    background: #059669;
+    transform: translateY(-1px);
     box-shadow: var(--shadow-lg);
   }
 
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            min-width: auto;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-sm::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-sm:hover::before {
-            left: 100%;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons .btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .action-buttons .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .action-buttons .btn:active {
-            transform: translateY(0px) scale(1.02);
-        }
-
-        .action-buttons .btn i {
-            margin-right: 4px;
-            transition: transform 0.2s ease;
-        }
-
-        .action-buttons .btn:hover i {
-            transform: scale(1.1);
-        }
-
-        .action-buttons .btn:focus {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        .action-buttons .btn:focus:not(:focus-visible) {
-            outline: none;
-        }
-
-        .action-buttons .btn:focus-visible {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-
-        .btn-sm .icon {
-            font-size: 0.875rem;
-        }
-
-        /* Bulk actions bar */
-        .bulk-actions {
-            background: rgba(79, 70, 229, 0.1);
-            border: 2px solid rgba(79, 70, 229, 0.2);
-            border-radius: 16px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            display: none;
-            align-items: center;
-            gap: 1rem;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .bulk-actions.show {
-            display: flex;
-        }
-
-        .bulk-actions-text {
-            flex: 1;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        body.dark-mode .bulk-actions {
-            background: rgba(6, 182, 212, 0.1);
-            border-color: rgba(6, 182, 212, 0.2);
-        }
-
-        body.dark-mode .bulk-actions-text {
-            color: var(--accent-light);
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-  /* Table Styles */
-  .table-container {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--glass-shadow);
-    margin-top: var(--spacing-lg);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    max-height: 70vh;
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+    box-shadow: var(--shadow);
   }
 
-        .table-container::-webkit-scrollbar {
-            height: 8px;
-        }
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
 
-        .table-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-        }
+  .btn-sm {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.75rem;
+  }
 
-        .table-container::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 4px;
-        }
+  .btn-lg {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1rem;
+  }
 
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
-        }
+  /* Modern Form Styles */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
 
-        body.dark-mode .table-container {
-            background: rgba(30, 41, 59, 0.9);
-            border-color: rgba(51, 65, 85, 0.3);
-        }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .form-input {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: var(--transition-fast);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .form-input:hover {
+    border-color: var(--gray-300);
+  }
+
+  .form-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-section {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    border: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .section-title i {
+    color: var(--primary);
+  }
+
+  /* Modern Search Bar */
+  .search-container {
+    position: relative;
+    max-width: 400px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    padding-left: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: var(--transition-fast);
+    height: 42px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* Modern Table */
+  .table-container {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
 
   .data-table {
     width: 100%;
     border-collapse: collapse;
-    background: transparent;
-    min-width: fit-content;
-    table-layout: fixed;
-    margin: 0;
+  }
+
+  /* Remove vertical borders for seamless look */
+  .data-table th,
+  .data-table td {
+    border-left: none;
+  }
+
+  .data-table th:first-child,
+  .data-table td:first-child {
+    border-left: none;
   }
 
   .data-table th {
@@ -807,56 +1311,6 @@
     -webkit-backdrop-filter: var(--glass-blur);
   }
 
-        th::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 25%;
-            height: 50%;
-            width: 1px;
-            background: rgba(255,255,255,0.2);
-        }
-
-        th:first-child {
-            width: 200px;
-            min-width: 180px;
-        }
-
-        th:nth-child(2) {
-            width: 80px;
-            min-width: 60px;
-        }
-
-        th:nth-child(3) {
-            width: 250px;
-            min-width: 200px;
-        }
-
-        th:nth-child(4) {
-            width: 150px;
-            min-width: 120px;
-        }
-
-        th:nth-child(5) {
-            width: 200px;
-            min-width: 150px;
-        }
-
-        th:nth-child(6) {
-            width: 140px;
-            min-width: 120px;
-        }
-
-        th:nth-child(7) {
-            width: 120px;
-            min-width: 100px;
-        }
-
-        th:nth-child(8) {
-            width: 120px;
-            min-width: 100px;
-        }
-
   .data-table td {
     padding: 16px 12px;
     border-bottom: 1px solid var(--border-light);
@@ -870,47 +1324,13 @@
     white-space: nowrap;
   }
 
-        td:first-child {
-            text-align: left;
-            width: 200px;
-            min-width: 180px;
-        }
-
-        td:nth-child(2) {
-            width: 80px;
-            min-width: 60px;
-            text-align: center;
-        }
-
-        td:nth-child(3) {
-            width: 250px;
-            min-width: 200px;
-        }
-
-        td:nth-child(4) {
-            width: 150px;
-            min-width: 120px;
-        }
-
-        td:nth-child(5) {
-            width: 200px;
-            min-width: 150px;
-        }
-
-        td:nth-child(6) {
-            width: 140px;
-            min-width: 120px;
-        }
-
-        td:nth-child(7) {
-            width: 120px;
-            min-width: 100px;
-        }
-
-        td:nth-child(8) {
-            width: 120px;
-            min-width: 100px;
-        }
+  .data-table td:last-child {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    padding-left: 8px;
+    padding-right: 12px;
+  }
 
   .data-table tr:hover {
     background: var(--glass-bg);
@@ -922,557 +1342,1251 @@
     border-bottom: none;
   }
 
-        .member-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--accent);
-            border-radius: 4px;
-        }
+  /* Action Buttons in Table */
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    align-items: center;
+    justify-items: center;
+    width: 110px;
+    height: 55px;
+    padding: 3px;
+    position: relative;
+    margin: 0 0 0 8px;
+    justify-self: start;
+  }
 
-        /* Select all checkbox */
-        #selectAll {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--accent);
-        }
+  /* Grid layout for action buttons */
+  .action-buttons .btn {
+    width: 100%;
+    height: 100%;
+    min-height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    padding: 3px 4px;
+    cursor: pointer;
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+  }
 
-  /* Modal Styles */
-  .modal {
+  /* Enhanced button hover effects for scroll */
+  .action-buttons .btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .action-buttons .btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Grid button hover effects */
+  .action-buttons .btn:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    z-index: 10;
+  }
+
+  /* Active button state */
+  .action-buttons .btn:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Button click animation */
+  .action-buttons .btn.clicked {
+    animation: buttonClick 0.2s ease-out;
+  }
+
+  @keyframes buttonClick {
+    0% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(1px) scale(0.95);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Modern Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .stat-card {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .stat-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: rgba(99, 102, 241, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.25rem;
+  }
+
+  /* Modern Dark Mode Toggle */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .theme-toggle:hover {
+    background: var(--gray-100);
+  }
+
+  .theme-toggle input[type="checkbox"] {
+    display: none;
+  }
+
+  .theme-toggle-label {
+    width: 40px;
+    height: 20px;
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+    position: relative;
+    transition: var(--transition-fast);
+  }
+
+  .theme-toggle-label::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+  }
+
+  input[type="checkbox"]:checked + .theme-toggle-label {
+    background: var(--primary);
+  }
+
+  input[type="checkbox"]:checked + .theme-toggle-label::after {
+    transform: translateX(20px);
+  }
+
+  /* Modern Responsive Design */
+  @media (max-width: 1024px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+
+    .main-content {
+      margin-left: 0;
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .main-header {
+      padding: var(--spacing-lg);
+      flex-direction: column;
+      gap: var(--spacing-md);
+      align-items: stretch;
+    }
+
+    .header-actions {
+      justify-content: space-between;
+    }
+
+    .main-body {
+      padding: var(--spacing-lg);
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .data-table {
+      font-size: 0.75rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: var(--spacing-md) var(--spacing-sm);
+    }
+  }
+
+  /* Modern Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .slide-in {
+    animation: slideIn 0.6s ease-out;
+  }
+
+  /* Modern Loading States */
+  .loading {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Modern Empty States */
+  .empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--text-muted);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--gray-300);
+  }
+
+  .empty-state h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+  }
+
+  .empty-state p {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  /* Modern Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+  }
+
+  .action-btn {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .action-btn.edit:hover {
+    background: var(--primary);
+    color: white;
+  }
+
+  .action-btn.delete:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+
+  /* Modern Table Container */
+  .table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-xl);
+  }
+
+  .table-container::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .table-container::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: var(--radius-full);
+  }
+
+  .table-container::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-full);
+  }
+
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+  }
+
+  /* Modern Checkbox */
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    position: relative;
+  }
+
+  .checkbox:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  /* Table Actions */
+  .table-actions {
+    position: sticky;
+    right: 0;
+    background: inherit;
+    padding-left: var(--spacing-md);
+  }
+
+  /* Modern Status Badges */
+  .status-badge {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .status-badge.inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .status-badge.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  /* Modern Photo Upload */
+  .photo-upload {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: var(--surface);
+  }
+
+  .photo-upload:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  .photo-upload input[type="file"] {
+    display: none;
+  }
+
+  .photo-preview {
+    max-width: 150px;
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-md);
+    box-shadow: var(--shadow);
+  }
+
+  /* Modern QR Modal */
+  .qr-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+
+  .qr-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .qr-modal-content {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    box-shadow: var(--shadow-2xl);
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .qr-code {
+    max-width: 250px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Edit Modal Styling */
+  .edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+
+  .edit-modal.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .edit-modal-content {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--glass-border);
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+  }
+
+  .edit-modal.show .edit-modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .edit-modal-header {
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--glass-bg);
+  }
+
+  .edit-modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .edit-modal-header h3 i {
+    color: var(--primary);
+  }
+
+  .edit-modal-close {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .edit-modal-close::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: var(--danger);
+    border-radius: 50%;
+    transition: var(--transition-fast);
+    transform: translate(-50%, -50%);
+    z-index: -1;
+  }
+
+  .edit-modal-close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+  }
+
+  .edit-modal-close:hover::before {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+  }
+
+  .edit-modal-close:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    border-radius: 12px;
+  }
+
+  .edit-modal-body {
+    padding: var(--spacing-xl);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .edit-modal-footer {
+    padding: var(--spacing-xl);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    background: var(--glass-bg);
+  }
+
+  /* Dark mode styling for edit modal */
+  body.dark-mode .edit-modal-content {
+    background: var(--surface-elevated);
+    border-color: var(--glass-border);
+  }
+
+  body.dark-mode .edit-modal-header {
+    background: rgba(30, 30, 30, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-mode .edit-modal-header h3 {
+    color: var(--text-primary);
+  }
+
+  body.dark-mode .edit-modal-close {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px;
+  }
+
+  body.dark-mode .edit-modal-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    transform: scale(1.05);
+    border-radius: 16px;
+  }
+
+  body.dark-mode .edit-modal-close:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+    border-radius: 12px;
+  }
+
+  body.dark-mode .edit-modal-footer {
+    background: rgba(30, 30, 30, 0.8);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Form styling for edit modal */
+  .form-section {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .form-section h4 {
+    margin: 0 0 var(--spacing-lg) 0;
+    color: var(--text-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .form-section h4::before {
+    color: var(--primary);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .form-section .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-section .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .form-section .form-input {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: var(--transition-fast);
+  }
+
+  .form-section .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  /* Modern Card Modal - Updated Styling */
+  .card-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     z-index: 2000;
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    animation: fadeIn 0.3s ease-out;
   }
 
-  .modal.show {
-    display: flex !important;
-    opacity: 1;
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 9999 !important;
+  .card-modal.show {
+    display: flex;
   }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-  .modal-content, .modal-card {
+  .card-modal-content {
     background: var(--surface-elevated);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
     box-shadow: var(--shadow-xl);
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 500px;
+    width: 90%;
     position: relative;
+    animation: slideUp 0.3s ease-out;
   }
 
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(40px) scale(0.95);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        body.dark-mode .modal-content {
-            background: rgba(15, 23, 42, 0.95);
-            color: var(--text-dark);
-            border-color: rgba(51, 65, 85, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-        }
-
-        body.dark-mode .modal-header {
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        body.dark-mode .modal-title {
-            color: var(--accent-light);
-        }
-
-        .close-modal {
-            background: rgba(0,0,0,0.05);
-            border: none;
-            font-size: 1.5rem;
-            color: var(--gray);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 12px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            transform: rotate(90deg);
-        }
-
-        .form-section {
-            margin-bottom: 2.5rem;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        body.dark-mode .section-title {
-            color: var(--accent-light);
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: var(--dark);
-            font-size: 0.95rem;
-        }
-
-        body.dark-mode .form-group label {
-            color: var(--text-dark);
-        }
-
-  .form-control {
-    padding: 12px 16px;
-    border: 2px solid var(--glass-border);
-    border-radius: var(--radius);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+  .card-modal-content h3 {
+    margin: 0 0 var(--spacing-xl) 0;
     color: var(--text-primary);
-    font-size: 1rem;
-    transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
   }
 
-  .form-control:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow);
+  .card-modal-content .close {
+    position: absolute;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+  }
+
+  .card-modal-content .close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+    transform: rotate(90deg);
+  }
+
+  .card-layout {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    margin: var(--spacing-xl) 0;
+  }
+
+  .card {
+    width: 340px;
+    height: 216px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    background: var(--surface);
+  }
+
+  .card-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Card overlay elements */
+  .overlay {
+    position: absolute;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    pointer-events: none;
+    font-weight: bold;
+  }
+
+  .overlay.name {
+    top: 100px;
+    left: 37px;
+    right: 25px;
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .overlay.date {
+    bottom: 43px;
+    left: 127px;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .overlay.photo {
+    top: 42px;
+    right: 20px;
+    width: 141px;
+    height: 141px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  .overlay.photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .overlay.qr {
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    transform: translate(-50%, -50%);
+  }
+
+  .overlay.qr img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Dark mode styling for card modal */
+  body.dark-mode .card-modal-content {
     background: var(--surface-elevated);
-    transform: translateY(-1px);
+    border-color: var(--glass-border);
   }
 
-  .form-control:hover {
+  body.dark-mode .card-modal-content h3 {
+    color: var(--text-primary);
+  }
+
+  body.dark-mode .card-modal-content .close {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
+  }
+
+  /* Animations for card modal */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Modern Mobile Menu Toggle */
+  .mobile-menu-toggle {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .mobile-menu-toggle:hover {
+    background: var(--primary);
+    color: white;
     border-color: var(--primary);
-    transform: translateY(-1px);
   }
 
-        /* Custom Select Styling */
-        .form-group select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 12px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
-        }
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 
-        body.dark-mode .form-group select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-        }
+  /* Modern Utility Classes */
+  .text-center { text-align: center; }
+  .text-left { text-align: left; }
+  .text-right { text-align: right; }
 
-        .form-group select option {
-            background: white;
-            color: var(--dark);
-            padding: 8px;
-        }
+  .mb-0 { margin-bottom: 0; }
+  .mb-1 { margin-bottom: var(--spacing-xs); }
+  .mb-2 { margin-bottom: var(--spacing-sm); }
+  .mb-3 { margin-bottom: var(--spacing-md); }
+  .mb-4 { margin-bottom: var(--spacing-lg); }
+  .mb-5 { margin-bottom: var(--spacing-xl); }
 
-        body.dark-mode .form-group select option {
-            background: var(--bg-dark);
-            color: var(--text-dark);
-        }
+  .mt-0 { margin-top: 0; }
+  .mt-1 { margin-top: var(--spacing-xs); }
+  .mt-2 { margin-top: var(--spacing-sm); }
+  .mt-3 { margin-top: var(--spacing-md); }
+  .mt-4 { margin-top: var(--spacing-lg); }
+  .mt-5 { margin-top: var(--spacing-xl); }
 
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2.5rem;
-            padding-top: 2rem;
-            border-top: 2px solid rgba(0,0,0,0.05);
-        }
+  .hidden { display: none; }
+  .block { display: block; }
+  .flex { display: flex; }
+  .grid { display: grid; }
 
-        body.dark-mode .modal-actions {
-            border-top-color: rgba(255,255,255,0.1);
-        }
+  .w-full { width: 100%; }
+  .h-full { height: 100%; }
 
-        .modal-actions .btn {
-            min-width: 140px;
-            justify-content: center;
-        }
+  .rounded { border-radius: var(--radius); }
+  .rounded-lg { border-radius: var(--radius-lg); }
+  .rounded-full { border-radius: var(--radius-full); }
 
-        /* Photo Upload Styles */
-        .photo-upload {
-            border: 2px dashed #e5e7eb;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+  .shadow { box-shadow: var(--shadow); }
+  .shadow-lg { box-shadow: var(--shadow-lg); }
+  .shadow-xl { box-shadow: var(--shadow-xl); }
 
-        .photo-upload:hover {
-            border-color: var(--accent);
-            background: rgba(6, 182, 212, 0.05);
-        }
+  .cursor-pointer { cursor: pointer; }
+  .cursor-not-allowed { cursor: not-allowed; }
 
-        .photo-upload input {
-            display: none;
-        }
+  .select-none { user-select: none; }
+  .select-text { user-select: text; }
 
-        #photoPreview {
-            max-width: 150px;
-            border-radius: 12px;
-            margin-top: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+  .transition { transition: var(--transition); }
+  .transition-fast { transition: var(--transition-fast); }
+  .transition-slow { transition: var(--transition-slow); }
 
-        /* QR Modal Styles */
-        .qr-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 2500;
-            justify-content: center;
-            align-items: center;
-        }
+  /* Additional Enhancements */
+  .member-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
 
-        .qr-modal.show {
-            display: flex;
-            animation: fadeIn 0.3s ease-out;
-        }
+  .member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
 
-        .qr-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 2.5rem;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-            animation: slideUp 0.3s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+  .member-name {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
 
-        body.dark-mode .qr-content {
-            background: rgba(15, 23, 42, 0.95);
-            color: var(--text-dark);
-            border-color: rgba(51, 65, 85, 0.3);
-        }
+  .address {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
 
-        .qr-content h3 {
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
+  /* Enhanced table styling */
+  .data-table tbody tr {
+    transition: var(--transition-fast);
+  }
 
-        body.dark-mode .qr-content h3 {
-            color: var(--accent-light);
-        }
+  .data-table tbody tr:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
 
-        .qr-content img {
-            max-width: 300px;
-            margin-bottom: 1.5rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
+  /* ✨ Glassmorphism Enforcement & Modal Exclusion - Matching Dashboard */
+  /* Apply glass to all intended elements */
+  .sidebar,
+  .main,
+  .card,
+  .table-container,
+  .dashboard-content,
+  #chatbot-window,
+  .stats-overview-card,
+  .form-control,
+  .btn-outline,
+  .data-table th,
+  .data-table td {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+  }
+  /* Dark mode tweaks for form controls */
+  body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.6) !important;
+  }
+  /* ❌ EXCLUDE MODALS AND TOASTS FROM GLASS STYLING */
+  .modal,
+  .modal *,
+  .modal-content,
+  .modal-card,
+  .card-modal,
+  .card-modal *,
+  .toast-notification,
+  .toast-notification * {
+    background: unset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: unset !important;
+    box-shadow: unset !important;
+  }
+  /* But restore intended modal styles */
+  .modal-content,
+  .modal-card,
+  .card-modal-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-radius: 24px !important;
+  }
+  body.dark-mode .modal-content,
+  body.dark-mode .modal-card,
+  body.dark-mode .card-modal-content {
+    background: rgba(15, 23, 42, 0.95) !important;
+  }
 
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
+  /* Dark mode transition animation */
+  .dark-mode-transition {
+    animation: darkModePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
- @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                transform: translateX(-100%);
-            }
+  /* Dark mode transition overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+  }
+  body.dark-mode::before {
+    opacity: 1;
+  }
+  /* Animated elements during transition */
+  body.dark-mode-transition * {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+  }
+  /* 🌙 DARK MODE - With Dark Gray Background */
+  body.dark-mode {
+    --background: #121212;          /* Sleek dark gray */
+    --surface: rgba(30, 30, 30, 0.8);
+    --surface-elevated: rgba(40, 40, 40, 0.85);
+    --text-primary: var(--gray-100);
+    --text-secondary: var(--gray-300);
+    --text-muted: var(--gray-400);
+    --border: rgba(255, 255, 255, 0.1);
+    --border-light: rgba(255, 255, 255, 0.05);
+    /* Glassmorphism for dark gray */
+    --glass-bg: rgba(40, 40, 40, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --glass-blur: blur(10px);
+    /* Stronger glow to pop on neutral dark */
+    --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+  }
+  /* Additional dark mode styles */
+  body.dark-mode .sidebar {
+    background: rgba(20, 20, 20, 0.9);
+    border-right-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .card {
+    background: rgba(30, 30, 30, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .btn-outline {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary);
+  }
+  body.dark-mode .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  body.dark-mode .data-table th {
+    background: rgba(20, 20, 20, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .data-table td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .data-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-primary);
+  }
+  body.dark-mode .form-control:focus {
+    background: rgba(30, 41, 59, 1);
+    border-color: var(--accent);
+  }
+  body.dark-mode .form-control:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  body.dark-mode {
+    background: linear-gradient(135deg, #121212, #1a1a1a);
+  }
 
-            .sidebar.show {
-                transform: translateX(0);
-            }
+  /* Modern Notifications */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    z-index: 3000;
+    min-width: 300px;
+    animation: slideInRight 0.3s ease-out;
+  }
 
-            .main {
-                margin-left: 0;
-                padding: 1rem;
-                max-width: 100vw;
-            }
+  .notification-success {
+    border-left: 4px solid var(--success);
+  }
 
-            .modal {
-                padding: 1rem;
-            }
+  .notification-error {
+    border-left: 4px solid var(--danger);
+  }
 
-            .modal-content {
-                padding: 1.5rem;
-            }
+  .notification-info {
+    border-left: 4px solid var(--primary);
+  }
 
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+  .notification-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+  }
 
-            .modal-actions {
-                flex-direction: column;
-            }
+  .notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+  }
 
-            .modal-actions .btn {
-                width: 100%;
-            }
+  .notification-close:hover {
+    background: var(--surface);
+    color: var(--text-primary);
+  }
 
-            .top-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-            }
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
 
-            .search-box {
-                min-width: auto;
-                max-width: none;
-            }
-
-            .table-container {
-                margin-top: 0.75rem;
-            }
-
-            th, td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .btn-sm {
-                padding: 4px 8px;
-                font-size: 0.75rem;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .bulk-actions {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .slide-up {
-            animation: slideUp 0.6s ease-out;
-        }
-
-        /* Loading State */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* Success State */
-        .success-flash {
-            animation: successFlash 0.5s ease-out;
-        }
-
-.card-modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 100; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-}
-
-.card-modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 420px;
-  position: relative;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-}
-
-.card-modal-content h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.card-modal-content .close {
-  position: absolute;
-  top: 10px; right: 15px;
-  font-size: 22px;
-  cursor: pointer;
-}
-.card-layout {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.card {
-  width: 340px;  /* driver’s license size */
-  height: 216px;
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.card-bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* overlay common */
-.overlay {
-  position: absolute;
-  color: #000;
-  font-family: Arial, sans-serif;
-  pointer-events: none;
-}
-
-
-/* Name above the "Member" text in template */
-/* Name: slightly above the middle of the card */
-.overlay.name {
-  position: absolute;
-  top: 100px;      /* adjust for your template height */
-  left: 37px;
-  right: 25px;
-  text-align: left;
-  font-weight: bold;
-  font-size: 10px;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-/* Date: positioned beside "Membership Date :" text in template */
-.overlay.date {
-  position: absolute;
-  bottom: 43px;   /* near the bottom, adjust to match template */
-  left: 127px;    /* aligns next to pre-printed label */
-  font-size: 13px;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 12px;
-  color: #fff;
-}
-
-/* Photo circle overlay */
-.overlay.photo {
-  position: absolute;
-  top: 42px;
-  right: 20px;
-  width: 141px;
-  height: 141px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ddd;
-}
-
-.overlay.photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;   /* ensures it fills and stays centered */
-}
-
-/* QR square */
-.overlay.qr {
-  top: 50%;
-  left: 50%;
-  width: 120px;
-  height: 120px;
-  transform: translate(-50%, -50%);
-}
-
-.overlay.qr img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-  /* Animations */
+  /* Dashboard Animations */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1481,691 +2595,607 @@
     from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes successFlash {
-    0% { background: rgba(16, 185, 129, 0.2); }
-    100% { background: transparent; }
+  @keyframes darkModePulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
   }
-    </style>
+
+  /* Photo Preview Enhancement */
+  .photo-upload.dragover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  .photo-upload i {
+    font-size: 2rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .photo-upload p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  /* Enhanced form styling */
+  .form-input[type="file"] {
+    padding: 0;
+    border: none;
+    background: transparent;
+    height: auto;
+  }
+
+  /* Better select styling */
+  .form-input select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+  </style>
 </head>
 <body>
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="/images/logo.png" alt="Logo" class="logo">
-      <h3 class="label">Julita Public Library</h3>
+      <img src="/images/logo.png" alt="Library Logo" class="logo">
+      <span class="label">Julita Public Library</span>
     </div>
-    
-    <button class="toggle-btn" id="toggleSidebar" disabled>
-      <i class="fas fa-bars"></i>
-    </button>
-    
     <nav>
-      <a href="/dashboard">
-        <span class="icon">🏠</span>s2
+      <a href="{{ route('dashboard') }}" data-label="Dashboard">
+        <span class="icon"><i class="fas fa-home"></i></span>
         <span class="label">Dashboard</span>
       </a>
-      <a href="/books">
-        <span class="icon">📘</span>
-        <span class="label">Manage Books</span>
+      <a href="{{ route('books.index') }}" data-label="Books">
+        <span class="icon"><i class="fas fa-book"></i></span>
+        <span class="label">Books</span>
       </a>
-      <a href="/members" class="active">
-        <span class="icon">👥</span>
-        <span class="label">Manage Members</span>
+      <a href="{{ route('members.index') }}" class="active" data-label="Members">
+        <span class="icon"><i class="fas fa-users"></i></span>
+        <span class="label">Members</span>
       </a>
-      <a href="/timelog">
-        <span class="icon">⏰</span>
-        <span class="label">Time Logs</span>
+      <a href="{{ route('timelog.index') }}" data-label="Member Time-in/out">
+        <span class="icon"><i class="fas fa-user-clock"></i></span>
+        <span class="label">Member Time-in/out</span>
       </a>
     </nav>
-    
     <div class="dark-toggle">
-      <label class="switch">
+      <label class="switch" title="Toggle Dark Mode">
         <input type="checkbox" id="darkModeToggle">
-        <span class="slider"></span>
+        <span class="slider">
+          <span class="slider-thumb">
+            <span class="icon-sun">🌞</span>
+            <span class="icon-moon">🌙</span>
+          </span>
+        </span>
       </label>
-      <a href="/logout" class="logout-link">
-        <span>🚪</span>
-        <span class="label">Logout</span>
-      </a>
+      <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light Mode</span>
     </div>
   </div>
 
   <!-- Main Content -->
   <div class="main" id="mainContent">
-    <div class="page-header">
-      <h1 class="page-title">
-        <span>👥</span>
-        Registered Members
-      </h1>
+    <div class="page-title">
+      <i class="fas fa-users"></i>
+      Registered Members
     </div>
 
-    <div class="top-controls">
-      <div class="search-box">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" placeholder="Search members by name, address, or contact...">
+    <!-- Members Content Container (matching books page structure) -->
+    <div class="members-content">
+      <!-- Members Management Container -->
+      <div class="members-management-header">
+        <div class="members-management-content">
+          <div class="collection-info">
+            <i class="fas fa-users" style="color: var(--primary); font-size: 1.5rem; margin-right: 12px;"></i>
+            <span style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">Members Collection</span>
+          </div>
+          <div class="management-controls">
+            <div class="search-container">
+              <input type="text" class="search-input" placeholder="Search members by name, address, or contact..." id="searchInput">
+              <i class="fas fa-search search-icon"></i>
+            </div>
+            <button class="btn btn-primary" onclick="openRegisterModal()">
+              <i class="fas fa-user-plus"></i> Register Member
+            </button>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="openRegisterModal()">
-        <i class="fas fa-user-plus"></i>
-        Register Member
-      </button>
 
-   <!-- Members Table -->
-<div class="table-container">
-  <table id="membersTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Age</th>
-        <th>Address</th>
-        <th>Contact Number</th>
-        <th>School</th>
-        <th>Member Since</th>
-        <th>Computer Time</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="membersTableBody">
-      @if(isset($members) && $members->count())
-        @foreach ($members as $member)
+      <!-- Members Table -->
+      <div class="table-container">
+      <div class="table-wrapper">
+        <table class="data-table" id="membersTable">
+        <thead>
           <tr>
-            {{-- Name --}}
-            <td>
-              {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}
-              @if (!empty($member->first_name) && $member->first_name !== 'null')
-                {{ (!empty($member->last_name) && $member->last_name !== 'null') ? ', ' : '' }}{{ $member->first_name }}
-              @endif
-              @if (!empty($member->middle_name) && $member->middle_name !== 'null')
-                {{ ' ' . $member->middle_name }}
-              @endif
-            </td>
-
-            {{-- Age --}}
-            <td>{{ $member->age ?? '' }}</td>
-
-            {{-- Full Address --}}
-            <td>
-              {{ collect([
-                (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
-                (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
-                (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
-                (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
-                (!empty($member->province) && $member->province !== 'null') ? $member->province : null
-              ])->filter()->implode(', ') }}
-            </td>
-
-            {{-- Contact Number --}}
-            <td>{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '' }}</td>
-
-            {{-- School --}}
-            <td>{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '' }}</td>
-
-            {{-- Member Since --}}
-            <td>
-              @if (!empty($member->memberdate) && $member->memberdate !== 'null')
-                {{ \Carbon\Carbon::parse($member->memberdate)->format('F j, Y') }}
-              @endif
-            </td>
-
-            {{-- Computer Time --}}
-            <td>{{ (!empty($member->member_time) && $member->member_time !== 'null') ? $member->member_time . ' min' : '' }}</td>
-
-            {{-- Actions - Individual Edit and Download Buttons --}}
-            <td>
-              <div class="action-buttons">
-                  <button 
-                class="btn btn-sm btn-primary editBtn" 
-                data-id="{{ $member->id }}"
-                title="Edit Member">
-                <i class="fas fa-edit"></i> Edit
-                  </button>
-
-<a href="javascript:void(0)" 
-   onclick="openCardModal({{ $member->id }})"
-   class="btn btn-sm btn-success" 
-   title="Download ID Card">
-  <i class="fas fa-download"></i>
-</a>
-
-              </div>
-            </td>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Contact</th>
+            <th>School</th>
+            <th>Member Since</th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
-        @endforeach
-      @else
-        <tr>
-          <td colspan="8" style="text-align: center;">No members found.</td>
-        </tr>
-      @endif
-    </tbody>
-  </table>
-</div>
+        </thead>
+        <tbody id="membersTableBody">
+          @if(isset($members) && $members->count())
+            @foreach ($members as $member)
+              <tr>
+                <td>
+                  {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}
+                  @if (!empty($member->first_name) && $member->first_name !== 'null')
+                    {{ (!empty($member->last_name) && $member->last_name !== 'null') ? ', ' : '' }}{{ $member->first_name }}
+                  @endif
+                  @if (!empty($member->middle_name) && $member->middle_name !== 'null')
+                    {{ ' ' . $member->middle_name }}
+                  @endif
+                </td>
+                <td>{{ $member->age ?? '-' }}</td>
+                <td>
+                  {{ collect([
+                    (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
+                    (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
+                    (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
+                    (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
+                    (!empty($member->province) && $member->province !== 'null') ? $member->province : null
+                  ])->filter()->implode(', ') }}
+                </td>
+                <td>{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '-' }}</td>
+                <td>{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '-' }}</td>
+                <td>
+                  @if (!empty($member->memberdate) && $member->memberdate !== 'null')
+                    {{ \Carbon\Carbon::parse($member->memberdate)->format('M j, Y') }}
+                  @else
+                    -
+                  @endif
+                </td>
+                <td>
+                  <span class="status-badge active">Active</span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" onclick="editMember({{ $member->id }})" title="Edit Member">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="openCardModal({{ $member->id }})" title="View Card">
+                      <i class="fas fa-id-card"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            @endforeach
+          @else
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 2rem;">
+                <i class="fas fa-users" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                <h3 style="color: #6b7280; margin-bottom: 0.5rem;">No Members Found</h3>
+                <p style="color: #9ca3af; margin-bottom: 1.5rem;">Start by registering your first member to get started.</p>
+                <button class="btn btn-primary" onclick="openRegisterModal()">
+                  <i class="fas fa-user-plus"></i>
+                  Register First Member
+                </button>
+              </td>
+            </tr>
+          @endif
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   </div>
 
-<!-- Register Member Modal -->
-  <div class="modal" id="registerModal">
-    <div class="modal-content">
+  <!-- Register Member Modal -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal-container">
       <div class="modal-header">
         <h2 class="modal-title">
           <i class="fas fa-user-plus"></i>
           Register New Member
         </h2>
-        <button class="close-modal" onclick="closeRegisterModal()">
+        <button class="modal-close" onclick="closeRegisterModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <form id="registerForm">
-        <!-- Personal Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-user"></i>
-            Personal Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="firstName">First Name *</label>
-              <input type="text" id="firstName" name="firstName" required>
-            </div>
-            <div class="form-group">
-              <label for="middleName">Middle Name</label>
-              <input type="text" id="middleName" name="middleName">
-            </div>
-            <div class="form-group">
-              <label for="lastName">Last Name *</label>
-              <input type="text" id="lastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-              <label for="age">Age *</label>
-              <input type="number" id="age" name="age" min="1" max="150" required>
+      <div class="modal-body">
+        <form id="registerForm">
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-user"></i>
+              Personal Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName" class="form-label">First Name *</label>
+                <input type="text" id="firstName" name="firstName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="middleName" class="form-label">Middle Name</label>
+                <input type="text" id="middleName" name="middleName" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="lastName" class="form-label">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="age" class="form-label">Age *</label>
+                <input type="number" id="age" name="age" class="form-input" min="1" max="150" required>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Address Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-map-marker-alt"></i>
-            Address Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="houseNumber">House Number</label>
-              <input type="text" id="houseNumber" name="houseNumber">
-            </div>
-            <div class="form-group">
-              <label for="street">Street</label>
-              <input type="text" id="street" name="street">
-            </div>
-            <div class="form-group">
-              <label for="barangay">Barangay *</label>
-              <input type="text" id="barangay" name="barangay" required>
-            </div>
-            <div class="form-group">
-              <label for="municipality">Municipality/City *</label>
-              <input type="text" id="municipality" name="municipality" required>
-            </div>
-            <div class="form-group">
-              <label for="province">Province *</label>
-              <input type="text" id="province" name="province" required>
+          <!-- Address Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-map-marker-alt"></i>
+              Address Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="houseNumber" class="form-label">House Number</label>
+                <input type="text" id="houseNumber" name="houseNumber" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="street" class="form-label">Street</label>
+                <input type="text" id="street" name="street" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="barangay" class="form-label">Barangay *</label>
+                <input type="text" id="barangay" name="barangay" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="municipality" class="form-label">Municipality/City *</label>
+                <input type="text" id="municipality" name="municipality" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="province" class="form-label">Province *</label>
+                <input type="text" id="province" name="province" class="form-input" required>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-phone"></i>
-            Contact Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="contactNumber">Contact Number *</label>
-              <input type="tel" id="contactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
-            </div>
-            <div class="form-group">
-              <label for="school">School/Institution</label>
-              <input type="text" id="school" name="school">
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-camera"></i>
-            Upload Photo
-          </h3>
-          <div class="form-group">
-            <label for="photoInput">Upload Photo</label>
-            <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
-            <div style="margin-top: 10px;">
-              <img id="photoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+          <!-- Contact Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-phone"></i>
+              Contact Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="contactNumber" class="form-label">Contact Number *</label>
+                <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+              </div>
+              <div class="form-group">
+                <label for="school" class="form-label">School/Institution</label>
+                <input type="text" id="school" name="school" class="form-input">
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
-            <i class="fas fa-times"></i>
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" onclick="submitRegister()">
-            <i class="fas fa-save"></i>
-            Register Member
-          </button>
-        </div>
-      </form>
+
+          <!-- Photo Upload Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-camera"></i>
+              Upload Photo
+            </h3>
+            <div class="form-group">
+              <label class="form-label">Profile Photo</label>
+              <div class="photo-upload" onclick="document.getElementById('photo').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload or drag and drop</p>
+                <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+              </div>
+              <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" onclick="submitRegister()">
+          <i class="fas fa-save"></i>
+          Register Member
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Julita Register Modal -->
-  <div class="modal" id="julitaRegisterModal">
-    <div class="modal-content">
+  <div class="modal-overlay" id="julitaRegisterModal">
+    <div class="modal-container">
       <div class="modal-header">
         <h2 class="modal-title">
           <i class="fas fa-user-plus"></i>
           Register Julita Resident
         </h2>
-        <button class="close-modal" onclick="closeJulitaRegisterModal()">
+        <button class="modal-close" onclick="closeJulitaRegisterModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <form id="julitaRegisterForm">
-        <!-- Personal Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-user"></i>
-            Personal Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="julitaFirstName">First Name *</label>
-              <input type="text" id="julitaFirstName" name="firstName" required>
-            </div>
-            <div class="form-group">
-              <label for="julitaMiddleName">Middle Name</label>
-              <input type="text" id="julitaMiddleName" name="middleName">
-            </div>
-            <div class="form-group">
-              <label for="julitaLastName">Last Name *</label>
-              <input type="text" id="julitaLastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-              <label for="julitaAge">Age *</label>
-              <input type="number" id="julitaAge" name="age" min="1" max="150" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-map-marker-alt"></i>
-            Address Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="julitaHouseNumber">House Number</label>
-              <input type="text" id="julitaHouseNumber" name="houseNumber">
-            </div>
-            <div class="form-group">
-              <label for="julitaStreet">Street</label>
-              <input type="text" id="julitaStreet" name="street">
-            </div>
-            <div class="form-group">
-              <label for="julitaBarangay">Barangay *</label>
-              <select id="julitaBarangay" name="barangay" required>
-                <option value="" disabled selected>Select Barangay</option>
-                <option>Alegria</option>
-                <option>Balante</option>
-                <option>Bugho</option>
-                <option>Campina</option>
-                <option>Canwhaton</option>
-                <option>Caridad Norte</option>
-                <option>Caridad Sur</option>
-                <option>Cuatro de Agosto</option>
-                <option>Dita</option>
-                <option>Hinalaan</option>
-                <option>Hindang</option>
-                <option>Iniguihan</option>
-                <option>Macopa</option>
-                <option>San Andres</option>
-                <option>San Pablo</option>
-                <option>San Roque</option>
-                <option>Santo Niño</option>
-                <option>Sta. Cruz</option>
-                <option>Taglibas</option>
-                <option>Veloso</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="julitaMunicipality">Municipality *</label>
-              <input type="text" id="julitaMunicipality" name="municipality" value="Julita" readonly>
-            </div>
-            <div class="form-group">
-              <label for="julitaProvince">Province *</label>
-              <input type="text" id="julitaProvince" name="province" value="Leyte" readonly>
+      <div class="modal-body">
+        <form id="julitaRegisterForm">
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-user"></i>
+              Personal Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="julitaFirstName" class="form-label">First Name *</label>
+                <input type="text" id="julitaFirstName" name="firstName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="julitaMiddleName" class="form-label">Middle Name</label>
+                <input type="text" id="julitaMiddleName" name="middleName" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="julitaLastName" class="form-label">Last Name *</label>
+                <input type="text" id="julitaLastName" name="lastName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="julitaAge" class="form-label">Age *</label>
+                <input type="number" id="julitaAge" name="age" class="form-input" min="1" max="150" required>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-phone"></i>
-            Contact Information
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="julitaContactNumber">Contact Number *</label>
-              <input type="tel" id="julitaContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
-            </div>
-            <div class="form-group">
-              <label for="julitaSchool">School/Institution</label>
-              <input type="text" id="julitaSchool" name="school">
+          <!-- Address Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-map-marker-alt"></i>
+              Address Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="julitaHouseNumber" class="form-label">House Number</label>
+                <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="julitaStreet" class="form-label">Street</label>
+                <input type="text" id="julitaStreet" name="street" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="julitaBarangay" class="form-label">Barangay *</label>
+                <select id="julitaBarangay" name="barangay" class="form-input" required>
+                  <option value="" disabled selected>Select Barangay</option>
+                  <option>Alegria</option>
+                  <option>Balante</option>
+                  <option>Bugho</option>
+                  <option>Campina</option>
+                  <option>Canwhaton</option>
+                  <option>Caridad Norte</option>
+                  <option>Caridad Sur</option>
+                  <option>Cuatro de Agosto</option>
+                  <option>Dita</option>
+                  <option>Hinalaan</option>
+                  <option>Hindang</option>
+                  <option>Iniguihan</option>
+                  <option>Macopa</option>
+                  <option>San Andres</option>
+                  <option>San Pablo</option>
+                  <option>San Roque</option>
+                  <option>Santo Niño</option>
+                  <option>Sta. Cruz</option>
+                  <option>Taglibas</option>
+                  <option>Veloso</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="julitaMunicipality" class="form-label">Municipality *</label>
+                <input type="text" id="julitaMunicipality" name="municipality" class="form-input" value="Julita" readonly>
+              </div>
+              <div class="form-group">
+                <label for="julitaProvince" class="form-label">Province *</label>
+                <input type="text" id="julitaProvince" name="province" class="form-input" value="Leyte" readonly>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="form-section">
-          <h3 class="section-title">
-            <i class="fas fa-camera"></i>
-            Upload Photo
-          </h3>
-          <div class="form-group">
-            <label for="julitaPhoto">Upload Photo</label>
-            <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-control" />
-            <div style="margin-top: 10px;">
-              <img id="julitaPhotoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+
+          <!-- Contact Information Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-phone"></i>
+              Contact Information
+            </h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="julitaContactNumber" class="form-label">Contact Number *</label>
+                <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+              </div>
+              <div class="form-group">
+                <label for="julitaSchool" class="form-label">School/Institution</label>
+                <input type="text" id="julitaSchool" name="school" class="form-input">
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
-            <i class="fas fa-times"></i>
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" onclick="submitRegister()">
-            <i class="fas fa-save"></i>
-            Register Member
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
-<!-- Membership Card Preview Modal -->
-<div id="cardModal" class="card-modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeCardModal()">&times;</span>
-
-    <h3>Membership Card Preview</h3>
-
-    <div id="card-container" class="card-layout">
-      <!-- Front -->
-<!-- Front -->
-<div class="card front" id="card-front">
-    <img src="{{ asset('card_temp/card-1.png') }}" class="card-bg">
-
-    <!-- Name (slightly above middle) -->
-    <div class="overlay name" id="card-name"></div>
-
-    <!-- Date (beside "Membership Date :" text) -->
-    <div class="overlay date" id="card-memberdate"></div>
-
-    <!-- Photo circle -->
-    <div class="overlay photo" id="card-photo"></div>
-</div>
-      <!-- Back -->
-      <div class="card back" id="card-back">
-        <img src="{{ asset('card_temp/card-2.png') }}" class="card-bg">
-
-        <!-- QR overlay -->
-        <div class="overlay qr" id="card-qr"></div>
+          <!-- Photo Upload Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-camera"></i>
+              Upload Photo
+            </h3>
+            <div class="form-group">
+              <label class="form-label">Profile Photo</label>
+              <div class="photo-upload" onclick="document.getElementById('julitaPhoto').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload or drag and drop</p>
+                <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
+              </div>
+              <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" onclick="submitJulitaRegister()">
+          <i class="fas fa-save"></i>
+          Register Member
+        </button>
       </div>
     </div>
-
-    <button onclick="downloadCard()">Download PNG</button>
   </div>
-</div>
+
+  <!-- Membership Card Preview Modal -->
+  <div id="cardModal" class="card-modal">
+    <div class="card-modal-content">
+      <span class="close" onclick="closeCardModal()">&times;</span>
+
+      <h3>Membership Card Preview</h3>
+
+      <div id="card-container" class="card-layout">
+        <!-- Front Card -->
+        <div class="card front" id="card-front">
+          <img src="{{ asset('card_temp/card-1.png') }}" class="card-bg">
+
+          <!-- Name overlay -->
+          <div class="overlay name" id="card-name"></div>
+
+          <!-- Date overlay -->
+          <div class="overlay date" id="card-memberdate"></div>
+
+          <!-- Photo overlay -->
+          <div class="overlay photo" id="card-photo"></div>
+        </div>
+
+        <!-- Back Card -->
+        <div class="card back" id="card-back">
+          <img src="{{ asset('card_temp/card-2.png') }}" class="card-bg">
+
+          <!-- QR overlay -->
+          <div class="overlay qr" id="card-qr"></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="downloadCard()" style="margin-top: 1rem;">
+        <i class="fas fa-download"></i>
+        Download PNG
+      </button>
+    </div>
+  </div>
 
   <!-- Edit Member Modal -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-edit"></i>
-          Edit Member Information
-        </h2>
-        <button class="close-modal" onclick="closeEditModal()">
-          <i class="fas fa-times"></i>
+  <div id="editModal" class="edit-modal" style="display: none;">
+    <div class="edit-modal-content">
+      <div class="edit-modal-header">
+        <h3><i class="fas fa-edit"></i> Edit Member Information</h3>
+        <button class="edit-modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="edit-modal-body">
+        <form id="editForm">
+          <input type="hidden" id="editMemberId" name="memberId">
+
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <h4><i class="fas fa-user"></i> Personal Information</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="editFirstName" class="form-label">First Name *</label>
+                <input type="text" id="editFirstName" name="firstName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="editMiddleName" class="form-label">Middle Name</label>
+                <input type="text" id="editMiddleName" name="middleName" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="editLastName" class="form-label">Last Name *</label>
+                <input type="text" id="editLastName" name="lastName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="editAge" class="form-label">Age *</label>
+                <input type="number" id="editAge" name="age" class="form-input" min="1" max="150" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Information Section -->
+          <div class="form-section">
+            <h4><i class="fas fa-map-marker-alt"></i> Address Information</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="editHouseNumber" class="form-label">House Number</label>
+                <input type="text" id="editHouseNumber" name="houseNumber" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="editStreet" class="form-label">Street</label>
+                <input type="text" id="editStreet" name="street" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="editBarangay" class="form-label">Barangay *</label>
+                <input type="text" id="editBarangay" name="barangay" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="editMunicipality" class="form-label">Municipality/City *</label>
+                <input type="text" id="editMunicipality" name="municipality" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="editProvince" class="form-label">Province *</label>
+                <input type="text" id="editProvince" name="province" class="form-input" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information Section -->
+          <div class="form-section">
+            <h4><i class="fas fa-phone"></i> Contact Information</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="editContactNumber" class="form-label">Contact Number *</label>
+                <input type="tel" id="editContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+              </div>
+              <div class="form-group">
+                <label for="editSchool" class="form-label">School/Institution</label>
+                <input type="text" id="editSchool" name="school" class="form-input">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="edit-modal-footer">
+        <button type="button" class="btn btn-danger" onclick="deleteMember()">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" form="editForm">
+          <i class="fas fa-save"></i> Save Changes
         </button>
       </div>
-
-      <form id="editForm">
-        <input type="hidden" id="editMemberId" name="memberId">
-        
-        <!-- Personal Information Section -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-user"></i> Personal Information</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editFirstName">First Name *</label>
-              <input type="text" id="editFirstName" name="firstName" required>
-            </div>
-            <div class="form-group">
-              <label for="editMiddleName">Middle Name</label>
-              <input type="text" id="editMiddleName" name="middleName">
-            </div>
-            <div class="form-group">
-              <label for="editLastName">Last Name *</label>
-              <input type="text" id="editLastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-              <label for="editAge">Age *</label>
-              <input type="number" id="editAge" name="age" min="1" max="150" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Information Section -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editHouseNumber">House Number</label>
-              <input type="text" id="editHouseNumber" name="houseNumber">
-            </div>
-            <div class="form-group">
-              <label for="editStreet">Street</label>
-              <input type="text" id="editStreet" name="street">
-            </div>
-            <div class="form-group">
-              <label for="editBarangay">Barangay *</label>
-              <input type="text" id="editBarangay" name="barangay" required>
-            </div>
-            <div class="form-group">
-              <label for="editMunicipality">Municipality/City *</label>
-              <input type="text" id="editMunicipality" name="municipality" required>
-            </div>
-            <div class="form-group">
-              <label for="editProvince">Province *</label>
-              <input type="text" id="editProvince" name="province" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-phone"></i> Contact Information</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="editContactNumber">Contact Number *</label>
-              <input type="tel" id="editContactNumber" name="contactNumber" pattern="[0-9]{11}" maxlength="11" required>
-            </div>
-            <div class="form-group">
-              <label for="editSchool">School/Institution</label>
-              <input type="text" id="editSchool" name="school">
-            </div>
-          </div>
-        </div>
-          
-        <div class="modal-actions">
-          <button type="button" class="btn btn-danger" onclick="deleteMember()">
-            Delete
-          </button>
-          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-            <i class="fas fa-times"></i> Cancel
-          </button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Changes
-          </button>
-        </div>
-      </form>
     </div>
   </div>
-<script>
-// Dark mode functionality
-const darkToggle = document.getElementById('darkModeToggle');
 
-// Initialize dark mode on page load
-document.addEventListener('DOMContentLoaded', function() {
-  const darkMode = localStorage.getItem('darkMode') === 'true';
-  if (darkMode) {
-    document.body.classList.add('dark-mode');
-    darkToggle.checked = true;
-  }
-});
 
-// Dark mode toggle event listener
-darkToggle.addEventListener('change', function() {
-  document.body.classList.toggle('dark-mode');
-  localStorage.setItem('darkMode', this.checked);
-});
+<!-- External Scripts - Organized and Modern -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-// Sidebar toggle functionality
-const sidebar = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const toggleBtn = document.getElementById('toggleSidebar');
-
-toggleBtn.addEventListener('click', function() {
-  sidebar.classList.toggle('collapsed');
-  mainContent.classList.toggle('collapsed');
-});
-
-// Card preview function
-function showCardPreviewModal(cardUrl) {
-  document.getElementById("cardPreviewFrame").src = cardUrl;
-  document.getElementById("downloadCardBtn").href = cardUrl;
-  document.getElementById("cardPreviewModal").style.display = "block";
-}
-
-function closeCardPreviewModal() {
-  document.getElementById("cardPreviewModal").style.display = "none";
-  document.getElementById("cardPreviewFrame").src = "";
-}
-
-// Add missing openCardModal function
-function openCardModal(memberId) {
-  console.log('Opening card modal for member ID:', memberId);
-  
-  // Create a simple modal for card generation
-  const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3000;
-  `;
-  
-  modal.innerHTML = `
-    <div style="
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      max-width: 400px;
-      width: 90%;
-    ">
-      <h3 style="margin-bottom: 1rem; color: #333;">📄 Generate ID Card</h3>
-      <p style="margin-bottom: 1.5rem; color: #666;">Generate ID card for member ID: ${memberId}</p>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <button onclick="this.closest('.modal').remove()" style="
-          padding: 8px 16px;
-          background: #6b7280;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        ">Cancel</button>
-        <button onclick="generateCard(${memberId})" style="
-          padding: 8px 16px;
-          background: #10b981;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        ">Generate Card</button>
-      </div>
-    </div>
-  `;
-  
-  modal.className = 'modal';
-  document.body.appendChild(modal);
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      modal.remove();
-    }
-  });
-}
-
-function generateCard(memberId) {
-  // This would typically generate and download the card
-  alert(`Card generated for member ID: ${memberId}`);
-  document.querySelector('.modal').remove();
-}
-
-// Ensure buttons work properly
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Members page JavaScript loaded successfully');
-  
-  // Test if edit buttons are being found
-  const editButtons = document.querySelectorAll('.editBtn');
-  console.log('Found edit buttons:', editButtons.length);
-  
-  // Add click event listeners to edit buttons as backup
-  editButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const memberId = this.getAttribute('data-id');
-      console.log('Edit button clicked for member ID:', memberId);
-      
-      // Let the existing memberedit.js handle the functionality
-      // This is just a backup to ensure the button is clickable
-    });
-  });
-});
-
-</script>
-
-<!-- External Scripts - ONLY INCLUDE EACH ONCE -->
-<script src="{{ asset('js/overdue.js') }}"></script>
+<!-- Custom Scripts -->
 <script src="{{ asset('js/photoprev.js') }}"></script>
 <script src="{{ asset('js/membersearch.js') }}"></script>
 <script src="{{ asset('js/memberscript.js') }}"></script>
 <script src="{{ asset('js/memberedit.js') }}"></script>
 <script src="{{ asset('js/sidebarcollapse.js') }}"></script>
+<script src="{{ asset('js/dashb.js') }}"></script>
 <script src="{{ asset('js/showqr.js') }}"></script>
 <script src="{{ asset('js/qrgen.js') }}"></script>
 <script src="{{ asset('js/card_gen.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 
 </body>

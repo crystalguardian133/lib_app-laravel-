@@ -362,10 +362,11 @@
 
     .modal-content {
       background: var(--white);
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: 12px;
       width: 90%;
-      max-width: 600px;
+      max-width: 500px;
+      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
     }
 
     .modal-content label {
@@ -434,6 +435,41 @@ body.dark-mode .actions .delete {
       border-radius: 6px;
       cursor: pointer;
       color: white;
+    }
+
+    /* Custom Button Styles for Modals */
+    .btn-cancel {
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+
+    .btn-confirm {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-confirm:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #059669, #047857);
     }
   </style>
 </head>
@@ -523,8 +559,8 @@ body.dark-mode .actions .delete {
       <input type="text" id="school">
 
       <div class="actions">
-        <button class="cancel" onclick="closeRegisterModal()">Cancel</button>
-        <button class="submit" onclick="submitRegister()">Submit</button>
+        <button class="btn-cancel" onclick="closeRegisterModal()">Cancel</button>
+        <button class="btn-confirm" onclick="submitRegister()">Submit</button>
       </div>
     </div>
   </div>
@@ -533,7 +569,7 @@ body.dark-mode .actions .delete {
     <h3>📷 Scan Member QR</h3>
     <div id="qr-reader" style="width: 100%; height: auto;"></div>
     <div class="actions">
-      <button class="cancel" onclick="closeScanQRModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closeScanQRModal()">Cancel</button>
     </div>
   </div>
 </div>

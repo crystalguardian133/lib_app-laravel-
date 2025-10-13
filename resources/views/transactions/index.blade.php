@@ -158,15 +158,51 @@
 
     .modal-content {
       background: white;
-      padding: 2rem;
-      border-radius: 10px;
+      padding: 1.5rem;
+      border-radius: 12px;
       width: 90%;
-      max-width: 500px;
+      max-width: 400px;
+      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
     }
 
     body.dark-mode .modal-content {
       background: #1e293b;
       color: var(--text-dark);
+    }
+
+    /* Custom Button Styles for Modals */
+    .btn-cancel {
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+
+    .btn-confirm {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-confirm:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #059669, #047857);
     }
 
     .actions {
@@ -331,8 +367,8 @@ body.dark-mode .styled-table tbody tr.overdue {
       <h3>Confirm Return</h3>
       <p>Return <strong><span id="modalBook"></span></strong> borrowed by <strong><span id="modalMember"></span></strong>?</p>
       <div class="actions">
-        <button class="cancel" onclick="closeReturnModal()">Cancel</button>
-        <button class="submit" onclick="confirmReturn()">Confirm</button>
+        <button class="btn-cancel" onclick="closeReturnModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmReturn()">Confirm</button>
       </div>
     </div>
   </div>

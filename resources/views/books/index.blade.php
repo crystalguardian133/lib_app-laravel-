@@ -639,6 +639,33 @@
     box-shadow: var(--shadow-lg);
   }
 
+  /* Custom Button Styles for Modals */
+  .btn-cancel {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+  }
+
+  .btn-cancel:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+  }
+
+  .btn-confirm {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+  }
+
+  .btn-confirm:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+
   /* Table Styles */
   .table-container {
     background: var(--glass-bg);
@@ -1721,11 +1748,11 @@
                 </form>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="closeAddBookModal()">
+                <button type="button" class="btn btn-cancel" onclick="closeAddBookModal()">
                     <i class="fas fa-times"></i>
                     Cancel
                 </button>
-                <button type="submit" form="addBookForm" class="btn btn-primary">
+                <button type="submit" form="addBookForm" class="btn btn-confirm">
                     <i class="fas fa-plus"></i>
                     Add Book
                 </button>
@@ -1796,7 +1823,7 @@
                 </form>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="closeEditBookModal()">
+                <button type="button" class="btn btn-cancel" onclick="closeEditBookModal()">
                     <i class="fas fa-times"></i>
                     Cancel
                 </button>
@@ -1804,7 +1831,7 @@
                     <i class="fas fa-trash"></i>
                     Delete
                 </button>
-                <button type="button" class="btn btn-primary" id="save-button" onclick="saveChanges()">
+                <button type="button" class="btn btn-confirm" id="save-button" onclick="saveChanges()">
                     <i class="fas fa-save"></i>
                     Save Changes
                 </button>
@@ -1837,7 +1864,7 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">
+                <button type="button" class="btn btn-cancel" onclick="closeDeleteModal()">
                     <i class="fas fa-times"></i> Cancel
                 </button>
                 <button type="button" class="btn btn-danger" onclick="confirmDelete()">
@@ -1867,10 +1894,10 @@
                         <img id="qrImage" src="" alt="QR Code" style="margin: 20px auto; display: block; border: 2px solid var(--border); border-radius: var(--radius); max-width: 250px; height: 250px;">
                         <p style="font-size: 1rem; color: var(--text-primary); margin: 15px 0; font-weight: 600;" id="qrBookTitleDisplay">Book Title</p>
                         <div style="margin-top: 20px;">
-                            <button class="btn btn-outline" onclick="downloadQR()" style="margin-right: 10px;">
+                            <button class="btn btn-cancel" onclick="downloadQR()" style="margin-right: 10px;">
                                 <i class="fas fa-download"></i> Download QR
                             </button>
-                            <button class="btn btn-primary" onclick="printQR()">
+                            <button class="btn btn-confirm" onclick="printQR()">
                                 <i class="fas fa-print"></i> Print QR
                             </button>
                         </div>
@@ -2025,10 +2052,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeBorrowModal()">
+                <button class="btn btn-cancel" onclick="closeBorrowModal()">
                     <i class="fas fa-times"></i> Cancel
                 </button>
-                <button class="btn btn-primary" onclick="confirmBorrow()" id="confirmBorrowBtn" disabled>
+                <button class="btn btn-confirm" onclick="confirmBorrow()" id="confirmBorrowBtn" disabled>
                     <i class="fas fa-check"></i> Confirm Borrow
                 </button>
             </div>
