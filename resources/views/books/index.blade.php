@@ -1956,7 +1956,7 @@
                     <div class="form-group">
                         <label for="memberName">Member Name</label>
                         <div style="display: flex; gap: 8px;">
-                            <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed; flex: 1;" onchange="if (typeof window.updateConfirmButtonState === 'function') { window.updateConfirmButtonState(); }">
+                            <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed; flex: 1;">
                             <button type="button" class="btn btn-outline btn-sm" onclick="clearMemberInfo()" title="Clear member information">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -2055,7 +2055,7 @@
                 <button class="btn btn-cancel" onclick="closeBorrowModal()">
                     <i class="fas fa-times"></i> Cancel
                 </button>
-                <button class="btn btn-confirm" onclick="confirmBorrow()" id="confirmBorrowBtn" disabled>
+                <button class="btn btn-confirm" onclick="confirmBorrow()" id="confirmBorrowBtn">
                     <i class="fas fa-check"></i> Confirm Borrow
                 </button>
             </div>
@@ -2172,11 +2172,24 @@
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
                         if (typeof window.updateConfirmButtonState === 'function') {
+                            console.log('Books list changed, updating button state');
                             window.updateConfirmButtonState();
                         }
                     });
                 });
                 observer.observe(selectedBooksList, { childList: true });
+
+                // Also add manual update when books are removed via remove buttons
+                selectedBooksList.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('button')) {
+                        setTimeout(() => {
+                            if (typeof window.updateConfirmButtonState === 'function') {
+                                console.log('Book removal detected, updating button state');
+                                window.updateConfirmButtonState();
+                            }
+                        }, 100);
+                    }
+                });
             }
         });
 

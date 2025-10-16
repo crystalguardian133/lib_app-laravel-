@@ -168,27 +168,7 @@ function submitRegister() {
   });
 }
 
-// Update photo preview event listener to handle both forms
-document.addEventListener('change', function (e) {
-  if (e.target && (e.target.matches("#photo") || e.target.matches("#julitaPhoto"))) {
-    const modal = e.target.closest(".modal");
-    const preview = modal?.querySelector("#photoPreview");
-    const file = e.target.files[0];
-    if (preview) {
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = evt => {
-          preview.src = evt.target.result;
-          preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      } else {
-        preview.src = "";
-        preview.style.display = "none";
-      }
-    }
-  }
-});
+// Photo preview is now handled by photoprev.js
 
 // SORT FUNCTION
 document.addEventListener("DOMContentLoaded", function () {

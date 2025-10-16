@@ -1,5 +1,5 @@
 // ======================
-// BORROW.JS - COMPLETE IMPLEMENTATION
+// BORROW.JS - CLEAN & SIMPLE VERSION
 // ======================
 
 // Global variables
@@ -7,8 +7,7 @@ let selectedBooks = [];
 let selectionMode = false;
 
 // DEBUG: Log when borrow.js is loaded
-console.log('🚀 BORROW.JS LOADED - Version with Philippine business days and z-index fixes');
-console.log('📅 Current time in Philippine timezone:', new Date().toLocaleString('en-US', {timeZone: 'Asia/Manila'}));
+console.log('🚀 BORROW.JS LOADED - Clean & Simple Version');
 
 // ======================
 // TOAST NOTIFICATIONS
@@ -29,14 +28,251 @@ function showToast(message, type = 'info') {
 }
 
 // ======================
-// UTILITY FUNCTIONS
+// CORE BORROW FUNCTIONS
 // ======================
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+function openBorrowModal() {
+    const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
+    if (selectedRows.length === 0) {
+        showToast("No books selected for borrowing", 'warning');
+        return;
+    }
+
+    // Set default due date (10 working days from now)
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 10);
+
+    const dueDateInput = document.getElementById('dueDate');
+    if (dueDateInput) {
+        dueDateInput.value = futureDate.toISOString().split('T')[0];
+    }
+
+    // Set default time
+    const dueTimeInput = document.getElementById('dueTime');
+    if (dueTimeInput) {
+        dueTimeInput.value = '23:59';
+    }
+
+    // Clear member info
+    const memberNameInput = document.getElementById('memberName');
+    const memberIdInput = document.getElementById('memberId');
+    if (memberNameInput) memberNameInput.value = '';
+    if (memberIdInput) memberIdInput.value = '';
+
+    // Show modal
+    const modal = document.getElementById('borrowModal');
+    if (modal) {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+    }
+
+    updateConfirmButtonState();
 }
+
+function closeBorrowModal() {
+    const modal = document.getElementById('borrowModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    // Clear selections
+    document.querySelectorAll('#booksTableBody tr.selected').forEach(row => {
+        row.classList.remove('selected');
+    });
+    selectedBooks = [];
+}
+
+function confirmBorrow() {
+    const memberName = document.getElementById('memberName').value.trim();
+    const memberId = document.getElementById('memberId').value.trim();
+    const dueDate = document.getElementById('dueDate').value;
+    const dueTimeHidden = document.getElementById('dueTime');
+    const dueTime = dueTimeHidden ? dueTimeHidden.value : '';
+
+    if (!memberName || !memberId) {
+        showToast('Please scan member QR code first', 'warning');
+        return;
+    }
+
+    if (!dueDate || !dueTime) {
+        showToast('Please set due date and time', 'warning');
+        return;
+    }
+
+    // Get books from modal's selected books list
+    const selectedBooksList = document.getElementById('selectedBooksList');
+    let bookIds = [];
+    
+    if (selectedBooksList && selectedBooksList.children.length > 0) {
+        bookIds = Array.from(selectedBooksList.children).map(li => parseInt(li.dataset.id));
+        console.log('📚 Getting books from modal list:', bookIds);
+    } else {
+        const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
+        if (selectedRows.length === 0) {
+            showToast('Please select books to borrow first', 'warning');
+            return;
+        }
+        bookIds = Array.from(selectedRows).map(row => parseInt(row.dataset.id));
+        console.log('📚 Getting books from table selection:', bookIds);
+    }
+
+    if (bookIds.length === 0) {
+        showToast('Please select books to borrow first', 'warning');
+        return;
+    }
+
+    const tokenElement = document.querySelector('meta[name="csrf-token"]');
+    if (!tokenElement) {
+        showToast('CSRF token not found', 'error');
+        return;
+    }
+
+    const token = tokenElement.content;
+
+    const confirmButton = document.getElementById('confirmBorrowBtn');
+    if (confirmButton) {
+        confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        confirmButton.disabled = true;
+    }
+
+    // Prepare data as JSON - IMPORTANT: book_ids MUST be an array
+    const borrowData = {
+        member_name: memberName,
+        member_id: memberId,
+        due_date: dueDate,
+        due_time: dueTime,
+        book_ids: bookIds
+    };
+
+    console.log('📨 Sending JSON:', JSON.stringify(borrowData, null, 2));
+
+    // Send as JSON
+    fetch('/borrow/process', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(borrowData)
+    })
+    .then(response => {
+        console.log('📡 Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Success:', data);
+        showToast(data.message || 'Books borrowed successfully!', 'success');
+        closeBorrowModal();
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        showToast('Failed to borrow books: ' + error.message, 'error');
+        
+        if (confirmButton) {
+            confirmButton.innerHTML = '<i class="fas fa-check"></i> Confirm Borrow';
+            confirmButton.disabled = false;
+        }
+    });
+}
+
+function borrowOne(bookId) {
+    const row = document.querySelector(`tr[data-id="${bookId}"]`);
+    if (!row) {
+        showToast("Book not found", 'error');
+        return;
+    }
+
+    // Clear previous selections
+    document.querySelectorAll('#booksTableBody tr.selected').forEach(r => {
+        r.classList.remove('selected');
+    });
+
+    // Select current book
+    row.classList.add('selected');
+    openBorrowModal();
+}
+
+function updateConfirmButtonState() {
+    const memberName = document.getElementById('memberName');
+    const confirmBtn = document.getElementById('confirmBorrowBtn');
+    const selectedBooksCount = document.querySelectorAll('#booksTableBody tr.selected').length;
+
+    if (memberName && confirmBtn) {
+        const hasMember = memberName.value.trim() !== '';
+
+        if (hasMember && selectedBooksCount > 0) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm Borrow';
+            confirmBtn.style.backgroundColor = '#10b981';
+        } else if (hasMember) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-book"></i> Select Books';
+            confirmBtn.style.backgroundColor = '#f59e0b';
+        } else {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-qrcode"></i> Scan Member';
+            confirmBtn.style.backgroundColor = '#9ca3af';
+        }
+    }
+}
+
+// ======================
+// QR SCANNER FUNCTIONS
+// ======================
+
+function startQRScan(type) {
+    console.log(`Starting QR scan for: ${type}`);
+
+    if (typeof Html5Qrcode === 'undefined') {
+        showToast('QR Scanner library not loaded', 'error');
+        return;
+    }
+
+    // For now, just show a placeholder message
+    showToast(`QR Scanner for ${type} - Feature coming soon`, 'info');
+}
+
+// ======================
+// BOOK SELECTION FUNCTIONS
+// ======================
+
+function toggleBookSelection(bookId) {
+    const row = document.querySelector(`tr[data-id="${bookId}"]`);
+    if (!row) return;
+
+    if (row.classList.contains('selected')) {
+        row.classList.remove('selected');
+    } else {
+        row.classList.add('selected');
+    }
+
+    updateConfirmButtonState();
+}
+
+// ======================
+// EXPORT FUNCTIONS
+// ======================
+
+window.borrowOne = borrowOne;
+window.openBorrowModal = openBorrowModal;
+window.closeBorrowModal = closeBorrowModal;
+window.confirmBorrow = confirmBorrow;
+window.updateConfirmButtonState = updateConfirmButtonState;
+window.startQRScan = startQRScan;
+window.toggleBookSelection = toggleBookSelection;
+window.showToast = showToast;
 
 // Initialize custom precise time picker
 function initializeCustomTimePicker() {
@@ -112,7 +348,6 @@ function initializeCustomTimePicker() {
 
     console.log('⏰ Custom time picker initialized successfully');
 }
-
 
 // ======================
 // BORROW MODAL FUNCTIONS
@@ -288,7 +523,16 @@ function openBorrowModal() {
         initialBtn.style.opacity = '1';
         initialBtn.disabled = false;
         initialBtn.removeAttribute('disabled');
-        initialBtn.onclick = null; // Remove any existing handlers
+    }
+
+    // Clear member info when opening modal
+    if (memberName) {
+        memberName.value = '';
+        memberName.style.backgroundColor = 'var(--surface-elevated)';
+        memberName.style.cursor = 'not-allowed';
+    }
+    if (memberId) {
+        memberId.value = '';
     }
 
     // Update button state immediately
@@ -299,6 +543,42 @@ function openBorrowModal() {
         console.log('🔄 Updating button state after modal open delay');
         updateConfirmButtonState();
     }, 50);
+
+    // Set up observer for selected books list changes
+    const selectedBooksList = document.getElementById('selectedBooksList');
+    if (selectedBooksList) {
+        const booksObserver = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    console.log('🔄 Books list changed, updating button state');
+                    updateConfirmButtonState();
+                }
+            });
+        });
+        booksObserver.observe(selectedBooksList, { childList: true });
+
+        // Also listen for click events on remove buttons
+        selectedBooksList.addEventListener('click', function(e) {
+            if (e.target && e.target.matches('button')) {
+                setTimeout(() => {
+                    console.log('🔄 Book removal detected, updating button state');
+                    updateConfirmButtonState();
+                }, 50);
+            }
+        });
+
+        console.log('👁️ Books list observer and click listener set up');
+    }
+
+    // Also set up listener for member name input in the modal
+    const memberNameInputModal = document.getElementById('memberName');
+    if (memberNameInputModal) {
+        console.log('👁️ Setting up member name input listener');
+        memberNameInputModal.addEventListener('input', function() {
+            console.log('🔄 Member name input changed in modal, updating button state');
+            setTimeout(() => updateConfirmButtonState(), 10);
+        });
+    }
 }
 
 function closeBorrowModal() {
@@ -334,314 +614,21 @@ function closeBorrowModal() {
 
     selectedBooks = [];
 
-    const memberNameField = document.getElementById('memberName');
-    if (memberNameField) {
-        memberNameField.style.backgroundColor = 'var(--surface-elevated)';
-        memberNameField.style.cursor = 'not-allowed';
-    }
-
     updateConfirmButtonState();
 }
 
-function confirmBorrow() {
-    const memberName = document.getElementById('memberName').value.trim();
-    const memberId = document.getElementById('memberId').value.trim();
-    const dueDate = document.getElementById('dueDate').value;
-    const dueTimeHidden = document.getElementById('dueTime');
-    const dueTime = dueTimeHidden ? dueTimeHidden.value : '';
-
-    if (!memberName || !memberId) {
-        showToast('Please scan member QR code', 'warning');
-        return;
-    }
-
-    if (!dueDate || !dueTime) {
-        showToast('Please set due date and time', 'warning');
-        return;
-    }
-
-    const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
-    if (selectedRows.length === 0) {
-        showToast('No books selected', 'warning');
-        return;
-    }
-
-    const token = document.querySelector('meta[name="csrf-token"]').content;
-    if (!token) {
-        showToast('Security token missing. Please refresh the page.', 'error');
-        return;
-    }
-
-    const bookIds = Array.from(selectedRows).map(row => parseInt(row.dataset.id));
-    const borrowData = {
-        member_name: memberName,
-        due_date: dueDate,
-        due_time: dueTime,
-        book_ids: bookIds
-    };
-
-    const confirmButton = document.getElementById('confirmBorrowBtn');
-    if (confirmButton) {
-        const originalText = confirmButton.innerHTML;
-        confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        confirmButton.disabled = true;
-
-        fetch('/borrow/process', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(borrowData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            showToast('Books borrowed successfully!', 'success');
-            closeBorrowModal();
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        })
-        .catch(error => {
-            console.error('Borrow error:', error);
-            showToast('Failed to process borrowing', 'error');
-        })
-        .finally(() => {
-            confirmButton.innerHTML = originalText;
-            confirmButton.disabled = false;
-        });
-    }
-}
-
-function borrowOne(bookId) {
-    const row = document.querySelector(`tr[data-id="${bookId}"]`);
-    if (!row) {
-        showToast("Book not found", 'error');
-        return;
-    }
-
-    const availability = parseInt(row.dataset.availability);
-    if (availability <= 0) {
-        showToast("This book is currently not available", 'warning');
-        return;
-    }
-
-    document.querySelectorAll('#booksTableBody tr.selected').forEach(r => {
-        r.classList.remove('selected');
-    });
-
-    row.classList.add('selected');
-    openBorrowModal();
-}
-
-function updateConfirmButtonState() {
-    console.log('🔄 updateConfirmButtonState called');
-
-    const memberName = document.getElementById('memberName');
-    let confirmBtn = document.getElementById('confirmBorrowBtn');
-    const selectedBooksList = document.getElementById('selectedBooksList');
-
-    console.log('🔍 Elements found:', {
-        memberName: !!memberName,
-        confirmBtn: !!confirmBtn,
-        selectedBooksList: !!selectedBooksList,
-        confirmBtnId: confirmBtn ? confirmBtn.id : 'not found'
-    });
-
-    // If button not found, try to find it by searching in the borrow modal
-    if (!confirmBtn) {
-        const borrowModal = document.getElementById('borrowModal');
-        if (borrowModal) {
-            confirmBtn = borrowModal.querySelector('#confirmBorrowBtn');
-            console.log('🔍 Button found in modal:', !!confirmBtn);
-        }
-    }
-
-    // If still not found, try to find any button with confirm in the text or class
-    if (!confirmBtn) {
-        const allButtons = document.querySelectorAll('button');
-        confirmBtn = Array.from(allButtons).find(btn =>
-            btn.textContent.toLowerCase().includes('confirm') ||
-            btn.textContent.toLowerCase().includes('scan') ||
-            btn.textContent.toLowerCase().includes('borrow') ||
-            btn.id?.toLowerCase().includes('confirm')
-        );
-        console.log('🔍 Button found by text search:', !!confirmBtn);
-    }
-
-    // Additional debugging for button state
-    if (confirmBtn) {
-        console.log('🔍 Button details:', {
-            tagName: confirmBtn.tagName,
-            type: confirmBtn.type,
-            disabled: confirmBtn.disabled,
-            style: confirmBtn.style.cssText,
-            className: confirmBtn.className,
-            innerHTML: confirmBtn.innerHTML,
-            hasOnclick: !!confirmBtn.onclick
-        });
-    } else {
-        console.error('❌ confirmBorrowBtn element not found!');
-        // Try to find any button with similar ID
-        const allButtons = document.querySelectorAll('button');
-        console.log('🔍 All buttons on page:', allButtons.length);
-        allButtons.forEach((btn, index) => {
-            console.log(`${index + 1}. Button ID: "${btn.id}", Class: "${btn.className}", Text: "${btn.textContent.trim()}"`);
-        });
-        return; // Exit if button not found
-    }
-
-    if (memberName && confirmBtn && selectedBooksList) {
-        const hasMember = memberName.value.trim() !== '';
-        const hasBooks = selectedBooksList.children.length > 0 || selectedBooks.length > 0;
-
-        console.log('📋 State check:', {
-            hasMember: hasMember,
-            hasBooks: hasBooks,
-            memberNameValue: memberName.value,
-            booksCount: selectedBooksList.children.length,
-            selectedBooksArrayLength: selectedBooks.length,
-            booksListChildren: Array.from(selectedBooksList.children).map(child => child.textContent),
-            buttonCurrentHTML: confirmBtn.innerHTML,
-            buttonCurrentDisabled: confirmBtn.disabled,
-            buttonCurrentOnclick: !!confirmBtn.onclick
-        });
-
-        // Force remove disabled attribute and existing onclick handlers
-        confirmBtn.disabled = false;
-        confirmBtn.removeAttribute('disabled');
-        confirmBtn.onclick = null;
-
-        if (!hasMember) {
-            console.log('🔄 Setting button to SCAN MEMBER state');
-            confirmBtn.innerHTML = '<i class="fas fa-qrcode"></i> Scan Member';
-            confirmBtn.style.backgroundColor = '#9ca3af';
-            confirmBtn.style.cursor = 'pointer';
-            confirmBtn.style.opacity = '1';
-            confirmBtn.disabled = false;
-            confirmBtn.removeAttribute('disabled');
-            confirmBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔘 Scan Member button clicked - opening QR scanner');
-                console.log('📋 Button state when clicked:', {
-                    innerHTML: confirmBtn.innerHTML,
-                    disabled: confirmBtn.disabled,
-                    backgroundColor: confirmBtn.style.backgroundColor
-                });
-                if (typeof showQRScannerModal === 'function') {
-                    showQRScannerModal('member');
-                } else if (window.showQRScannerModal) {
-                    window.showQRScannerModal('member');
-                } else {
-                    showToast('QR Scanner not available', 'error');
-                }
-            };
-        } else if (!hasBooks) {
-            console.log('🔄 Setting button to ADD BOOKS state');
-            confirmBtn.innerHTML = '<i class="fas fa-book"></i> Add Books to Borrow';
-            confirmBtn.style.backgroundColor = '#9ca3af';
-            confirmBtn.style.cursor = 'pointer';
-            confirmBtn.style.opacity = '1';
-            confirmBtn.disabled = false;
-            confirmBtn.removeAttribute('disabled');
-            confirmBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔘 Add Books button clicked - opening QR scanner for books');
-                console.log('📋 Current state when Add Books clicked:', {
-                    hasMember: hasMember,
-                    hasBooks: hasBooks,
-                    memberName: memberName.value,
-                    booksCount: selectedBooksList.children.length
-                });
-                if (typeof showQRScannerModal === 'function') {
-                    showQRScannerModal('book');
-                } else if (window.showQRScannerModal) {
-                    window.showQRScannerModal('book');
-                } else {
-                    showToast('Please select books to borrow first', 'warning');
-                }
-            };
-        } else {
-            console.log('✅ Both member and books detected - showing Confirm button');
-            console.log('📋 Final state check:', {
-                hasMember: hasMember,
-                hasBooks: hasBooks,
-                memberNameValue: memberName.value,
-                booksCount: selectedBooksList.children.length,
-                selectedBooksArrayLength: selectedBooks.length
-            });
-
-            console.log('🔄 Setting button to CONFIRM state');
-            confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm';
-            confirmBtn.style.backgroundColor = '#10b981';
-            confirmBtn.style.cursor = 'pointer';
-            confirmBtn.style.opacity = '1';
-            confirmBtn.disabled = false;
-            confirmBtn.removeAttribute('disabled');
-            confirmBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔘 Confirm button clicked!');
-                console.log('📋 Button state when clicked:', {
-                    hasMember: memberName.value.trim() !== '',
-                    hasBooks: selectedBooksList.children.length > 0,
-                    memberName: memberName.value,
-                    booksCount: selectedBooksList.children.length,
-                    buttonHTML: confirmBtn.innerHTML
-                });
-
-                // Call confirmBorrow directly
-                if (typeof confirmBorrow === 'function') {
-                    console.log('✅ Calling confirmBorrow');
-                    confirmBorrow();
-                } else if (window.confirmBorrow && typeof window.confirmBorrow === 'function') {
-                    console.log('✅ Calling window.confirmBorrow');
-                    window.confirmBorrow();
-                } else {
-                    console.error('❌ confirmBorrow function not found in any scope');
-                    showToast('Error: Borrow function not available. Please refresh the page.', 'error');
-                }
-            };
-        }
-
-        console.log('✅ Button state updated:', {
-            hasMember: hasMember,
-            hasBooks: hasBooks,
-            buttonText: confirmBtn.innerHTML,
-            buttonDisabled: confirmBtn.disabled,
-            buttonColor: confirmBtn.style.backgroundColor,
-            hasOnclick: !!confirmBtn.onclick
-        });
-    } else {
-        console.error('❌ Required elements not found for confirm button setup');
-        console.log('🔍 Missing elements:', {
-            memberName: !memberName,
-            confirmBtn: !confirmBtn,
-            selectedBooksList: !selectedBooksList
-        });
-    }
-}
-
 function clearMemberInfo() {
-    const memberNameField = document.getElementById('memberName');
-    const memberIdField = document.getElementById('memberId');
+    const memberName = document.getElementById('memberName');
+    const memberId = document.getElementById('memberId');
 
-    if (memberNameField) {
-        memberNameField.value = '';
-        memberNameField.style.backgroundColor = 'var(--surface-elevated)';
-        memberNameField.style.cursor = 'not-allowed';
+    if (memberName) {
+        memberName.value = '';
+        memberName.style.backgroundColor = 'var(--surface-elevated)';
+        memberName.style.cursor = 'not-allowed';
     }
 
-    if (memberIdField) {
-        memberIdField.value = '';
+    if (memberId) {
+        memberId.value = '';
     }
 
     // Update button state after member info is cleared
@@ -1127,40 +1114,18 @@ function stopAllMediaTracks() {
         }
     });
 
-    // Also check for any active getUserMedia streams
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    stream.getTracks().forEach(track => track.stop());
-                    console.log('Dummy stream stopped');
-                })
-                .catch(err => {
-                    console.log('Dummy stream approach not needed or failed:', err.message);
-                });
-        } catch (e) {
-            console.error('Error with dummy stream approach:', e);
-        }
-    }
-
     console.log('Media tracks cleanup completed');
 }
 
 function showQRScannerModal(type) {
-    console.log('🔍 Opening QR scanner modal for:', type);
-    console.log('🎯 Current z-index values check...');
+    console.log('Opening QR scanner modal for:', type);
 
     const modal = document.getElementById('qrScannerModal');
     if (!modal) {
-        console.error('❌ QR Scanner modal not found');
+        console.error('QR Scanner modal not found');
         showToast('QR Scanner modal not found', 'error');
         return;
     }
-
-    // Check current z-index values
-    const computedStyle = window.getComputedStyle(modal);
-    console.log('📊 Current modal z-index:', computedStyle.zIndex);
-    console.log('📊 Current modal display:', computedStyle.display);
 
     // Store reference to current modal (borrow modal)
     window.previousModal = document.getElementById('borrowModal');
@@ -1179,7 +1144,7 @@ function showQRScannerModal(type) {
     // Show modal with extreme z-index and proper positioning (ABOVE borrow modal)
     modal.classList.add('show');
     modal.style.display = 'flex';
-    modal.style.zIndex = '999999999'; // HIGHEST z-index for QR scanner
+    modal.style.zIndex = '999999999';
     modal.style.position = 'fixed';
     modal.style.top = '0';
     modal.style.left = '0';
@@ -1199,12 +1164,11 @@ function showQRScannerModal(type) {
     // Ensure borrow modal has lower z-index
     const borrowModal = document.getElementById('borrowModal');
     if (borrowModal) {
-        borrowModal.style.zIndex = '999999900'; // Lower than QR scanner
-        console.log('📉 Borrow modal z-index set to:', borrowModal.style.zIndex);
+        borrowModal.style.zIndex = '999999900';
+        console.log('Borrow modal z-index set to:', borrowModal.style.zIndex);
     }
 
-    console.log('✅ QR Scanner modal opened with z-index:', modal.style.zIndex);
-    console.log('📍 Modal position:', modal.style.position, modal.style.top, modal.style.left);
+    console.log('QR Scanner modal opened with z-index:', modal.style.zIndex);
 
     // Start scanning after a short delay
     setTimeout(() => {
@@ -1218,7 +1182,7 @@ function closeQRScannerModal() {
     const modal = document.getElementById('qrScannerModal');
     if (!modal) return;
 
-    // 1. First, ensure scanner is properly stopped (aggressive cleanup)
+    // First, ensure scanner is properly stopped
     if (qrScannerInstance) {
         console.log('Force stopping scanner instance...');
         qrScannerInstance.stop()
@@ -1235,20 +1199,20 @@ function closeQRScannerModal() {
         cleanupScannerInstance();
     }
 
-    // 2. Stop all media tracks
+    // Stop all media tracks
     stopAllMediaTracks();
 
-    // 3. Hide modal immediately
+    // Hide modal immediately
     modal.classList.remove('show');
     modal.style.display = 'none';
 
-    // 4. Clear modal content immediately
+    // Clear modal content immediately
     const qrReader = document.getElementById('qr-reader');
     if (qrReader) {
         qrReader.innerHTML = '';
     }
 
-    // 5. Restore previous modal if it was open
+    // Restore previous modal if it was open
     if (window.previousModal && window.previousModal.classList.contains('show')) {
         window.previousModal.style.display = 'flex';
     }
@@ -1330,63 +1294,8 @@ function showQRError(message) {
     isQRScanning = false;
 }
 
-// Force cleanup function for emergency situations
-function forceCleanupScanners() {
-    console.log('Force cleanup of all scanners...');
-
-    // Reset all global variables
-    if (qrScannerInstance) {
-        try {
-            qrScannerInstance.stop();
-            qrScannerInstance.clear();
-        } catch (e) {
-            console.error('Error during force cleanup:', e);
-        }
-        qrScannerInstance = null;
-    }
-
-    isQRScanning = false;
-    currentBorrowScanType = null;
-
-    // Close any open QR scanner modals
-    const modal = document.getElementById('qrScannerModal');
-    if (modal) {
-        modal.classList.remove('show');
-        modal.style.display = 'none';
-
-        const qrReader = document.getElementById('qr-reader');
-        if (qrReader) {
-            qrReader.innerHTML = '';
-        }
-    }
-
-    // Stop all media tracks
-    stopAllMediaTracks();
-
-    console.log('Force cleanup completed');
-}
-
-// Test function for debugging
-function testQRScanner() {
-    console.log('Testing QR Scanner...');
-
-    if (typeof Html5Qrcode === 'undefined') {
-        showToast('Html5Qrcode library not loaded', 'error');
-        return;
-    }
-
-    showToast('QR Scanner library is loaded', 'success');
-
-    // Test modal elements
-    if (initializeQRModalElements()) {
-        showToast('QR Modal elements initialized successfully', 'success');
-    } else {
-        showToast('Failed to initialize QR modal elements', 'error');
-    }
-}
-
 function processMemberQR(qrData) {
-    console.log('🔍 Processing member QR:', qrData);
+    console.log('Processing member QR:', qrData);
 
     let memberId = null;
 
@@ -1400,7 +1309,7 @@ function processMemberQR(qrData) {
         memberId = qrData.split('/').pop();
     }
 
-    console.log('📋 Extracted member ID:', memberId);
+    console.log('Extracted member ID:', memberId);
 
     if (!memberId || isNaN(memberId)) {
         showToast('Invalid member QR code format', 'error');
@@ -1428,26 +1337,28 @@ function processMemberQR(qrData) {
             const memberIdInput = document.getElementById('memberId');
 
             if (memberNameInput) {
+                console.log('Setting member name to:', fullName);
                 memberNameInput.value = fullName;
                 memberNameInput.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
                 memberNameInput.style.cursor = 'default';
-                // Trigger change event to update button state
-                memberNameInput.dispatchEvent(new Event('change'));
+                memberNameInput.readOnly = false;
+
+                console.log('Triggering events on member input...');
+                memberNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                memberNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+                memberNameInput.dispatchEvent(new Event('keyup', { bubbles: true }));
+                memberNameInput.readOnly = true;
+
+                console.log('Member name set and events triggered');
             }
 
             if (memberIdInput) {
                 memberIdInput.value = member.id;
             }
 
-            // Update button state immediately after member data is set
-            console.log('🔄 Updating button state immediately after member scan');
+            // Enable button immediately after member scan
+            console.log('Enabling button after member scan');
             updateConfirmButtonState();
-
-            // Also update after a short delay to ensure DOM is fully updated
-            setTimeout(() => {
-                console.log('🔄 Updating button state after delay (member scan)');
-                updateConfirmButtonState();
-            }, 100);
 
             showToast(`Member: ${fullName}`, 'success');
             closeQRScannerModal();
@@ -1525,12 +1436,16 @@ function processBookQR(qrData) {
         removeBtn.className = 'btn btn-sm btn-danger';
         removeBtn.style.marginLeft = '10px';
         removeBtn.style.padding = '4px 8px';
-        removeBtn.onclick = () => removeBookFromSelection(bookId);
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            removeBookFromSelection(bookId);
+        };
 
         li.appendChild(removeBtn);
         list.appendChild(li);
 
-        console.log('📚 Book added to DOM:', {
+        console.log('Book added to DOM:', {
             bookId: bookId,
             title: title,
             listChildrenCount: list.children.length,
@@ -1539,12 +1454,12 @@ function processBookQR(qrData) {
     }
 
     // Update button state immediately after book is added
-    console.log('🔄 Updating button state immediately after book scan');
+    console.log('Updating button state immediately after book scan');
     updateConfirmButtonState();
 
     // Also update after a short delay to ensure DOM is fully updated
     setTimeout(() => {
-        console.log('🔄 Updating button state after delay (book scan)');
+        console.log('Updating button state after delay (book scan)');
         updateConfirmButtonState();
     }, 100);
 
@@ -1569,6 +1484,7 @@ window.unselectAllBooks = unselectAllBooks;
 window.deleteSelected = deleteSelected;
 window.editBook = editBook;
 window.showToast = showToast;
+window.updateConfirmButtonState = updateConfirmButtonState;
 
 // QR Scanner functions
 window.startQRScan = startQRScan;
@@ -1576,10 +1492,6 @@ window.stopQRScan = stopQRScan;
 window.showQRScannerModal = showQRScannerModal;
 window.closeQRScannerModal = closeQRScannerModal;
 window.closeQRScanner = closeQRScanner;
-window.testQRScanner = testQRScanner;
-window.forceCleanupScanners = forceCleanupScanners;
-window.stopAllMediaTracks = stopAllMediaTracks;
-window.cleanupScannerInstance = cleanupScannerInstance;
 window.processMemberQR = processMemberQR;
 window.processBookQR = processBookQR;
 window.initializeQRModalElements = initializeQRModalElements;

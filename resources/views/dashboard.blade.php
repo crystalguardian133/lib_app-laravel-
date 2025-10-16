@@ -405,14 +405,33 @@
     box-shadow: var(--glass-shadow);
   }
   .dashboard-content::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   .dashboard-content::-webkit-scrollbar-thumb {
-    background: var(--text-muted);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
     border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .dashboard-content::-webkit-scrollbar-track {
     background: var(--border-light);
+  }
+  .table-container::-webkit-scrollbar {
+    width: 10px;
+  }
+  .table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .table-container::-webkit-scrollbar-track {
+    background: rgba(99, 102, 241, 0.1);
+  }
+  body.dark-mode .table-container {
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.15);
+  }
+  body.dark-mode .table-container::-webkit-scrollbar-track {
+    background: rgba(99, 102, 241, 0.2);
   }
   .heading {
     font-size: 2rem;
@@ -768,66 +787,117 @@
     }
   }
   .modal-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
     border-radius: 24px;
-    padding: 2.5rem;
+    padding: 3rem;
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl), 0 0 40px rgba(99, 102, 241, 0.15) !important;
     animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(99, 102, 241, 0.1) !important;
+    position: relative;
+    z-index: 10;
   }
   body.dark-mode .modal-content {
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.98);
     color: var(--text-primary);
-    border-color: rgba(51, 65, 85, 0.3);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 50px rgba(99, 102, 241, 0.2);
+  }
+  body.dark-mode .modal-title {
+    color: var(--accent);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  body.dark-mode .modal-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+    border-bottom-color: rgba(99, 102, 241, 0.4);
   }
   .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid rgba(0,0,0,0.05);
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 4px solid rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(6, 182, 212, 0.05));
+    border-radius: 16px 16px 0 0;
+    padding: 2.5rem 3rem 2rem 3rem;
+    margin: -3rem -3rem 2.5rem -3rem;
+    position: relative;
+    overflow: hidden;
+    z-index: 5;
+  }
+  .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(6, 182, 212, 0.05));
+    z-index: 1;
+  }
+  .modal-header > * {
+    position: relative;
+    z-index: 2;
   }
   body.dark-mode .modal-header {
     border-bottom-color: rgba(255,255,255,0.1);
   }
   .modal-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--primary);
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
   body.dark-mode .modal-title {
     color: var(--accent-light);
   }
   .modal-close, .close-modal {
-    background: rgba(0,0,0,0.05);
-    border: none;
-    font-size: 1.5rem;
-    color: var(--gray);
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    font-size: 1.8rem;
+    color: var(--primary);
     cursor: pointer;
-    padding: 8px;
+    padding: 12px;
     border-radius: 50%;
     transition: var(--transition);
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    position: relative;
+    z-index: 15;
   }
   .modal-close:hover, .close-modal:hover {
-    background: rgba(0,0,0,0.1);
-    color: var(--primary);
-    transform: scale(1.1);
+    background: var(--primary);
+    color: #ffffff;
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    border-color: var(--primary);
+  }
+  body.dark-mode .modal-close, body.dark-mode .close-modal {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: var(--accent);
+  }
+  body.dark-mode .modal-close:hover, body.dark-mode .close-modal:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.5);
   }
   .modal-body {
     padding: 0;
@@ -999,14 +1069,26 @@
   }
   /* Table Styles */
   .table-container {
-    max-height: 400px;
+    max-height: 450px;
     overflow-y: auto;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(99, 102, 241, 0.2);
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .table-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    z-index: 1;
   }
   .data-table {
     width: 100%;
@@ -1016,24 +1098,33 @@
     -webkit-backdrop-filter: var(--glass-blur);
   }
   .data-table th {
-    background: var(--glass-bg);
-    color: var(--text-primary);
-    font-weight: 600;
-    padding: 12px 8px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #ffffff;
+    font-weight: 700;
+    padding: 16px 12px;
     text-align: left;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     position: sticky;
     top: 0;
     z-index: 10;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
   }
   .data-table td {
-    padding: 10px 8px;
+    padding: 14px 12px;
     border-bottom: 1px solid var(--border-light);
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
   }
   .data-table tr:hover {
-    background: var(--glass-bg);
+    background: rgba(99, 102, 241, 0.08);
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
   }
   .data-table tr:last-child td {
     border-bottom: none;
@@ -1359,6 +1450,22 @@
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
   }
+  /* Ensure modal elements are never affected by glassmorphism */
+  .modal *,
+  .modal-content,
+  .modal-card,
+  .modal-title,
+  .modal-header,
+  .modal-body,
+  .modal-footer,
+  .modal-close,
+  .close-modal {
+    background: unset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: unset !important;
+    box-shadow: unset !important;
+  }
   /* Dark mode tweaks for form controls */
   body.dark-mode .form-control {
     background: rgba(30, 41, 59, 0.6) !important;
@@ -1376,17 +1483,21 @@
     border: unset !important;
     box-shadow: unset !important;
   }
-  /* But restore intended modal styles */
+  /* Restore intended modal styles */
   .modal-content,
   .modal-card {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: var(--shadow-lg) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: var(--shadow-xl), 0 0 40px rgba(99, 102, 241, 0.15) !important;
     border-radius: 24px !important;
+    border: 2px solid rgba(99, 102, 241, 0.1) !important;
   }
   body.dark-mode .modal-content,
   body.dark-mode .modal-card {
-    background: rgba(15, 23, 42, 0.95) !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    box-shadow: var(--shadow-xl), 0 0 50px rgba(99, 102, 241, 0.2) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
   }
   /* Responsive Design */
   @media (max-width: 768px) {
@@ -2031,13 +2142,13 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Genre</th>
-                                <th>Year</th>
-                                <th>Available</th>
-                                <th>Added</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">#</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Title</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Author</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Genre</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Year</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Available</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Added</th>
                             </tr>
                         </thead>
                         <tbody id="booksTableBody">
@@ -2113,12 +2224,12 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Age</th>
-                                <th>Barangay</th>
-                                <th>Contact</th>
-                                <th>Registered</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">#</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Name</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Age</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Barangay</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Contact</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Registered</th>
                             </tr>
                         </thead>
                         <tbody id="membersTableBody">
@@ -2239,10 +2350,10 @@
                 tbody.innerHTML = '<tr><td colspan="7" class="loading">No books found</td></tr>';
                 return;
             }
-            books.forEach(book => {
+            books.forEach((book, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${book.id}</td>
+                    <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
                     <td>${book.title}</td>
                     <td>${book.author}</td>
                     <td>${book.genre || '-'}</td>
@@ -2267,13 +2378,13 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="loading">No members found</td></tr>';
                 return;
             }
-            members.forEach(member => {
+            members.forEach((member, index) => {
                 const fullName = [member.first_name, member.middle_name, member.last_name]
                     .filter(name => name && name !== 'null')
                     .join(' ');
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${member.id}</td>
+                    <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
                     <td>${fullName}</td>
                     <td>${member.age}</td>
                     <td>${member.barangay}</td>

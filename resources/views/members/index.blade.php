@@ -1186,18 +1186,26 @@
 
   .form-input {
     padding: var(--spacing-md);
-    border: 1px solid var(--border);
+    border: 3px solid #6b7280;
     border-radius: var(--radius-lg);
     background: var(--surface);
     color: var(--text-primary);
     font-size: 0.875rem;
     transition: var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .form-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-width: 3px;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  }
+
+  .form-input:hover {
+    border-color: #4b5563;
+    border-width: 3px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
   }
 
   .form-input:hover {
@@ -1792,13 +1800,25 @@
 
   /* Modern Photo Upload */
   .photo-upload {
-    border: 2px dashed var(--border);
+    border: 3px dashed var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     text-align: center;
     transition: var(--transition-fast);
     cursor: pointer;
     background: var(--surface);
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .photo-upload.hidden {
+    display: none;
   }
 
   .photo-upload:hover {
@@ -1811,10 +1831,25 @@
   }
 
   .photo-preview {
-    max-width: 150px;
+    width: 150px;
+    height: 150px;
     border-radius: var(--radius-lg);
-    margin-top: var(--spacing-md);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .photo-upload-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Modern QR Modal */
@@ -2092,22 +2127,24 @@
 
   /* Modern Card Modal - Updated Styling */
   .card-modal {
-    display: none;
+    display: none !important;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
     z-index: 2000;
+    display: flex;
     justify-content: center;
     align-items: center;
     animation: fadeIn 0.3s ease-out;
+    padding: 20px;
   }
 
   .card-modal.show {
-    display: flex;
+    display: flex !important;
   }
 
   .card-modal-content {
@@ -2116,12 +2153,15 @@
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
+    padding: 60px 40px 40px 40px;
     box-shadow: var(--shadow-xl);
-    max-width: 500px;
-    width: 90%;
+    max-width: 900px;
+    width: 95%;
+    max-height: 85vh;
     position: relative;
     animation: slideUp 0.3s ease-out;
+    overflow-y: auto;
+    margin: 40px auto;
   }
 
   .card-modal-content h3 {
@@ -2138,44 +2178,50 @@
 
   .card-modal-content .close {
     position: absolute;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    font-size: 1.5rem;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
     color: var(--text-muted);
     cursor: pointer;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: var(--radius-full);
-    width: 32px;
-    height: 32px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--transition-fast);
+    z-index: 10;
+    font-weight: bold;
   }
 
   .card-modal-content .close:hover {
     background: var(--danger);
     color: white;
     border-color: var(--danger);
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
   }
 
   .card-layout {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-2xl);
     justify-content: center;
+    align-items: center;
     margin: var(--spacing-xl) 0;
+    flex-wrap: wrap;
   }
 
   .card {
-    width: 340px;
-    height: 216px;
+    width: 380px;
+    height: 240px;
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-xl);
     position: relative;
     background: var(--surface);
+    margin: var(--spacing-sm);
   }
 
   .card-bg {
@@ -2194,27 +2240,27 @@
   }
 
   .overlay.name {
-    top: 100px;
-    left: 37px;
-    right: 25px;
+    top: 110px;
+    left: 40px;
+    right: 30px;
     text-align: left;
-    font-size: 10px;
+    font-size: 11px;
     text-transform: uppercase;
     line-height: 1.2;
   }
 
   .overlay.date {
-    bottom: 43px;
-    left: 127px;
-    font-size: 12px;
+    bottom: 50px;
+    left: 140px;
+    font-size: 13px;
     text-transform: uppercase;
   }
 
   .overlay.photo {
-    top: 42px;
-    right: 20px;
-    width: 141px;
-    height: 141px;
+    top: 52%;
+    right: 24px;
+    width: 155px;
+    height: 155px;
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -2222,19 +2268,24 @@
     justify-content: center;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: var(--glass-blur);
+    transform: translateY(-50%);
+    position: absolute;
+    margin: 0;
   }
 
   .overlay.photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
+    display: block;
   }
 
   .overlay.qr {
     top: 50%;
     left: 50%;
-    width: 120px;
-    height: 120px;
+    width: 135px;
+    height: 135px;
     transform: translate(-50%, -50%);
   }
 
@@ -2258,6 +2309,19 @@
     background: rgba(30, 41, 59, 0.9);
     border-color: rgba(71, 85, 105, 0.5);
     color: var(--text-muted);
+  }
+
+  /* Dark mode photo preview styling */
+  body.dark-mode .photo-preview {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Drag and drop styling for preview */
+  .photo-preview.dragover {
+    border-color: var(--danger) !important;
+    filter: brightness(0.8) !important;
+    transform: scale(1.02);
   }
 
   /* Animations for card modal */
@@ -2516,6 +2580,23 @@
     background: rgba(30, 41, 59, 1);
     border-color: var(--accent);
   }
+
+  /* Enhanced form input borders for better visibility */
+  body.dark-mode .form-input {
+    border: 3px solid #9ca3af;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .form-input:focus {
+    border-color: var(--primary);
+    border-width: 3px;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .form-input:hover {
+    border-color: #d1d5db;
+    border-width: 3px;
+  }
   body.dark-mode .form-control:hover {
     border-color: rgba(255, 255, 255, 0.2);
   }
@@ -2610,7 +2691,15 @@
   /* Photo Preview Enhancement */
   .photo-upload.dragover {
     border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
+    background: rgba(99, 102, 241, 0.15);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .photo-upload:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+    transform: scale(1.02);
   }
 
   .photo-upload i {
@@ -2640,6 +2729,13 @@
     background-repeat: no-repeat;
     background-size: 16px;
     padding-right: 40px;
+    border: 3px solid #6b7280;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  body.dark-mode .form-input select {
+    border: 3px solid #9ca3af;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   }
   </style>
 </head>
@@ -2889,12 +2985,14 @@
             </h3>
             <div class="form-group">
               <label class="form-label">Profile Photo</label>
-              <div class="photo-upload" onclick="document.getElementById('photo').click()">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Click to upload or drag and drop</p>
-                <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+              <div class="photo-upload-container">
+                <div class="photo-upload">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+                </div>
+                <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
               </div>
-              <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
             </div>
           </div>
         </form>
@@ -3030,12 +3128,14 @@
             </h3>
             <div class="form-group">
               <label class="form-label">Profile Photo</label>
-              <div class="photo-upload" onclick="document.getElementById('julitaPhoto').click()">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>Click to upload or drag and drop</p>
-                <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
+              <div class="photo-upload-container">
+                <div class="photo-upload">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
+                </div>
+                <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Julita Photo Preview" style="display: none;">
               </div>
-              <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
             </div>
           </div>
         </form>
@@ -3054,7 +3154,7 @@
   </div>
 
   <!-- Membership Card Preview Modal -->
-  <div id="cardModal" class="card-modal">
+  <div id="cardModal" class="card-modal" style="display: none;">
     <div class="card-modal-content">
       <span class="close" onclick="closeCardModal()">&times;</span>
 
@@ -3086,7 +3186,7 @@
 
       <button class="btn btn-primary" onclick="downloadCard()" style="margin-top: 1rem;">
         <i class="fas fa-download"></i>
-        Download PNG
+        Download Cards (ZIP)
       </button>
     </div>
   </div>
@@ -3185,6 +3285,7 @@
 
 <!-- External Scripts - Organized and Modern -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <!-- Custom Scripts -->
 <script src="{{ asset('js/photoprev.js') }}"></script>
