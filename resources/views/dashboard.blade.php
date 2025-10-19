@@ -8,11 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
+    <link rel="stylesheet" href="{{ asset('css/christmas-effects.css') }}" id="christmas-styles">
+    <style>
   :root {
     /* Shared Color Palette */
     --primary: #2fb9eb;           /* Indigo */
-    --primary-dark:Resume #4f46e5;
+    --primary-dark: #4f46e5;
     --secondary: #8b5cf6;         /* Purple */
     --accent: #06b6d4;            /* Cyan */
     --accent-dark: #0891b2;
@@ -204,6 +205,20 @@
   body:not(.dark-mode) .sidebar .label {
     color: #1a1a1a;
   }
+  /* Enhanced sidebar header label visibility */
+  .sidebar-header .label {
+    display: block !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: var(--transition);
+    opacity: 1;
+    color: var(--primary) !important;
+    visibility: visible !important;
+  }
   .sidebar-header {
     display: flex;
     align-items: center;
@@ -230,6 +245,9 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     transition: var(--transition);
+    color: var(--primary) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
   /* Nav Links */
   .sidebar nav a {
@@ -267,7 +285,14 @@
   }
   /* Light mode navigation */
   body:not(.dark-mode) .sidebar nav a {
-    color: rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 0.9);
+  }
+  body:not(.dark-mode) .sidebar nav a .label {
+    color: rgba(0, 0, 0, 0.9);
+    transition: var(--transition);
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline !important;
   }
   body:not(.dark-mode) .sidebar nav a:hover {
     background: var(--glass-bg);
@@ -275,6 +300,9 @@
     -webkit-backdrop-filter: var(--glass-blur);
     color: #1a1a1a;
     box-shadow: var(--shadow-md);
+  }
+  body:not(.dark-mode) .sidebar nav a:hover .label {
+    color: #1a1a1a;
   }
   body:not(.dark-mode) .sidebar nav a.active {
     background: rgba(59, 130, 246, 0.15);
@@ -426,11 +454,30 @@
   .table-container::-webkit-scrollbar-track {
     background: rgba(99, 102, 241, 0.1);
   }
+  /* Modal table container scrollbar styling */
+  .modal-body .table-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  .modal-body .table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .modal-body .table-container::-webkit-scrollbar-track {
+    background: rgba(99, 102, 241, 0.1);
+  }
   body.dark-mode .table-container {
     border-color: rgba(99, 102, 241, 0.4);
     box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.15);
   }
+  body.dark-mode .modal-body .table-container {
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.15);
+  }
   body.dark-mode .table-container::-webkit-scrollbar-track {
+    background: rgba(99, 102, 241, 0.2);
+  }
+  body.dark-mode .modal-body .table-container::-webkit-scrollbar-track {
     background: rgba(99, 102, 241, 0.2);
   }
   .heading {
@@ -444,10 +491,15 @@
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .dashboard-title {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: transparent;
+    padding: 1rem 0;
+    margin: -1rem 0 1rem 0;
     font-size: 2rem;
     font-weight: 800;
     color: var(--primary);
-    margin-bottom: var(--spacing-xl);
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
   /* Stats Cards */
@@ -533,13 +585,19 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
+  /* Enhanced card header visibility */
+  .card-header h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
   .card .count {
     font-size: 2.2rem;
     font-weight: 900;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary);
     line-height: 1.2;
   }
   .card-header {
@@ -550,6 +608,11 @@
   }
   .card-header h3 {
     margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   /* New header layout with title and buttons side by side */
   .card-header-with-buttons {
@@ -587,7 +650,7 @@
   .card-actions .btn {
     flex-shrink: 0;
   }
-  /* Bottom positioned action buttons */
+  /* Bottom positioned action buttons — GLASSMORPHISM REMOVED */
   .card-actions-bottom {
     display: flex;
     gap: 8px;
@@ -597,12 +660,52 @@
     padding-top: var(--spacing-sm);
     position: relative;
     z-index: 3;
-  }
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+  /* ✨ ENHANCED CARD ACTION BUTTONS WITH ENCIRCLING HOVER ANIMATION */
   .card-actions-bottom .btn {
     position: relative;
     z-index: 4;
     pointer-events: auto;
-  }
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    transition: 
+        border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.5s cubic-bezier(0.4, 0, 0.2, 1)
+        box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card-actions-bottom .btn i {
+    color: var(--primary) !important;
+    font-size: 16px;
+    font-weight: 900;
+    transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.card-actions-bottom .btn:hover {
+    border-color: var(--primary) !important;
+    background: transparent !important;
+    color: var(--primary) !important;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+}
+
+.card-actions-bottom .btn:hover i {
+    color: var(--primary) !important;
+}
+
   /* Stats Overview Card */
   .stats-overview-card {
     cursor: default;
@@ -669,6 +772,14 @@
     outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
+  /* Light mode specific enhancements */
+  body:not(.dark-mode) .card-actions-bottom .btn i {
+    color: var(--primary);
+  }
+  body:not(.dark-mode) .card-actions-bottom .btn:hover i {
+    color: var(--primary);
+  }
+  /* Additional button enhancements for better visibility */
   .btn-sm i {
     transition: transform 0.2s ease;
   }
@@ -694,12 +805,9 @@
     background: transparent;
     color: var(--text-secondary);
     border: 1px solid var(--border);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
   }
   .btn-outline:hover {
-    background: var(--glass-bg);
+    background: transparent;
     color: var(--primary);
     border-color: var(--primary);
     transform: translateY(-2px) scale(1.05);
@@ -1168,9 +1276,9 @@
     place-items: center;
     background: linear-gradient(135deg, var(--accent), var(--primary));
     color: #fff;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.4);
     cursor: pointer;
     z-index: 2200;
     transition: var(--transition-spring);
@@ -1201,9 +1309,9 @@
     width: 380px;
     max-width: calc(100vw - 48px);
     background: var(--surface-elevated);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid var(--glass-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
     display: none;
@@ -1220,13 +1328,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   }
   #chatbot-close {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid rgba(255, 255, 255, 0.4);
     color: white;
     font-size: 18px;
     width: 34px;
@@ -1248,6 +1357,7 @@
     padding: 16px;
     background: var(--surface);
     color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
   }
   #chatbot-messages::-webkit-scrollbar {
     width: 6px;
@@ -1262,12 +1372,12 @@
     gap: 12px;
     padding: 16px;
     background: var(--surface);
-    border-top: 1px solid var(--border);
+    border-top: 2px solid var(--border);
   }
   #chatbot-user-input {
     flex: 1;
     padding: 12px 16px;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: var(--radius);
     font-size: 0.95rem;
     background: var(--surface-elevated);
@@ -1281,14 +1391,14 @@
   }
   #chatbot-send {
     padding: 12px 18px;
-    border: none;
+    border: 2px solid transparent;
     border-radius: var(--radius);
     background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: white;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-spring);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
   }
   #chatbot-send:hover {
     transform: translateY(-2px) scale(1.05);
@@ -1300,13 +1410,13 @@
   /* Toast Notifications */
   .toast-notification {
     background: var(--surface-elevated);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid var(--glass-border);
     color: var(--text-primary);
     padding: 16px 20px;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
     opacity: 0;
     transform: translateY(-30px) scale(0.9);
     transition: var(--transition-spring);
@@ -1374,10 +1484,10 @@
     font-weight: 600;
   }
   .toast-close {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     color: white;
     width: 32px;
     height: 32px;
@@ -1499,15 +1609,379 @@
     box-shadow: var(--shadow-xl), 0 0 50px rgba(99, 102, 241, 0.2) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
   }
+  /* 🎄 Christmas Effects Styles */
+  body.christmas-theme {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
+    position: relative;
+  }
+  body.christmas-theme.dark-mode {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+  }
+  /* Christmas Snow Animation */
+  body.christmas-theme::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.8), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: snowTexture 20s linear infinite;
+    pointer-events: none;
+    z-index: 997;
+    opacity: 0.3;
+  }
+  @keyframes snowTexture {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100px); }
+  }
+  /* Christmas Card Enhancements */
+  body.christmas-theme .card {
+    border: 2px solid #dc2626 !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15), 0 0 20px rgba(220, 38, 38, 0.1) !important;
+    position: relative;
+    overflow: visible !important;
+  }
+  body.christmas-theme .card::before {
+    content: '🎄';
+    position: absolute;
+    top: -15px;
+    right: 15px;
+    font-size: 20px;
+    opacity: 0.7;
+    z-index: 1001;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  body.christmas-theme .card:hover {
+    border-color: #16a34a !important;
+    box-shadow: 0 12px 35px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.15) !important;
+    transform: translateY(-5px) scale(1.02) !important;
+  }
+  /* Christmas Button Enhancements */
+  body.christmas-theme .btn-primary {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    border: 2px solid #991b1b !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3), 0 0 20px rgba(220, 38, 38, 0.2) !important;
+    position: relative;
+    overflow: hidden;
+  }
+  body.christmas-theme .btn-primary::before {
+    content: '🎅';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+  }
+  body.christmas-theme .btn-primary:hover::before {
+    right: 8px;
+    opacity: 0.6;
+  }
+  body.christmas-theme .btn-primary:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
+    border-color: #166534 !important;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4), 0 0 25px rgba(22, 163, 74, 0.3) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+  }
+  /* Christmas Sidebar Enhancements */
+  body.christmas-theme .sidebar {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%) !important;
+    border-right: 3px solid #dc2626 !important;
+    position: relative;
+    overflow: visible !important;
+  }
+  body.christmas-theme .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -3px;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom,
+      #dc2626 0%,
+      #16a34a 25%,
+      #fbbf24 50%,
+      #16a34a 75%,
+      #dc2626 100%);
+    animation: christmasBorder 2s linear infinite;
+  }
+  @keyframes christmasBorder {
+    0%, 100% { background-position: 0 0; }
+    50% { background-position: 0 100px; }
+  }
+  body.christmas-theme .sidebar nav a {
+    position: relative;
+    border-radius: 12px;
+    margin: 4px 8px;
+  }
+  body.christmas-theme .sidebar nav a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #dc2626, #16a34a);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 2px;
+  }
+  body.christmas-theme .sidebar nav a:hover::before,
+  body.christmas-theme .sidebar nav a.active::before {
+    opacity: 1;
+  }
+  body.christmas-theme .sidebar nav a.active {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2) !important;
+  }
+  /* Christmas Logo Enhancement */
+  body.christmas-theme .logo {
+    position: relative;
+    filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.3)) !important;
+  }
+  body.christmas-theme .logo::after {
+    content: '🎄';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 16px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  /* Christmas Stats Cards */
+  body.christmas-theme .stats {
+    position: relative;
+  }
+  body.christmas-theme .stats::before {
+    content: '❄';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    opacity: 0.5;
+    animation: snowFloat 4s ease-in-out infinite;
+  }
+  @keyframes snowFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.3; }
+    50% { transform: translateX(-50%) translateY(-10px); opacity: 0.7; }
+  }
+  /* Christmas Heading Enhancement */
+  body.christmas-theme .heading,
+  body.christmas-theme .dashboard-title {
+    position: relative;
+    text-shadow: 2px 2px 4px rgba(220, 38, 38, 0.3) !important;
+  }
+  body.christmas-theme .heading::after,
+  body.christmas-theme .dashboard-title::after {
+    content: '🎅';
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    animation: santaWave 3s ease-in-out infinite;
+  }
+  @keyframes santaWave {
+    0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+    50% { transform: translateY(-50%) rotate(5deg); }
+  }
+  /* Christmas Table Enhancements */
+  body.christmas-theme .data-table th {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    position: relative;
+  }
+  body.christmas-theme .data-table th::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #16a34a, #fbbf24, #16a34a);
+    animation: tableAccent 3s linear infinite;
+  }
+  @keyframes tableAccent {
+    0% { background-position: -100px 0; }
+    100% { background-position: 100px 0; }
+  }
+  body.christmas-theme .data-table tr:nth-child(even) {
+    background: rgba(220, 38, 38, 0.05) !important;
+  }
+  body.christmas-theme .data-table tr:hover {
+    background: rgba(22, 163, 74, 0.1) !important;
+    transform: translateX(4px) !important;
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2) !important;
+  }
+  /* Christmas Modal Enhancements */
+  body.christmas-theme .modal-content {
+    border: 3px solid #dc2626 !important;
+    box-shadow: 0 20px 40px rgba(220, 38, 38, 0.2), 0 0 30px rgba(220, 38, 38, 0.1) !important;
+  }
+  body.christmas-theme .modal-header {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    border-bottom: 3px solid #16a34a !important;
+    position: relative;
+  }
+  body.christmas-theme .modal-header::after {
+    content: '🎁';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    opacity: 0.7;
+  }
+  body.christmas-theme .modal-title {
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+  }
+  /* Christmas Form Enhancements */
+  body.christmas-theme .form-control {
+    border: 2px solid #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.1) !important;
+  }
+  body.christmas-theme .form-control:focus {
+    border-color: #16a34a !important;
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.2) !important;
+  }
+  /* Christmas Toast Enhancements */
+  body.christmas-theme .toast-notification.toast-success {
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
+    border-left: 5px solid #dc2626 !important;
+  }
+  body.christmas-theme .toast-notification.toast-error {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    border-left: 5px solid #16a34a !important;
+  }
+  body.christmas-theme .toast-notification.toast-info {
+    background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+    border-left: 5px solid #dc2626 !important;
+  }
+  /* Christmas Scrollbar Styling */
+  body.christmas-theme ::-webkit-scrollbar {
+    width: 12px !important;
+  }
+  body.christmas-theme ::-webkit-scrollbar-track {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  }
+  body.christmas-theme ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #dc2626, #16a34a) !important;
+    border-radius: 6px !important;
+    border: 2px solid #fbbf24 !important;
+  }
+  body.christmas-theme ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #b91c1c, #15803d) !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5) !important;
+  }
+  /* Dark mode Christmas theme adjustments */
+  body.christmas-theme.dark-mode .card {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-color: #dc2626 !important;
+  }
+  body.christmas-theme.dark-mode .sidebar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+  }
+  body.christmas-theme.dark-mode .data-table th {
+    background: linear-gradient(135deg, #7f1d1d, #991b1b) !important;
+  }
+  body.christmas-theme.dark-mode .btn-primary {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  }
+  /* Christmas Toggle Button Styling */
+  .christmas-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(220, 38, 38, 0.1);
+    border: 2px solid #dc2626;
+    border-radius: 20px;
+    color: #dc2626;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 8px auto;
+    min-width: 120px;
+    justify-content: center;
+  }
+  .christmas-toggle:hover {
+    background: rgba(220, 38, 38, 0.2);
+    border-color: #b91c1c;
+    color: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+  }
+  .christmas-toggle.active {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+    border-color: #991b1b;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+  }
+  .christmas-toggle .icon {
+    font-size: 16px;
+    animation: christmasIcon 2s ease-in-out infinite;
+  }
+  @keyframes christmasIcon {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+  }
+  /* Christmas Mobile Responsiveness */
+  @media (max-width: 768px) {
+    body.christmas-theme .christmas-toggle {
+      padding: 6px 10px;
+      font-size: 12px;
+      min-width: 100px;
+    }
+    body.christmas-theme .card::before {
+      font-size: 16px;
+      top: -12px;
+      right: 12px;
+    }
+    body.christmas-theme .heading::after,
+    body.christmas-theme .dashboard-title::after {
+      font-size: 20px;
+      right: -30px;
+    }
+  }
   /* Responsive Design */
   @media (max-width: 768px) {
     .sidebar {
       width: 80px;
       padding: var(--spacing);
     }
-    .sidebar-header .label,
+    .sidebar-header .label {
+      display: block !important;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary) !important;
+      transition: var(--transition);
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
     .sidebar nav a .label {
-      display: none !important;
+      display: inline !important;
+      font-weight: 500;
+      font-size: 14px;
+      background: none;
+      background-clip: initial;
+      -webkit-background-clip: initial;
+      -webkit-text-fill-color: initial;
+      color: rgba(255, 255, 255, 0.9) !important;
+      transition: var(--transition);
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .main {
       margin-left: 80px;
@@ -1609,16 +2083,21 @@
             </label>
             <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light Mode</span>
         </div>
+        <!-- Christmas Effects Toggle -->
+        <div class="christmas-toggle" id="christmasToggle" title="Toggle Christmas Effects">
+            <span class="icon">🎄</span>
+            <span id="christmasToggleText">Enable Christmas</span>
+        </div>
     </div>
     <!-- Main Content -->
     <div class="main" id="mainContent">
-        <div class="dashboard-title" style="position: sticky; top: 0; z-index: 100; background: transparent; padding: 1rem 0; margin: -1rem 0 1rem 0;">DASHBOARD</div>
+        <div class="dashboard-title">DASHBOARD</div>
         <div class="dashboard-content">
         <!-- Stats Cards -->
         <div class="stats">
             <div class="card" id="booksCard">
                 <div class="card-header">
-                    <h3>Books</h3>
+                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Books</h3>
                 </div>
                 <div class="count">{{ $booksCount }}</div>
                 <div class="card-actions-bottom">
@@ -1632,7 +2111,7 @@
             </div>
             <div class="card" id="membersCard">
                 <div class="card-header">
-                    <h3>Members</h3>
+                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Members</h3>
                 </div>
                 <div class="count">{{ $membersCount }}</div>
                 <div class="card-actions-bottom">
@@ -1648,7 +2127,7 @@
         <!-- Combined Borrowers Table and Weekly Chart -->
         <div class="card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
-                <h3>📚 Borrower List</h3>
+                <h3 style="opacity: 1; color: var(--text-muted);">📚 Borrower List</h3>
                 <div class="card-actions">
                     <select id="borrowersFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterBorrowers(this.value)">
                         <option value="all">All Borrowers</option>
@@ -1671,13 +2150,13 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Title</th>
-                                <th>Borrowed Date</th>
-                                <th>Due Date</th>
-                                <th>Returned At</th>
-                                <th>Action</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">#</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Name</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Title</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Borrowed Date</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Due Date</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Returned At</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="borrowersTableBody">
@@ -1721,7 +2200,7 @@
         <!-- Consolidated Statistics with Line Graph -->
         <div class="card stats-overview-card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
-                <h3>📊 Statistics Overview</h3>
+                <h3 style="opacity: 1; color: var(--text-muted);">📊 Statistics Overview</h3>
                 <div class="card-actions">
                     <select id="statsFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterStats(this.value)">
                         <option value="lifetime">Lifetime</option>
@@ -1733,16 +2212,16 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0.5rem;">
                 <!-- Stats Numbers -->
                 <div id="statsDisplay" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                    <div class="count" id="mainCount" style="font-size: 2.5rem; margin-bottom: 0.25rem;">{{ $lifetimeCount }}</div>
-                    <p id="mainLabel" style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary);">Total Transactions</p>
+                    <div class="count" id="mainCount" style="font-size: 2.5rem; margin-bottom: 0.25rem; opacity: 1; color: var(--primary);">{{ $lifetimeCount }}</div>
+                    <p id="mainLabel" style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary); opacity: 1;">Total Transactions</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="stats-subcard" style="text-align: center; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
                             <div class="count" style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="booksCount">{{ $booksCount }}</div>
-                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">Books</p>
+                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; opacity: 1;">Books</p>
                         </div>
                         <div class="stats-subcard" style="text-align: center; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
                             <div class="count" style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="membersCount">{{ $membersCount }}</div>
-                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem;">Members</p>
+                            <p style="margin: 0; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; opacity: 1;">Members</p>
                         </div>
                     </div>
                 </div>
@@ -2138,7 +2617,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="table-container">
+                <div class="table-container" style="max-height: 60vh; overflow-y: auto;">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -2161,7 +2640,6 @@
             </div>
         </div>
     </div>
-
     <!-- BORROW MODAL -->
     <div class="modal" id="borrowModal" style="display: none;">
         <div class="modal-content">
@@ -2220,7 +2698,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="table-container">
+                <div class="table-container" style="max-height: 60vh; overflow-y: auto;">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -2253,13 +2731,11 @@
     <script src="{{ asset('js/overdue.js') }}" defer></script>
     <script src="{{ asset('js/bookadd.js') }}"></script>
     <script src="{{ asset('js/memberscript.js') }}"></script>
+    <script src="{{ asset('js/borrow.js') }}"></script>
+    <script src="{{ asset('js/christmas-effects.js') }}"></script>
     <script>
-        // Member date and time are automatically filled by the backend
-        // Member form submission is now handled by memberscript.js
-        // Function to open register modal with Julita resident confirmation
         function openJulitaRegisterModal() {
             console.log('openJulitaRegisterModal called');
-            // Close any other open modals first
             closeAllModals();
             const confirmJulita = confirm("Are you a Julita resident?\nClick OK for Yes, Cancel for No.");
             if (confirmJulita) {
@@ -2284,7 +2760,6 @@
                 }
             }
         }
-        // Function to close all modals
         function closeAllModals() {
             const modals = document.querySelectorAll('.modal');
             modals.forEach(modal => {
@@ -2293,7 +2768,6 @@
             });
             document.body.classList.remove("modal-open");
         }
-        // Function to close register modal
         function closeRegisterModal() {
             const registerModal = document.getElementById("registerModal");
             const julitaModal = document.getElementById("julitaRegisterModal");
@@ -2305,20 +2779,15 @@
         }
     </script>
 <script>
-    // Dark mode toggle initialization will be moved to DOMContentLoaded
     const chatbotWindow = document.getElementById('chatbot-window');
     const chatbotButton = document.getElementById('chatbot-button');
     const chatbotClose = document.getElementById('chatbot-close');
-    // Open chatbot
     chatbotButton?.addEventListener('click', () => {
         chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
     });
-    // Close chatbot
     chatbotClose?.addEventListener('click', () => {
         chatbotWindow.style.display = 'none';
     });
-    // Modal functions are now handled by imported bookadd.js and memberscript.js
-    // Popup table functions
     function openBooksTable() {
         document.getElementById('booksTableModal').style.display = 'flex';
         loadBooksData();
@@ -2398,9 +2867,7 @@
             document.getElementById('membersTableBody').innerHTML = '<tr><td colspan="6" class="loading">Error loading members</td></tr>';
         }
     }
-    // Store original borrowers data for search
     let originalBorrowersData = [];
-    // Load borrowers data on page load
     function loadBorrowersData() {
         const tbody = document.getElementById('borrowersTableBody');
         tbody.innerHTML = '';
@@ -2408,11 +2875,9 @@
             tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
             return;
         }
-        // Store original data for search
         originalBorrowersData = [...borrowersData];
         displayBorrowersData(borrowersData);
     }
-    // Display borrowers data in table
     function displayBorrowersData(data) {
         const tbody = document.getElementById('borrowersTableBody');
         tbody.innerHTML = '';
@@ -2420,30 +2885,31 @@
             tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
             return;
         }
-        data.forEach(borrower => {
+        data.forEach((borrower, index) => {
             const fullName = [borrower.member.first_name, borrower.member.middle_name, borrower.member.last_name]
                 .filter(name => name && name !== 'null')
                 .join(' ');
             const borrowedDate = new Date(borrower.borrowed_at).toLocaleDateString();
             const dueDate = new Date(borrower.due_date).toLocaleDateString();
             const returnedAt = borrower.returned_at ? new Date(borrower.returned_at).toLocaleDateString() : '-';
-            const statusBadge = borrower.returned_at ? 
-                '<span style="color: #10b981; font-weight: 600;">Returned</span>' : 
-                '<span style="color: #f59e0b; font-weight: 600;">Active</span>';
+            const actions = borrower.returned_at ?
+                '<span style="color: #10b981; font-weight: 600;">Returned</span>' :
+                `<button class="btn btn-sm btn-primary" onclick="returnBookDirect(${borrower.id}, '${borrower.book.title.replace(/'/g, "\\'")}', '${fullName.replace(/'/g, "\\'")}')" style="font-size: 0.8rem; padding: 4px 8px;">
+                    <i class="fas fa-undo"></i> Return
+                </button>`;
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${borrower.id}</td>
+                <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
                 <td>${fullName}</td>
                 <td>${borrower.book.title}</td>
                 <td>${borrowedDate}</td>
                 <td>${dueDate}</td>
                 <td>${returnedAt}</td>
-                <td>${statusBadge}</td>
+                <td>${actions}</td>
             `;
             tbody.appendChild(row);
         });
     }
-    // Search borrowers function
     function searchBorrowers(searchTerm) {
         if (!searchTerm.trim()) {
             displayBorrowersData(originalBorrowersData);
@@ -2456,36 +2922,30 @@
                 .toLowerCase();
             const bookTitle = borrower.book.title.toLowerCase();
             const searchLower = searchTerm.toLowerCase();
-            return fullName.includes(searchLower) || 
+            return fullName.includes(searchLower) ||
                    bookTitle.includes(searchLower) ||
-                   borrower.id.toString().includes(searchLower);
+                   (index + 1).toString().includes(searchLower);
         });
         displayBorrowersData(filteredData);
     }
-    // Filter borrowers by date range
     async function filterBorrowers(filter) {
         try {
             const response = await fetch(`{{ route("dashboard.borrowers-data") }}?filter=${filter}`);
             const borrowers = await response.json();
-            // Update original data for search
             originalBorrowersData = [...borrowers];
-            // Clear search input
             document.getElementById('borrowerSearch').value = '';
-            // Display filtered data
             displayBorrowersData(borrowers);
         } catch (error) {
             console.error('Error loading borrowers:', error);
             document.getElementById('borrowersTableBody').innerHTML = '<tr><td colspan="7" class="loading">Error loading borrowers</td></tr>';
         }
     }
-    // Update weekly chart based on month/year selection
     async function updateWeeklyChart() {
         const month = document.getElementById('monthFilter').value;
         const year = document.getElementById('yearFilter').value;
         try {
             const response = await fetch(`{{ route("dashboard.weekly-data") }}?month=${month}&year=${year}`);
             const data = await response.json();
-            // Update the chart with new data
             if (window.weeklyChart) {
                 window.weeklyChart.data.labels = data.map(item => item.week);
                 window.weeklyChart.data.datasets[0].data = data.map(item => item.count);
@@ -2495,7 +2955,6 @@
             console.error('Error updating weekly chart:', error);
         }
     }
-    // Stats data for different time periods
     const statsData = {
         lifetime: {
             mainCount: {{ $lifetimeCount }},
@@ -2510,7 +2969,7 @@
         },
         today: {
             mainCount: {{ $dailyCount }},
-            mainLabel: 'Today\'s Transactions',
+            mainLabel: "Today's Transactions",
             booksCount: {{ $booksToday }},
             membersCount: {{ $membersToday }},
             chartData: {
@@ -2521,7 +2980,7 @@
         },
         weekly: {
             mainCount: {{ $weeklyCount }},
-            mainLabel: 'This Week\'s Transactions',
+            mainLabel: "This Week's Transactions",
             booksCount: {{ $booksThisWeek }},
             membersCount: {{ $membersThisWeek }},
             chartData: {
@@ -2531,15 +2990,12 @@
             }
         }
     };
-    // Filter stats by time period
     function filterStats(period) {
         const data = statsData[period];
-        // Update main count and label
         document.getElementById('mainCount').textContent = data.mainCount;
         document.getElementById('mainLabel').textContent = data.mainLabel;
         document.getElementById('booksCount').textContent = data.booksCount;
         document.getElementById('membersCount').textContent = data.membersCount;
-        // Update chart
         if (window.statsChart) {
             window.statsChart.data.labels = data.chartData.labels;
             window.statsChart.data.datasets[0].data = data.chartData.books;
@@ -2547,30 +3003,124 @@
             window.statsChart.update();
         }
     }
-    // Initialize page
+    function returnBookDirect(transactionId, bookTitle, memberName) {
+        if (confirm(`Are you sure you want to return the book "${bookTitle}" borrowed by ${memberName}?`)) {
+            if (typeof window.returnId !== 'undefined') {
+                window.returnId = transactionId;
+            } else {
+                returnId = transactionId;
+            }
+            if (typeof confirmReturn === 'function') {
+                confirmReturn();
+            } else {
+                submitReturnForm(transactionId);
+            }
+        }
+    }
+    function submitReturnForm(transactionId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/transactions/${transactionId}/return`;
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = token.getAttribute('content');
+            form.appendChild(csrf);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    }
+    function handleBookReturnSuccess() {
+        showToast('success', 'Book returned successfully!');
+        if (typeof closeReturnModal === 'function') {
+            closeReturnModal();
+        }
+        loadBorrowersData();
+        if (typeof loadOverdueData === 'function') {
+            loadOverdueData();
+        }
+    }
+    function showToast(type, message) {
+        let toast = document.querySelector('.toast-notification.toast-' + type);
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-notification toast-' + type;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+                    <div class="toast-text">${message}</div>
+                    <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+            document.getElementById('toast-stack').appendChild(toast);
+        } else {
+            toast.querySelector('.toast-text').textContent = message;
+        }
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+    function initializeChristmasToggle() {
+        let attempts = 0;
+        const maxAttempts = 10;
+        function tryInitialize() {
+            attempts++;
+            const christmasToggle = document.getElementById('christmasToggle');
+            const christmasToggleText = document.querySelector('#christmasToggle #christmasToggleText');
+            if (christmasToggle && christmasToggleText) {
+                function updateToggleAppearance() {
+                    const isActive = window.christmasEffects && window.christmasEffects.getState ?
+                        window.christmasEffects.getState().active : false;
+                    christmasToggle.classList.toggle('active', isActive);
+                    christmasToggleText.textContent = isActive ? 'Disable Christmas' : 'Enable Christmas';
+                }
+                updateToggleAppearance();
+                christmasToggle.addEventListener('click', function() {
+                    if (window.christmasEffects && window.christmasEffects.toggle) {
+                        window.christmasEffects.toggle();
+                        updateToggleAppearance();
+                    } else {
+                        console.error('Christmas effects not loaded');
+                        document.dispatchEvent(new CustomEvent('christmas-toggle'));
+                    }
+                });
+                document.addEventListener('christmas-state-changed', function(e) {
+                    updateToggleAppearance();
+                });
+                console.log('Christmas toggle initialized successfully');
+                return true;
+            } else if (attempts < maxAttempts) {
+                setTimeout(tryInitialize, 100);
+                return false;
+            } else {
+                console.log('Christmas toggle elements not found after', maxAttempts, 'attempts');
+                return false;
+            }
+        }
+        return tryInitialize();
+    }
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Dashboard page loaded');
-        // Detect system preference
         const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const savedMode = localStorage.getItem('darkMode');
         const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
-        // Apply mode
         document.body.classList.toggle('dark-mode', isDark);
         darkModeToggle.checked = isDark;
         darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
-        // Toggle dark mode
         darkModeToggle.addEventListener('change', () => {
             const isChecked = darkModeToggle.checked;
             document.body.classList.toggle('dark-mode', isChecked);
             localStorage.setItem('darkMode', isChecked);
             darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
         });
-        // Initialize dark mode toggle
         function initializeDarkModeToggle() {
             const darkModeToggle = document.getElementById('darkModeToggle');
             if (darkModeToggle) {
                 console.log('Dark mode toggle found and initialized');
-                // Apply saved preference on load
                 const savedDarkMode = localStorage.getItem('darkMode') === 'true';
                 if (savedDarkMode) {
                     document.body.classList.add('dark-mode');
@@ -2579,7 +3129,6 @@
                 } else {
                     console.log('Applied light mode on load');
                 }
-                // Update label text on load
                 const label = document.getElementById('darkModeLabel');
                 if (label) {
                     label.textContent = savedDarkMode ? 'Dark Mode' : 'Light Mode';
@@ -2592,17 +3141,13 @@
                 return false;
             }
         }
-        // Try to initialize immediately
         if (!initializeDarkModeToggle()) {
-            // If not found, try again after a short delay
             setTimeout(() => {
                 if (!initializeDarkModeToggle()) {
-                    // Final attempt after DOM is fully loaded
                     setTimeout(initializeDarkModeToggle, 100);
                 }
             }, 50);
         }
-        // Make dark mode toggle function globally available for testing
         window.testDarkModeToggle = function() {
             const toggle = document.getElementById('darkModeToggle');
             const label = document.getElementById('darkModeLabel');
@@ -2613,32 +3158,60 @@
             console.log('Label text:', label ? label.textContent : 'N/A');
             console.log('Body classes:', document.body.classList.toString());
             if (toggle) {
-                // Manually trigger the toggle
                 toggle.click();
                 console.log('Manual toggle completed');
             }
         };
-        // Load all borrowers data by default
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('returned') === 'success') {
+            showToast('success', 'Book returned successfully!');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
         loadBorrowersData();
-        // Set current month as default
         const currentMonth = new Date().getMonth() + 1;
         document.getElementById('monthFilter').value = currentMonth;
-        // Set current year as default
         const currentYear = new Date().getFullYear();
         document.getElementById('yearFilter').value = currentYear;
-        // Initialize stats with lifetime data (default)
         filterStats('lifetime');
-        // Set borrowers filter to show all by default
         document.getElementById('borrowersFilter').value = 'all';
-        // Test if member card buttons are working
+        setTimeout(() => {
+            if (!initializeChristmasToggle()) {
+                setTimeout(initializeChristmasToggle, 500);
+            }
+        }, 100);
         const memberCardButtons = document.querySelectorAll('.card .btn');
         console.log('Found member card buttons:', memberCardButtons.length);
-        // Add click event listeners as backup
         memberCardButtons.forEach(button => {
             button.addEventListener('click', function(e) {
                 console.log('Button clicked:', this.onclick?.toString());
             });
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📚 Initializing borrow functionality...');
+        const memberNameInput = document.getElementById('memberName');
+        if (memberNameInput) {
+            memberNameInput.addEventListener('input', function() {
+                console.log('🔄 Member name changed, updating button state');
+                if (typeof updateConfirmButtonState === 'function') {
+                    updateConfirmButtonState();
+                }
+            });
+        }
+        const bookRows = document.querySelectorAll('#booksTableBody tr[data-id]');
+        bookRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn')) {
+                    const bookId = this.dataset.id;
+                    if (typeof toggleBookSelection === 'function') {
+                        toggleBookSelection(bookId);
+                    }
+                }
+            });
+        });
+        console.log('✅ Borrow functionality initialized');
     });
 </script>
 </body>

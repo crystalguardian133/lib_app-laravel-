@@ -171,6 +171,53 @@ public function store(Request $request)
         return response()->json(['success' => true, 'message' => 'Book deleted']);
     }
 
+    public function getMediaImages()
+    {
+        $imageDirectories = [
+            public_path('images'),
+            public_path('cover'),
+            public_path('qrcode/books'),
+            public_path('resource/member_images')
+        ];
+
+        $images = [];
+
+        foreach ($imageDirectories as $directory) {
+            if (file_exists($directory) && is_dir($directory)) {
+                $files = scandir($directory);
+
+                foreach ($files as $file) {
+                    $filePath = $directory . '/' . $file;
+                    $fileName = basename($file);
+
+                    // Skip directories and hidden files
+                    if (is_file($filePath) && !str_starts_with($fileName, '.')) {
+                        // Check if it's an image file
+                        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                        if (in_array($extension, $imageExtensions)) {
+                            $images[] = [
+                                'name' => $fileName,
+                                'path' => str_replace(public_path(), '', $filePath),
+                                'url' => asset($fileName),
+                                'size' => filesize($filePath),
+                                'modified' => date('Y-m-d H:i:s', filemtime($filePath))
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sort by modified date (newest first)
+        usort($images, function($a, $b) {
+            return strtotime($b['modified']) - strtotime($a['modified']);
+        });
+
+        return response()->json($images);
+    }
+
     private function generateQrFile(Book $book)
     {
         $qrFileName = 'book-' . $book->id . '.png';

@@ -45,6 +45,7 @@ Route::post('/chatbot/message', [ChatbotController::class, 'send']);
 // ===========================
 Route::resource('books', BookController::class);
 Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
+Route::get('/api/media/images', [BookController::class, 'getMediaImages'])->name('api.media.images');
 
 // ===========================
 // MEMBERS ROUTES

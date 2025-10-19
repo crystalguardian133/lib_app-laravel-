@@ -1934,6 +1934,66 @@
         </div>
     </div>
 
+    <!-- MEDIA PICKER MODAL -->
+    <div class="modal" id="mediaPickerModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-images"></i>
+                    Select Book Cover
+                </h3>
+                <button class="close-modal" onclick="closeMediaPicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="mediaSearch">Search Images</label>
+                        <input type="text" id="mediaSearch" class="form-control" placeholder="Search by filename...">
+                    </div>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Or Upload New Image
+                    </h4>
+                    <div id="media-upload-area" style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 2rem; text-align: center; cursor: pointer; background: var(--glass-bg); margin-bottom: 1.5rem; transition: var(--transition);">
+                        <div id="media-upload-content">
+                            <i id="media-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
+                            <p style="color: var(--text-muted); margin: 0; font-weight: 500; font-size: 1rem;">Drag and drop image here or click to browse</p>
+                            <small style="color: var(--text-muted); margin-top: 8px; display: block;">Supports JPG, PNG, GIF (max 5MB)</small>
+                            <input type="file" id="media-file-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Gallery -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-th"></i>
+                        Available Images
+                    </h4>
+                    <div id="media-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; max-height: 300px; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--glass-bg);">
+                        <!-- Images will be loaded here -->
+                        <div id="media-loading" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Loading images...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeMediaPicker()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- BORROW MODAL -->
     <div class="modal" id="borrowModal" style="z-index: 999999900 !important;">
         <div class="modal-content" style="max-width: 900px !important;">
@@ -2107,6 +2167,19 @@
             // Initialize cover upload functionality
             initializeCoverUpload();
             initializeEditCoverUpload();
+   
+            // Override resetCoverPreview to also clear media picker selections
+            const originalResetCoverPreview = window.resetCoverPreview;
+            window.resetCoverPreview = function() {
+                // Call original function if it exists
+                if (originalResetCoverPreview) {
+                    originalResetCoverPreview();
+                }
+   
+                // Clear media picker selections
+                window.selectedCoverImage = null;
+                window.uploadedMediaFile = null;
+            };
 
             // Set default due date and time using Philippine timezone and business days
             function calculatePhilippineBusinessDueDate() {
@@ -2741,6 +2814,366 @@
             }
         });
 
+        // Media Picker Functions
+        function openMediaPicker() {
+            const modal = document.getElementById('mediaPickerModal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                loadAvailableImages();
+            }
+        }
+
+        function closeMediaPicker() {
+            const modal = document.getElementById('mediaPickerModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        async function loadAvailableImages() {
+            const gallery = document.getElementById('media-gallery');
+            const loading = document.getElementById('media-loading');
+
+            try {
+                // Show loading state
+                loading.style.display = 'block';
+
+                // Fetch available images from server
+                const response = await fetch('/api/media/images');
+                let images = [];
+
+                if (response.ok) {
+                    images = await response.json();
+                } else {
+                    // Fallback: scan common image directories
+                    images = await scanImageDirectories();
+                }
+
+                // Filter to only include image files
+                const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                const imageFiles = images.filter(img =>
+                    imageExtensions.some(ext => img.toLowerCase().includes(ext))
+                );
+
+                displayImagesInGallery(imageFiles);
+
+            } catch (error) {
+                console.error('Error loading images:', error);
+                showToast('Error loading images', 'error');
+                loading.innerHTML = '<p style="color: var(--danger);">Error loading images</p>';
+            }
+        }
+
+        async function scanImageDirectories() {
+            // This is a fallback function that would scan common directories
+            // In a real implementation, this would be handled by a backend API
+            const commonPaths = [
+                '/images/',
+                '/cover/',
+                '/public/images/',
+                '/public/cover/',
+                '/storage/app/public/images/',
+                '/storage/app/public/cover/'
+            ];
+
+            const images = [];
+
+            // For demo purposes, return some sample images
+            // In production, this would scan actual directories
+            return [
+                'book-1.jpg',
+                'book-2.png',
+                'book-3.jpg',
+                'cover-1756669537.jpg',
+                'no-cover.png'
+            ];
+        }
+
+        function displayImagesInGallery(images) {
+            const gallery = document.getElementById('media-gallery');
+            const loading = document.getElementById('media-loading');
+
+            // Clear loading state
+            loading.style.display = 'none';
+
+            if (images.length === 0) {
+                gallery.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">No images found</p>';
+                return;
+            }
+
+            gallery.innerHTML = '';
+
+            images.forEach(imageName => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'media-item';
+                imageItem.style.cssText = `
+                    cursor: pointer;
+                    border: 2px solid var(--border-light);
+                    border-radius: var(--radius-sm);
+                    overflow: hidden;
+                    transition: var(--transition);
+                    background: var(--surface);
+                `;
+
+                const imageUrl = `/images/${imageName}`;
+
+                imageItem.innerHTML = `
+                    <img src="${imageUrl}" alt="${imageName}"
+                         style="width: 100%; height: 100px; object-fit: cover;"
+                         onerror="this.src='/images/no-cover.png'">
+                    <div style="padding: 8px; text-align: center; font-size: 0.8rem; color: var(--text-secondary);">
+                        ${imageName.length > 15 ? imageName.substring(0, 15) + '...' : imageName}
+                    </div>
+                `;
+
+                imageItem.addEventListener('click', () => selectMediaImage(imageUrl, imageName));
+                imageItem.addEventListener('mouseenter', () => {
+                    imageItem.style.borderColor = 'var(--primary)';
+                    imageItem.style.transform = 'translateY(-2px)';
+                    imageItem.style.boxShadow = 'var(--shadow-md)';
+                });
+                imageItem.addEventListener('mouseleave', () => {
+                    imageItem.style.borderColor = 'var(--border-light)';
+                    imageItem.style.transform = '';
+                    imageItem.style.boxShadow = '';
+                });
+
+                gallery.appendChild(imageItem);
+            });
+        }
+
+        function selectMediaImage(imageUrl, imageName) {
+            // Update the cover preview area with selected image
+            const coverPreviewContent = document.getElementById('cover-preview-content');
+            if (coverPreviewContent) {
+                coverPreviewContent.innerHTML = `
+                    <img src="${imageUrl}" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                    <p style="color: var(--text-primary); font-weight: 600;">${imageName}</p>
+                    <small style="color: var(--text-muted);">Click to change</small>
+                `;
+
+                // Store the selected image URL for form submission
+                window.selectedCoverImage = imageUrl;
+
+                // Also update the file input to ensure form submission works
+                updateFormWithSelectedImage(imageUrl, imageName);
+            }
+
+            // Close media picker
+            closeMediaPicker();
+
+            showToast(`Selected: ${imageName}`, 'success');
+        }
+
+        async function updateFormWithSelectedImage(imageUrl, imageName) {
+            try {
+                // Fetch the image and convert to blob
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+
+                // Create a File object
+                const file = new File([blob], imageName, { type: blob.type });
+
+                // Set the file to the cover input
+                const coverInput = document.getElementById('cover-input');
+                if (coverInput) {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    coverInput.files = dt.files;
+
+                    console.log('Updated form with selected image:', imageName);
+                }
+            } catch (error) {
+                console.error('Error updating form with selected image:', error);
+                // Fallback: just store the URL
+                window.selectedCoverImage = imageUrl;
+            }
+        }
+
+        // Initialize media picker upload area drag and drop
+        function initializeMediaPickerUpload() {
+            const uploadArea = document.getElementById('media-upload-area');
+            const uploadContent = document.getElementById('media-upload-content');
+            const fileInput = document.getElementById('media-file-input');
+
+            if (!uploadArea || !fileInput) return;
+
+            // Click to open file picker or select uploaded file
+            uploadArea.addEventListener('click', () => {
+                if (window.uploadedMediaFile) {
+                    // If file is already uploaded, select it
+                    selectUploadedMediaFile();
+                } else {
+                    // Otherwise open file picker
+                    fileInput.click();
+                }
+            });
+
+            // File selection handler
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaFileUpload(file);
+                }
+            });
+
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            uploadArea.addEventListener('dragenter', () => {
+                uploadArea.style.transform = 'scale(1.02)';
+                uploadArea.style.borderColor = 'var(--primary)';
+            });
+
+            uploadArea.addEventListener('dragover', () => {
+                uploadContent.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.transform = '';
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadContent.style.backgroundColor = 'var(--glass-bg)';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                uploadArea.style.transform = '';
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadContent.style.backgroundColor = 'var(--glass-bg)';
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleMediaFileUpload(files[0]);
+                }
+            });
+        }
+
+        function handleMediaFileUpload(file) {
+            // Validate file type
+            if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
+                showToast('Only JPG, PNG, and GIF images are allowed.', 'error');
+                return;
+            }
+
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large! Maximum size is 5MB.', 'error');
+                return;
+            }
+
+            // Create preview in media picker
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const uploadContent = document.getElementById('media-upload-content');
+                uploadContent.innerHTML = `
+                    <img src="${e.target.result}" alt="Upload Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                    <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                    <small style="color: var(--text-muted);">Click to select this image</small>
+                `;
+
+                // Store the uploaded file for later use
+                window.uploadedMediaFile = file;
+
+                // Update form with uploaded file
+                updateFormWithUploadedFile(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateFormWithUploadedFile(file) {
+            // Set the file to the cover input
+            const coverInput = document.getElementById('cover-input');
+            if (coverInput) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                coverInput.files = dt.files;
+
+                console.log('Updated form with uploaded file:', file.name);
+            }
+        }
+
+        function selectUploadedMediaFile() {
+            if (!window.uploadedMediaFile) return;
+
+            const file = window.uploadedMediaFile;
+
+            // Update the cover preview area with uploaded file
+            const coverPreviewContent = document.getElementById('cover-preview-content');
+            if (coverPreviewContent) {
+                // Create preview using FileReader
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    coverPreviewContent.innerHTML = `
+                        <img src="${e.target.result}" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                        <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                        <small style="color: var(--text-muted);">Click to change</small>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Update form with uploaded file
+            updateFormWithUploadedFile(file);
+
+            // Close media picker
+            closeMediaPicker();
+
+            showToast(`Selected: ${file.name}`, 'success');
+        }
+
+        // Media search functionality
+        function initializeMediaSearch() {
+            const searchInput = document.getElementById('mediaSearch');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const mediaItems = document.querySelectorAll('.media-item');
+
+                mediaItems.forEach(item => {
+                    const imageName = item.querySelector('div').textContent.toLowerCase();
+                    const shouldShow = imageName.includes(searchTerm);
+                    item.style.display = shouldShow ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Initialize media picker when modal opens
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override the existing click handler to open media picker instead
+            const coverPreviewContent = document.getElementById('cover-preview-content');
+            if (coverPreviewContent) {
+                coverPreviewContent.removeEventListener('click', initializeCoverUpload); // Remove old handler
+                coverPreviewContent.addEventListener('click', openMediaPicker);
+            }
+
+            // Initialize media picker upload area when modal is shown
+            const mediaPickerModal = document.getElementById('mediaPickerModal');
+            if (mediaPickerModal) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.attributeName === 'class') {
+                            if (mediaPickerModal.classList.contains('show')) {
+                                initializeMediaPickerUpload();
+                                initializeMediaSearch();
+                            }
+                        }
+                    });
+                });
+                observer.observe(mediaPickerModal, { attributes: true });
+            }
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             // ESC to close modals
@@ -2752,13 +3185,13 @@
                         closeButton.click();
                     }
                 }
-                
+
                 // Exit selection mode
                 if (isSelectionMode) {
                     exitSelectionMode();
                 }
             }
-            
+
             // Ctrl/Cmd + A to select all in selection mode
             if ((e.ctrlKey || e.metaKey) && e.key === 'a' && isSelectionMode) {
                 e.preventDefault();

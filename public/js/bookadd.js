@@ -18,13 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     
-    // Specifically handle the cover file input
+    // Handle cover image - check for media picker selection or file input
     const coverInput = document.getElementById('cover-input');
-    if (coverInput && coverInput.files && coverInput.files[0]) {
-      console.log('Adding cover file to FormData:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+
+    if (window.selectedCoverImage) {
+      // Use selected image from media picker
+      console.log('Using selected cover image from media picker:', window.selectedCoverImage);
+      formData.append('cover_image_url', window.selectedCoverImage);
+    } else if (window.uploadedMediaFile) {
+      // Use uploaded file from media picker
+      console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name);
+      formData.append('cover', window.uploadedMediaFile);
+    } else if (coverInput && coverInput.files && coverInput.files[0]) {
+      // Fallback to direct file input
+      console.log('Using direct file input:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
       formData.append('cover', coverInput.files[0]);
     } else {
-      console.log('No cover file selected');
+      console.log('No cover image selected');
     }
 
     // Debug: Log all FormData entries
@@ -235,11 +245,16 @@ document.addEventListener('DOMContentLoaded', () => {
         Supports JPG, PNG, GIF (max 5MB)
       </small>
     `;
-    
+
     // Reset styles
     coverPreviewContent.style.backgroundColor = '#f9fafb';
     coverPreviewContent.style.position = '';
     coverInput.value = '';
+
+    // Clear media picker selections
+    window.selectedCoverImage = null;
+    window.uploadedMediaFile = null;
+
     coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
     coverPreviewArea.style.borderStyle = 'dashed';
     coverPreviewArea.style.transform = '';
