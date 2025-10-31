@@ -21,30 +21,89 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle cover image - check for media picker selection or file input
     const coverInput = document.getElementById('cover-input');
 
+    // Debug: Check all possible sources
+    console.log('=== COVER IMAGE DEBUG ===');
+    console.log('window.selectedCoverImage:', window.selectedCoverImage);
+    console.log('window.uploadedMediaFile:', window.uploadedMediaFile);
+    console.log('coverInput exists:', !!coverInput);
+    console.log('coverInput.files:', coverInput?.files);
+    if (coverInput?.files[0]) {
+      console.log('coverInput file:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+    }
+
     if (window.selectedCoverImage) {
-      // Use selected image from media picker
+      // Use selected image from media picker - convert URL to file
       console.log('Using selected cover image from media picker:', window.selectedCoverImage);
-      formData.append('cover_image_url', window.selectedCoverImage);
+
+      try {
+        // Fetch the image and convert to File object for proper upload
+        const response = await fetch(window.selectedCoverImage);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        const fileName = window.selectedCoverImage.split('/').pop() || 'cover-image.jpg';
+        const file = new File([blob], fileName, { type: blob.type });
+        formData.append('cover', file);
+        console.log('✅ Successfully converted media picker URL to File object:', fileName, 'Size:', file.size, 'Type:', file.type);
+      } catch (error) {
+        console.error('❌ Error converting media picker URL to File:', error);
+        showCornerPopup('Error processing selected cover image: ' + error.message);
+        return;
+      }
     } else if (window.uploadedMediaFile) {
       // Use uploaded file from media picker
-      console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name);
+      console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name, 'Size:', window.uploadedMediaFile.size);
       formData.append('cover', window.uploadedMediaFile);
+      console.log('✅ Using uploaded media file');
     } else if (coverInput && coverInput.files && coverInput.files[0]) {
       // Fallback to direct file input
       console.log('Using direct file input:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
       formData.append('cover', coverInput.files[0]);
+      console.log('✅ Using direct file input');
     } else {
-      console.log('No cover image selected');
+      console.log('⚠️ No cover image selected or available');
+
+      // Additional check: try to get file from preview area data attribute
+      const previewImg = document.querySelector('#cover-preview-content img');
+      if (previewImg && previewImg.src) {
+        console.log('Found preview image, attempting to use it');
+        try {
+          // If preview exists, try to fetch it and create a file
+          const response = await fetch(previewImg.src);
+          const blob = await response.blob();
+          const fileName = 'cover-image.jpg';
+          const file = new File([blob], fileName, { type: blob.type });
+          formData.append('cover', file);
+          console.log('✅ Created file from preview image');
+        } catch (error) {
+          console.error('❌ Failed to create file from preview:', error);
+        }
+      }
     }
 
     // Debug: Log all FormData entries
-    console.log('FormData contents:');
+    console.log('=== FORMDATA DEBUG ===');
     for (let [key, value] of formData.entries()) {
       if (value instanceof File) {
-        console.log(`${key}: [File] ${value.name} (${value.size} bytes)`);
+        console.log(`${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
       } else {
         console.log(`${key}: ${value}`);
       }
+    }
+
+    // Additional validation for cover field
+    const coverFiles = [];
+    formData.forEach((value, key) => {
+      if (key === 'cover' && value instanceof File) {
+        coverFiles.push(value);
+      }
+    });
+
+    if (coverFiles.length > 0) {
+      console.log('✅ Cover file ready for upload:', coverFiles[0].name, 'Size:', coverFiles[0].size);
+    } else {
+      console.log('❌ No cover file in FormData');
     }
 
     try {
@@ -78,196 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // === Cover Preview: Giant Drag & Drop Rectangle ===
-  const coverPreviewArea = document.getElementById('cover-preview-area');
-  const coverInput = document.getElementById('cover-input');
-  const coverPreviewContent = document.getElementById('cover-preview-content');
-
-  // Make it a giant rectangle
-  Object.assign(coverPreviewArea.style, {
-    height: '250px',
-    border: '3px dashed var(--gray-light, #d1d5db)',
-    borderRadius: '16px',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    marginTop: '1rem',
-    marginBottom: '1.5rem',
-  });
-
-  Object.assign(coverPreviewContent.style, {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    color: 'var(--gray, #6b7280)',
-    fontSize: '1rem',
-    textAlign: 'center',
-    backgroundColor: '#f9fafb',
-    transition: 'background-color 0.3s ease',
-  });
-
-  // FIXED: Complete content replacement instead of background image overlay
-  function updateCoverPreview(file) {
-    if (!file) return;
-
-    if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
-      showCornerPopup('Only JPG, PNG, and GIF images are allowed.');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      showCornerPopup('Image too large! Maximum size is 5MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      // FIXED: Completely replace the content instead of using background image
-      coverPreviewContent.innerHTML = `
-        <img src="${e.target.result}" alt="Book Cover Preview" style="
-          max-width: 100%;
-          max-height: 100%;
-          width: auto;
-          height: auto;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          object-fit: contain;
-        ">
-        <p style="
-          position: absolute;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(0, 0, 0, 0.7);
-          color: white;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 0.8rem;
-          margin: 0;
-          max-width: 90%;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        ">${file.name}</p>
-      `;
-      
-      // Update the container styles
-      coverPreviewContent.style.position = 'relative';
-      coverPreviewContent.style.backgroundColor = '#f1f5f9';
-      coverPreviewArea.style.borderColor = 'var(--primary, #2fb9eb)';
-      coverPreviewArea.style.borderStyle = 'solid';
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // Click to open file picker
-  coverPreviewContent.addEventListener('click', () => {
-    coverInput.click();
-  });
-
-  // Handle file selection - FIXED VERSION
-  coverInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
-      updateCoverPreview(file);
-      
-      // Verify the file is still in the input after preview update
-      setTimeout(() => {
-        if (coverInput.files && coverInput.files[0]) {
-          console.log('File confirmed in input:', coverInput.files[0].name);
-        } else {
-          console.log('WARNING: File not found in input after preview update');
-        }
-      }, 100);
-    }
-  });
-
-  // Prevent default drag behaviors
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    coverPreviewArea.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
-  });
-
-  // Visual feedback on drag over
-  coverPreviewArea.addEventListener('dragenter', () => {
-    coverPreviewArea.style.transform = 'scale(1.02)';
-    coverPreviewArea.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-  });
-
-  coverPreviewArea.addEventListener('dragover', () => {
-    coverPreviewContent.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
-    coverPreviewArea.style.borderColor = 'var(--accent, #0891b2)';
-  });
-
-  coverPreviewArea.addEventListener('dragleave', () => {
-    coverPreviewArea.style.transform = '';
-    coverPreviewArea.style.boxShadow = '';
-    coverPreviewContent.style.backgroundColor = '#f9fafb';
-    coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-  });
-
-  // Fixed drag and drop handler
-  coverPreviewArea.addEventListener('drop', (e) => {
-    coverPreviewArea.style.transform = '';
-    coverPreviewArea.style.boxShadow = '';
-    coverPreviewContent.style.backgroundColor = '#f9fafb';
-    coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-    
-    const files = e.dataTransfer.files;
-    if (files.length) {
-      // Manually set the file to the input element
-      const dt = new DataTransfer();
-      dt.items.add(files[0]);
-      coverInput.files = dt.files;
-      
-      console.log('File dropped and set to input:', files[0].name);
-      updateCoverPreview(files[0]);
-    }
-  });
-
-  // FIXED: Reset cover preview with complete content replacement
-  window.resetCoverPreview = function () {
-    // Reset the innerHTML completely
-    coverPreviewContent.innerHTML = `
-      <i id="cover-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted, #6b7280); margin-bottom: 12px;"></i>
-      <p id="cover-preview-text" style="color: var(--text-muted, #6b7280); margin: 0; font-weight: 500; font-size: 1.1rem;">
-        Click or drag image here...
-      </p>
-      <small style="color: var(--text-muted, #6b7280); margin-top: 8px; display: block;">
-        Supports JPG, PNG, GIF (max 5MB)
-      </small>
-    `;
-
-    // Reset styles
-    coverPreviewContent.style.backgroundColor = '#f9fafb';
-    coverPreviewContent.style.position = '';
-    coverInput.value = '';
-
-    // Clear media picker selections
-    window.selectedCoverImage = null;
-    window.uploadedMediaFile = null;
-
-    coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-    coverPreviewArea.style.borderStyle = 'dashed';
-    coverPreviewArea.style.transform = '';
-    coverPreviewArea.style.boxShadow = '';
-  };
 });
 
 // === Modal Controls ===
 function openAddBookModal() {
   const modal = document.getElementById('addBookModal');
   if (modal) {
+    modal.classList.add('active');
     modal.style.display = 'flex';
-    modal.classList.add('show');
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+    document.body.classList.add('modal-open');
     // Optional: reset form and preview
     document.getElementById('addBookForm').reset();
     if (typeof resetCoverPreview === 'function') resetCoverPreview();
@@ -277,8 +157,11 @@ function openAddBookModal() {
 function closeAddBookModal() {
   const modal = document.getElementById('addBookModal');
   if (modal) {
+    modal.classList.remove('active');
     modal.style.display = 'none';
-    modal.classList.remove('show');
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    document.body.classList.remove('modal-open');
   }
 }
 

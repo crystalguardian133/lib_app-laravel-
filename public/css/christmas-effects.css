@@ -1,17 +1,12 @@
-/* 🎄 Christmas Effects Styles - Separate File */
+/* 🎄 Christmas Effects Styles - Complete Rework */
 
-/* Christmas Theme Body Background */
+/* Christmas Theme - Clean Implementation */
 body.christmas-theme {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
   position: relative;
 }
 
-body.christmas-theme.dark-mode {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
-}
-
-/* Christmas Snow Animation */
-body.christmas-theme::after {
+/* Christmas Snow Animation - Snow piles at bottom and disappears */
+body.christmas-theme::before {
   content: '';
   position: fixed;
   top: 0;
@@ -19,22 +14,34 @@ body.christmas-theme::after {
   width: 100%;
   height: 100%;
   background-image:
-    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
-    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
-    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.8), transparent);
+    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 40px 70px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 160px 30px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 60px 90px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 200px 60px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 80px 120px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 250px 80px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 120px 150px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2px 2px at 180px 120px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 220px 160px, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 50px 200px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 280px 40px, rgba(255,255,255,0.4), transparent);
   background-repeat: repeat;
-  background-size: 200px 100px;
-  animation: snowTexture 20s linear infinite;
+  background-size: 350px 250px;
+  animation: christmasSnow 30s linear infinite;
   pointer-events: none;
-  z-index: 997;
-  opacity: 0.3;
+  z-index: 999;
+  opacity: 0.4;
 }
 
-@keyframes snowTexture {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(100px); }
+@keyframes christmasSnow {
+  0% { transform: translateY(-50px) translateX(0); }
+  70% { transform: translateY(100vh) translateX(0); opacity: 0.4; }
+  85% { transform: translateY(calc(100vh + 20px)) translateX(0); opacity: 0.2; }
+  100% { transform: translateY(calc(100vh + 20px)) translateX(0); opacity: 0; }
 }
 
 /* Christmas Card Enhancements */
@@ -43,17 +50,6 @@ body.christmas-theme .card {
   box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15), 0 0 20px rgba(220, 38, 38, 0.1) !important;
   position: relative;
   overflow: visible !important;
-}
-
-body.christmas-theme .card::before {
-  content: '🎄';
-  position: absolute;
-  top: -15px;
-  right: 15px;
-  font-size: 20px;
-  opacity: 0.7;
-  z-index: 1001;
-  animation: twinkle 3s ease-in-out infinite;
 }
 
 body.christmas-theme .card:hover {
@@ -71,21 +67,7 @@ body.christmas-theme .btn-primary {
   overflow: hidden;
 }
 
-body.christmas-theme .btn-primary::before {
-  content: '🎅';
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  opacity: 0.3;
-  transition: all 0.3s ease;
-}
-
-body.christmas-theme .btn-primary:hover::before {
-  right: 8px;
-  opacity: 0.6;
-}
+/* Removed Santa emoji from buttons */
 
 body.christmas-theme .btn-primary:hover {
   background: linear-gradient(135deg, #16a34a, #15803d) !important;
@@ -98,7 +80,7 @@ body.christmas-theme .btn-primary:hover {
 body.christmas-theme .sidebar {
   background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%) !important;
   border-right: 3px solid #dc2626 !important;
-  position: relative;
+  position: fixed !important;
   overflow: visible !important;
 }
 
@@ -196,21 +178,7 @@ body.christmas-theme .dashboard-title {
   text-shadow: 2px 2px 4px rgba(220, 38, 38, 0.3) !important;
 }
 
-body.christmas-theme .heading::after,
-body.christmas-theme .dashboard-title::after {
-  content: '🎅';
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-  animation: santaWave 3s ease-in-out infinite;
-}
-
-@keyframes santaWave {
-  0%, 100% { transform: translateY(-50%) rotate(-5deg); }
-  50% { transform: translateY(-50%) rotate(5deg); }
-}
+/* Removed Santa emoji from headings */
 
 /* Christmas Table Enhancements */
 body.christmas-theme .data-table th {

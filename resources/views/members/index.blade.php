@@ -2889,141 +2889,148 @@
   </div>
   </div>
 
-  <!-- Register Member Modal -->
-  <div class="modal-overlay" id="registerModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-user-plus"></i>
-          Register New Member
-        </h2>
-        <button class="modal-close" onclick="closeRegisterModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="registerForm">
-          <!-- Personal Information Section -->
-          <div class="form-section">
-            <h3 class="section-title">
-              <i class="fas fa-user"></i>
-              Personal Information
-            </h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="firstName" class="form-label">First Name *</label>
-                <input type="text" id="firstName" name="firstName" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label for="middleName" class="form-label">Middle Name</label>
-                <input type="text" id="middleName" name="middleName" class="form-input">
-              </div>
-              <div class="form-group">
-                <label for="lastName" class="form-label">Last Name *</label>
-                <input type="text" id="lastName" name="lastName" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label for="age" class="form-label">Age *</label>
-                <input type="number" id="age" name="age" class="form-input" min="1" max="150" required>
-              </div>
-            </div>
-          </div>
+ <!-- REGISTER MODAL (Non-Julita Residents) -->
+ <div class="modal-overlay" id="registerModal">
+   <div class="modal-container">
+     <div class="modal-header">
+       <div class="modal-header-content">
+         <div class="modal-icon-wrapper">
+           <i class="fas fa-user-plus"></i>
+         </div>
+         <div class="modal-title-section">
+           <h2 class="modal-title">Register New Member</h2>
+           <p class="modal-subtitle">Add a new member to the library system</p>
+         </div>
+       </div>
+       <button class="modal-close" onclick="closeRegisterModal()">
+         <i class="fas fa-times"></i>
+       </button>
+     </div>
+     <div class="modal-body">
+       <form id="registerForm">
+         <!-- Personal Information Section -->
+         <div class="form-section">
+           <h3 class="section-title">
+             <i class="fas fa-user"></i>
+             Personal Information
+           </h3>
+           <div class="form-grid">
+             <div class="form-group">
+               <label for="firstName">First Name *</label>
+               <input type="text" id="firstName" name="firstName" class="form-input" required>
+             </div>
+             <div class="form-group">
+               <label for="middleName">Middle Name</label>
+               <input type="text" id="middleName" name="middleName" class="form-input">
+             </div>
+             <div class="form-group">
+               <label for="lastName">Last Name *</label>
+               <input type="text" id="lastName" name="lastName" class="form-input" required>
+             </div>
+             <div class="form-group">
+               <label for="age">Age *</label>
+               <input type="number" id="age" name="age" class="form-input" min="1" max="150" required>
+             </div>
+           </div>
+         </div>
+         <!-- Address Information Section -->
+         <div class="form-section">
+           <h3 class="section-title">
+             <i class="fas fa-map-marker-alt"></i>
+             Address Information
+           </h3>
+           <div class="form-grid">
+             <div class="form-group">
+               <label for="houseNumber">House Number</label>
+               <input type="text" id="houseNumber" name="houseNumber" class="form-input">
+             </div>
+             <div class="form-group">
+               <label for="street">Street</label>
+               <input type="text" id="street" name="street" class="form-input">
+             </div>
+             <div class="form-group">
+               <label for="barangay">Barangay *</label>
+               <input type="text" id="barangay" name="barangay" class="form-input" required>
+             </div>
+             <div class="form-group">
+               <label for="municipality">Municipality/City *</label>
+               <input type="text" id="municipality" name="municipality" class="form-input" required>
+             </div>
+             <div class="form-group">
+               <label for="province">Province *</label>
+               <input type="text" id="province" name="province" class="form-input" required>
+             </div>
+           </div>
+         </div>
+         <!-- Contact Information Section -->
+         <div class="form-section">
+           <h3 class="section-title">
+             <i class="fas fa-phone"></i>
+             Contact Information
+           </h3>
+           <div class="form-grid">
+             <div class="form-group">
+               <label for="contactNumber">Contact Number *</label>
+               <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+             </div>
+             <div class="form-group">
+               <label for="school">School/Institution</label>
+               <input type="text" id="school" name="school" class="form-input">
+             </div>
+           </div>
+         </div>
+         <!-- Photo Upload Section -->
+         <div class="form-section">
+           <h3 class="section-title">
+             <i class="fas fa-camera"></i>
+             Upload Photo
+           </h3>
+           <div class="form-group">
+             <label class="form-label">Profile Photo</label>
+             <div class="photo-upload-container">
+               <div class="photo-upload">
+                 <i class="fas fa-cloud-upload-alt"></i>
+                 <p>Click to upload or drag and drop</p>
+                 <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+               </div>
+               <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+             </div>
+           </div>
+         </div>
+       </form>
+     </div>
+     <div class="modal-footer">
+       <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
+         <i class="fas fa-times"></i>
+         Cancel
+       </button>
+       <button type="button" class="btn btn-primary" onclick="submitRegister()">
+         <i class="fas fa-save"></i>
+         Register Member
+       </button>
+     </div>
+   </div>
+ </div>
 
-          <!-- Address Information Section -->
-          <div class="form-section">
-            <h3 class="section-title">
-              <i class="fas fa-map-marker-alt"></i>
-              Address Information
-            </h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="houseNumber" class="form-label">House Number</label>
-                <input type="text" id="houseNumber" name="houseNumber" class="form-input">
-              </div>
-              <div class="form-group">
-                <label for="street" class="form-label">Street</label>
-                <input type="text" id="street" name="street" class="form-input">
-              </div>
-              <div class="form-group">
-                <label for="barangay" class="form-label">Barangay *</label>
-                <input type="text" id="barangay" name="barangay" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label for="municipality" class="form-label">Municipality/City *</label>
-                <input type="text" id="municipality" name="municipality" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label for="province" class="form-label">Province *</label>
-                <input type="text" id="province" name="province" class="form-input" required>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact Information Section -->
-          <div class="form-section">
-            <h3 class="section-title">
-              <i class="fas fa-phone"></i>
-              Contact Information
-            </h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="contactNumber" class="form-label">Contact Number *</label>
-                <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
-              </div>
-              <div class="form-group">
-                <label for="school" class="form-label">School/Institution</label>
-                <input type="text" id="school" name="school" class="form-input">
-              </div>
-            </div>
-          </div>
-
-          <!-- Photo Upload Section -->
-          <div class="form-section">
-            <h3 class="section-title">
-              <i class="fas fa-camera"></i>
-              Upload Photo
-            </h3>
-            <div class="form-group">
-              <label class="form-label">Profile Photo</label>
-              <div class="photo-upload-container">
-                <div class="photo-upload">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <p>Click to upload or drag and drop</p>
-                  <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
-                </div>
-                <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
-          <i class="fas fa-times"></i>
-          Cancel
-        </button>
-        <button type="button" class="btn btn-primary" onclick="submitRegister()">
-          <i class="fas fa-save"></i>
-          Register Member
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Julita Register Modal -->
+  <!-- ADD MEMBER MODAL (Julita Residents) -->
   <div class="modal-overlay" id="julitaRegisterModal">
     <div class="modal-container">
       <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-user-plus"></i>
-          Register Julita Resident
-        </h2>
+        <div class="modal-header-content">
+          <div class="modal-icon-wrapper">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="modal-title-section">
+            <h2 class="modal-title">Register Julita Resident</h2>
+            <p class="modal-subtitle">Add a new member from Julita municipality</p>
+          </div>
+        </div>
         <button class="modal-close" onclick="closeJulitaRegisterModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="modal-body">
-        <form id="julitaRegisterForm">
+        <form id="julitaRegisterForm" enctype="multipart/form-data">
           <!-- Personal Information Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -3032,24 +3039,35 @@
             </h3>
             <div class="form-grid">
               <div class="form-group">
-                <label for="julitaFirstName" class="form-label">First Name *</label>
+                <label for="julitaFirstName" class="form-label">
+                  <i class="fas fa-signature"></i>
+                  First Name *
+                </label>
                 <input type="text" id="julitaFirstName" name="firstName" class="form-input" required>
               </div>
               <div class="form-group">
-                <label for="julitaMiddleName" class="form-label">Middle Name</label>
+                <label for="julitaMiddleName" class="form-label">
+                  <i class="fas fa-signature"></i>
+                  Middle Name
+                </label>
                 <input type="text" id="julitaMiddleName" name="middleName" class="form-input">
               </div>
               <div class="form-group">
-                <label for="julitaLastName" class="form-label">Last Name *</label>
+                <label for="julitaLastName" class="form-label">
+                  <i class="fas fa-signature"></i>
+                  Last Name *
+                </label>
                 <input type="text" id="julitaLastName" name="lastName" class="form-input" required>
               </div>
               <div class="form-group">
-                <label for="julitaAge" class="form-label">Age *</label>
+                <label for="julitaAge" class="form-label">
+                  <i class="fas fa-birthday-cake"></i>
+                  Age *
+                </label>
                 <input type="number" id="julitaAge" name="age" class="form-input" min="1" max="150" required>
               </div>
             </div>
           </div>
-
           <!-- Address Information Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -3058,50 +3076,70 @@
             </h3>
             <div class="form-grid">
               <div class="form-group">
-                <label for="julitaHouseNumber" class="form-label">House Number</label>
+                <label for="julitaHouseNumber" class="form-label">
+                  <i class="fas fa-home"></i>
+                  House Number
+                </label>
                 <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-input">
               </div>
               <div class="form-group">
-                <label for="julitaStreet" class="form-label">Street</label>
+                <label for="julitaStreet" class="form-label">
+                  <i class="fas fa-road"></i>
+                  Street
+                </label>
                 <input type="text" id="julitaStreet" name="street" class="form-input">
               </div>
               <div class="form-group">
-                <label for="julitaBarangay" class="form-label">Barangay *</label>
+                <label for="julitaBarangay" class="form-label">
+                  <i class="fas fa-map"></i>
+                  Barangay *
+                </label>
                 <select id="julitaBarangay" name="barangay" class="form-input" required>
                   <option value="" disabled selected>Select Barangay</option>
                   <option>Alegria</option>
+                  <option>Anibong</option>
+                  <option>Aslum</option>
                   <option>Balante</option>
+                  <option>Bongdo</option>
+                  <option>Bonifacio</option>
                   <option>Bugho</option>
-                  <option>Campina</option>
-                  <option>Canwhaton</option>
-                  <option>Caridad Norte</option>
-                  <option>Caridad Sur</option>
-                  <option>Cuatro de Agosto</option>
+                  <option>Calbasag</option>
+                  <option>Caridad</option>
+                  <option>Cuya-e</option>
                   <option>Dita</option>
-                  <option>Hinalaan</option>
+                  <option>Gitabla</option>
                   <option>Hindang</option>
-                  <option>Iniguihan</option>
-                  <option>Macopa</option>
+                  <option>Inawangan</option>
+                  <option>Jurao</option>
+                  <option>Poblacion District I</option>
+                  <option>Poblacion District II</option>
+                  <option>Poblacion District III</option>
+                  <option>Poblacion District IV</option>
                   <option>San Andres</option>
                   <option>San Pablo</option>
-                  <option>San Roque</option>
+                  <option>Santa Cruz</option>
                   <option>Santo Niño</option>
-                  <option>Sta. Cruz</option>
-                  <option>Taglibas</option>
-                  <option>Veloso</option>
+                  <option>Tagkip</option>
+                  <option>Tolosahay</option>
+                  <option>Villa Hermosa</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="julitaMunicipality" class="form-label">Municipality *</label>
+                <label for="julitaMunicipality" class="form-label">
+                  <i class="fas fa-city"></i>
+                  Municipality *
+                </label>
                 <input type="text" id="julitaMunicipality" name="municipality" class="form-input" value="Julita" readonly>
               </div>
               <div class="form-group">
-                <label for="julitaProvince" class="form-label">Province *</label>
+                <label for="julitaProvince" class="form-label">
+                  <i class="fas fa-globe-asia"></i>
+                  Province *
+                </label>
                 <input type="text" id="julitaProvince" name="province" class="form-input" value="Leyte" readonly>
               </div>
             </div>
           </div>
-
           <!-- Contact Information Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -3110,16 +3148,21 @@
             </h3>
             <div class="form-grid">
               <div class="form-group">
-                <label for="julitaContactNumber" class="form-label">Contact Number *</label>
+                <label for="julitaContactNumber" class="form-label">
+                  <i class="fas fa-mobile-alt"></i>
+                  Contact Number *
+                </label>
                 <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
               </div>
               <div class="form-group">
-                <label for="julitaSchool" class="form-label">School/Institution</label>
+                <label for="julitaSchool" class="form-label">
+                  <i class="fas fa-school"></i>
+                  School/Institution
+                </label>
                 <input type="text" id="julitaSchool" name="school" class="form-input">
               </div>
             </div>
           </div>
-
           <!-- Photo Upload Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -3127,14 +3170,22 @@
               Upload Photo
             </h3>
             <div class="form-group">
-              <label class="form-label">Profile Photo</label>
+              <label class="form-label">
+                <i class="fas fa-image"></i>
+                Profile Photo
+              </label>
               <div class="photo-upload-container">
                 <div class="photo-upload">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <p>Click to upload or drag and drop</p>
+                  <div class="upload-icon-wrapper">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                  </div>
+                  <div class="upload-text">
+                    <p class="upload-main-text">Click to upload or drag and drop</p>
+                    <p class="upload-sub-text">JPG, PNG, GIF up to 5MB</p>
+                  </div>
                   <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
                 </div>
-                <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Julita Photo Preview" style="display: none;">
+                <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
               </div>
             </div>
           </div>
@@ -3300,4 +3351,4 @@
 
 
 </body>
-</html>
+</html>]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]

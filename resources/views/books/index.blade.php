@@ -1560,7 +1560,7 @@
                         <div class="search-container">
                             <input type="text" class="search-bar" placeholder="Search by title, author, or genre..." id="searchInput">
                         </div>
-                        <button class="btn btn-outline" onclick="enterSelectionMode()">
+                        <button class="btn btn-outline" onclick="enterSelectionMode()" id="selectButton">
                             <i class="fas fa-check-square"></i> Select
                         </button>
                         <button class="btn btn-primary" onclick="openAddBookModal()">
@@ -1687,77 +1687,82 @@
 
     <!-- ADD BOOK MODAL -->
     <div class="modal" id="addBookModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-plus"></i>
-                    Add New Book
-                </h2>
-                <button class="close-modal" onclick="closeAddBookModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+      <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+          <div class="modal-header-content">
+            <div class="modal-icon-wrapper">
+              <i class="fas fa-plus"></i>
             </div>
-            <div class="modal-body">
-                <form id="addBookForm" enctype="multipart/form-data">
-                    <!-- Cover Image Section -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-image"></i>
-                            Book Cover
-                        </h3>
-                        <div id="cover-preview-area">
-                            <div id="cover-preview-content">
-                                <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
-                                <p id="cover-preview-text">Click or drag image here...</p>
-                                <small style="color: var(--text-muted); margin-top: 8px; display: block;">
-                                    Supports JPG, PNG, GIF (max 5MB)
-                                </small>
-                                <input type="file" id="cover-input" class="cover-input" accept="image/*">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Book Information Section -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-book"></i>
-                            Book Information
-                        </h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="bookTitle">Title *</label>
-                                <input type="text" id="bookTitle" name="title" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="bookAuthor">Author *</label>
-                                <input type="text" id="bookAuthor" name="author" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="bookGenre">Genre</label>
-                                <input type="text" id="bookGenre" name="genre" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookYear">Published Year *</label>
-                                <input type="number" id="bookYear" name="published_year" class="form-control" required min="1000" max="2099">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookAvailability">Availability *</label>
-                                <input type="number" id="bookAvailability" name="availability" class="form-control" required min="0">
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div class="modal-title-section">
+              <h2 class="modal-title">Add New Book</h2>
+              <p class="modal-subtitle">Add a new book to the library collection</p>
             </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-cancel" onclick="closeAddBookModal()">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </button>
-                <button type="submit" form="addBookForm" class="btn btn-confirm">
-                    <i class="fas fa-plus"></i>
-                    Add Book
-                </button>
-            </div>
+          </div>
+          <button class="modal-close" onclick="closeAddBookModal()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+        <div class="modal-body">
+          <form id="addBookForm" enctype="multipart/form-data">
+            <!-- Cover Image Section -->
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-image"></i>
+                Book Cover
+              </h3>
+              <div id="cover-preview-area">
+                <div id="cover-preview-content">
+                  <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
+                  <p id="cover-preview-text">Click or drag image here...</p>
+                  <small style="color: var(--text-muted); margin-top: 8px; display: block;">
+                    Supports JPG, PNG, GIF (max 5MB)
+                  </small>
+                  <input type="file" id="cover-input" name="cover" class="cover-input" accept="image/*">
+                </div>
+              </div>
+            </div>
+            <!-- Book Information Section -->
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-book"></i>
+                Book Information
+              </h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="bookTitle">Title *</label>
+                  <input type="text" id="bookTitle" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="bookAuthor">Author *</label>
+                  <input type="text" id="bookAuthor" name="author" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="bookGenre">Genre</label>
+                  <input type="text" id="bookGenre" name="genre" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="bookYear">Published Year *</label>
+                  <input type="number" id="bookYear" name="published_year" class="form-control" required min="1000" max="2099">
+                </div>
+                <div class="form-group">
+                  <label for="bookAvailability">Availability *</label>
+                  <input type="number" id="bookAvailability" name="availability" class="form-control" required min="0">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeAddBookModal()">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+          <button type="submit" form="addBookForm" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Add Book
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- EDIT BOOK MODAL -->
@@ -2548,7 +2553,13 @@
         function enterSelectionMode() {
             isSelectionMode = true;
             selectedBooks = [];
-            
+
+            // Disable the select button when selection mode is active
+            const selectButton = document.getElementById('selectButton');
+            if (selectButton) {
+                selectButton.disabled = true;
+            }
+
             // Add checkboxes to table
             const table = document.getElementById('booksTable');
             const headerRow = table.querySelector('thead tr');
@@ -2574,7 +2585,13 @@
         function exitSelectionMode() {
             isSelectionMode = false;
             selectedBooks = [];
-            
+
+            // Re-enable the select button when exiting selection mode
+            const selectButton = document.getElementById('selectButton');
+            if (selectButton) {
+                selectButton.disabled = false;
+            }
+
             // Remove checkboxes
             const table = document.getElementById('booksTable');
             const checkboxHeaders = table.querySelectorAll('.checkbox-cell');

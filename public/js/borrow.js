@@ -6,8 +6,75 @@
 let selectedBooks = [];
 let selectionMode = false;
 
+// Enhanced book data structure for better readability
+let borrowerBooksData = [];
+
 // DEBUG: Log when borrow.js is loaded
-console.log('🚀 BORROW.JS LOADED - Clean & Simple Version');
+console.log('🚀 BORROW.JS LOADED - Enhanced Multiple Books Version');
+
+// Enhanced book data management functions
+function addBookToBorrowerData(bookData) {
+    // bookData should be an object with id, title, author, etc.
+    if (!bookData || !bookData.id) {
+        console.error('Invalid book data provided to addBookToBorrowerData');
+        return false;
+    }
+
+    // Check if book already exists
+    const existingIndex = borrowerBooksData.findIndex(book => book.id === bookData.id);
+    if (existingIndex >= 0) {
+        console.log('Book already in borrower data:', bookData.title);
+        return false;
+    }
+
+    // Add book with readable information
+    const enhancedBookData = {
+        id: bookData.id,
+        book_id: bookData.id, // Keep original book_id for backend compatibility
+        title: bookData.title || 'Unknown Title',
+        author: bookData.author || 'Unknown Author',
+        genre: bookData.genre || null,
+        published_year: bookData.published_year || null,
+        availability: bookData.availability || 0,
+        added_at: new Date().toISOString()
+    };
+
+    borrowerBooksData.push(enhancedBookData);
+    console.log('Added book to borrower data:', enhancedBookData);
+    return true;
+}
+
+function removeBookFromBorrowerData(bookId) {
+    const index = borrowerBooksData.findIndex(book => book.id === bookId);
+    if (index >= 0) {
+        const removedBook = borrowerBooksData.splice(index, 1)[0];
+        console.log('Removed book from borrower data:', removedBook);
+        return removedBook;
+    }
+    return null;
+}
+
+function getBorrowerBooksData() {
+    return [...borrowerBooksData]; // Return a copy to prevent external modification
+}
+
+function clearBorrowerBooksData() {
+    console.log('Cleared borrower books data. Previous count:', borrowerBooksData.length);
+    borrowerBooksData = [];
+}
+
+function getBookIdsArray() {
+    return borrowerBooksData.map(book => book.id);
+}
+
+function getReadableBooksList() {
+    return borrowerBooksData.map(book => ({
+        book_id: book.book_id,
+        title: book.title,
+        author: book.author,
+        details: `${book.title} by ${book.author}${book.published_year ? ` (${book.published_year})` : ''}`
+    }));
+}
 
 // ======================
 // TOAST NOTIFICATIONS
@@ -38,15 +105,61 @@ function openBorrowModal() {
         return;
     }
 
+    // Clear previous borrower data
+    clearBorrowerBooksData();
+
     const list = document.getElementById('selectedBooksList');
     if (list) {
         list.innerHTML = '';
         selectedRows.forEach(row => {
+            const bookData = {
+                id: row.dataset.id,
+                title: row.dataset.title || 'Unknown Title',
+                author: row.dataset.author || 'Unknown Author',
+                genre: row.dataset.genre || null,
+                published_year: row.dataset.published_year || null,
+                availability: row.dataset.availability || 0
+            };
+
+            // Add to enhanced borrower data structure
+            addBookToBorrowerData(bookData);
+
+            // Update UI list
             const li = document.createElement('li');
-            li.textContent = row.dataset.title || 'Unknown Title';
-            li.setAttribute('data-id', row.dataset.id);
+            li.textContent = `${bookData.title} by ${bookData.author}`;
+            li.setAttribute('data-id', bookData.id);
+            li.setAttribute('title', `Book ID: ${bookData.id} | Genre: ${bookData.genre || 'N/A'} | Year: ${bookData.published_year || 'N/A'}`);
             li.style.padding = '8px 0';
             li.style.borderBottom = '1px solid var(--border-light)';
+            li.style.position = 'relative';
+
+            // Add remove button for each book
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '×';
+            removeBtn.className = 'btn btn-sm';
+            removeBtn.style.cssText = `
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--danger);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            removeBtn.onclick = function(e) {
+                e.stopPropagation();
+                removeBookFromSelection(bookData.id);
+            };
+
+            li.appendChild(removeBtn);
             list.appendChild(li);
         });
     }
@@ -139,7 +252,9 @@ function closeBorrowModal() {
         if (field) field.value = '';
     });
 
+    // Clear enhanced data structures
     selectedBooks = [];
+    clearBorrowerBooksData();
     updateConfirmButtonState();
 }
 
@@ -160,19 +275,9 @@ function confirmBorrow() {
         return;
     }
 
-    const selectedBooksList = document.getElementById('selectedBooksList');
-    let bookIds = [];
-    
-    if (selectedBooksList && selectedBooksList.children.length > 0) {
-        bookIds = Array.from(selectedBooksList.children).map(li => parseInt(li.dataset.id));
-    } else {
-        const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
-        if (selectedRows.length === 0) {
-            showToast('Please select books to borrow first', 'warning');
-            return;
-        }
-        bookIds = Array.from(selectedRows).map(row => parseInt(row.dataset.id));
-    }
+    // Use enhanced borrower data structure
+    const booksData = getBorrowerBooksData();
+    const bookIds = getBookIdsArray();
 
     if (bookIds.length === 0) {
         showToast('Please select books to borrow first', 'warning');
@@ -187,21 +292,35 @@ function confirmBorrow() {
 
     const token = tokenElement.content;
     const confirmButton = document.getElementById('confirmBorrowBtn');
-    
+
     if (confirmButton) {
         confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         confirmButton.disabled = true;
     }
 
+    // Enhanced borrow data with readable book information
     const borrowData = {
         member_name: memberName,
         member_id: memberId,
         due_date: dueDate,
         due_time: dueTime,
-        book_ids: bookIds
+        book_ids: bookIds,
+        books_data: booksData, // Full book information for better tracking
+        books_count: booksData.length,
+        transaction_summary: {
+            member: `${memberName} (ID: ${memberId})`,
+            books: getReadableBooksList(),
+            due_datetime: `${dueDate} ${dueTime}`,
+            total_books: booksData.length
+        }
     };
 
-    console.log('📨 Sending borrow data:', borrowData);
+    console.log('📨 Enhanced borrow data being sent:');
+    console.log('Member:', borrowData.transaction_summary.member);
+    console.log('Books:', borrowData.transaction_summary.books);
+    console.log('Due Date:', borrowData.transaction_summary.due_datetime);
+    console.log('Book IDs Array:', bookIds);
+    console.log('Full books data:', booksData);
 
     fetch('/borrow/process', {
         method: 'POST',
@@ -387,18 +506,28 @@ function clearMemberInfo() {
 }
 
 function removeBookFromSelection(bookId) {
+    // Remove from enhanced data structure
+    const removedBook = removeBookFromBorrowerData(bookId);
+
+    // Remove visual selection
     const row = document.querySelector(`tr[data-id="${bookId}"]`);
     if (row) {
         row.classList.remove('selected');
     }
 
+    // Remove from UI list
     const listItem = document.querySelector(`#selectedBooksList li[data-id="${bookId}"]`);
     if (listItem) {
         listItem.remove();
     }
 
     updateConfirmButtonState();
-    showToast('Book removed from selection', 'info');
+
+    if (removedBook) {
+        showToast(`Removed: ${removedBook.title} (ID: ${bookId})`, 'info');
+    } else {
+        showToast('Book removed from selection', 'info');
+    }
 }
 
 // ======================
@@ -1126,7 +1255,7 @@ function processBookQR(qrData) {
 
     const row = document.querySelector(`tr[data-id="${bookId}"]`);
     if (!row) {
-        showToast('Book not found', 'error');
+        showToast('Book not found in table', 'error');
         return;
     }
 
@@ -1136,34 +1265,91 @@ function processBookQR(qrData) {
         return;
     }
 
-    const title = row.dataset.title;
-    const alreadySelected = document.querySelector(`#selectedBooksList li[data-id="${bookId}"]`);
-
-    if (alreadySelected) {
+    // Check if book is already in borrower data
+    if (borrowerBooksData.find(book => book.id === bookId)) {
         showToast('Book already selected', 'warning');
         return;
     }
 
-    row.classList.add('selected');
+    const bookData = {
+        id: bookId,
+        title: row.dataset.title || 'Unknown Title',
+        author: row.dataset.author || 'Unknown Author',
+        genre: row.dataset.genre || null,
+        published_year: row.dataset.published_year || null,
+        availability: availability
+    };
 
-    const list = document.getElementById('selectedBooksList');
-    if (list) {
-        const li = document.createElement('li');
-        li.textContent = title;
-        li.setAttribute('data-id', bookId);
-        li.style.padding = '8px 0';
-        li.style.borderBottom = '1px solid var(--border-light)';
-        list.appendChild(li);
+    // Check if borrow modal is open, if not, open it
+    const borrowModal = document.getElementById('borrowModal');
+    const isModalOpen = borrowModal && borrowModal.classList.contains('show');
+
+    if (!isModalOpen) {
+        // If no books are currently selected, select this one and open modal
+        document.querySelectorAll('#booksTableBody tr.selected').forEach(r => {
+            r.classList.remove('selected');
+        });
+        row.classList.add('selected');
+        openBorrowModal();
+    } else {
+        // Modal is already open, just add the book to selection
+        row.classList.add('selected');
+
+        // Add to enhanced data structure
+        addBookToBorrowerData(bookData);
+
+        // Update UI list with enhanced information
+        const list = document.getElementById('selectedBooksList');
+        if (list) {
+            const li = document.createElement('li');
+            li.textContent = `${bookData.title} by ${bookData.author}`;
+            li.setAttribute('data-id', bookId);
+            li.setAttribute('title', `Book ID: ${bookId} | Genre: ${bookData.genre || 'N/A'} | Year: ${bookData.published_year || 'N/A'}`);
+            li.style.padding = '8px 0';
+            li.style.borderBottom = '1px solid var(--border-light)';
+            li.style.position = 'relative';
+
+            // Add remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '×';
+            removeBtn.className = 'btn btn-sm';
+            removeBtn.style.cssText = `
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--danger);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            removeBtn.onclick = function(e) {
+                e.stopPropagation();
+                removeBookFromSelection(bookId);
+            };
+
+            li.appendChild(removeBtn);
+            list.appendChild(li);
+        }
+
+        updateConfirmButtonState();
     }
 
-    updateConfirmButtonState();
-    showToast(`Added: ${title}`, 'success');
+    showToast(`Added: ${bookData.title} (ID: ${bookId})`, 'success');
 }
 
 // ======================
 // EXPORT FUNCTIONS
 // ======================
 
+// Core borrow functions
 window.borrowOne = borrowOne;
 window.openBorrowModal = openBorrowModal;
 window.closeBorrowModal = closeBorrowModal;
@@ -1179,6 +1365,15 @@ window.editBook = editBook;
 window.showToast = showToast;
 window.updateConfirmButtonState = updateConfirmButtonState;
 
+// Enhanced book data management functions
+window.addBookToBorrowerData = addBookToBorrowerData;
+window.removeBookFromBorrowerData = removeBookFromBorrowerData;
+window.getBorrowerBooksData = getBorrowerBooksData;
+window.clearBorrowerBooksData = clearBorrowerBooksData;
+window.getBookIdsArray = getBookIdsArray;
+window.getReadableBooksList = getReadableBooksList;
+
+// QR Scanner functions
 window.startQRScan = startQRScan;
 window.stopQRScan = stopQRScan;
 window.showQRScannerModal = showQRScannerModal;

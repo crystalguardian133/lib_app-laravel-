@@ -6,11 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>📚 Library Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/christmas-effects.css') }}" id="christmas-styles">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ asset('css/christmas-effects.css') }}">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-  :root {
+:root {
     /* Shared Color Palette */
     --primary: #2fb9eb;           /* Indigo */
     --primary-dark: #4f46e5;
@@ -21,7 +24,7 @@
     --warning: #f59e0b;           /* Amber */
     --danger: #ef4444;            /* Red */
     /* Neutral Scale */
-    --white: #ffffff;
+    --white: #ffffff
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -32,6 +35,12 @@
     --gray-700: #334155;
     --gray-800: #1e293b;
     --gray-900: #0f172a;
+    /*Google Color Scheme*/
+    --google-blue: #4285F4;
+    --google-red: #EA4335 ;
+    --google-yellow: #FBBC05;
+    --google-green: #34A853;
+    
     /* 🌞 LIGHT MODE DEFAULT */
     --background: #f8fafc;
     --surface: rgba(255, 255, 255, 0.85);
@@ -143,8 +152,8 @@
     color: var(--text-primary);
     line-height: 1.6;
     transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
@@ -412,36 +421,36 @@
     display: flex;
     flex-direction: column;
     transform: translateZ(0);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
-  /* Dashboard Content */
+  /* Dashboard Content - Only Scrollable Area */
   .dashboard-content {
+    background: transparent;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none !important;
+    box-shadow: none !important;
+    padding: var(--spacing-lg);
+    margin: 0;
     flex: 1;
     overflow-y: auto;
-    padding-right: 8px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-sm) 0;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--spacing-lg) * 2);
+    max-height: none;
+}
   .dashboard-content::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   .dashboard-content::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: rgba(99, 102, 241, 0.3);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .dashboard-content::-webkit-scrollbar-track {
-    background: var(--border-light);
+    background: rgba(255, 255, 255, 0.05);
   }
   .table-container::-webkit-scrollbar {
     width: 10px;
@@ -477,8 +486,144 @@
   body.dark-mode .table-container::-webkit-scrollbar-track {
     background: rgba(99, 102, 241, 0.2);
   }
+  /* Dark mode adjustments for transparent main container */
+  body.dark-mode .main {
+    background: transparent;
+  }
+  body.dark-mode .dashboard-content {
+    background: transparent;
+  }
+  body.dark-mode footer {
+    background: rgba(0, 0, 0, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
   body.dark-mode .modal-body .table-container::-webkit-scrollbar-track {
     background: rgba(99, 102, 241, 0.2);
+  }
+  /* Enhanced borrower table styles for grouped display */
+  .books-tooltip {
+    position: absolute;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    max-width: 300px;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  body.dark-mode .books-tooltip {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  /* Multiple book return button styling */
+  .btn-return-multiple {
+    background: linear-gradient(135deg, var(--success), #059669);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  .btn-return-multiple:hover {
+    background: linear-gradient(135deg, #059669, var(--success));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  /* Enhanced book display in table cells */
+  .books-cell {
+    position: relative;
+    cursor: help;
+  }
+  .books-cell:hover .books-tooltip {
+    display: block !important;
+  }
+  /* Status indicators for grouped rows */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .status-returned {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  .status-overdue {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+  /* Borrower Status Row Styling */
+  .returned-row {
+    background: rgba(16, 185, 129, 0.05) !important;
+    border-left: 4px solid #10b981;
+  }
+  .pending-row {
+    background: rgba(245, 158, 11, 0.05) !important;
+    border-left: 4px solid #f59e0b;
+  }
+  .overdue-row {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-left: 4px solid #ef4444;
+    animation: overduePulse 2s ease-in-out infinite;
+  }
+  @keyframes overduePulse {
+    0%, 100% { background-color: rgba(239, 68, 68, 0.08); }
+    50% { background-color: rgba(239, 68, 68, 0.12); }
+  }
+  body.dark-mode .returned-row {
+    background: rgba(16, 185, 129, 0.1) !important;
+  }
+  body.dark-mode .pending-row {
+    background: rgba(245, 158, 11, 0.1) !important;
+  }
+  body.dark-mode .overdue-row {
+    background: rgba(239, 68, 68, 0.15) !important;
+  }
+  /* Subtle table header sorting indicators */
+  .sortable-header {
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .sortable-header:hover {
+    background: rgba(99, 102, 241, 0.05);
+    color: var(--primary);
+  }
+  .sortable-header:hover .sort-indicator {
+    opacity: 0.6 !important;
+  }
+  .sortable-header .sort-indicator {
+    transition: all 0.2s ease;
+    font-weight: normal;
+    display: inline-block;
+    transform-origin: center;
+  }
+  .sortable-header:hover .sort-indicator {
+    transform: scale(1.1);
+  }
+  body.dark-mode .sortable-header:hover {
+    background: rgba(99, 102, 241, 0.1);
+  }
+  /* Mobile responsive sort indicators */
+  @media (max-width: 768px) {
+    .sortable-header .sort-indicator {
+      font-size: 0.7rem;
+      opacity: 0.2;
+    }
+    .sortable-header:hover .sort-indicator {
+      opacity: 0.5 !important;
+    }
   }
   .heading {
     font-size: 2rem;
@@ -541,25 +686,11 @@
   .card:hover::before {
     opacity: 1;
   }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
-    opacity: 0;
-    transition: var(--transition);
-  }
   .card:hover {
     transform: scale(1) !important;
     box-shadow: var(--shadow-xl), var(--shadow-glow) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
     z-index: 10 !important;
-  }
-  .card:hover::before {
-    opacity: 1;
   }
   /* Simplified hover system - ensure buttons work properly */
   .card-actions-inline .btn {
@@ -685,15 +816,12 @@
         color 0.5s cubic-bezier(0.4, 0, 0.2, 1)
         box-shadow 0.25s ease, transform 0.25s ease;
 }
-
 .card-actions-bottom .btn i {
     color: var(--primary) !important;
     font-size: 16px;
     font-weight: 900;
     transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-
 .card-actions-bottom .btn:hover {
     border-color: var(--primary) !important;
     background: transparent !important;
@@ -701,11 +829,9 @@
     transform: translateY(-2px) scale(1.03);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
 }
-
 .card-actions-bottom .btn:hover i {
     color: var(--primary) !important;
 }
-
   /* Stats Overview Card */
   .stats-overview-card {
     cursor: default;
@@ -813,7 +939,7 @@
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  /* Modal Styles */
+  /* Modal Overlay Styles - UPDATED TO MATCH BOOKS/MEMBERS */
   .modal {
     display: none;
     position: fixed;
@@ -823,9 +949,571 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 2000;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .modal.show {
+    display: flex !important;
+    opacity: 1;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999 !important;
+  }
+  .modal-content, .modal-card {
+    background: var(--surface-elevated);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  /* New Modal Styles to Match Members/Index */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal-container {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+  }
+  .modal-overlay.active .modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  .modal-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface-elevated);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .modal-close {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-muted);
+  }
+  .modal-close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+  .modal-body {
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+  .modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  .modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: var(--radius);
+  }
+  .modal-body::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+  .modal-footer {
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+  }
+  body.dark-mode .modal-header {
+    border-bottom-color: var(--border);
+  }
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+  }
+  .modal-close, .close-modal {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close:hover, .close-modal:hover {
+    background: var(--glass-bg);
+    color: var(--danger);
+    transform: scale(1.1);
+    border-color: var(--danger);
+  }
+  .modal-body {
+    padding: 0;
+    margin-bottom: 1.5rem;
+  }
+  .modal-footer, .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border-light);
+  }
+  body.dark-mode .modal-footer,
+  body.dark-mode .modal-actions {
+    border-top-color: var(--border);
+  }
+  body.dark-mode .modal-body::-webkit-scrollbar-thumb {
+    background: var(--accent);
+  }
+  body.dark-mode .modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .form-section::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+  }
+  body.dark-mode .form-section::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  body.dark-mode .form-section.no-scroll {
+    max-height: none;
+    overflow: visible;
+  }
+  /* Ensure modal footer buttons are visible and clickable */
+  .modal-footer .btn,
+  .modal-actions .btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    min-width: 140px;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+  /* Form Styles - Copied from Members Index */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+  }
+  .form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .form-input, .form-control {
+    padding: 12px 16px;
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+  }
+  .form-input:focus, .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow);
+    background: var(--surface-elevated);
+    transform: translateY(-1px);
+  }
+  .form-input:hover, .form-control:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  .form-input[type="file"] {
+    display: none;
+  }
+  .form-input select, .form-control select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+    border: 2px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+  }
+  /* Photo Upload Styles - Matching Books/Members Design */
+  .photo-upload {
+    border: 3px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: var(--surface);
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+  }
+  .photo-upload:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .photo-upload input[type="file"] {
+    display: none;
+  }
+  .photo-upload i {
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+  }
+  .photo-upload:hover i {
+    color: var(--primary);
+    transform: scale(1.1);
+  }
+  .photo-upload p {
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+  .photo-preview {
+    width: 100%;
+    height: 200px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .photo-upload-container {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Button Styles - MATCHING BOOKS/MEMBERS DESIGN */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: 12px 24px;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    min-width: 140px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: var(--shadow);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    box-shadow: var(--shadow);
+  }
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  /* Custom Button Styles for Modals */
+  .btn-cancel {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+  }
+  .btn-cancel:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+  }
+  .btn-confirm {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+  }
+  .btn-confirm:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+  /* Dark Mode Adjustments for Modals */
+  body.dark-mode .modal-content,
+  body.dark-mode .modal-card {
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    border-color: var(--glass-border);
+  }
+  body.dark-mode .modal-header {
+    background: rgba(30, 30, 30, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .modal-close, body.dark-mode .close-modal {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
+  }
+  body.dark-mode .modal-close:hover, body.dark-mode .close-modal:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+  body.dark-mode .form-input, body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  body.dark-mode .form-input:focus, body.dark-mode .form-control:focus {
+    background: rgba(30, 41, 59, 1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  body.dark-mode .form-input:hover, body.dark-mode .form-control:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  body.dark-mode .form-input select, body.dark-mode .form-control select {
+    border-color: rgba(71, 85, 105, 0.5);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  body.dark-mode .photo-upload {
+    background: rgba(30, 41, 59, 0.3);
+    border-color: #9ca3af;
+  }
+  body.dark-mode .photo-upload:hover {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: var(--accent);
+  }
+  .form-section {
+    margin-bottom: 2rem;
+    overflow: visible;
+  }
+  .form-section::-webkit-scrollbar {
+    width: 6px;
+  }
+  .form-section::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: var(--radius);
+  }
+  .form-section::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-label i {
+    color: var(--primary);
+    font-size: 0.85rem;
+  }
+  .photo-upload-container {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .photo-upload {
+    border: 3px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: var(--surface);
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-upload:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .upload-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-sm);
+    box-shadow: var(--shadow-md);
+    animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .upload-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .upload-main-text {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+  }
+  .upload-sub-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  .photo-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    position: absolute;
+    top: 0;
+    left: 0;
   }
   .modal.show {
     display: flex !important;
@@ -836,7 +1524,7 @@
     to { opacity: 1; }
   }
   .modal-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0);
     backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 2.5rem;
@@ -848,13 +1536,13 @@
     animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   @keyframes slideUp {
-    from { 
-      opacity: 0; 
-      transform: translateY(30px) scale(0.95); 
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
     }
-    to { 
-      opacity: 1; 
-      transform: translateY(0) scale(1); 
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
   @keyframes slideInFromLeft {
@@ -894,27 +1582,6 @@
       transform: scale(1);
     }
   }
-  .modal-content {
-    background: rgba(255, 255, 255, 0.98) !important;
-    backdrop-filter: blur(25px) !important;
-    border-radius: 24px;
-    padding: 3rem;
-    width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-xl), 0 0 40px rgba(99, 102, 241, 0.15) !important;
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid rgba(99, 102, 241, 0.1) !important;
-    position: relative;
-    z-index: 10;
-  }
-  body.dark-mode .modal-content {
-    background: rgba(15, 23, 42, 0.98);
-    color: var(--text-primary);
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: var(--shadow-xl), 0 0 50px rgba(99, 102, 241, 0.2);
-  }
   body.dark-mode .modal-title {
     color: var(--accent);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -927,16 +1594,68 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 4px solid rgba(99, 102, 241, 0.3);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(6, 182, 212, 0.05));
-    border-radius: 16px 16px 0 0;
-    padding: 2.5rem 3rem 2rem 3rem;
-    margin: -3rem -3rem 2.5rem -3rem;
+    margin-bottom: 0rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     position: relative;
     overflow: hidden;
-    z-index: 5;
+  }
+  .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(6, 182, 212, 0.05));
+    z-index: 1;
+  }
+  .modal-header > * {
+    position: relative;
+    z-index: 2;
+  }
+  .modal-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .modal-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-lg);
+    animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .modal-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  .modal-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
   }
   .modal-header::before {
     content: '';
@@ -970,53 +1689,25 @@
   body.dark-mode .modal-title {
     color: var(--accent-light);
   }
-  .modal-close, .close-modal {
-    background: rgba(99, 102, 241, 0.1);
-    border: 2px solid rgba(99, 102, 241, 0.2);
-    font-size: 1.8rem;
-    color: var(--primary);
-    cursor: pointer;
-    padding: 12px;
-    border-radius: 50%;
-    transition: var(--transition);
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-    position: relative;
-    z-index: 15;
-  }
-  .modal-close:hover, .close-modal:hover {
-    background: var(--primary);
-    color: #ffffff;
-    transform: scale(1.15) rotate(90deg);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-    border-color: var(--primary);
-  }
-  body.dark-mode .modal-close, body.dark-mode .close-modal {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
-    color: var(--accent);
-  }
-  body.dark-mode .modal-close:hover, body.dark-mode .close-modal:hover {
-    background: var(--accent);
-    color: #ffffff;
-    border-color: var(--accent);
-    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.5);
-  }
   .modal-body {
     padding: 0;
   }
   .modal-footer, .modal-actions {
-    display: flex;
+    display: flex !important;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 2rem;
+    margin-top: -2rem;
+    padding-top: 1.5rem;
     border-top: 2px solid rgba(0,0,0,0.05);
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 50 !important;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    flex-shrink: 0;
   }
   body.dark-mode .modal-actions {
     border-top-color: rgba(255,255,255,0.1);
@@ -1025,16 +1716,61 @@
     min-width: 140px;
     justify-content: center;
     animation: slideInFromLeft 0.5s ease-out;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: var(--radius-lg);
+    padding: 12px 24px;
+    transition: var(--transition-spring);
   }
   .modal-actions .btn:nth-child(2) {
     animation: slideInFromRight 0.5s ease-out;
   }
+  .modal-actions .btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+  }
+  .modal-actions .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    box-shadow: var(--shadow-xl);
+  }
+  .modal-actions .btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-actions .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    box-shadow: var(--shadow-xl);
+  }
   .form-section {
     margin-bottom: 2.5rem;
+    margin-left: var(--spacing-sm);
+    margin-right: var(--spacing-sm);
     animation: slideInFromLeft 0.6s ease-out;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    box-shadow: var(--glass-shadow);
+    transition: var(--transition);
   }
   .form-section:nth-child(even) {
     animation: slideInFromRight 0.6s ease-out;
+  }
+  .form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: rgba(99, 102, 241, 0.3);
   }
   .section-title {
     font-size: 1.3rem;
@@ -1057,6 +1793,7 @@
     flex-direction: column;
     margin-bottom: 0;
     animation: bounceIn 0.5s ease-out;
+    padding: 0 var(--spacing-sm);
   }
   .form-group:nth-child(1) { animation-delay: 0.1s; }
   .form-group:nth-child(2) { animation-delay: 0.2s; }
@@ -1089,8 +1826,13 @@
     transform: translateY(-1px);
   }
   .form-control:hover {
-    border-color: #d1d5db;
+    border-color: var(--primary);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+  .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
   }
   body.dark-mode .form-control {
     background: rgba(30, 41, 59, 0.9);
@@ -1125,55 +1867,6 @@
     background: linear-gradient(135deg, #4b5563, #374151);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
-  }
-  #cover-preview-area {
-    border: 2px dashed #d1d5db;
-    border-radius: 16px;
-    padding: 2rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: rgba(249, 250, 251, 0.5);
-    backdrop-filter: blur(10px);
-    animation: bounceIn 0.8s ease-out;
-  }
-  #cover-preview-area:hover {
-    border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
-  }
-  #cover-preview-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
-  #cover-upload-icon {
-    font-size: 2.5rem;
-    color: var(--text-muted);
-    transition: all 0.3s ease;
-  }
-  #cover-preview-area:hover #cover-upload-icon {
-    color: var(--primary);
-    transform: scale(1.1);
-  }
-  #cover-preview-text {
-    color: var(--text-muted);
-    margin: 0;
-    font-weight: 500;
-    font-size: 1.1rem;
-  }
-  .cover-input {
-    display: none;
-  }
-  body.dark-mode #cover-preview-area {
-    background: rgba(30, 41, 59, 0.3);
-    border-color: rgba(71, 85, 105, 0.5);
-  }
-  body.dark-mode #cover-preview-area:hover {
-    background: rgba(6, 182, 212, 0.1);
-    border-color: var(--accent);
   }
   /* Table Styles */
   .table-container {
@@ -1268,10 +1961,10 @@
   /* Chatbot Button */
   #chatbot-button {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 60px;
-    height: 60px;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
     display: grid;
     place-items: center;
     background: linear-gradient(135deg, var(--accent), var(--primary));
@@ -1283,6 +1976,7 @@
     z-index: 2200;
     transition: var(--transition-spring);
     animation: pulse 3s infinite alternate;
+    font-size: 18px;
   }
   @keyframes pulse {
     0% { 
@@ -1304,10 +1998,10 @@
   /* Chatbot Window */
   #chatbot-window {
     position: fixed;
-    bottom: 100px;
-    right: 24px;
-    width: 380px;
-    max-width: calc(100vw - 48px);
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    max-width: calc(100vw - 40px);
     background: var(--surface-elevated);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -1320,8 +2014,100 @@
     z-index: 2300;
     animation: chatSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  /* Message Container */
+  .message-container {
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .message-container.user {
+    justify-content: flex-end;
+  }
+
+  .message-container i {
+    font-size: 14px;
+    position: absolute;
+    top: 10px;
+    color: var(--primary);
+  }
+
+  .message-container.bot i {
+    left: 6px;
+  }
+
+  .message-container.user i {
+    right: 6px;
+  }
+
+  .message-container .msg {
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    max-width: 80%;
+    word-wrap: break-word;
+    margin-left: 20px;
+    font-size: 0.9rem;
+  }
+
+  .message-container.user .msg {
+    margin-left: 0;
+    margin-right: 20px;
+  }
+
+  .message-container .msg.user {
+    background: var(--primary);
+    color: white;
+    text-align: left;
+  }
+
+  .message-container .msg.bot {
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+
+  /* Typing Indicator */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-right: auto;
+    max-width: 80%;
+  }
+
+  .ripple-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .ripple-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: ripple 1.4s ease-in-out infinite both;
+  }
+
+  .ripple-circle:nth-child(1) { animation-delay: -0.32s; }
+  .ripple-circle:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes ripple {
+    0%, 80%, 100% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
   #chatbot-header {
-    padding: 16px 18px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     font-weight: 700;
@@ -1330,31 +2116,36 @@
     justify-content: space-between;
     box-shadow: var(--shadow-lg);
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
   }
   #chatbot-close {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    font-size: 18px;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0.7;
   }
   #chatbot-close:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+    opacity: 1;
+    transform: scale(1.05);
   }
   #chatbot-messages {
-    height: 320px;
+    height: 280px;
     overflow-y: auto;
-    padding: 16px;
+    padding: 12px;
     background: var(--surface);
     color: var(--text-primary);
     border-bottom: 1px solid var(--border);
@@ -1369,17 +2160,17 @@
   #chatbot-input {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px;
+    gap: 6px;
+    padding: 10px;
     background: var(--surface);
     border-top: 2px solid var(--border);
   }
   #chatbot-user-input {
     flex: 1;
-    padding: 12px 16px;
+    padding: 8px 10px;
     border: 2px solid var(--border);
     border-radius: var(--radius);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     background: var(--surface-elevated);
     color: var(--text-primary);
     transition: var(--transition);
@@ -1389,8 +2180,37 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
   }
+  #chatbot-user-input {
+    transition: all 0.3s ease-in-out;
+    position: relative;
+  }
+  #chatbot-user-input::placeholder {
+    transition: opacity 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .gemini-branding {
+    transition: opacity 0.3s ease-in-out;
+  }
+  /* Thinking animation for input box */
+  #chatbot-user-input.thinking {
+    animation: thinkingPulse 1.5s ease-in-out infinite;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+  }
+  @keyframes thinkingPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes spinningGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes geminiGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
   #chatbot-send {
-    padding: 12px 18px;
+    padding: 8px 12px;
     border: 2px solid transparent;
     border-radius: var(--radius);
     background: linear-gradient(135deg, var(--accent), var(--accent-dark));
@@ -1399,6 +2219,7 @@
     cursor: pointer;
     transition: var(--transition-spring);
     box-shadow: var(--shadow-lg);
+    font-size: 0.85rem;
   }
   #chatbot-send:hover {
     transform: translateY(-2px) scale(1.05);
@@ -1541,7 +2362,7 @@
   .dark-mode-transition {
     animation: darkModePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* ✨ Glassmorphism Enforcement & Modal Exclusion */
+  /* ✨ Glassmorphism Enforcement & Modal Exclusion — FIXED */
   /* Apply glass to all intended elements */
   .sidebar,
   .main,
@@ -1560,439 +2381,189 @@
     border: 1px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
   }
-  /* Ensure modal elements are never affected by glassmorphism */
-  .modal *,
-  .modal-content,
-  .modal-card,
-  .modal-title,
-  .modal-header,
-  .modal-body,
-  .modal-footer,
-  .modal-close,
-  .close-modal {
-    background: unset !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: unset !important;
-    box-shadow: unset !important;
-  }
-  /* Dark mode tweaks for form controls */
-  body.dark-mode .form-control {
-    background: rgba(30, 41, 59, 0.6) !important;
-  }
-  /* ❌ EXCLUDE MODALS AND TOASTS FROM GLASS STYLING */
-  .modal,
-  .modal *,
-  .modal-content,
-  .modal-card,
-  .toast-notification,
-  .toast-notification * {
-    background: unset !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: unset !important;
-    box-shadow: unset !important;
-  }
-  /* Restore intended modal styles */
-  .modal-content,
-  .modal-card {
-    background: rgba(255, 255, 255, 0.98) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    box-shadow: var(--shadow-xl), 0 0 40px rgba(99, 102, 241, 0.15) !important;
-    border-radius: 24px !important;
-    border: 2px solid rgba(99, 102, 241, 0.1) !important;
-  }
-  body.dark-mode .modal-content,
-  body.dark-mode .modal-card {
-    background: rgba(15, 23, 42, 0.98) !important;
-    box-shadow: var(--shadow-xl), 0 0 50px rgba(99, 102, 241, 0.2) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
-  }
-  /* 🎄 Christmas Effects Styles */
-  body.christmas-theme {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%) !important;
-    position: relative;
-  }
-  body.christmas-theme.dark-mode {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
-  }
-  /* Christmas Snow Animation */
-  body.christmas-theme::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image:
-      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
-      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
-      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
-      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
-      radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.8), transparent);
-    background-repeat: repeat;
-    background-size: 200px 100px;
-    animation: snowTexture 20s linear infinite;
-    pointer-events: none;
-    z-index: 997;
-    opacity: 0.3;
-  }
-  @keyframes snowTexture {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(100px); }
-  }
-  /* Christmas Card Enhancements */
-  body.christmas-theme .card {
-    border: 2px solid #dc2626 !important;
-    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15), 0 0 20px rgba(220, 38, 38, 0.1) !important;
-    position: relative;
-    overflow: visible !important;
-  }
-  body.christmas-theme .card::before {
-    content: '🎄';
-    position: absolute;
-    top: -15px;
-    right: 15px;
-    font-size: 20px;
-    opacity: 0.7;
-    z-index: 1001;
-    animation: twinkle 3s ease-in-out infinite;
-  }
-  body.christmas-theme .card:hover {
-    border-color: #16a34a !important;
-    box-shadow: 0 12px 35px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.15) !important;
-    transform: translateY(-5px) scale(1.02) !important;
-  }
-  /* Christmas Button Enhancements */
-  body.christmas-theme .btn-primary {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    border: 2px solid #991b1b !important;
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3), 0 0 20px rgba(220, 38, 38, 0.2) !important;
-    position: relative;
-    overflow: hidden;
-  }
-  body.christmas-theme .btn-primary::before {
-    content: '🎅';
-    position: absolute;
-    right: -20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    opacity: 0.3;
-    transition: all 0.3s ease;
-  }
-  body.christmas-theme .btn-primary:hover::before {
-    right: 8px;
-    opacity: 0.6;
-  }
-  body.christmas-theme .btn-primary:hover {
-    background: linear-gradient(135deg, #16a34a, #15803d) !important;
-    border-color: #166534 !important;
-    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4), 0 0 25px rgba(22, 163, 74, 0.3) !important;
-    transform: translateY(-2px) scale(1.05) !important;
-  }
-  /* Christmas Sidebar Enhancements */
-  body.christmas-theme .sidebar {
-    background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%) !important;
-    border-right: 3px solid #dc2626 !important;
-    position: relative;
-    overflow: visible !important;
-  }
-  body.christmas-theme .sidebar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -3px;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom,
-      #dc2626 0%,
-      #16a34a 25%,
-      #fbbf24 50%,
-      #16a34a 75%,
-      #dc2626 100%);
-    animation: christmasBorder 2s linear infinite;
-  }
-  @keyframes christmasBorder {
-    0%, 100% { background-position: 0 0; }
-    50% { background-position: 0 100px; }
-  }
-  body.christmas-theme .sidebar nav a {
-    position: relative;
-    border-radius: 12px;
-    margin: 4px 8px;
-  }
-  body.christmas-theme .sidebar nav a::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(to bottom, #dc2626, #16a34a);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 2px;
-  }
-  body.christmas-theme .sidebar nav a:hover::before,
-  body.christmas-theme .sidebar nav a.active::before {
-    opacity: 1;
-  }
-  body.christmas-theme .sidebar nav a.active {
-    background: rgba(220, 38, 38, 0.1) !important;
-    border: 1px solid rgba(220, 38, 38, 0.3) !important;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2) !important;
-  }
-  /* Christmas Logo Enhancement */
-  body.christmas-theme .logo {
-    position: relative;
-    filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.3)) !important;
-  }
-  body.christmas-theme .logo::after {
-    content: '🎄';
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 16px;
-    animation: bounce 2s ease-in-out infinite;
-  }
-  /* Christmas Stats Cards */
-  body.christmas-theme .stats {
-    position: relative;
-  }
-  body.christmas-theme .stats::before {
-    content: '❄';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    opacity: 0.5;
-    animation: snowFloat 4s ease-in-out infinite;
-  }
-  @keyframes snowFloat {
-    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.3; }
-    50% { transform: translateX(-50%) translateY(-10px); opacity: 0.7; }
-  }
-  /* Christmas Heading Enhancement */
-  body.christmas-theme .heading,
-  body.christmas-theme .dashboard-title {
-    position: relative;
-    text-shadow: 2px 2px 4px rgba(220, 38, 38, 0.3) !important;
-  }
-  body.christmas-theme .heading::after,
-  body.christmas-theme .dashboard-title::after {
-    content: '🎅';
-    position: absolute;
-    right: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 24px;
-    animation: santaWave 3s ease-in-out infinite;
-  }
-  @keyframes santaWave {
-    0%, 100% { transform: translateY(-50%) rotate(-5deg); }
-    50% { transform: translateY(-50%) rotate(5deg); }
-  }
-  /* Christmas Table Enhancements */
-  body.christmas-theme .data-table th {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    position: relative;
-  }
-  body.christmas-theme .data-table th::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #16a34a, #fbbf24, #16a34a);
-    animation: tableAccent 3s linear infinite;
-  }
-  @keyframes tableAccent {
-    0% { background-position: -100px 0; }
-    100% { background-position: 100px 0; }
-  }
-  body.christmas-theme .data-table tr:nth-child(even) {
-    background: rgba(220, 38, 38, 0.05) !important;
-  }
-  body.christmas-theme .data-table tr:hover {
-    background: rgba(22, 163, 74, 0.1) !important;
-    transform: translateX(4px) !important;
-    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.2) !important;
-  }
-  /* Christmas Modal Enhancements */
-  body.christmas-theme .modal-content {
-    border: 3px solid #dc2626 !important;
-    box-shadow: 0 20px 40px rgba(220, 38, 38, 0.2), 0 0 30px rgba(220, 38, 38, 0.1) !important;
-  }
-  body.christmas-theme .modal-header {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    border-bottom: 3px solid #16a34a !important;
-    position: relative;
-  }
-  body.christmas-theme .modal-header::after {
-    content: '🎁';
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    opacity: 0.7;
-  }
-  body.christmas-theme .modal-title {
+  /* Override for modal footer buttons to ensure visibility */
+  .modal-footer .btn,
+  .modal-actions .btn {
+    background: var(--primary) !important;
     color: white !important;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+    border: 2px solid var(--primary) !important;
+    box-shadow: var(--shadow-lg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
-  /* Christmas Form Enhancements */
-  body.christmas-theme .form-control {
-    border: 2px solid #dc2626 !important;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.1) !important;
-  }
-  body.christmas-theme .form-control:focus {
-    border-color: #16a34a !important;
-    box-shadow: 0 0 15px rgba(22, 163, 74, 0.2) !important;
-  }
-  /* Christmas Toast Enhancements */
-  body.christmas-theme .toast-notification.toast-success {
-    background: linear-gradient(135deg, #16a34a, #15803d) !important;
-    border-left: 5px solid #dc2626 !important;
-  }
-  body.christmas-theme .toast-notification.toast-error {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-    border-left: 5px solid #16a34a !important;
-  }
-  body.christmas-theme .toast-notification.toast-info {
-    background: linear-gradient(135deg, #fbbf24, #d97706) !important;
-    border-left: 5px solid #dc2626 !important;
-  }
-  /* Christmas Scrollbar Styling */
-  body.christmas-theme ::-webkit-scrollbar {
-    width: 12px !important;
-  }
-  body.christmas-theme ::-webkit-scrollbar-track {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
-  }
-  body.christmas-theme ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #dc2626, #16a34a) !important;
-    border-radius: 6px !important;
-    border: 2px solid #fbbf24 !important;
-  }
-  body.christmas-theme ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #b91c1c, #15803d) !important;
-    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5) !important;
-  }
-  /* Dark mode Christmas theme adjustments */
-  body.christmas-theme.dark-mode .card {
-    background: rgba(15, 23, 42, 0.9) !important;
-    border-color: #dc2626 !important;
-  }
-  body.christmas-theme.dark-mode .sidebar {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
-  }
-  body.christmas-theme.dark-mode .data-table th {
-    background: linear-gradient(135deg, #7f1d1d, #991b1b) !important;
-  }
-  body.christmas-theme.dark-mode .btn-primary {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
-  }
-  /* Christmas Toggle Button Styling */
-  .christmas-toggle {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: rgba(220, 38, 38, 0.1);
-    border: 2px solid #dc2626;
-    border-radius: 20px;
-    color: #dc2626;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 8px auto;
-    min-width: 120px;
-    justify-content: center;
-  }
-  .christmas-toggle:hover {
-    background: rgba(220, 38, 38, 0.2);
-    border-color: #b91c1c;
-    color: #b91c1c;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
-  }
-  .christmas-toggle.active {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    color: white;
-    border-color: #991b1b;
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
-  }
-  .christmas-toggle .icon {
-    font-size: 16px;
-    animation: christmasIcon 2s ease-in-out infinite;
-  }
-  @keyframes christmasIcon {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.1) rotate(5deg); }
-  }
-  /* Christmas Mobile Responsiveness */
-  @media (max-width: 768px) {
-    body.christmas-theme .christmas-toggle {
-      padding: 6px 10px;
-      font-size: 12px;
-      min-width: 100px;
-    }
-    body.christmas-theme .card::before {
-      font-size: 16px;
-      top: -12px;
-      right: 12px;
-    }
-    body.christmas-theme .heading::after,
-    body.christmas-theme .dashboard-title::after {
-      font-size: 20px;
-      right: -30px;
-    }
-  }
-  /* Responsive Design */
-  @media (max-width: 768px) {
+  /* Large Desktop - Enhanced Layout */
+  @media (min-width: 1200px) {
     .sidebar {
-      width: 80px;
-      padding: var(--spacing);
+      width: 300px;
+    }
+    .main {
+      margin-left: 300px;
+      min-width: calc(100% - 300px);
+    }
+    .stats {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+  /* Tablet Landscape and Small Desktop */
+  @media (min-width: 769px) and (max-width: 1199px) {
+    .sidebar {
+      width: 240px;
+      padding: var(--spacing-lg);
+    }
+    .main {
+      margin-left: 240px;
+      min-width: calc(100% - 240px);
+      padding: var(--spacing-lg);
+    }
+    .sidebar-header .label {
+      font-size: 1rem;
+    }
+    .stats {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--spacing-lg);
+    }
+    .card {
+      min-height: 160px;
+    }
+    .dashboard-content {
+      padding: var(--spacing-xl);
+    }
+  }
+  /* Enhanced Mobile-First Design */
+  @media (max-width: 768px) {
+    /* Collapsible Sidebar for Mobile */
+    .sidebar {
+      width: 70px;
+      padding: var(--spacing-sm);
+      position: fixed;
+      z-index: 1000;
+    }
+    /* Compact sidebar header */
+    .sidebar-header {
+      margin-bottom: var(--spacing-lg);
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-header .logo {
+      width: 32px;
+      height: 32px;
     }
     .sidebar-header .label {
       display: block !important;
+      font-size: 0.75rem;
       font-weight: 700;
-      font-size: 1.1rem;
       color: var(--primary) !important;
-      transition: var(--transition);
+      text-align: center;
+      line-height: 1.2;
       opacity: 1 !important;
       visibility: visible !important;
+    }
+    /* Icon-only navigation for mobile */
+    .sidebar nav a {
+      padding: 12px;
+      justify-content: center;
+      margin-bottom: var(--spacing-xs);
     }
     .sidebar nav a .label {
-      display: inline !important;
-      font-weight: 500;
-      font-size: 14px;
-      background: none;
-      background-clip: initial;
-      -webkit-background-clip: initial;
-      -webkit-text-fill-color: initial;
-      color: rgba(255, 255, 255, 0.9) !important;
-      transition: var(--transition);
-      opacity: 1 !important;
-      visibility: visible !important;
+      display: none !important;
     }
+    .sidebar nav a .icon {
+      font-size: 20px;
+      width: 24px;
+    }
+    /* Full-width main content */
     .main {
-      margin-left: 80px;
-      min-width: calc(100% - 80px);
-      padding: var(--spacing-lg);
+      margin-left: 70px;
+      width: calc(100% - 70px);
+      padding: var(--spacing);
+      height: 100vh;
+      overflow: hidden;
+      min-height: 100vh;
     }
+    /* Mobile-friendly dashboard title */
+    .dashboard-title {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+      padding: 0 var(--spacing-sm);
+    }
+    /* Enhanced card layout for mobile */
+    .card {
+      min-height: 140px;
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-header {
+      margin-bottom: var(--spacing);
+    }
+    .card-header h3 {
+      font-size: 0.9rem;
+      margin-bottom: var(--spacing-sm);
+      text-align: center;
+      line-height: 1.3;
+    }
+    .card .count {
+      font-size: 2.2rem;
+      text-align: center;
+      margin: var(--spacing) 0;
+      font-weight: 900;
+    }
+    /* Touch-friendly buttons */
+    .card-actions-bottom {
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: var(--spacing-lg);
+      gap: var(--spacing);
+      width: 100%;
+    }
+    .card-actions-bottom .btn {
+      flex: 1;
+      min-width: 48px; /* Minimum touch target */
+      min-height: 48px;
+      padding: var(--spacing-sm) var(--spacing-xs);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .card-actions-bottom .btn i {
+      font-size: 18px;
+    }
+    .card-actions-bottom .btn:first-child {
+      margin-right: var(--spacing-xs);
+    }
+    /* Single column layouts */
+    .stats {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+      width: 100%;
+    }
+    /* Optimized dashboard content scrolling */
+    .dashboard-content {
+      height: calc(100vh - var(--spacing) - 100px);
+      max-height: calc(100vh - var(--spacing) - 100px);
+      padding: var(--spacing);
+      margin: var(--spacing-sm) 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Thinner scrollbar for mobile */
+    .dashboard-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    /* Mobile chatbot */
     #chatbot-window {
       width: calc(100vw - 32px);
       left: 16px;
       right: 16px;
       bottom: 90px;
+      max-height: 60vh;
       border-radius: var(--radius-md);
     }
     #chatbot-button {
@@ -2000,52 +2571,324 @@
       right: 16px;
       width: 56px;
       height: 56px;
+      z-index: 1500;
     }
+    /* Single column charts */
     .chart-grid {
       grid-template-columns: 1fr;
-    }
-    .stats {
-      grid-template-columns: 1fr;
-    }
-    .heading {
-      font-size: 1.75rem;
-    }
-    /* Improved mobile card responsiveness */
-    .card {
-      min-height: 120px;
-    }
-    .card-actions-bottom {
-      justify-content: center;
-      margin-top: var(--spacing-sm);
-    }
-    .card-actions-bottom .btn {
-      flex: 1;
-      max-width: 120px;
-    }
-    .card .count {
-      text-align: center;
-      margin-top: 8px;
-    }
-    .stats-subcard {
-      min-height: 80px;
-    }
-  }
-  @media (max-width: 480px) {
-    .main {
-      padding: var(--spacing);
-    }
-    .stats {
       gap: var(--spacing);
     }
-    .card {
-      padding: var(--spacing);
+    /* Mobile-optimized modals */
+    .modal-content {
+      max-width: 95vw;
+      max-height: 90vh;
+      margin: 5vh auto;
+      padding: var(--spacing-lg);
     }
-    .heading {
-      font-size: 1.5rem;
+    .modal-header {
+      padding: var(--spacing-lg) var(--spacing-lg) var(--spacing);
+      margin: -var(--spacing-lg) -var(--spacing-lg) var(--spacing-lg);
+    }
+    /* Single column forms */
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing);
+    }
+    /* Mobile-friendly tables */
+    .data-table {
+      font-size: 0.85rem;
+    }
+    .data-table th,
+    .data-table td {
+      padding: var(--spacing-sm) 6px;
+    }
+    /* Mobile toast positioning */
+    #toast-stack {
+      left: var(--spacing);
+      right: var(--spacing);
+      max-width: none;
+      bottom: var(--spacing);
+      top: auto;
+    }
+    /* Mobile filter controls */
+    .card-actions {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      align-items: stretch;
+    }
+    .card-actions select {
+      width: 100%;
+      margin-bottom: 0;
+    }
+    /* Better touch targets for mobile */
+    .btn, button {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 10px 16px;
+    }
+    /* Improved form elements for mobile */
+    .form-control {
+      padding: 14px 16px;
+      font-size: 16px; /* Prevents zoom on iOS */
+      border-radius: var(--radius);
+    }
+    select.form-control {
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+    /* Better spacing for mobile */
+    .card {
+      margin-bottom: var(--spacing-lg);
+    }
+    /* Mobile-optimized headings */
+    h3, .card-header h3 {
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+    /* Landscape orientation improvements */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .main {
+        padding: 8px;
+      }
+      .dashboard-content {
+        height: calc(100vh - 8px - 50px - 1rem);
+        padding: 8px;
+      }
+      .card {
+        min-height: 100px;
+        padding: 12px;
+      }
+      .sidebar {
+        width: 60px;
+      }
+      .main {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+      }
     }
   }
+  /* Extra Small Mobile Devices */
+  @media (max-width: 480px) {
+    /* Further reduced sidebar */
+    .sidebar {
+      width: 60px;
+      padding: 6px;
+    }
+    .main {
+      margin-left: 60px;
+      width: calc(100% - 60px);
+      padding: var(--spacing-sm);
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Smaller dashboard content */
+    .dashboard-content {
+      height: calc(100vh - var(--spacing-sm) - 80px);
+      max-height: calc(100vh - var(--spacing-sm) - 80px);
+      padding: var(--spacing-sm);
+      margin: 8px 0;
+    }
+    /* Compact dashboard title */
+    .dashboard-title {
+      font-size: 1.25rem;
+      margin-bottom: var(--spacing);
+    }
+    /* Smaller cards for very small screens */
+    .card {
+      min-height: 130px;
+      padding: var(--spacing);
+      margin-bottom: var(--spacing);
+    }
+    .card .count {
+      font-size: 1.9rem;
+      margin: var(--spacing-sm) 0;
+    }
+    .card-actions-bottom .btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+    /* Compact stats layout */
+    .stats {
+      gap: 12px;
+      margin-bottom: var(--spacing);
+    }
+    /* Smaller text in tables */
+    .data-table {
+      font-size: 0.8rem;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 8px 4px;
+    }
+    /* Compact modal for very small screens */
+    .modal-content {
+      max-width: 98vw;
+      padding: var(--spacing);
+    }
+    /* Smaller chatbot on very small screens */
+    #chatbot-window {
+      max-height: 50vh;
+    }
+    #chatbot-button {
+      width: 50px;
+      height: 50px;
+    }
+    /* Hide non-essential elements on very small screens */
+    .sidebar-header .label {
+      display: none !important;
+    }
+    /* Compact navigation for very small screens */
+    .sidebar nav a {
+      padding: 10px;
+    }
+  }
+  /* Prevent horizontal scroll on all devices */
+  * {
+    max-width: 100%;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Ensure proper viewport handling */
+  @media (max-width: 768px) {
+    .main, .dashboard-content {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Better button spacing on mobile */
+    .card-actions-bottom {
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing);
+    }
+    .card-actions-bottom .btn {
+      font-size: 0.9rem;
+      padding: var(--spacing-sm) var(--spacing);
+    }
+    /* Ensure proper card content spacing */
+    .card-header {
+      margin-bottom: var(--spacing-sm);
+    }
+    .card .count {
+      margin: var(--spacing-sm) 0 var(--spacing) 0;
+    }
+  }
+  /* Additional mobile layout fixes */
+  @media (max-width: 768px) {
+    /* Ensure no horizontal overflow */
+    * {
+      box-sizing: border-box;
+    }
+    /* Better main content layout */
+    .main {
+      position: relative;
+      z-index: 1;
+    }
+    /* Proper dashboard content structure */
+    .dashboard-content > * {
+      margin-bottom: var(--spacing-lg);
+    }
+    .dashboard-content > *:last-child {
+      margin-bottom: 0;
+    }
+    /* Mobile-friendly borrower table */
+    .books-tooltip {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: none;
+      z-index: 9999;
+    }
+    /* Mobile action buttons */
+    .btn-return-multiple {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+    }
+    /* Compact book display on mobile */
+    .books-cell {
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Mobile bulk return section */
+    #bulkReturnSection {
+      margin: 0.5rem;
+      padding: 0.75rem;
+    }
+    #bulkReturnSection .btn {
+      font-size: 0.7rem;
+      padding: 6px 10px;
+    }
+  }
+  /* Enhanced table row hover effects for grouped data */
+  .data-table tr {
+    transition: all 0.3s ease;
+  }
+  .data-table tr:hover .books-tooltip {
+    display: block !important;
+  }
+  /* Loading state improvements */
+  .loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  /* Button states for return operations */
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-return-multiple:disabled {
+    background: var(--warning) !important;
+    color: white !important;
+  }
+  /* Enhanced tooltip positioning */
+  .books-tooltip {
+    position: absolute;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    max-width: 300px;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+  body.dark-mode .books-tooltip {
+    background: rgba(30, 30, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  /* Mobile tooltip improvements */
+  @media (max-width: 768px) {
+    .books-tooltip {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: none;
+      z-index: 9999;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  }
+  /* Select all checkbox styling */
+  #selectAllBooks {
+    cursor: pointer;
+    accent-color: var(--primary);
+    transform: scale(1.2);
+  }
 </style>
-</head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -2088,6 +2931,49 @@
             <span class="icon">🎄</span>
             <span id="christmasToggleText">Enable Christmas</span>
         </div>
+        <script>
+            // Initialize Christmas effects toggle with persistent state
+            document.addEventListener('DOMContentLoaded', function() {
+                const christmasToggle = document.getElementById('christmasToggle');
+                const christmasToggleText = document.getElementById('christmasToggleText');
+
+                if (christmasToggle && christmasToggleText) {
+                    // Check localStorage for saved preference
+                    const savedPreference = localStorage.getItem('christmasEffects');
+                    const shouldBeActive = savedPreference === 'true';
+
+                    // Apply saved state on page load
+                    if (shouldBeActive) {
+                        document.body.classList.add('christmas-theme');
+                        christmasToggle.classList.add('active');
+                        christmasToggleText.textContent = 'Disable Christmas';
+                    } else {
+                        document.body.classList.remove('christmas-theme');
+                        christmasToggle.classList.remove('active');
+                        christmasToggleText.textContent = 'Enable Christmas';
+                    }
+
+                    // Add click handler
+                    christmasToggle.addEventListener('click', function() {
+                        const isCurrentlyActive = document.body.classList.contains('christmas-theme');
+
+                        if (isCurrentlyActive) {
+                            // Disable Christmas effects
+                            document.body.classList.remove('christmas-theme');
+                            christmasToggle.classList.remove('active');
+                            christmasToggleText.textContent = 'Enable Christmas';
+                            localStorage.setItem('christmasEffects', 'false');
+                        } else {
+                            // Enable Christmas effects
+                            document.body.classList.add('christmas-theme');
+                            christmasToggle.classList.add('active');
+                            christmasToggleText.textContent = 'Disable Christmas';
+                            localStorage.setItem('christmasEffects', 'true');
+                        }
+                    });
+                }
+            });
+        </script>
     </div>
     <!-- Main Content -->
     <div class="main" id="mainContent">
@@ -2128,20 +3014,26 @@
         <div class="card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
                 <h3 style="opacity: 1; color: var(--text-muted);">📚 Borrower List</h3>
-                <div class="card-actions">
+                <div class="card-actions" style="display: flex; gap: 8px; align-items: center;">
                     <select id="borrowersFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterBorrowers(this.value)">
                         <option value="all">All Borrowers</option>
                         <option value="today">Today</option>
                         <option value="weekly">This Week</option>
                     </select>
+                    <select id="returnStatusFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterByReturnStatus(this.value)">
+                        <option value="all">All Books</option>
+                        <option value="returned">Returned Only</option>
+                        <option value="pending">Pending Return</option>
+                        <option value="overdue">Overdue Only</option>
+                    </select>
+                </div>
             </div>
-        </div>
             <!-- Borrowers Table -->
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <!-- Search Bar -->
                 <div style="padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius) var(--radius) 0 0; border: 1px solid var(--border); border-bottom: none;">
                     <div style="position: relative;">
-                        <input type="text" id="borrowerSearch" placeholder="Search borrowers..." style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-elevated); color: var(--text-primary); font-size: 0.85rem; transition: var(--transition);" onkeyup="searchBorrowers(this.value)">
+                        <input type="text" id="borrowerSearch" placeholder="Search borrowers..." style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-elevated); color: var(--text-primary); font-size: 0.85rem; transition: var(--transition);" onkeyup="searchBorrowers(this.value)" onkeydown="if(event.keyCode===13) searchBorrowers(this.value)">
                         <i class="fas fa-search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
             </div>
         </div>
@@ -2150,18 +3042,57 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">#</th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Name</th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Title</th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Borrowed Date</th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Due Date</th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Returned At</th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); text-align: center; width: 50px;">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" style="transform: scale(1.2); cursor: pointer;" title="Select All">
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(0)" data-sort="number" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        #
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(1)" data-sort="text" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Name
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(2)" data-sort="text" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Title
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(3)" data-sort="date" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Borrowed Date
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(4)" data-sort="date" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Due Date
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(5)" data-sort="date" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Returned At
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(6)" data-sort="status" class="sortable-header">
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        Return Status
+                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
+                                    </div>
+                                </th>
                                 <th style="font-size: 1rem; font-weight: 700; color: var(--primary);">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="borrowersTableBody">
                             <tr>
-                                <td colspan="7" class="loading">Loading borrowers...</td>
+                                <td colspan="9" class="loading">Loading borrowers...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -2197,6 +3128,99 @@
                 </div>
             </div>
             </div>
+        <!-- Analytics Section -->
+        <div class="analytics-section" style="margin-top: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem;">
+            <!-- Book Popularity Analytics (Full Width) -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">📚 Book Popularity by Genre</h3>
+                </div>
+                <div style="padding: 1rem; height: 400px; position: relative;">
+                    <div style="display: flex; height: 360px; gap: 2rem;">
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                            <canvas id="bookPopularityChart" style="height: 300px; width: 300px; margin-bottom: 10px;"></canvas>
+                            <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
+                                Genre Distribution
+                            </div>
+                        </div>
+                        <div id="bookLegend" style="width: 280px; height: 360px; overflow-y: auto; padding: 15px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary); font-size: 1rem; font-weight: 600; text-align: center;">📊 Genre Breakdown</h4>
+                            <div id="legendItems" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Age Distribution -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">🎂 Age Distribution</h3>
+                </div>
+                <div style="padding: 1rem; height: 300px;">
+                    <canvas id="ageDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Books and Active Members -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">🏆 Top Books & Active Members</h3>
+                    <div class="card-actions">
+                        <select id="activityFilter" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="switchActivityView(this.value)">
+                            <option value="borrowing">By Borrowing Frequency</option>
+                            <option value="timelog">By Time-in/out Frequency</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: 1rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Top 10 Most Borrowed Books -->
+                        <div>
+                            <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1rem; font-weight: 600;">📖 Top 10 Most Borrowed Books</h4>
+                            <div style="max-height: 300px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                <div id="topBooksList" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Books will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Most Active Members -->
+                        <div>
+                            <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1rem; font-weight: 600;">👤 Most Active Members</h4>
+                            <div style="max-height: 300px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                <div id="activeMembersList" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Members will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Demographics (Full Width) -->
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <h3 style="opacity: 1; color: var(--text-muted);">👥 Member Demographics</h3>
+                <div class="card-actions">
+                    <select id="demographicsFilter" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="switchDemographicsView(this.value)">
+                        <option value="julita">Julita Residents</option>
+                        <option value="non-julita">Other Municipalities</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding: 1rem;">
+                <div id="julitaDemographics" style="height: 450px;">
+                    <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Julita Barangay Distribution</h4>
+                    <div id="barangayMap" style="height: 400px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border);"></div>
+                </div>
+                <div id="nonJulitaDemographics" style="height: 450px; display: none;">
+                    <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Other Municipalities</h4>
+                    <canvas id="municipalityChart" style="max-height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Consolidated Statistics with Line Graph -->
         <div class="card stats-overview-card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
@@ -2232,7 +3256,7 @@
             </div>
         </div>
         <!-- Footer -->
-        <footer style="margin-top: 3rem; text-align: center; color: var(--gray); font-size: 0.9rem;">
+        <footer style="margin-top: auto; padding: var(--spacing-lg); text-align: center; color: var(--text-muted); font-size: 0.9rem; background: rgba(0, 0, 0, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.1); width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center;">
             &copy; {{ date('Y') }} Julita Public Library. All rights reserved.
         </footer>
         </div>
@@ -2246,8 +3270,14 @@
         </div>
         <div id="chatbot-messages"></div>
         <div id="chatbot-input">
-            <input type="text" id="chatbot-user-input" placeholder="Ask me anything..." />
-            <button id="chatbot-send">Send</button>
+            <div style="position: relative; display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="chatbot-user-input" placeholder="Ask me anything..." data-original-placeholder="Ask me anything..." data-hover-placeholder="Powered by Gemini 2.0" style="width: 230px;" />
+                <div id="gemini-branding" class="gemini-branding" style="display: none; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; font-weight: 600; pointer-events: none;">
+                    <span style="color: var(--text-muted);">Powered by </span>
+                    <span style="background: linear-gradient(90deg, #4285f4 0%, #34a853 25%, #fbbc04 50%, #ea4335 75%, #4285f4 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: geminiGradient 3s ease-in-out infinite;">Gemini 2.0</span>
+                </div>
+                <button id="chatbot-send">Send</button>
+            </div>
         </div>
     </div>
 <!-- Toast Container -->
@@ -2288,324 +3318,430 @@
     </div>
 </div>
     <!-- ADD BOOK MODAL -->
-    <div class="modal" id="addBookModal" style="display: none;">
-        <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-overlay" id="addBookModal">
+        <div class="modal-container">
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-plus"></i>
-                    Add New Book
-                </h2>
-                <button class="close-modal" onclick="closeAddBookModal()">
+                <div class="modal-header-content">
+                    <div class="modal-icon-wrapper">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="modal-title-section">
+                        <h2 class="modal-title">Add New Book</h2>
+                        <p class="modal-subtitle">Add a new book to the library collection</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeAddBookModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="addBookForm" enctype="multipart/form-data">
-                    @csrf
                     <!-- Cover Image Section -->
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-image"></i>
-                            Book Cover
+                            <div class="section-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <span>Book Cover</span>
                         </h3>
-                        <div id="cover-preview-area">
-                            <div id="cover-preview-content">
-                                <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
-                                <p id="cover-preview-text">Click or drag image here...</p>
-                                <small style="color: var(--text-muted); margin-top: 8px; display: block;">
-                                    Supports JPG, PNG, GIF (max 5MB)
-                                </small>
-                                <input type="file" id="cover-input" class="cover-input" accept="image/*">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-camera"></i>
+                                Cover Image
+                            </label>
+                            <div class="photo-upload-container">
+                                <div class="photo-upload">
+                                    <div class="upload-icon-wrapper">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="upload-main-text">Click to upload or drag and drop</p>
+                                        <p class="upload-sub-text">JPG, PNG, GIF up to 5MB</p>
+                                    </div>
+                                    <input type="file" id="cover-input" name="cover" accept="image/*" class="form-input">
+                                </div>
+                                <img id="cover-preview" class="photo-preview" src="#" alt="Cover Preview" style="display: none;">
                             </div>
                         </div>
                     </div>
                     <!-- Book Information Section -->
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-book"></i>
-                            Book Information
+                            <div class="section-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <span>Book Information</span>
                         </h3>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="bookTitle">Title *</label>
-                                <input type="text" id="bookTitle" name="title" class="form-control" required>
+                                <label for="bookTitle" class="form-label">
+                                    <i class="fas fa-heading"></i>
+                                    Title *
+                                </label>
+                                <input type="text" id="bookTitle" name="title" class="form-input" required placeholder="Enter book title">
                             </div>
                             <div class="form-group">
-                                <label for="bookAuthor">Author *</label>
-                                <input type="text" id="bookAuthor" name="author" class="form-control" required>
+                                <label for="bookAuthor" class="form-label">
+                                    <i class="fas fa-user-edit"></i>
+                                    Author *
+                                </label>
+                                <input type="text" id="bookAuthor" name="author" class="form-input" required placeholder="Enter author name">
                             </div>
                             <div class="form-group">
-                                <label for="bookGenre">Genre</label>
-                                <input type="text" id="bookGenre" name="genre" class="form-control">
+                                <label for="bookGenre" class="form-label">
+                                    <i class="fas fa-tags"></i>
+                                    Genre
+                                </label>
+                                <input type="text" id="bookGenre" name="genre" class="form-input" placeholder="Enter book genre">
                             </div>
                             <div class="form-group">
-                                <label for="bookYear">Published Year *</label>
-                                <input type="number" id="bookYear" name="published_year" class="form-control" required min="1000" max="2099">
+                                <label for="bookYear" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Published Year *
+                                </label>
+                                <input type="number" id="bookYear" name="published_year" class="form-input" required min="1000" max="2099" placeholder="Enter publication year">
                             </div>
                             <div class="form-group">
-                                <label for="bookAvailability">Availability *</label>
-                                <input type="number" id="bookAvailability" name="availability" class="form-control" required min="0">
+                                <label for="bookAvailability" class="form-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    Availability *
+                                </label>
+                                <input type="number" id="bookAvailability" name="availability" class="form-input" required min="0" placeholder="Enter number of copies">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-actions">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeAddBookModal()">
                     <i class="fas fa-times"></i>
                     Cancel
                 </button>
-                <button type="submit" form="addBookForm" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
+                <button type="button" class="btn btn-primary" onclick="submitAddBook()">
+                    <i class="fas fa-save"></i>
                     Add Book
                 </button>
             </div>
         </div>
     </div>
-    <!-- ADD MEMBER MODAL -->
-    <div class="modal" id="julitaRegisterModal" style="display: none;">
-        <div class="modal-content">
+    <!-- ADD MEMBER MODAL (Julita Residents) -->
+    <div class="modal-overlay" id="julitaRegisterModal">
+        <div class="modal-container">
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-user-plus"></i>
-                    Register Julita Resident
-                </h2>
-                <button class="close-modal" onclick="closeJulitaRegisterModal()">
+                <div class="modal-header-content">
+                    <div class="modal-icon-wrapper">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="modal-title-section">
+                        <h2 class="modal-title">Register Julita Resident</h2>
+                        <p class="modal-subtitle">Add a new member from Julita municipality</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeJulitaRegisterModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="julitaRegisterForm" enctype="multipart/form-data">
-                <!-- Personal Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-user"></i>
-                        Personal Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="julitaFirstName">First Name *</label>
-                            <input type="text" id="julitaFirstName" name="firstName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaMiddleName">Middle Name</label>
-                            <input type="text" id="julitaMiddleName" name="middleName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaLastName">Last Name *</label>
-                            <input type="text" id="julitaLastName" name="lastName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaAge">Age *</label>
-                            <input type="number" id="julitaAge" name="age" class="form-control" min="1" max="150" required>
-                        </div>
-                    </div>
-                </div>
-                <!-- Address Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Address Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="julitaHouseNumber">House Number</label>
-                            <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaStreet">Street</label>
-                            <input type="text" id="julitaStreet" name="street" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaBarangay">Barangay *</label>
-                            <select id="julitaBarangay" name="barangay" class="form-control" required>
-                                <option value="" disabled selected>Select Barangay</option>
-                                <option>Alegria</option>
-                                <option>Balante</option>
-                                <option>Bugho</option>
-                                <option>Campina</option>
-                                <option>Canwhaton</option>
-                                <option>Caridad Norte</option>
-                                <option>Caridad Sur</option>
-                                <option>Cuatro de Agosto</option>
-                                <option>Dita</option>
-                                <option>Hinalaan</option>
-                                <option>Hindang</option>
-                                <option>Iniguihan</option>
-                                <option>Macopa</option>
-                                <option>San Andres</option>
-                                <option>San Pablo</option>
-                                <option>San Roque</option>
-                                <option>Santo Niño</option>
-                                <option>Sta. Cruz</option>
-                                <option>Taglibas</option>
-                                <option>Veloso</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaMunicipality">Municipality *</label>
-                            <input type="text" id="julitaMunicipality" name="municipality" class="form-control" value="Julita" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaProvince">Province *</label>
-                            <input type="text" id="julitaProvince" name="province" class="form-control" value="Leyte" readonly>
+            <div class="modal-body">
+                <form id="julitaRegisterForm" enctype="multipart/form-data">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span>Personal Information</span>
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="julitaFirstName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    First Name *
+                                </label>
+                                <input type="text" id="julitaFirstName" name="firstName" class="form-input" required placeholder="Enter first name">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaMiddleName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    Middle Name
+                                </label>
+                                <input type="text" id="julitaMiddleName" name="middleName" class="form-input" placeholder="Enter middle name (optional)">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaLastName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    Last Name *
+                                </label>
+                                <input type="text" id="julitaLastName" name="lastName" class="form-input" required placeholder="Enter last name">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaAge" class="form-label">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    Age *
+                                </label>
+                                <input type="number" id="julitaAge" name="age" class="form-input" min="1" max="150" required placeholder="Enter age">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- Contact Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-phone"></i>
-                        Contact Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="julitaContactNumber">Contact Number *</label>
-                            <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-control" pattern="[0-9]{11}" maxlength="11" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="julitaSchool">School/Institution</label>
-                            <input type="text" id="julitaSchool" name="school" class="form-control">
+                    <!-- Address Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>Address Information</span>
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="julitaHouseNumber" class="form-label">
+                                    <i class="fas fa-home"></i>
+                                    House Number
+                                </label>
+                                <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-input" placeholder="Enter house number">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaStreet" class="form-label">
+                                    <i class="fas fa-road"></i>
+                                    Street
+                                </label>
+                                <input type="text" id="julitaStreet" name="street" class="form-input" placeholder="Enter street name">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaBarangay" class="form-label">
+                                    <i class="fas fa-map"></i>
+                                    Barangay *
+                                </label>
+                                <select id="julitaBarangay" name="barangay" class="form-input" required>
+                                    <option value="" disabled selected>Select Barangay</option>
+                                    <option>Alegria</option>
+                                    <option>Anibong</option>
+                                    <option>Aslum</option>
+                                    <option>Balante</option>
+                                    <option>Bongdo</option>
+                                    <option>Bonifacio</option>
+                                    <option>Bugho</option>
+                                    <option>Calbasag</option>
+                                    <option>Caridad</option>
+                                    <option>Cuya-e</option>
+                                    <option>Dita</option>
+                                    <option>Gitabla</option>
+                                    <option>Hindang</option>
+                                    <option>Inawangan</option>
+                                    <option>Jurao</option>
+                                    <option>Poblacion District I</option>
+                                    <option>Poblacion District II</option>
+                                    <option>Poblacion District III</option>
+                                    <option>Poblacion District IV</option>
+                                    <option>San Andres</option>
+                                    <option>San Pablo</option>
+                                    <option>Santa Cruz</option>
+                                    <option>Santo Niño</option>
+                                    <option>Tagkip</option>
+                                    <option>Tolosahay</option>
+                                    <option>Villa Hermosa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaMunicipality" class="form-label">
+                                    <i class="fas fa-city"></i>
+                                    Municipality *
+                                </label>
+                                <input type="text" id="julitaMunicipality" name="municipality" class="form-input" value="Julita" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaProvince" class="form-label">
+                                    <i class="fas fa-globe-asia"></i>
+                                    Province *
+                                </label>
+                                <input type="text" id="julitaProvince" name="province" class="form-input" value="Leyte" readonly>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-camera"></i>
-                        Upload Photo
-                    </h3>
-                    <div class="form-group">
-                        <label for="julitaPhoto">Upload Photo</label>
-                        <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-control" />
-                        <div style="margin-top: 10px;">
-                            <img id="julitaPhotoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+                    <!-- Contact Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>Contact Information</span>
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="julitaContactNumber" class="form-label">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Contact Number *
+                                </label>
+                                <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required placeholder="09XXXXXXXXX">
+                            </div>
+                            <div class="form-group">
+                                <label for="julitaSchool" class="form-label">
+                                    <i class="fas fa-school"></i>
+                                    School/Institution
+                                </label>
+                                <input type="text" id="julitaSchool" name="school" class="form-input" placeholder="Enter school or institution name">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
-                        <i class="fas fa-times"></i>
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Register Member
-                    </button>
-                </div>
-            </form>
+                    <!-- Photo Upload Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <span>Upload Photo</span>
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-image"></i>
+                                Profile Photo
+                            </label>
+                            <div class="photo-upload-container">
+                                <div class="photo-upload">
+                                    <div class="upload-icon-wrapper">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="upload-main-text">Click to upload or drag and drop</p>
+                                        <p class="upload-sub-text">JPG, PNG, GIF up to 5MB</p>
+                                    </div>
+                                    <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
+                                </div>
+                                <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="submitJulitaRegister()">
+                    <i class="fas fa-save"></i>
+                    Register Member
+                </button>
+            </div>
         </div>
     </div>
     <!-- REGISTER MODAL (Non-Julita Residents) -->
-    <div class="modal" id="registerModal" style="display: none;">
-        <div class="modal-content">
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-container">
             <div class="modal-header">
                 <h2 class="modal-title">
                     <i class="fas fa-user-plus"></i>
-                    Register Member
+                    Register New Member
                 </h2>
-                <button class="close-modal" onclick="closeRegisterModal()">
+                <button class="modal-close" onclick="closeRegisterModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="registerForm" enctype="multipart/form-data">
-                <!-- Personal Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-user"></i>
-                        Personal Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="firstName">First Name *</label>
-                            <input type="text" id="firstName" name="firstName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="middleName">Middle Name</label>
-                            <input type="text" id="middleName" name="middleName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name *</label>
-                            <input type="text" id="lastName" name="lastName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="age">Age *</label>
-                            <input type="number" id="age" name="age" class="form-control" min="1" max="150" required>
-                        </div>
-                    </div>
-                </div>
-                <!-- Address Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Address Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="houseNumber">House Number</label>
-                            <input type="text" id="houseNumber" name="houseNumber" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="street">Street</label>
-                            <input type="text" id="street" name="street" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="barangay">Barangay *</label>
-                            <input type="text" id="barangay" name="barangay" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="municipality">Municipality *</label>
-                            <input type="text" id="municipality" name="municipality" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="province">Province *</label>
-                            <input type="text" id="province" name="province" class="form-control" required>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" id="middleName" name="middleName" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="age" class="form-label">Age *</label>
+                                <input type="number" id="age" name="age" class="form-input" min="1" max="150" required>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- Contact Information Section -->
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-phone"></i>
-                        Contact Information
-                    </h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="contactNumber">Contact Number *</label>
-                            <input type="tel" id="contactNumber" name="contactNumber" class="form-control" pattern="[0-9]{11}" maxlength="11" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="school">School/Institution</label>
-                            <input type="text" id="school" name="school" class="form-control">
+                    <!-- Address Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Address Information
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="houseNumber" class="form-label">House Number</label>
+                                <input type="text" id="houseNumber" name="houseNumber" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="street" class="form-label">Street</label>
+                                <input type="text" id="street" name="street" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="barangay" class="form-label">Barangay *</label>
+                                <input type="text" id="barangay" name="barangay" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="municipality" class="form-label">Municipality/City *</label>
+                                <input type="text" id="municipality" name="municipality" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="province" class="form-label">Province *</label>
+                                <input type="text" id="province" name="province" class="form-input" required>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-camera"></i>
-                        Upload Photo
-                    </h3>
-                    <div class="form-group">
-                        <label for="photo">Upload Photo</label>
-                        <input type="file" id="photo" name="photo" accept="image/*" class="form-control" />
-                        <div style="margin-top: 10px;">
-                            <img id="photoPreview" src="#" alt="Photo Preview" style="max-width: 150px; display: none;">
+                    <!-- Contact Information Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-phone"></i>
+                            Contact Information
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="contactNumber" class="form-label">Contact Number *</label>
+                                <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="school" class="form-label">School/Institution</label>
+                                <input type="text" id="school" name="school" class="form-input">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
-                        <i class="fas fa-times"></i>
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Register Member
-                    </button>
-                </div>
-            </form>
+                    <!-- Photo Upload Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-camera"></i>
+                            Upload Photo
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Profile Photo</label>
+                            <div class="photo-upload-container">
+                                <div class="photo-upload">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Click to upload or drag and drop</p>
+                                    <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+                                </div>
+                                <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="submitRegister()">
+                    <i class="fas fa-save"></i>
+                    Register Member
+                </button>
+            </div>
         </div>
     </div>
     <!-- BOOKS TABLE MODAL -->
-    <div class="modal" id="booksTableModal" style="display: none;">
+    <div class="modal" id="booksTableModal">
         <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
                 <h2 class="modal-title">
@@ -2640,35 +3776,95 @@
             </div>
         </div>
     </div>
-    <!-- BORROW MODAL -->
-    <div class="modal" id="borrowModal" style="display: none;">
-        <div class="modal-content">
+    <!-- MEDIA PICKER MODAL -->
+    <div class="modal" id="mediaPickerModal">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h3 class="modal-title">Borrow Books</h3>
+                <h3 class="modal-title">
+                    <i class="fas fa-images"></i>
+                    Select Book Cover
+                </h3>
+                <button class="close-modal" onclick="closeMediaPicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="mediaSearch">Search Images</label>
+                        <input type="text" id="mediaSearch" class="form-control" placeholder="Search by filename...">
+                    </div>
+                </div>
+                <!-- Upload Area -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Or Upload New Image
+                    </h4>
+                    <div id="media-upload-area" style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 2rem; text-align: center; cursor: pointer; background: var(--glass-bg); margin-bottom: 1.5rem; transition: var(--transition);">
+                        <div id="media-upload-content">
+                            <i id="media-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
+                            <p style="color: var(--text-muted); margin: 0; font-weight: 500; font-size: 1rem;">Drag and drop image here or click to browse</p>
+                            <small style="color: var(--text-muted); margin-top: 8px; display: block;">Supports JPG, PNG, GIF (max 5MB)</small>
+                            <input type="file" id="media-file-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+                <!-- Image Gallery -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-th"></i>
+                        Available Images
+                    </h4>
+                    <div id="media-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; max-height: 300px; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--glass-bg);">
+                        <!-- Images will be loaded here -->
+                        <div id="media-loading" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Loading images...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeMediaPicker()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- BORROW MODAL -->
+    <div class="modal" id="borrowModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-book-reader"></i>
+                    Borrow Books
+                </h3>
                 <button class="close-modal" onclick="closeBorrowModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Member Name</label>
+                    <label for="memberName">Member Name</label>
                     <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill" readonly>
                     <input type="hidden" id="memberId">
                 </div>
                 <div class="form-group">
-                    <label>Due Date</label>
+                    <label for="dueDate">Due Date</label>
                     <input type="date" id="dueDate" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label>Due Time</label>
+                    <label for="dueTime">Due Time</label>
                     <input type="time" id="dueTime" class="form-control">
                     <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
                         Default time set to end of day (11:59 PM)
                     </small>
                 </div>
                 <div class="form-group">
-                    <label>Selected Books</label>
-                    <ul id="selectedBooksList" style="list-style: none; padding: 0;"></ul>
+                    <label for="selectedBooksList">Selected Books</label>
+                    <ul id="selectedBooksList" style="list-style: none; padding: 0; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; background: var(--surface);"></ul>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 1rem;">
                     <button type="button" class="btn btn-outline" onclick="startQRScan('member')">
@@ -2679,14 +3875,20 @@
                     </button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeBorrowModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmBorrow()">Confirm</button>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeBorrowModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button class="btn btn-confirm" onclick="confirmBorrow()">
+                    <i class="fas fa-check"></i>
+                    Confirm
+                </button>
             </div>
         </div>
     </div>
     <!-- MEMBERS TABLE MODAL -->
-    <div class="modal" id="membersTableModal" style="display: none;">
+    <div class="modal" id="membersTableModal">
         <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
                 <h2 class="modal-title">
@@ -2722,497 +3924,607 @@
     </div>
     <!-- Scripts -->
     <script>
+        function closeRegisterModal() {
+            const registerModal = document.getElementById("registerModal");
+            const julitaModal = document.getElementById("julitaRegisterModal");
+            if (registerModal) {
+                registerModal.classList.remove("active");
+            }
+            if (julitaModal) {
+                julitaModal.classList.remove("active");
+            }
+            document.body.classList.remove("modal-open");
+        }
+        function closeJulitaRegisterModal() {
+            closeRegisterModal();
+        }
+        function openRegisterModal() {
+            const modal = document.getElementById("registerModal");
+            if (modal) {
+                modal.classList.add("active");
+                document.body.classList.add("modal-open");
+            }
+        }
+        function openJulitaRegisterModal() {
+            const modal = document.getElementById("julitaRegisterModal");
+            if (modal) {
+                modal.classList.add("active");
+                document.body.classList.add("modal-open");
+            }
+        }
+        // Close modal when clicking on overlay
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            }
+        });
+        // Media Picker Functions
+        function openMediaPicker() {
+            const modal = document.getElementById('mediaPickerModal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                loadAvailableImages();
+            }
+        }
+        function closeMediaPicker() {
+            const modal = document.getElementById('mediaPickerModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+        async function loadAvailableImages() {
+            const gallery = document.getElementById('media-gallery');
+            const loading = document.getElementById('media-loading');
+            try {
+                // Show loading state
+                loading.style.display = 'block';
+                // Fetch available images from server
+                const response = await fetch('/api/media/images');
+                let images = [];
+                if (response.ok) {
+                    images = await response.json();
+                } else {
+                    // Fallback: scan common image directories
+                    images = await scanImageDirectories();
+                }
+                // Filter to only include image files
+                const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                const imageFiles = images.filter(img =>
+                    imageExtensions.some(ext => img.toLowerCase().includes(ext))
+                );
+                displayImagesInGallery(imageFiles);
+            } catch (error) {
+                console.error('Error loading images:', error);
+                showToast('Error loading images', 'error');
+                loading.innerHTML = '<p style="color: var(--danger);">Error loading images</p>';
+            }
+        }
+        async function scanImageDirectories() {
+            // This is a fallback function that would scan common directories
+            // In a real implementation, this would be handled by a backend API
+            const commonPaths = [
+                '/images/',
+                '/cover/',
+                '/public/images/',
+                '/public/cover/',
+                '/storage/app/public/images/',
+                '/storage/app/public/cover/'
+            ];
+            const images = [];
+            // For demo purposes, return some sample images
+            // In production, this would scan actual directories
+            return [
+                'book-1.jpg',
+                'book-2.png',
+                'book-3.jpg',
+                'cover-1756669537.jpg',
+                'no-cover.png'
+            ];
+        }
+        function displayImagesInGallery(images) {
+            const gallery = document.getElementById('media-gallery');
+            const loading = document.getElementById('media-loading');
+            // Clear loading state
+            loading.style.display = 'none';
+            if (images.length === 0) {
+                gallery.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">No images found</p>';
+                return;
+            }
+            gallery.innerHTML = '';
+            images.forEach(imageName => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'media-item';
+                imageItem.style.cssText = `
+                    cursor: pointer;
+                    border: 2px solid var(--border-light);
+                    border-radius: var(--radius-sm);
+                    overflow: hidden;
+                    transition: var(--transition);
+                    background: var(--surface);
+                `;
+                const imageUrl = `/images/${imageName}`;
+                imageItem.innerHTML = `
+                    <img src="${imageUrl}" alt="${imageName}"
+                         style="width: 100%; height: 100px; object-fit: cover;"
+                         onerror="this.src='/images/no-cover.png'">
+                    <div style="padding: 8px; text-align: center; font-size: 0.8rem; color: var(--text-secondary);">
+                        ${imageName.length > 15 ? imageName.substring(0, 15) + '...' : imageName}
+                    </div>
+                `;
+                imageItem.addEventListener('click', () => selectMediaImage(imageUrl, imageName));
+                imageItem.addEventListener('mouseenter', () => {
+                    imageItem.style.borderColor = 'var(--primary)';
+                    imageItem.style.transform = 'translateY(-2px)';
+                    imageItem.style.boxShadow = 'var(--shadow-md)';
+                });
+                imageItem.addEventListener('mouseleave', () => {
+                    imageItem.style.borderColor = 'var(--border-light)';
+                    imageItem.style.transform = '';
+                    imageItem.style.boxShadow = '';
+                });
+                gallery.appendChild(imageItem);
+            });
+        }
+        function selectMediaImage(imageUrl, imageName) {
+            // Find the active modal
+            const activeModal = document.querySelector('.modal.show');
+            if (!activeModal) return;
+            // Update the cover preview area with selected image
+            const coverPreviewContent = activeModal.querySelector('#cover-preview-content');
+            if (coverPreviewContent) {
+                coverPreviewContent.innerHTML = `
+                    <img src="${imageUrl}" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                    <p style="color: var(--text-primary); font-weight: 600;">${imageName}</p>
+                    <small style="color: var(--text-muted);">Click to change</small>
+                `;
+                // Store the selected image URL for form submission
+                window.selectedCoverImage = imageUrl;
+                // Also update the file input to ensure form submission works
+                updateFormWithSelectedImage(imageUrl, imageName, activeModal);
+            }
+            // Close media picker
+            closeMediaPicker();
+            showToast(`Selected: ${imageName}`, 'success');
+        }
+        async function updateFormWithSelectedImage(imageUrl, imageName) {
+            try {
+                // Fetch the image and convert to blob
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                // Create a File object
+                const file = new File([blob], imageName, { type: blob.type });
+                // Set the file to the cover input
+                const coverInput = document.getElementById('cover-input');
+                if (coverInput) {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    coverInput.files = dt.files;
+                    console.log('Updated form with selected image:', imageName);
+                }
+            } catch (error) {
+                console.error('Error updating form with selected image:', error);
+                // Fallback: just store the URL
+                window.selectedCoverImage = imageUrl;
+            }
+        }
+        // Initialize media picker upload area drag and drop
+        function initializeMediaPickerUpload() {
+            const uploadArea = document.getElementById('media-upload-area');
+            const uploadContent = document.getElementById('media-upload-content');
+            const fileInput = document.getElementById('media-file-input');
+            if (!uploadArea || !fileInput) return;
+            // Click to open file picker or select uploaded file
+            uploadArea.addEventListener('click', () => {
+                if (window.uploadedMediaFile) {
+                    // If file is already uploaded, select it
+                    selectUploadedMediaFile();
+                } else {
+                    // Otherwise open file picker
+                    fileInput.click();
+                }
+            });
+            // File selection handler
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaFileUpload(file);
+                }
+            });
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            uploadArea.addEventListener('dragenter', () => {
+                uploadArea.style.transform = 'scale(1.02)';
+                uploadArea.style.borderColor = 'var(--primary)';
+            });
+            uploadArea.addEventListener('dragover', () => {
+                uploadContent.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.transform = '';
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadContent.style.backgroundColor = 'var(--glass-bg)';
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                uploadArea.style.transform = '';
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadContent.style.backgroundColor = 'var(--glass-bg)';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleMediaFileUpload(files[0]);
+                }
+            });
+        }
+        function handleMediaFileUpload(file) {
+            // Validate file type
+            if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
+                showToast('Only JPG, PNG, and GIF images are allowed.', 'error');
+                return;
+            }
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large! Maximum size is 5MB.', 'error');
+                return;
+            }
+            // Create preview in media picker
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const uploadContent = document.getElementById('media-upload-content');
+                uploadContent.innerHTML = `
+                    <img src="${e.target.result}" alt="Upload Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                    <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                    <small style="color: var(--text-muted);">Click to select this image</small>
+                `;
+                // Store the uploaded file for later use
+                window.uploadedMediaFile = file;
+                // Update form with uploaded file
+                updateFormWithUploadedFile(file);
+            };
+            reader.readAsDataURL(file);
+        }
+        function updateFormWithUploadedFile(file) {
+            // Set the file to the cover input
+            const coverInput = document.getElementById('cover-input');
+            if (coverInput) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                coverInput.files = dt.files;
+                console.log('Updated form with uploaded file:', file.name);
+            }
+        }
+        function selectUploadedMediaFile() {
+            if (!window.uploadedMediaFile) return;
+            const file = window.uploadedMediaFile;
+            // Update the cover preview area with uploaded file
+            const coverPreviewContent = document.getElementById('cover-preview-content');
+            if (coverPreviewContent) {
+                // Create preview using FileReader
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    coverPreviewContent.innerHTML = `
+                        <img src="${e.target.result}" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
+                        <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
+                        <small style="color: var(--text-muted);">Click to change</small>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+            // Update form with uploaded file
+            updateFormWithUploadedFile(file);
+            // Close media picker
+            closeMediaPicker();
+            showToast(`Selected: ${file.name}`, 'success');
+        }
+        // Media search functionality
+        function initializeMediaSearch() {
+            const searchInput = document.getElementById('mediaSearch');
+            if (!searchInput) return;
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const mediaItems = document.querySelectorAll('.media-item');
+                mediaItems.forEach(item => {
+                    const imageName = item.querySelector('div').textContent.toLowerCase();
+                    const shouldShow = imageName.includes(searchTerm);
+                    item.style.display = shouldShow ? 'block' : 'none';
+                });
+            });
+        }
+        // Initialize media picker when modal opens
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override the existing click handler to directly open file picker for all cover preview contents
+            const coverPreviewContents = document.querySelectorAll('#cover-preview-content');
+            coverPreviewContents.forEach(content => {
+                // Remove old handler if it exists (safe check)
+                if (typeof initializeCoverUpload === 'function') {
+                    content.removeEventListener('click', initializeCoverUpload);
+                }
+                // Directly trigger file input click instead of opening media picker modal
+                content.addEventListener('click', function() {
+                    const fileInput = document.getElementById('cover-input');
+                    if (fileInput) {
+                        fileInput.click();
+                    }
+                });
+            });
+        });
+        // Cover preview area now opens media picker on click
+    </script>
+    <script>
         const weeklyData = @json($weeklyData);
         const visitsData = @json($visitsData);
         const borrowersData = @json($borrowers);
+        const analyticsData = @json($analytics);
+        window.dashboardStats = {
+            lifetimeCount: {{ $lifetimeCount }},
+            booksCount: {{ $booksCount }},
+            membersCount: {{ $membersCount }},
+            dailyCount: {{ $dailyCount }},
+            booksToday: {{ $booksToday }},
+            membersToday: {{ $membersToday }},
+            weeklyCount: {{ $weeklyCount }},
+            booksThisWeek: {{ $booksThisWeek }},
+            membersThisWeek: {{ $membersThisWeek }}
+        };
     </script>
     <script src="{{ asset('js/dashb.js') }}"></script>
+    <script src="{{ asset('js/dashb_iScripts.js') }}"></script>
+    <script src="{{ asset('js/analytics.js') }}"></script>
     <script src="{{ asset('js/chatbot.js') }}"></script>
+    <script>
+        // Function to switch between demographics views
+        function switchDemographicsView(viewType) {
+            const julitaView = document.getElementById('julitaDemographics');
+            const nonJulitaView = document.getElementById('nonJulitaDemographics');
+
+            if (viewType === 'julita') {
+                julitaView.style.display = 'block';
+                nonJulitaView.style.display = 'none';
+            } else {
+                julitaView.style.display = 'none';
+                nonJulitaView.style.display = 'block';
+            }
+        }
+
+        // Function to switch between activity views
+        function switchActivityView(viewType) {
+            loadTopBooks();
+            loadActiveMembers(viewType);
+        }
+
+        // Load top 10 most borrowed books
+        function loadTopBooks() {
+            const topBooks = @json($analytics['topBooks']);
+            const container = document.getElementById('topBooksList');
+
+            if (topBooks.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin: 2rem 0;">No borrowing data available</p>';
+                return;
+            }
+
+            container.innerHTML = topBooks.map((book, index) => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                    <div style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">
+                        ${index + 1}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${book.title}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">by ${book.author}</div>
+                    </div>
+                    <div style="background: var(--success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+                        ${book.borrow_count} borrows
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load most active members
+        function loadActiveMembers(viewType = 'borrowing') {
+            const members = viewType === 'borrowing'
+                ? @json($analytics['mostActiveMembers'])
+                : @json($analytics['mostActiveTimeLogMembers']);
+            const container = document.getElementById('activeMembersList');
+
+            if (members.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin: 2rem 0;">No activity data available</p>';
+                return;
+            }
+
+            const countLabel = viewType === 'borrowing' ? 'borrows' : 'visits';
+
+            container.innerHTML = members.map((member, index) => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                    <div style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">
+                        ${index + 1}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${member.name}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">${member.barangay}</div>
+                    </div>
+                    <div style="background: var(--accent); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+                        ${member.borrow_count || member.visit_count} ${countLabel}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTopBooks();
+            loadActiveMembers('borrowing');
+
+            // Check for Christmas effects preference on load
+            const christmasPreference = localStorage.getItem('christmasEffects');
+            if (christmasPreference === 'true') {
+                document.body.classList.add('christmas-theme');
+            }
+        });
+    </script>
     <script src="{{ asset('js/overdue.js') }}" defer></script>
     <script src="{{ asset('js/bookadd.js') }}"></script>
     <script src="{{ asset('js/memberscript.js') }}"></script>
     <script src="{{ asset('js/borrow.js') }}"></script>
-    <script src="{{ asset('js/christmas-effects.js') }}"></script>
+    <!-- ✅ ENHANCED COVER UPLOAD LOGIC FOR ADD BOOK MODAL -->
     <script>
-        function openJulitaRegisterModal() {
-            console.log('openJulitaRegisterModal called');
-            closeAllModals();
-            const confirmJulita = confirm("Are you a Julita resident?\nClick OK for Yes, Cancel for No.");
-            if (confirmJulita) {
-                const modal = document.getElementById("julitaRegisterModal");
-                if (modal) {
-                    modal.classList.add("show");
-                    modal.style.display = "flex";
-                    document.body.classList.add("modal-open");
-                    console.log('Julita modal opened');
-                } else {
-                    console.error('julitaRegisterModal element not found');
-                }
-            } else {
-                const modal = document.getElementById("registerModal");
-                if (modal) {
-                    modal.classList.add("show");
-                    modal.style.display = "flex";
-                    document.body.classList.add("modal-open");
-                    console.log('Register modal opened');
-                } else {
-                    console.error('registerModal element not found');
-                }
-            }
+    document.addEventListener('DOMContentLoaded', () => {
+      const coverPreviewArea = document.getElementById('cover-preview-area');
+      const coverInput = document.getElementById('cover-input');
+      const coverPreviewContent = document.getElementById('cover-preview-content');
+
+      if (!coverPreviewArea || !coverInput || !coverPreviewContent) return;
+
+      // Style the drop zone
+      Object.assign(coverPreviewArea.style, {
+        height: '250px',
+        border: '3px dashed var(--gray-light, #d1d5db)',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        marginTop: '1rem',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      });
+
+      // Update preview with image
+      function updateCoverPreview(file) {
+        if (!file) return;
+
+        if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
+          alert('Only JPG, PNG, and GIF images are allowed.');
+          return;
         }
-        function closeAllModals() {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                modal.classList.remove("show");
-                modal.style.display = "none";
-            });
-            document.body.classList.remove("modal-open");
+
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Image too large! Maximum size is 5MB.');
+          return;
         }
-        function closeRegisterModal() {
-            const registerModal = document.getElementById("registerModal");
-            const julitaModal = document.getElementById("julitaRegisterModal");
-            registerModal.classList.remove("show");
-            registerModal.style.display = "none";
-            julitaModal.classList.remove("show");
-            julitaModal.style.display = "none";
-            document.body.classList.remove("modal-open");
-        }
-    </script>
-<script>
-    const chatbotWindow = document.getElementById('chatbot-window');
-    const chatbotButton = document.getElementById('chatbot-button');
-    const chatbotClose = document.getElementById('chatbot-close');
-    chatbotButton?.addEventListener('click', () => {
-        chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
-    });
-    chatbotClose?.addEventListener('click', () => {
-        chatbotWindow.style.display = 'none';
-    });
-    function openBooksTable() {
-        document.getElementById('booksTableModal').style.display = 'flex';
-        loadBooksData();
-    }
-    function closeBooksTable() {
-        document.getElementById('booksTableModal').style.display = 'none';
-    }
-    function openMembersTable() {
-        console.log('openMembersTable called');
-        const modal = document.getElementById('membersTableModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            loadMembersData();
-            console.log('Members table modal opened');
-        } else {
-            console.error('membersTableModal element not found');
-        }
-    }
-    function closeMembersTable() {
-        document.getElementById('membersTableModal').style.display = 'none';
-    }
-    async function loadBooksData() {
-        try {
-            const response = await fetch('{{ route("dashboard.books-data") }}');
-            const books = await response.json();
-            const tbody = document.getElementById('booksTableBody');
-            tbody.innerHTML = '';
-            if (books.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="loading">No books found</td></tr>';
-                return;
-            }
-            books.forEach((book, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
-                    <td>${book.title}</td>
-                    <td>${book.author}</td>
-                    <td>${book.genre || '-'}</td>
-                    <td>${book.published_year}</td>
-                    <td>${book.availability}</td>
-                    <td>${new Date(book.created_at).toLocaleDateString()}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error loading books:', error);
-            document.getElementById('booksTableBody').innerHTML = '<tr><td colspan="7" class="loading">Error loading books</td></tr>';
-        }
-    }
-    async function loadMembersData() {
-        try {
-            const response = await fetch('{{ route("dashboard.members-data") }}');
-            const members = await response.json();
-            const tbody = document.getElementById('membersTableBody');
-            tbody.innerHTML = '';
-            if (members.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="loading">No members found</td></tr>';
-                return;
-            }
-            members.forEach((member, index) => {
-                const fullName = [member.first_name, member.middle_name, member.last_name]
-                    .filter(name => name && name !== 'null')
-                    .join(' ');
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
-                    <td>${fullName}</td>
-                    <td>${member.age}</td>
-                    <td>${member.barangay}</td>
-                    <td>${member.contactnumber}</td>
-                    <td>${new Date(member.created_at).toLocaleDateString()}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error loading members:', error);
-            document.getElementById('membersTableBody').innerHTML = '<tr><td colspan="6" class="loading">Error loading members</td></tr>';
-        }
-    }
-    let originalBorrowersData = [];
-    function loadBorrowersData() {
-        const tbody = document.getElementById('borrowersTableBody');
-        tbody.innerHTML = '';
-        if (borrowersData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
-            return;
-        }
-        originalBorrowersData = [...borrowersData];
-        displayBorrowersData(borrowersData);
-    }
-    function displayBorrowersData(data) {
-        const tbody = document.getElementById('borrowersTableBody');
-        tbody.innerHTML = '';
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="loading">No borrowers found</td></tr>';
-            return;
-        }
-        data.forEach((borrower, index) => {
-            const fullName = [borrower.member.first_name, borrower.member.middle_name, borrower.member.last_name]
-                .filter(name => name && name !== 'null')
-                .join(' ');
-            const borrowedDate = new Date(borrower.borrowed_at).toLocaleDateString();
-            const dueDate = new Date(borrower.due_date).toLocaleDateString();
-            const returnedAt = borrower.returned_at ? new Date(borrower.returned_at).toLocaleDateString() : '-';
-            const actions = borrower.returned_at ?
-                '<span style="color: #10b981; font-weight: 600;">Returned</span>' :
-                `<button class="btn btn-sm btn-primary" onclick="returnBookDirect(${borrower.id}, '${borrower.book.title.replace(/'/g, "\\'")}', '${fullName.replace(/'/g, "\\'")}')" style="font-size: 0.8rem; padding: 4px 8px;">
-                    <i class="fas fa-undo"></i> Return
-                </button>`;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td style="font-weight: 600; color: var(--primary);">${index + 1}</td>
-                <td>${fullName}</td>
-                <td>${borrower.book.title}</td>
-                <td>${borrowedDate}</td>
-                <td>${dueDate}</td>
-                <td>${returnedAt}</td>
-                <td>${actions}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-    function searchBorrowers(searchTerm) {
-        if (!searchTerm.trim()) {
-            displayBorrowersData(originalBorrowersData);
-            return;
-        }
-        const filteredData = originalBorrowersData.filter(borrower => {
-            const fullName = [borrower.member.first_name, borrower.member.middle_name, borrower.member.last_name]
-                .filter(name => name && name !== 'null')
-                .join(' ')
-                .toLowerCase();
-            const bookTitle = borrower.book.title.toLowerCase();
-            const searchLower = searchTerm.toLowerCase();
-            return fullName.includes(searchLower) ||
-                   bookTitle.includes(searchLower) ||
-                   (index + 1).toString().includes(searchLower);
-        });
-        displayBorrowersData(filteredData);
-    }
-    async function filterBorrowers(filter) {
-        try {
-            const response = await fetch(`{{ route("dashboard.borrowers-data") }}?filter=${filter}`);
-            const borrowers = await response.json();
-            originalBorrowersData = [...borrowers];
-            document.getElementById('borrowerSearch').value = '';
-            displayBorrowersData(borrowers);
-        } catch (error) {
-            console.error('Error loading borrowers:', error);
-            document.getElementById('borrowersTableBody').innerHTML = '<tr><td colspan="7" class="loading">Error loading borrowers</td></tr>';
-        }
-    }
-    async function updateWeeklyChart() {
-        const month = document.getElementById('monthFilter').value;
-        const year = document.getElementById('yearFilter').value;
-        try {
-            const response = await fetch(`{{ route("dashboard.weekly-data") }}?month=${month}&year=${year}`);
-            const data = await response.json();
-            if (window.weeklyChart) {
-                window.weeklyChart.data.labels = data.map(item => item.week);
-                window.weeklyChart.data.datasets[0].data = data.map(item => item.count);
-                window.weeklyChart.update();
-            }
-        } catch (error) {
-            console.error('Error updating weekly chart:', error);
-        }
-    }
-    const statsData = {
-        lifetime: {
-            mainCount: {{ $lifetimeCount }},
-            mainLabel: 'Total Transactions',
-            booksCount: {{ $booksCount }},
-            membersCount: {{ $membersCount }},
-            chartData: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                books: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {{ $booksCount }}],
-                members: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {{ $membersCount }}]
-            }
-        },
-        today: {
-            mainCount: {{ $dailyCount }},
-            mainLabel: "Today's Transactions",
-            booksCount: {{ $booksToday }},
-            membersCount: {{ $membersToday }},
-            chartData: {
-                labels: ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
-                books: [0, {{ $booksToday }}, 0, 0, 0, 0],
-                members: [0, {{ $membersToday }}, 0, 0, 0, 0]
-            }
-        },
-        weekly: {
-            mainCount: {{ $weeklyCount }},
-            mainLabel: "This Week's Transactions",
-            booksCount: {{ $booksThisWeek }},
-            membersCount: {{ $membersThisWeek }},
-            chartData: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                books: [0, 0, 0, 0, 0, 0, {{ $booksThisWeek }}],
-                members: [0, 0, 0, 0, 0, 0, {{ $membersThisWeek }}]
-            }
-        }
-    };
-    function filterStats(period) {
-        const data = statsData[period];
-        document.getElementById('mainCount').textContent = data.mainCount;
-        document.getElementById('mainLabel').textContent = data.mainLabel;
-        document.getElementById('booksCount').textContent = data.booksCount;
-        document.getElementById('membersCount').textContent = data.membersCount;
-        if (window.statsChart) {
-            window.statsChart.data.labels = data.chartData.labels;
-            window.statsChart.data.datasets[0].data = data.chartData.books;
-            window.statsChart.data.datasets[1].data = data.chartData.members;
-            window.statsChart.update();
-        }
-    }
-    function returnBookDirect(transactionId, bookTitle, memberName) {
-        if (confirm(`Are you sure you want to return the book "${bookTitle}" borrowed by ${memberName}?`)) {
-            if (typeof window.returnId !== 'undefined') {
-                window.returnId = transactionId;
-            } else {
-                returnId = transactionId;
-            }
-            if (typeof confirmReturn === 'function') {
-                confirmReturn();
-            } else {
-                submitReturnForm(transactionId);
-            }
-        }
-    }
-    function submitReturnForm(transactionId) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/transactions/${transactionId}/return`;
-        const token = document.querySelector('meta[name="csrf-token"]');
-        if (token) {
-            const csrf = document.createElement('input');
-            csrf.type = 'hidden';
-            csrf.name = '_token';
-            csrf.value = token.getAttribute('content');
-            form.appendChild(csrf);
-        }
-        document.body.appendChild(form);
-        form.submit();
-    }
-    function handleBookReturnSuccess() {
-        showToast('success', 'Book returned successfully!');
-        if (typeof closeReturnModal === 'function') {
-            closeReturnModal();
-        }
-        loadBorrowersData();
-        if (typeof loadOverdueData === 'function') {
-            loadOverdueData();
-        }
-    }
-    function showToast(type, message) {
-        let toast = document.querySelector('.toast-notification.toast-' + type);
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.className = 'toast-notification toast-' + type;
-            toast.innerHTML = `
-                <div class="toast-content">
-                    <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
-                    <div class="toast-text">${message}</div>
-                    <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
-                </div>
-            `;
-            document.getElementById('toast-stack').appendChild(toast);
-        } else {
-            toast.querySelector('.toast-text').textContent = message;
-        }
-        setTimeout(() => toast.classList.add('show'), 100);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 5000);
-    }
-    function initializeChristmasToggle() {
-        let attempts = 0;
-        const maxAttempts = 10;
-        function tryInitialize() {
-            attempts++;
-            const christmasToggle = document.getElementById('christmasToggle');
-            const christmasToggleText = document.querySelector('#christmasToggle #christmasToggleText');
-            if (christmasToggle && christmasToggleText) {
-                function updateToggleAppearance() {
-                    const isActive = window.christmasEffects && window.christmasEffects.getState ?
-                        window.christmasEffects.getState().active : false;
-                    christmasToggle.classList.toggle('active', isActive);
-                    christmasToggleText.textContent = isActive ? 'Disable Christmas' : 'Enable Christmas';
-                }
-                updateToggleAppearance();
-                christmasToggle.addEventListener('click', function() {
-                    if (window.christmasEffects && window.christmasEffects.toggle) {
-                        window.christmasEffects.toggle();
-                        updateToggleAppearance();
-                    } else {
-                        console.error('Christmas effects not loaded');
-                        document.dispatchEvent(new CustomEvent('christmas-toggle'));
-                    }
-                });
-                document.addEventListener('christmas-state-changed', function(e) {
-                    updateToggleAppearance();
-                });
-                console.log('Christmas toggle initialized successfully');
-                return true;
-            } else if (attempts < maxAttempts) {
-                setTimeout(tryInitialize, 100);
-                return false;
-            } else {
-                console.log('Christmas toggle elements not found after', maxAttempts, 'attempts');
-                return false;
-            }
-        }
-        return tryInitialize();
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Dashboard page loaded');
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const savedMode = localStorage.getItem('darkMode');
-        const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
-        document.body.classList.toggle('dark-mode', isDark);
-        darkModeToggle.checked = isDark;
-        darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
-        darkModeToggle.addEventListener('change', () => {
-            const isChecked = darkModeToggle.checked;
-            document.body.classList.toggle('dark-mode', isChecked);
-            localStorage.setItem('darkMode', isChecked);
-            darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
-        });
-        function initializeDarkModeToggle() {
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                console.log('Dark mode toggle found and initialized');
-                const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-                if (savedDarkMode) {
-                    document.body.classList.add('dark-mode');
-                    darkModeToggle.classList.add('dark-mode');
-                    console.log('Applied dark mode on load');
-                } else {
-                    console.log('Applied light mode on load');
-                }
-                const label = document.getElementById('darkModeLabel');
-                if (label) {
-                    label.textContent = savedDarkMode ? 'Dark Mode' : 'Light Mode';
-                    console.log('Label initialized to:', label.textContent);
-                }
-                console.log('Initial state: dark mode =', savedDarkMode);
-                return true;
-            } else {
-                console.log('Dark mode toggle not found, retrying...');
-                return false;
-            }
-        }
-        if (!initializeDarkModeToggle()) {
-            setTimeout(() => {
-                if (!initializeDarkModeToggle()) {
-                    setTimeout(initializeDarkModeToggle, 100);
-                }
-            }, 50);
-        }
-        window.testDarkModeToggle = function() {
-            const toggle = document.getElementById('darkModeToggle');
-            const label = document.getElementById('darkModeLabel');
-            console.log('Testing dark mode toggle:');
-            console.log('Toggle element:', toggle);
-            console.log('Toggle has dark-mode class:', toggle ? toggle.classList.contains('dark-mode') : 'N/A');
-            console.log('Label element:', label);
-            console.log('Label text:', label ? label.textContent : 'N/A');
-            console.log('Body classes:', document.body.classList.toString());
-            if (toggle) {
-                toggle.click();
-                console.log('Manual toggle completed');
-            }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          coverPreviewContent.innerHTML = `
+            <img src="${e.target.result}" alt="Book Cover Preview" style="
+              max-width: 100%;
+              max-height: 100%;
+              width: auto;
+              height: auto;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              object-fit: contain;
+            ">
+            <p style="
+              position: absolute;
+              bottom: 10px;
+              left: 50%;
+              transform: translateX(-50%);
+              background: rgba(0, 0, 0, 0.7);
+              color: white;
+              padding: 4px 8px;
+              border-radius: 6px;
+              font-size: 0.8rem;
+              margin: 0;
+              max-width: 90%;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+            ">${file.name}</p>
+          `;
+          coverPreviewContent.style.position = 'relative';
+          coverPreviewContent.style.backgroundColor = '#f1f5f9';
+          coverPreviewArea.style.borderColor = 'var(--primary, #2fb9eb)';
         };
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('returned') === 'success') {
-            showToast('success', 'Book returned successfully!');
-            window.history.replaceState({}, document.title, window.location.pathname);
+        reader.readAsDataURL(file);
+      }
+
+      // Click to open file picker
+      coverPreviewContent.addEventListener('click', () => {
+        coverInput.click();
+      });
+
+      // Handle file selection
+      coverInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) updateCoverPreview(file);
+      });
+
+      // Prevent default drag behaviors
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        coverPreviewArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      // Visual feedback
+      coverPreviewArea.addEventListener('dragenter', () => {
+        coverPreviewArea.style.borderColor = 'var(--accent, #0891b2)';
+      });
+
+      coverPreviewArea.addEventListener('dragover', () => {
+        coverPreviewArea.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+      });
+
+      coverPreviewArea.addEventListener('dragleave', () => {
+        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
+        coverPreviewArea.style.backgroundColor = '';
+      });
+
+      // Handle drop
+      coverPreviewArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length) {
+          const dt = new DataTransfer();
+          dt.items.add(files[0]);
+          coverInput.files = dt.files;
+          updateCoverPreview(files[0]);
         }
-        loadBorrowersData();
-        const currentMonth = new Date().getMonth() + 1;
-        document.getElementById('monthFilter').value = currentMonth;
-        const currentYear = new Date().getFullYear();
-        document.getElementById('yearFilter').value = currentYear;
-        filterStats('lifetime');
-        document.getElementById('borrowersFilter').value = 'all';
-        setTimeout(() => {
-            if (!initializeChristmasToggle()) {
-                setTimeout(initializeChristmasToggle, 500);
-            }
-        }, 100);
-        const memberCardButtons = document.querySelectorAll('.card .btn');
-        console.log('Found member card buttons:', memberCardButtons.length);
-        memberCardButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                console.log('Button clicked:', this.onclick?.toString());
-            });
-        });
+        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
+        coverPreviewArea.style.backgroundColor = '';
+      });
+
+      // Expose reset function globally
+      window.resetCoverPreview = function () {
+        coverPreviewContent.innerHTML = `
+          <i id="cover-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted, #6b7280); margin-bottom: 12px;"></i>
+          <p id="cover-preview-text" style="color: var(--text-muted, #6b7280); margin: 0; font-weight: 500; font-size: 1.1rem;">
+            Click or drag image here...
+          </p>
+          <small style="color: var(--text-muted, #6b7280); margin-top: 8px; display: block;">
+            Supports JPG, PNG, GIF (max 5MB)
+          </small>
+        `;
+        coverInput.value = '';
+        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
+        coverPreviewContent.style.backgroundColor = '';
+      };
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('📚 Initializing borrow functionality...');
-        const memberNameInput = document.getElementById('memberName');
-        if (memberNameInput) {
-            memberNameInput.addEventListener('input', function() {
-                console.log('🔄 Member name changed, updating button state');
-                if (typeof updateConfirmButtonState === 'function') {
-                    updateConfirmButtonState();
-                }
-            });
-        }
-        const bookRows = document.querySelectorAll('#booksTableBody tr[data-id]');
-        bookRows.forEach(row => {
-            row.addEventListener('click', function(e) {
-                if (!e.target.closest('.btn')) {
-                    const bookId = this.dataset.id;
-                    if (typeof toggleBookSelection === 'function') {
-                        toggleBookSelection(bookId);
-                    }
-                }
-            });
-        });
-        console.log('✅ Borrow functionality initialized');
-    });
-</script>
-</body>
+
+    // Ensure resetCoverPreview is called on modal close
+    function closeAddBookModal() {
+      const modal = document.getElementById('addBookModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        // Reset form and preview
+        document.getElementById('addBookForm').reset();
+        if (typeof resetCoverPreview === 'function') resetCoverPreview();
+      }
+    }
+    </script>
+  </body>
 </html>

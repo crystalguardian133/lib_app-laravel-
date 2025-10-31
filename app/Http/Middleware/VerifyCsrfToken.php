@@ -16,5 +16,6 @@ class VerifyCsrfToken extends Middleware
         'borrow',
         'suggest-members',
         'members/search',
+        'chatbot/message',
     ];
 }

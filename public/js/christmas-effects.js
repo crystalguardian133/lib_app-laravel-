@@ -83,6 +83,13 @@ class ChristmasEffects {
                 this.updateDimensions();
             }
         });
+
+        // Handle user interaction for music playback
+        document.addEventListener('click', () => {
+            if (this.isActive && this.music && this.music.paused) {
+                this.music.play().catch(e => console.log('Could not play music after user interaction:', e));
+            }
+        }, { once: true }); // Only listen once
     }
 
     toggle(silent = false) {
@@ -401,7 +408,7 @@ class ChristmasEffects {
     }
 
     addOrnaments() {
-        const ornaments = ['🎄', '🎅', '⭐', '🔔', '🎁'];
+        const ornaments = ['🎄', '⭐', '🔔', '🎁'];
         ornaments.forEach((ornament, index) => {
             const element = document.createElement('div');
             element.className = 'christmas-ornament';
@@ -599,19 +606,33 @@ class ChristmasEffects {
 
     // Music System
     startMusic() {
-        // Optional: Add Christmas music
-        // Uncomment if you want to add background music
-        /*
-        this.music = new Audio('/sounds/christmas-music.mp3');
-        this.music.volume = this.config.musicVolume;
-        this.music.loop = true;
-        this.music.play().catch(e => console.log('Could not play music:', e));
-        */
+        if (this.music) return; // Already playing
+
+        try {
+            this.music = new Audio('/audio/nekodex - Little Drummer Girl (osu! xmas 2020).mp3');
+            this.music.volume = this.config.musicVolume;
+            this.music.loop = true;
+
+            // Wait for user interaction before playing
+            const playPromise = this.music.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('🎵 Christmas music started!');
+                }).catch(error => {
+                    console.log('Could not play Christmas music:', error);
+                    // Show user-friendly message
+                    this.showToast('info', 'Click anywhere to enable Christmas music! 🎵');
+                });
+            }
+        } catch (error) {
+            console.log('Error creating audio:', error);
+        }
     }
 
     stopMusic() {
         if (this.music) {
             this.music.pause();
+            this.music.currentTime = 0; // Reset to beginning
             this.music = null;
         }
     }

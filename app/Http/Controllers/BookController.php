@@ -44,7 +44,7 @@ public function store(Request $request)
         'genre' => 'nullable|string|max:50',
         'published_year' => 'required|integer|min:1000|max:3000',
         'availability' => 'required|integer|min:0',
-        'cover' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120' // 5MB to match your JS
+        'cover' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:5120' // 5MB to match your JS, consistent mimes order
     ]);
 
     // Remove cover from validated data to avoid mass assignment issues

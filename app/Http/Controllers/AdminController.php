@@ -68,6 +68,9 @@ class AdminController extends Controller
         ->orderBy('borrowed_at', 'desc')
         ->get();
 
+    // Analytics data
+    $analytics = $this->getAnalyticsData();
+
     return view('dashboard', [
         'booksCount' => $booksCount,
         'membersCount' => $membersCount,
@@ -83,6 +86,7 @@ class AdminController extends Controller
         'weeklyData' => $weeklyData,
         'visitsData' => $visitsData,
         'borrowers' => $borrowers,
+        'analytics' => $analytics,
     ]);
 }
 
@@ -158,6 +162,178 @@ public function getRecentMembers()
         ->get();
 
     return response()->json($members);
+}
+
+private function getAnalyticsData()
+{
+    // Book popularity by genre
+    $bookGenres = DB::table('books')
+        ->select('genre', DB::raw('COUNT(*) as count'))
+        ->whereNotNull('genre')
+        ->groupBy('genre')
+        ->orderBy('count', 'desc')
+        ->get();
+
+    // Julita barangay distribution with coordinates
+    $julitaBarangays = DB::table('members')
+        ->select('barangay', DB::raw('COUNT(*) as count'))
+        ->where('municipality', 'Julita')
+        ->whereNotNull('barangay')
+        ->groupBy('barangay')
+        ->orderBy('barangay')
+        ->get();
+
+    // Add coordinates for each barangay in Julita
+    $barangayCoordinates = [
+        'Alegria' => [10.9365, 124.9496],
+        'Anibong' => [11.0154, 124.9806],
+        'Aslum' => [11.0164, 124.9526],
+        'Balante' => [10.9369, 124.9444],
+        'Bongdo' => [11.0105, 124.9661],
+        'Bonifacio' => [10.9688, 124.9572],
+        'Bugho' => [10.9467, 124.9418],
+        'Calbasag' => [10.9906, 124.9531],
+        'Caridad' => [10.9515, 124.9463],
+        'Cuya-e' => [10.9861, 124.9646],
+        'Dita' => [10.9756, 124.9490],
+        'Gitabla' => [10.9968, 124.9607],
+        'Hindang' => [10.9974, 124.9730],
+        'Inawangan' => [11.0035, 124.9740],
+        'Jurao' => [10.9574, 124.9253],
+        'Poblacion District I' => [10.9718, 124.9595],
+        'Poblacion District II' => [10.9729, 124.9621],
+        'Poblacion District III' => [10.9740, 124.9637],
+        'Poblacion District IV' => [10.9740, 124.9637],
+        'San Andres' => [10.9580, 124.9358],
+        'San Pablo' => [11.0019, 124.9683],
+        'Santa Cruz' => [11.0073, 124.9530],
+        'Santo Niño' => [10.9278, 124.9580],
+        'Tagkip' => [10.9500, 124.9573],
+        'Tolosahay' => [10.9403, 124.9627],
+        'Villa Hermosa' => [11.0130, 124.9745],
+    ];
+
+    // Add coordinates and member details to barangay data
+    $julitaBarangaysWithCoords = $julitaBarangays->map(function($barangay) use ($barangayCoordinates) {
+        $coords = $barangayCoordinates[$barangay->barangay] ?? [11.0667, 124.5167]; // Default to Julita center
+
+        // Get member details for this barangay
+        $members = DB::table('members')
+            ->select('first_name', 'middle_name', 'last_name', 'age')
+            ->where('municipality', 'Julita')
+            ->where('barangay', $barangay->barangay)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get()
+            ->map(function($member) {
+                return [
+                    'name' => trim($member->first_name . ' ' . ($member->middle_name ? $member->middle_name . ' ' : '') . $member->last_name),
+                    'age' => $member->age
+                ];
+            });
+
+        return [
+            'barangay' => $barangay->barangay,
+            'count' => $barangay->count,
+            'lat' => $coords[0],
+            'lng' => $coords[1],
+            'members' => $members
+        ];
+    });
+
+    // Non-Julita municipality distribution
+    $otherMunicipalities = DB::table('members')
+        ->select('municipality', DB::raw('COUNT(*) as count'))
+        ->where('municipality', '!=', 'Julita')
+        ->whereNotNull('municipality')
+        ->groupBy('municipality')
+        ->orderBy('count', 'desc')
+        ->get();
+
+    // Age distribution
+    $ageDistribution = DB::table('members')
+        ->select(
+            DB::raw("CASE
+                WHEN age BETWEEN 0 AND 12 THEN '0-12'
+                WHEN age BETWEEN 13 AND 18 THEN '13-18'
+                WHEN age BETWEEN 19 AND 25 THEN '19-25'
+                WHEN age BETWEEN 26 AND 35 THEN '26-35'
+                WHEN age BETWEEN 36 AND 50 THEN '36-50'
+                WHEN age BETWEEN 51 AND 65 THEN '51-65'
+                ELSE '65+'
+            END as age_group"),
+            DB::raw('COUNT(*) as count')
+        )
+        ->groupBy('age_group')
+        ->orderByRaw("FIELD(age_group, '0-12', '13-18', '19-25', '26-35', '36-50', '51-65', '65+')")
+        ->get();
+
+    // Top 10 most borrowed books
+    $topBooks = DB::table('transactions')
+        ->join('books', 'transactions.book_id', '=', 'books.id')
+        ->select('books.title', 'books.author', DB::raw('COUNT(*) as borrow_count'))
+        ->groupBy('books.id', 'books.title', 'books.author')
+        ->orderBy('borrow_count', 'desc')
+        ->limit(10)
+        ->get();
+
+    // Most active members based on borrowing frequency
+    $mostActiveMembers = DB::table('transactions')
+        ->join('members', 'transactions.member_id', '=', 'members.id')
+        ->select(
+            'members.first_name',
+            'members.middle_name',
+            'members.last_name',
+            'members.barangay',
+            DB::raw('COUNT(*) as borrow_count'),
+            DB::raw('MAX(transactions.created_at) as last_borrow')
+        )
+        ->groupBy('members.id', 'members.first_name', 'members.middle_name', 'members.last_name', 'members.barangay')
+        ->orderBy('borrow_count', 'desc')
+        ->limit(10)
+        ->get()
+        ->map(function($member) {
+            return [
+                'name' => trim($member->first_name . ' ' . ($member->middle_name ? $member->middle_name . ' ' : '') . $member->last_name),
+                'barangay' => $member->barangay,
+                'borrow_count' => $member->borrow_count,
+                'last_borrow' => $member->last_borrow
+            ];
+        });
+
+    // Most active members based on time-in/out frequency
+    $mostActiveTimeLogMembers = DB::table('time_logs')
+        ->join('members', 'time_logs.member_id', '=', 'members.id')
+        ->select(
+            'members.first_name',
+            'members.middle_name',
+            'members.last_name',
+            'members.barangay',
+            DB::raw('COUNT(*) as visit_count'),
+            DB::raw('MAX(time_logs.created_at) as last_visit')
+        )
+        ->groupBy('members.id', 'members.first_name', 'members.middle_name', 'members.last_name', 'members.barangay')
+        ->orderBy('visit_count', 'desc')
+        ->limit(10)
+        ->get()
+        ->map(function($member) {
+            return [
+                'name' => trim($member->first_name . ' ' . ($member->middle_name ? $member->middle_name . ' ' : '') . $member->last_name),
+                'barangay' => $member->barangay,
+                'visit_count' => $member->visit_count,
+                'last_visit' => $member->last_visit
+            ];
+        });
+
+    return [
+        'bookGenres' => $bookGenres,
+        'julitaBarangays' => $julitaBarangaysWithCoords,
+        'otherMunicipalities' => $otherMunicipalities,
+        'ageDistribution' => $ageDistribution,
+        'topBooks' => $topBooks,
+        'mostActiveMembers' => $mostActiveMembers,
+        'mostActiveTimeLogMembers' => $mostActiveTimeLogMembers,
+    ];
 }
 
 }
