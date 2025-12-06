@@ -855,6 +855,15 @@ body.dark-mode .actions .delete {
         </a>
       </div>
     </div>
+    <div class="logout-btn" style="margin-top: auto; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; gap: 12px; align-self: center; margin-left: auto; margin-right: auto; background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; width: 100%; max-width: 200px;">
+      <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+        @csrf
+        <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="logout-text">Logout</span>
+        </button>
+      </form>
+    </div>
     <div class="dark-toggle">
       <label class="switch" title="Toggle Dark Mode">
         <input type="checkbox" id="darkModeToggle">

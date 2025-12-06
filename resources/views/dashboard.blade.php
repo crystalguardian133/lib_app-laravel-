@@ -40,7 +40,6 @@
     --google-red: #EA4335 ;
     --google-yellow: #FBBC05;
     --google-green: #34A853;
-    
     /* 🌞 LIGHT MODE DEFAULT */
     --background: #f8fafc;
     --surface: rgba(255, 255, 255, 0.85);
@@ -81,6 +80,13 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 2.5rem;
+  }
+  .sidebar-header .logo {
+    transition: var(--transition-spring);
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+  }
+  .sidebar-header .logo:hover {
+    transform: scale(1.05) rotate(2deg);
   }
   /* 🌙 DARK MODE - With Dark Gray Background */
   body.dark-mode {
@@ -331,6 +337,74 @@
     margin-left: auto;
     margin-right: auto;
   }
+  /* Logout Button Hover Effects */
+  .logout-btn:hover {
+    background: linear-gradient(135deg, var(--danger), #dc2626) !important;
+    color: white !important;
+    border-color: var(--danger) !important;
+    box-shadow: var(--shadow) !important;
+    transform: translateY(-2px);
+  }
+  .logout-btn:hover .logout-text {
+    color: white !important;
+  }
+  .christmas-text {
+    transition: all 0.3s ease;
+  }
+  .christmas-toggle {
+    display: none; /* Hidden by default */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+  }
+  .christmas-toggle.visible {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .christmas-toggle:hover {
+    box-shadow: var(--shadow), 0 0 15px rgba(34, 197, 94, 0.3);
+  }
+  .christmas-toggle:hover .christmas-text {
+    background: linear-gradient(90deg, #dc2626, #16a34a, #ca8a04, #dc2626);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: christmasShift 4s linear infinite;
+    transform: scale(1.05);
+  }
+  /* Logout Button */
+  .logout-section {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .logout-btn {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+  }
+  .logout-text{
+
+  }
+  @keyframes christmasShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 300% 50%;
+    }
+  }
   /* Animated label */
   #darkModeLabel {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -410,11 +484,11 @@
   }
   /* Main Content */
   .main {
-    margin-left: 280px;
+    margin-left: 300px;
     padding: var(--spacing-lg);
     flex-grow: 1;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: calc(100% - 280px);
+    min-width: calc(100% - 300px);
     animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100vh;
     overflow: hidden;
@@ -2014,7 +2088,6 @@
     z-index: 2300;
     animation: chatSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-
   /* Message Container */
   .message-container {
     margin-bottom: 8px;
@@ -2023,26 +2096,21 @@
     display: flex;
     justify-content: flex-start;
   }
-
   .message-container.user {
     justify-content: flex-end;
   }
-
   .message-container i {
     font-size: 14px;
     position: absolute;
     top: 10px;
     color: var(--primary);
   }
-
   .message-container.bot i {
     left: 6px;
   }
-
   .message-container.user i {
     right: 6px;
   }
-
   .message-container .msg {
     padding: 8px 12px;
     border-radius: var(--radius);
@@ -2051,23 +2119,19 @@
     margin-left: 20px;
     font-size: 0.9rem;
   }
-
   .message-container.user .msg {
     margin-left: 0;
     margin-right: 20px;
   }
-
   .message-container .msg.user {
     background: var(--primary);
     color: white;
     text-align: left;
   }
-
   .message-container .msg.bot {
     background: var(--surface);
     color: var(--text-primary);
   }
-
   /* Typing Indicator */
   .typing-indicator {
     display: flex;
@@ -2078,13 +2142,11 @@
     margin-right: auto;
     max-width: 80%;
   }
-
   .ripple-container {
     display: flex;
     align-items: center;
     gap: 4px;
   }
-
   .ripple-circle {
     width: 8px;
     height: 8px;
@@ -2092,10 +2154,8 @@
     background: var(--primary);
     animation: ripple 1.4s ease-in-out infinite both;
   }
-
   .ripple-circle:nth-child(1) { animation-delay: -0.32s; }
   .ripple-circle:nth-child(2) { animation-delay: -0.16s; }
-
   @keyframes ripple {
     0%, 80%, 100% {
       transform: scale(0);
@@ -2285,6 +2345,16 @@
     color: white;
     border-left-color: var(--accent);
   }
+  .toast-notification.music-toast {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9));
+    color: white;
+    border-left-color: var(--success);
+    animation: musicPulse 0.6s ease-in-out;
+  }
+  @keyframes musicPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
   .toast-content {
     display: flex;
     align-items: center;
@@ -2324,7 +2394,464 @@
     background: rgba(255, 255, 255, 0.3);
     transform: scale(1.1) rotate(90deg);
   }
+  /* Modern Modal Styles */
+  .modern-modal-container {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 800px;
+    max-height: 450px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+  }
+  .modal-overlay.active .modern-modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  .modern-modal-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface-elevated);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+  .header-gradient-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+    z-index: 1;
+  }
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+  }
+  .modal-icon-container {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-lg);
+    animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .icon-glow {
+    animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .modal-main-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  .modal-description {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
+  }
+  .modern-close-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-muted);
+    position: relative;
+    z-index: 2;
+  }
+  .modern-close-btn:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+  .modern-modal-body {
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+  .modern-modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  .modern-modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: var(--radius);
+  }
+  .modern-modal-body::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+  .modern-modal-footer {
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  .footer-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+  .btn-cancel-premium {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-cancel-premium:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+  }
+  .btn-submit-premium {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+    box-shadow: var(--shadow);
+    transition: var(--transition-spring);
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit-premium:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #059669, #047857);
+  }
+  .btn-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-submit-premium:hover .btn-glow {
+    left: 100%;
+  }
+  /* Premium Form Styles */
+  .premium-form-section {
+    margin-bottom: 2rem;
+    animation: slideInFromLeft 0.6s ease-out;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    box-shadow: var(--glass-shadow);
+    transition: var(--transition);
+  }
+  .premium-form-section:nth-child(even) {
+    animation: slideInFromRight 0.6s ease-out;
+  }
+  .premium-form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .section-icon-box {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .section-info h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0 0 0.25rem 0;
+  }
+  .section-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
+  }
+  .premium-upload-area {
+    border: 3px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+  .premium-upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .upload-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .upload-icon-circle {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-md);
+    animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .upload-animations .floating-dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: inline-block;
+    animation: floatingDots 2s ease-in-out infinite;
+  }
+  .upload-animations .floating-dots span:nth-child(1) { animation-delay: 0s; }
+  .upload-animations .floating-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .upload-animations .floating-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes floatingDots {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-10px); opacity: 1; }
+  }
+  .upload-text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .upload-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .upload-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .upload-requirements {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .req-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .req-item i {
+    color: var(--success);
+  }
+  .hidden-file-input {
+    display: none;
+  }
+  .elegant-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .premium-form-group {
+    display: flex;
+    flex-direction: column;
+    animation: bounceIn 0.5s ease-out;
+    padding: 0 var(--spacing-sm);
+  }
+  .premium-form-group:nth-child(1) { animation-delay: 0.1s; }
+  .premium-form-group:nth-child(2) { animation-delay: 0.2s; }
+  .premium-form-group:nth-child(3) { animation-delay: 0.3s; }
+  .premium-form-group:nth-child(4) { animation-delay: 0.4s; }
+  .premium-form-group:nth-child(5) { animation-delay: 0.5s; }
+  .premium-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .premium-label i {
+    color: var(--primary);
+    font-size: 0.85rem;
+  }
+  .required-indicator {
+    color: var(--danger);
+    font-weight: bold;
+  }
+  .input-wrapper {
+    position: relative;
+  }
+  .premium-input {
+    padding: 12px 16px;
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--glass-shadow);
+    width: 100%;
+  }
+  .premium-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+  .premium-input:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+  .input-focus-line {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+  .premium-input:focus + .input-focus-line {
+    width: 100%;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  /* Dark mode adjustments for modern modal */
+  body.dark-mode .modern-modal-container {
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    border-color: var(--glass-border);
+  }
+  body.dark-mode .modern-modal-header {
+    background: rgba(30, 30, 30, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode .modern-close-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
+  }
+  body.dark-mode .modern-close-btn:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+  body.dark-mode .premium-input {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  body.dark-mode .premium-input:focus {
+    background: rgba(30, 41, 59, 1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  body.dark-mode .premium-input:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  body.dark-mode .premium-upload-area {
+    background: rgba(30, 41, 59, 0.3);
+    border-color: #9ca3af;
+  }
+  body.dark-mode .premium-upload-area:hover {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: var(--accent);
+  }
   /* Animations */
+  @keyframes iconBounce {
+    0% { transform: scale(0) rotate(-180deg); }
+    50% { transform: scale(1.3) rotate(-90deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
@@ -2356,6 +2883,43 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
     }
   }
   /* Dark mode transition animation */
@@ -2394,11 +2958,11 @@
   /* Large Desktop - Enhanced Layout */
   @media (min-width: 1200px) {
     .sidebar {
-      width: 300px;
+      width: 280px;
     }
     .main {
-      margin-left: 300px;
-      min-width: calc(100% - 300px);
+      margin-left: 280px;
+      min-width: calc(100% - 280px);
     }
     .stats {
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -2914,6 +3478,34 @@
                 <span class="label">Member Time-in/out</span>
             </a>
         </nav>
+        <!-- Logout Button -->
+        <div class="logout-section" style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; justify-content: center;">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
+                @csrf
+                <button type="submit" class="logout-btn" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    width: 160px;
+                    padding: 10px 12px;
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: none;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                ">
+                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
+                </button>
+            </form>
+        </div>
         <div class="dark-toggle">
             <label class="switch" title="Toggle Dark Mode">
                 <input type="checkbox" id="darkModeToggle">
@@ -2929,55 +3521,524 @@
         <!-- Christmas Effects Toggle -->
         <div class="christmas-toggle" id="christmasToggle" title="Toggle Christmas Effects">
             <span class="icon">🎄</span>
-            <span id="christmasToggleText">Enable Christmas</span>
+            <span id="christmasToggleText" class="christmas-text">Enable Christmas</span>
         </div>
         <script>
-            // Initialize Christmas effects toggle with persistent state
-            document.addEventListener('DOMContentLoaded', function() {
-                const christmasToggle = document.getElementById('christmasToggle');
-                const christmasToggleText = document.getElementById('christmasToggleText');
-
-                if (christmasToggle && christmasToggleText) {
-                    // Check localStorage for saved preference
+            // Christmas Effects Manager - Refactored for better organization
+            class ChristmasEffectsManager {
+                constructor() {
+                    this.musicPlayer = null;
+                    this.christmasToggle = null;
+                    this.christmasToggleText = null;
+                    this.isInitialized = false;
+                    this.init();
+                }
+                async init() {
+                    if (this.isInitialized) return;
+                    // Get DOM elements
+                    this.christmasToggle = document.getElementById('christmasToggle');
+                    this.christmasToggleText = document.getElementById('christmasToggleText');
+                    // Initialize music player
+                    this.musicPlayer = new ChristmasMusicPlayer();
+                    // Setup toggle functionality
+                    this.setupToggle();
+                    // Load saved preference
+                    this.loadSavedPreference();
+                    this.isInitialized = true;
+                }
+                setupToggle() {
+                    if (!this.christmasToggle) return;
+                    this.christmasToggle.addEventListener('click', () => this.toggleChristmasEffects());
+                }
+                async toggleChristmasEffects() {
+                    const isCurrentlyActive = document.body.classList.contains('christmas-theme');
+                    if (isCurrentlyActive) {
+                        this.disableChristmasEffects();
+                    } else {
+                        await this.enableChristmasEffects();
+                    }
+                }
+                async enableChristmasEffects() {
+                    // Check for new audio files before enabling
+                    await this.musicPlayer.checkForNewFiles();
+                    // Enable Christmas effects
+                    document.body.classList.add('christmas-theme');
+                    this.christmasToggle?.classList.add('active');
+                    localStorage.setItem('christmasEffects', 'true');
+                    // Update toggle button text
+                    this.updateToggleButtonText();
+                    // Show and start playing music automatically
+                    this.musicPlayer.showPlayer();
+                    await this.musicPlayer.play();
+                    // Show success toast
+                    this.showChristmasToast('Christmas theme enabled! Enjoy the festive music and effects.');
+                }
+                disableChristmasEffects() {
+                    // Disable Christmas effects
+                    document.body.classList.remove('christmas-theme');
+                    this.christmasToggle?.classList.remove('active');
+                    localStorage.setItem('christmasEffects', 'false');
+                    // Update toggle button text
+                    this.updateToggleButtonText();
+                    // Stop music and hide player
+                    this.musicPlayer.pause();
+                    this.musicPlayer.hidePlayer();
+                }
+                loadSavedPreference() {
                     const savedPreference = localStorage.getItem('christmasEffects');
                     const shouldBeActive = savedPreference === 'true';
-
-                    // Apply saved state on page load
                     if (shouldBeActive) {
                         document.body.classList.add('christmas-theme');
-                        christmasToggle.classList.add('active');
-                        christmasToggleText.textContent = 'Disable Christmas';
+                        this.christmasToggle?.classList.add('active');
+                        this.christmasToggleText.textContent = 'Disable Christmas';
+                        // Show player and start playing music automatically
+                        this.musicPlayer.showPlayer();
+                        this.musicPlayer.play();
                     } else {
                         document.body.classList.remove('christmas-theme');
-                        christmasToggle.classList.remove('active');
-                        christmasToggleText.textContent = 'Enable Christmas';
+                        this.christmasToggle?.classList.remove('active');
+                        this.christmasToggleText.textContent = 'Enable Christmas';
+                        this.musicPlayer.hidePlayer();
                     }
-
-                    // Add click handler
-                    christmasToggle.addEventListener('click', function() {
-                        const isCurrentlyActive = document.body.classList.contains('christmas-theme');
-
-                        if (isCurrentlyActive) {
-                            // Disable Christmas effects
-                            document.body.classList.remove('christmas-theme');
-                            christmasToggle.classList.remove('active');
-                            christmasToggleText.textContent = 'Enable Christmas';
-                            localStorage.setItem('christmasEffects', 'false');
-                        } else {
-                            // Enable Christmas effects
-                            document.body.classList.add('christmas-theme');
-                            christmasToggle.classList.add('active');
-                            christmasToggleText.textContent = 'Disable Christmas';
-                            localStorage.setItem('christmasEffects', 'true');
+                    // Update toggle button text based on current state
+                    this.updateToggleButtonText();
+                }
+                updateToggleButtonText() {
+                    const isActive = document.body.classList.contains('christmas-theme');
+                    if (this.christmasToggleText) {
+                        this.christmasToggleText.textContent = isActive ? 'Disable Christmas' : 'Enable Christmas';
+                    }
+                }
+                showChristmasToast(message) {
+                    const toastContainer = document.getElementById('christmasToastContainer');
+                    if (!toastContainer) return;
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification toast-success christmas-toast';
+                    toast.style.cssText = 'position: absolute; top: 10px; right: 10px; min-width: 350px; max-width: 450px; height: auto; pointer-events: auto; z-index: 1000;';
+                    toast.innerHTML = '<div class="toast-content"><div class="toast-icon">🎄</div><div class="toast-text">' + message + '</div><button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button></div>';
+                    toastContainer.appendChild(toast);
+                    setTimeout(() => toast.classList.add('show'), 100);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 5000); // 5 seconds for Christmas toast
+                }
+            }
+            // Christmas Music Player Class - Refactored for better organization
+            class ChristmasMusicPlayer {
+                constructor() {
+                    this.audio = new Audio();
+                    this.tracks = [];
+                    this.currentTrackIndex = 0;
+                    this.isPlaying = false;
+                    this.isShuffle = false;
+                    this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
+                    // Load saved volume or default to 0.3
+                    this.volume = parseFloat(localStorage.getItem('christmasPlayerVolume')) || 0.3;
+                    this.lastAudioCheck = 0;
+                    this.AUDIO_CHECK_INTERVAL = 30000; // Check every 30 seconds
+                    this.CACHE_KEY = 'christmas_audio_files';
+                    this.CACHE_TIMESTAMP_KEY = 'christmas_audio_timestamp';
+                    this.eventListenersAttached = false;
+                    this.initializeElements();
+                    this.setupEventListeners();
+                    this.loadAudioFiles();
+                }
+                initializeElements() {
+                    this.musicPlayer = document.getElementById('christmasMusicPlayer');
+                    this.playPauseBtn = document.getElementById('playPauseBtn');
+                    this.prevTrackBtn = document.getElementById('prevTrack');
+                    this.nextTrackBtn = document.getElementById('nextTrack');
+                    this.shuffleBtn = document.getElementById('shuffleBtn');
+                    this.repeatBtn = document.getElementById('repeatBtn');
+                    this.progressBar = document.getElementById('progressBar');
+                    this.volumeSlider = document.getElementById('volumeSlider');
+                    this.currentTrackDisplay = document.getElementById('currentTrack');
+                    this.currentTimeDisplay = document.getElementById('currentTime');
+                    this.durationDisplay = document.getElementById('duration');
+                    this.closeMusicPlayer = document.getElementById('closeMusicPlayer');
+                    // Set initial volume from saved value
+                    if (this.volumeSlider) {
+                        this.volumeSlider.value = this.volume;
+                        this.audio.volume = this.volume;
+                    }
+                }
+                setupEventListeners() {
+                    // Prevent duplicate event listeners
+                    if (this.eventListenersAttached) return;
+                    this.eventListenersAttached = true;
+                    // Audio events
+                    this.audio.addEventListener('loadedmetadata', () => this.onMetadataLoaded());
+                    this.audio.addEventListener('timeupdate', () => this.onTimeUpdate());
+                    this.audio.addEventListener('ended', () => this.onTrackEnded());
+                    this.audio.addEventListener('error', (e) => this.onAudioError(e));
+                    // Control events - bind methods to preserve this context
+                    if (this.playPauseBtn) this.playPauseBtn.addEventListener('click', this.togglePlayPause.bind(this));
+                    if (this.prevTrackBtn) this.prevTrackBtn.addEventListener('click', this.previousTrack.bind(this));
+                    if (this.nextTrackBtn) this.nextTrackBtn.addEventListener('click', this.nextTrack.bind(this));
+                    if (this.shuffleBtn) this.shuffleBtn.addEventListener('click', this.toggleShuffle.bind(this));
+                    if (this.repeatBtn) this.repeatBtn.addEventListener('click', this.toggleRepeat.bind(this));
+                    // Progress and volume
+                    if (this.progressBar) {
+                        this.progressBar.addEventListener('input', (e) => this.seekTo(e.target.value));
+                        this.progressBar.addEventListener('mousedown', () => this.progressBar.dragging = true;
+                        this.progressBar.addEventListener('mouseup', () => this.progressBar.dragging = false);
+                    }
+                    if (this.volumeSlider) this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+                    // Close button
+                    if (this.closeMusicPlayer) this.closeMusicPlayer.addEventListener('click', this.hidePlayer.bind(this));
+                    // Keyboard shortcut Ctrl+Alt+C to toggle music player
+                    document.addEventListener('keydown', (e) => {
+                        if (e.ctrlKey && e.altKey && (e.key === 'c' || e.key === 'C')) {
+                            e.preventDefault();
+                            this.togglePlayer();
                         }
                     });
+                    // Keyboard shortcut Ctrl+Alt+F to show/hide Christmas toggle
+                    document.addEventListener('keydown', (e) => {
+                        if (e.ctrlKey && e.altKey && (e.key === 'f' || e.key === 'F')) {
+                            e.preventDefault();
+                            this.toggleChristmasToggleVisibility();
+                        }
+                    });
+                }
+                // Cache management
+                getCachedAudioFiles() {
+                    try {
+                        const cached = localStorage.getItem(this.CACHE_KEY);
+                        const timestamp = localStorage.getItem(this.CACHE_TIMESTAMP_KEY);
+                        if (cached && timestamp) {
+                            const cacheAge = Date.now() - parseInt(timestamp);
+                            if (cacheAge < 3600000) { // 1 hour cache
+                                return JSON.parse(cached);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error reading audio cache:', error);
+                    }
+                    return null;
+                }
+                setCachedAudioFiles(audioFiles) {
+                    try {
+                        localStorage.setItem(this.CACHE_KEY, JSON.stringify(audioFiles));
+                        localStorage.setItem(this.CACHE_TIMESTAMP_KEY, Date.now().toString());
+                    } catch (error) {
+                        console.error('Error caching audio files:', error);
+                    }
+                }
+                // Audio file management
+                async loadAudioFiles(forceRefresh = false) {
+                    if (!forceRefresh) {
+                        const cached = this.getCachedAudioFiles();
+                        if (cached) {
+                            this.tracks = cached.map(file => ({
+                                title: file.title,
+                                filename: file.filename,
+                                src: file.url
+                            }));
+                            console.log('Loaded audio tracks from cache:', this.tracks.length);
+                            return;
+                        }
+                    }
+                    try {
+                        const response = await fetch('/api/audio/files');
+                        if (response.ok) {
+                            const audioFiles = await response.json();
+                            this.tracks = audioFiles.map(file => ({
+                                title: file.title,
+                                filename: file.filename,
+                                src: file.url
+                            }));
+                            this.setCachedAudioFiles(audioFiles);
+                            console.log('Loaded and cached audio tracks:', this.tracks.length);
+                        } else {
+                            this.loadFallbackTracks();
+                        }
+                    } catch (error) {
+                        console.error('Error loading audio files:', error);
+                        this.loadFallbackTracks();
+                    }
+                }
+                loadFallbackTracks() {
+                    this.tracks = [
+                        { title: 'nekodex - Little Drummer Girl', filename: 'nekodex - Little Drummer Girl (osu! xmas 2020).mp3', src: '/audio/nekodex - Little Drummer Girl (osu! xmas 2020).mp3' },
+                        { title: 'Deck the Halls', filename: 'Deck-the-Halls-B-chosic.com_.mp3', src: '/audio/Deck-the-Halls-B-chosic.com_.mp3' }
+                    ];
+                    console.log('Using fallback tracks');
+                }
+                async checkForNewFiles() {
+                    const now = Date.now();
+                    if (now - this.lastAudioCheck > this.AUDIO_CHECK_INTERVAL) {
+                        await this.loadAudioFiles(true);
+                        this.lastAudioCheck = now;
+                    }
+                }
+                // Track management
+                loadTrack(index) {
+                    if (index < 0 || index >= this.tracks.length) return;
+                    this.currentTrackIndex = index;
+                    const track = this.tracks[index];
+                    // Stop current audio before loading new track
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
+                    this.audio.src = track.src;
+                    this.audio.load();
+                    this.updateTrackDisplay();
+                    this.resetProgressBar();
+                }
+                updateTrackDisplay() {
+                    if (!this.currentTrackDisplay || !this.tracks[this.currentTrackIndex]) return;
+                    const track = this.tracks[this.currentTrackIndex];
+                    const displayName = track.filename
+                        ? track.filename.replace(/\.[^/.]+$/, "").replace(/_/g, " ")
+                        : track.title;
+                    this.currentTrackDisplay.textContent = displayName;
+                }
+                resetProgressBar() {
+                    if (this.progressBar) {
+                        this.progressBar.value = 0;
+                        this.progressBar.max = 100;
+                    }
+                    if (this.currentTimeDisplay) this.currentTimeDisplay.textContent = '0:00';
+                    if (this.durationDisplay) this.durationDisplay.textContent = '0:00';
+                }
+                // Playback controls
+                async play() {
+                    try {
+                        await this.audio.play();
+                        this.isPlaying = true;
+                        this.updatePlayPauseButton();
+                        this.showMusicToast('▶️ Now Playing', this.tracks[this.currentTrackIndex]?.title || 'Unknown Track');
+                    } catch (error) {
+                        console.error('Error playing audio:', error);
+                        this.showToast('Unable to play audio', 'error');
+                    }
+                }
+                pause() {
+                    this.audio.pause();
+                    this.isPlaying = false;
+                    this.updatePlayPauseButton();
+                    this.showMusicToast('⏸️ Paused', this.tracks[this.currentTrackIndex]?.title || 'Unknown Track');
+                }
+                togglePlayPause() {
+                    if (this.isPlaying) {
+                        this.pause();
+                    } else {
+                        this.play();
+                    }
+                }
+                previousTrack() {
+                    let newIndex;
+                    if (this.isShuffle) {
+                        newIndex = Math.floor(Math.random() * this.tracks.length);
+                        this.showMusicToast('🔀 Shuffle Previous', this.tracks[newIndex]?.title || 'Unknown Track');
+                    } else {
+                        newIndex = (this.currentTrackIndex - 1 + this.tracks.length) % this.tracks.length;
+                        this.showMusicToast('⏮️ Previous Track', this.tracks[newIndex]?.title || 'Unknown Track');
+                    }
+                    this.loadTrack(newIndex);
+                    this.play(); // Always play when changing tracks
+                }
+                nextTrack() {
+                    let newIndex;
+                    if (this.isShuffle) {
+                        newIndex = Math.floor(Math.random() * this.tracks.length);
+                        this.showMusicToast('🔀 Shuffle Next', this.tracks[newIndex]?.title || 'Unknown Track');
+                    } else {
+                        newIndex = (this.currentTrackIndex + 1) % this.tracks.length;
+                        this.showMusicToast('⏭️ Next Track', this.tracks[newIndex]?.title || 'Unknown Track');
+                    }
+                    this.loadTrack(newIndex);
+                    this.play(); // Always play when changing tracks
+                }
+                toggleShuffle() {
+                    this.isShuffle = !this.isShuffle;
+                    if (this.shuffleBtn) {
+                        this.shuffleBtn.style.color = this.isShuffle ? 'var(--primary)' : 'var(--text-secondary)';
+                        this.shuffleBtn.style.borderColor = this.isShuffle ? 'var(--primary)' : 'var(--border)';
+                    }
+                    this.showMusicToast(this.isShuffle ? '🔀 Shuffle On' : '🔀 Shuffle Off', 'Shuffle mode ' + (this.isShuffle ? 'enabled' : 'disabled'));
+                }
+                toggleRepeat() {
+                    this.repeatMode = (this.repeatMode + 1) % 3;
+                    this.audio.loop = this.repeatMode === 2;
+                    let modeText = '';
+                    if (this.repeatMode === 0) modeText = 'No Repeat';
+                    else if (this.repeatMode === 1) modeText = 'Repeat All';
+                    else if (this.repeatMode === 2) modeText = 'Repeat One';
+                    if (this.repeatBtn) {
+                        const icon = this.repeatBtn.querySelector('i');
+                        if (icon) {
+                            if (this.repeatMode === 0) {
+                                icon.className = 'fas fa-redo';
+                                this.repeatBtn.style.color = 'var(--text-secondary)';
+                                this.repeatBtn.style.borderColor = 'var(--border)';
+                            } else if (this.repeatMode === 1) {
+                                icon.className = 'fas fa-redo';
+                                this.repeatBtn.style.color = 'var(--primary)';
+                                this.repeatBtn.style.borderColor = 'var(--primary)';
+                            } else if (this.repeatMode === 2) {
+                                icon.className = 'fas fa-redo-alt';
+                                this.repeatBtn.style.color = 'var(--primary)';
+                                this.repeatBtn.style.borderColor = 'var(--primary)';
+                            }
+                        }
+                    }
+                    this.showMusicToast('🔁 ' + modeText, 'Repeat mode changed');
+                }
+                seekTo(percentage) {
+                    const time = (percentage / 100) * this.audio.duration;
+                    this.audio.currentTime = time;
+                }
+                setVolume(volume) {
+                    this.audio.volume = volume;
+                    this.volume = volume;
+                    // Save volume to localStorage
+                    localStorage.setItem('christmasPlayerVolume', volume.toString());
+                }
+                // Event handlers
+                onMetadataLoaded() {
+                    if (this.durationDisplay) {
+                        this.durationDisplay.textContent = this.formatTime(this.audio.duration);
+                    }
+                    if (this.progressBar) {
+                        this.progressBar.max = 100;
+                    }
+                }
+                onTimeUpdate() {
+                    if (this.progressBar && !this.progressBar.dragging) {
+                        const percentage = (this.audio.currentTime / this.audio.duration) * 100;
+                        this.progressBar.value = percentage;
+                    }
+                    if (this.currentTimeDisplay) {
+                        this.currentTimeDisplay.textContent = this.formatTime(this.audio.currentTime);
+                    }
+                }
+                onTrackEnded() {
+                    if (this.repeatMode === 2) {
+                        // Repeat one - handled by audio.loop
+                        this.showMusicToast('🔁 Repeating', this.tracks[this.currentTrackIndex]?.title || 'Unknown Track');
+                        return;
+                    } else if (this.repeatMode === 1 || !this.isShuffle) {
+                        // Repeat all or next track
+                        this.nextTrack();
+                    } else {
+                        // Shuffle mode
+                        this.nextTrack();
+                    }
+                }
+                onAudioError(error) {
+                    console.error('Audio error:', error);
+                    this.showToast('Error playing audio file', 'error');
+                    this.nextTrack(); // Skip to next track on error
+                }
+                // UI updates
+                updatePlayPauseButton() {
+                    if (this.playPauseBtn) {
+                        const icon = this.playPauseBtn.querySelector('i');
+                        if (icon) {
+                            icon.className = this.isPlaying ? 'fas fa-pause' : 'fas fa-play';
+                        }
+                    }
+                }
+                showPlayer() {
+                    if (this.musicPlayer) {
+                        this.musicPlayer.style.display = 'block';
+                    }
+                }
+                hidePlayer() {
+                    if (this.musicPlayer) {
+                        this.musicPlayer.style.display = 'none';
+                    }
+                }
+                togglePlayer() {
+                    // Only allow toggling if Christmas theme is active
+                    if (!document.body.classList.contains('christmas-theme')) {
+                        this.showChristmasToast('🎄 Enable Christmas theme first to access the music player!');
+                        return;
+                    }
+                    if (this.musicPlayer) {
+                        const isVisible = this.musicPlayer.style.display !== 'none';
+                        this.musicPlayer.style.display = isVisible ? 'none' : 'block';
+                    }
+                }
+                toggleChristmasToggleVisibility() {
+                    const christmasToggle = document.getElementById('christmasToggle');
+                    if (christmasToggle) {
+                        const isVisible = christmasToggle.classList.contains('visible');
+                        if (isVisible) {
+                            christmasToggle.classList.remove('visible');
+                        } else {
+                            christmasToggle.classList.add('visible');
+                            // Show a helpful toast
+                            this.showChristmasToast('🎄 Christmas toggle revealed! Press again to hide.');
+                        }
+                    }
+                }
+                // Utility functions
+                formatTime(seconds) {
+                    if (isNaN(seconds)) return '0:00';
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    return `${mins}:${secs.toString().padStart(2, '0')}`;
+                }
+                showToast(message, type = 'info') {
+                    const toastStack = document.getElementById('toast-stack');
+                    if (!toastStack) return;
+                    const toast = document.createElement('div');
+                    toast.className = `toast-notification toast-${type}`;
+                    toast.innerHTML = `
+                        <div class="toast-content">
+                            <div class="toast-icon">${type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️'}</div>
+                            <div class="toast-text">${message}</div>
+                            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                        </div>
+                    `;
+                    toastStack.appendChild(toast);
+                    setTimeout(() => toast.classList.add('show'), 100);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+                showMusicToast(action, trackName) {
+                    const toastStack = document.getElementById('toast-stack');
+                    if (!toastStack) return;
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification toast-info music-toast';
+                    toast.innerHTML = `
+                        <div class="toast-content">
+                            <div class="toast-icon">🎵</div>
+                            <div class="toast-text">
+                                <strong>${action}</strong><br>
+                                <small style="color: var(--text-muted);">${trackName}</small>
+                            </div>
+                            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                        </div>
+                    `;
+                    toastStack.appendChild(toast);
+                    setTimeout(() => toast.classList.add('show'), 100);
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 2500); // Shorter duration for music toasts
+                }
+            }
+            // Initialize Christmas effects when DOM is ready - ensure single instance
+            document.addEventListener('DOMContentLoaded', () => {
+                if (!window.christmasEffectsManager) {
+                    window.christmasEffectsManager = new ChristmasEffectsManager();
                 }
             });
         </script>
     </div>
     <!-- Main Content -->
     <div class="main" id="mainContent">
-        <div class="dashboard-title">DASHBOARD</div>
+        <div style="position: relative;">
+            <div class="dashboard-title">DASHBOARD</div>
+            <!-- Christmas Toast Container (positioned to the right of dashboard title) -->
+            <div id="christmasToastContainer" style="position: absolute; top: 0; right: 0; z-index: 1000; pointer-events: none;"></div>
+        </div>
         <div class="dashboard-content">
         <!-- Stats Cards -->
         <div class="stats">
@@ -3150,7 +4211,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Age Distribution -->
             <div class="card">
                 <div class="card-header">
@@ -3160,7 +4220,6 @@
                     <canvas id="ageDistributionChart"></canvas>
                 </div>
             </div>
-
             <!-- Top Books and Active Members -->
             <div class="card">
                 <div class="card-header">
@@ -3183,7 +4242,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Most Active Members -->
                         <div>
                             <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1rem; font-weight: 600;">👤 Most Active Members</h4>
@@ -3197,7 +4255,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Member Demographics (Full Width) -->
         <div class="card" style="margin-top: 2rem;">
             <div class="card-header">
@@ -3220,7 +4277,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Consolidated Statistics with Line Graph -->
         <div class="card stats-overview-card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
@@ -3254,6 +4310,84 @@
                     <canvas id="statsChart"></canvas>
                 </div>
             </div>
+        </div>
+        <!-- Christmas Music Player Overlay -->
+        <div id="christmasMusicPlayer" style="
+            position: fixed;
+            top: auto;
+            bottom: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--glass-shadow);
+            padding: 1.5rem;
+            z-index: 1001;
+            display: none;
+            min-width: 350px;
+            max-width: 400px;
+            pointer-events: auto;
+        ">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.2rem; margin: 0;">🎵 Christmas Music Player</h3>
+            </div>
+            <!-- Progress Bar -->
+            <div style="margin-bottom: 1rem;">
+                <input type="range" id="progressBar" min="0" max="100" value="0" style="width: 100%; height: 6px; border-radius: 3px; background: var(--border); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            <!-- Control Buttons (5 buttons: shuffle, prev, play/pause, next, repeat) -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem; margin-bottom: 1rem;">
+                <button id="shuffleBtn" class="btn btn-sm" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition); padding: 0; min-width: 32px;">
+                    <i class="fas fa-random" style="font-size: 14px;"></i>
+                </button>
+                <button id="prevTrack" class="btn btn-sm" style="background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition); padding: 0; min-width: 32px;">
+                    <i class="fas fa-step-backward" style="font-size: 14px;"></i>
+                </button>
+                <button id="playPauseBtn" class="btn btn-sm" style="background: var(--success); color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: var(--transition); padding: 0; min-width: 32px;">
+                    <i class="fas fa-play" style="font-size: 14px;"></i>
+                </button>
+                <button id="nextTrack" class="btn btn-sm" style="background: var(--primary); color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition); padding: 0; min-width: 32px;">
+                    <i class="fas fa-step-forward" style="font-size: 14px;"></i>
+                </button>
+                <button id="repeatBtn" class="btn btn-sm" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition); padding: 0; min-width: 32px;">
+                    <i class="fas fa-redo" style="font-size: 14px;"></i>
+                </button>
+            </div>
+            <!-- Volume Slider (smaller and shorter) -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; justify-content: center;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-volume-down"></i></span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.3" style="width: 120px; height: 6px; border-radius: 3px; background: var(--border); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-volume-up"></i></span>
+            </div>
+            <!-- Track Info -->
+            <div style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);">
+                <span id="currentTrack">nekodex - Little Drummer Girl</span>
+            </div>
+            <!-- Close Button -->
+            <button id="closeMusicPlayer" style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--text-muted);
+                transition: var(--transition);
+            ">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         <!-- Footer -->
         <footer style="margin-top: auto; padding: var(--spacing-lg); text-align: center; color: var(--text-muted); font-size: 0.9rem; background: rgba(0, 0, 0, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.1); width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center;">
@@ -3317,116 +4451,158 @@
         </div>
     </div>
 </div>
-    <!-- ADD BOOK MODAL -->
+    <!-- ADD BOOK MODAL - FULLY REDESIGNED -->
     <div class="modal-overlay" id="addBookModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-header-content">
-                    <div class="modal-icon-wrapper">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="modal-title-section">
-                        <h2 class="modal-title">Add New Book</h2>
-                        <p class="modal-subtitle">Add a new book to the library collection</p>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="closeAddBookModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+      <div class="modern-modal-container">
+        <!-- Animated Header with Gradient Background -->
+        <div class="modern-modal-header">
+          <div class="header-gradient-bg"></div>
+          <div class="header-content">
+            <div class="modal-icon-container">
+              <div class="icon-glow">
+                <i class="fas fa-plus-circle"></i>
+              </div>
             </div>
-            <div class="modal-body">
-                <form id="addBookForm" enctype="multipart/form-data">
-                    <!-- Cover Image Section -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            <span>Book Cover</span>
-                        </h3>
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-camera"></i>
-                                Cover Image
-                            </label>
-                            <div class="photo-upload-container">
-                                <div class="photo-upload">
-                                    <div class="upload-icon-wrapper">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="upload-text">
-                                        <p class="upload-main-text">Click to upload or drag and drop</p>
-                                        <p class="upload-sub-text">JPG, PNG, GIF up to 5MB</p>
-                                    </div>
-                                    <input type="file" id="cover-input" name="cover" accept="image/*" class="form-input">
-                                </div>
-                                <img id="cover-preview" class="photo-preview" src="#" alt="Cover Preview" style="display: none;">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Book Information Section -->
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            <span>Book Information</span>
-                        </h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="bookTitle" class="form-label">
-                                    <i class="fas fa-heading"></i>
-                                    Title *
-                                </label>
-                                <input type="text" id="bookTitle" name="title" class="form-input" required placeholder="Enter book title">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookAuthor" class="form-label">
-                                    <i class="fas fa-user-edit"></i>
-                                    Author *
-                                </label>
-                                <input type="text" id="bookAuthor" name="author" class="form-input" required placeholder="Enter author name">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookGenre" class="form-label">
-                                    <i class="fas fa-tags"></i>
-                                    Genre
-                                </label>
-                                <input type="text" id="bookGenre" name="genre" class="form-input" placeholder="Enter book genre">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookYear" class="form-label">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Published Year *
-                                </label>
-                                <input type="number" id="bookYear" name="published_year" class="form-input" required min="1000" max="2099" placeholder="Enter publication year">
-                            </div>
-                            <div class="form-group">
-                                <label for="bookAvailability" class="form-label">
-                                    <i class="fas fa-hashtag"></i>
-                                    Availability *
-                                </label>
-                                <input type="number" id="bookAvailability" name="availability" class="form-input" required min="0" placeholder="Enter number of copies">
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div class="title-section">
+              <h1 class="modal-main-title">Add New Book</h1>
+              <p class="modal-description">Expand your library collection with a new book entry</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeAddBookModal()">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </button>
-                <button type="button" class="btn btn-primary" onclick="submitAddBook()">
-                    <i class="fas fa-save"></i>
-                    Add Book
-                </button>
-            </div>
+          </div>
+          <button class="modern-close-btn" onclick="closeAddBookModal()" aria-label="Close modal">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+        <!-- Enhanced Scrollable Body -->
+        <div class="modern-modal-body">
+          <form id="addBookForm" enctype="multipart/form-data" novalidate>
+            <!-- Premium Cover Upload Section -->
+            <div class="premium-form-section cover-section">
+              <div class="section-header">
+                <div class="section-icon-box">
+                  <i class="fas fa-camera-retro"></i>
+                </div>
+                <div class="section-info">
+                  <h3 class="section-title">Book Cover Image</h3>
+                  <p class="section-subtitle">Upload a stunning cover image for your book</p>
+                </div>
+              </div>
+              <div class="premium-upload-area" id="cover-preview-area" style="height: 180px;">
+                <div class="upload-zone" id="cover-preview-content">
+                  <div class="upload-visual">
+                    <div class="upload-icon-circle">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-animations">
+                      <div class="floating-dots">
+                        <span></span><span></span><span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="upload-text-content">
+                    <h4 class="upload-title">Drop your image here</h4>
+                    <p class="upload-subtitle">or click to browse files</p>
+                    <div class="upload-requirements">
+                      <span class="req-item"><i class="fas fa-check-circle"></i> JPG, PNG, GIF</span>
+                      <span class="req-item"><i class="fas fa-check-circle"></i> Max 5MB</span>
+                      <span class="req-item"><i class="fas fa-check-circle"></i> High quality</span>
+                    </div>
+                  </div>
+                  <img id="cover-preview" class="cover-preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-lg); position: absolute; top: 0; left: 0;">
+                  <button class="remove-preview-btn" id="remove-cover-preview" style="display: none; position: absolute; top: 5px; right: 5px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; z-index: 10;" title="Remove image">×</button>
+                  <input type="file" id="cover-input" name="cover" class="hidden-file-input" accept="image/*">
+                </div>
+              </div>
+            </div>
+            <!-- Elegant Book Details Section -->
+            <div class="premium-form-section details-section">
+              <div class="section-header">
+                <div class="section-icon-box">
+                  <i class="fas fa-book-open"></i>
+                </div>
+                <div class="section-info">
+                  <h3 class="section-title">Book Details</h3>
+                  <p class="section-subtitle">Enter the essential information about your book</p>
+                </div>
+              </div>
+              <div class="elegant-form-grid">
+                <div class="premium-form-group">
+                  <label for="bookTitle" class="premium-label">
+                    <i class="fas fa-heading"></i>
+                    <span class="label-text">Book Title</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookTitle" name="title" class="premium-input" required placeholder="Enter the book title" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+                <div class="premium-form-group">
+                  <label for="bookAuthor" class="premium-label">
+                    <i class="fas fa-user-edit"></i>
+                    <span class="label-text">Author Name</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookAuthor" name="author" class="premium-input" required placeholder="Enter author name" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+                <div class="premium-form-group">
+                  <label for="bookGenre" class="premium-label">
+                    <i class="fas fa-tags"></i>
+                    <span class="label-text">Genre/Category</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookGenre" name="genre" class="premium-input" placeholder="e.g., Fiction, Science, History" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+                <div class="premium-form-group">
+                  <label for="bookYear" class="premium-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="label-text">Publication Year</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="number" id="bookYear" name="published_year" class="premium-input" required min="1900" max="2099" placeholder="e.g., 2023" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+                <div class="premium-form-group full-width">
+                  <label for="bookAvailability" class="premium-label">
+                    <i class="fas fa-hashtag"></i>
+                    <span class="label-text">Available Copies</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="number" id="bookAvailability" name="availability" class="premium-input" required min="0" placeholder="Number of copies available" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- Premium Footer with Enhanced Actions -->
+        <div class="modern-modal-footer">
+          <div class="footer-actions">
+            <button type="button" class="btn-cancel-premium" onclick="closeAddBookModal()">
+              <i class="fas fa-times"></i>
+              <span>Cancel</span>
+            </button>
+            <button type="button" class="btn-submit-premium" onclick="submitAddBookFromBooksIndex()">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Book</span>
+              <div class="btn-glow"></div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- ADD MEMBER MODAL (Julita Residents) -->
     <div class="modal-overlay" id="julitaRegisterModal">
         <div class="modal-container">
+            <!-- Enhanced Header with Gradient Background -->
             <div class="modal-header">
                 <div class="modal-header-content">
                     <div class="modal-icon-wrapper">
@@ -3437,80 +4613,81 @@
                         <p class="modal-subtitle">Add a new member from Julita municipality</p>
                     </div>
                 </div>
-                <button class="modal-close" onclick="closeJulitaRegisterModal()">
+                <button class="modal-close" onclick="closeJulitaRegisterModal()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            <!-- Scrollable Body -->
             <div class="modal-body">
-                <form id="julitaRegisterForm" enctype="multipart/form-data">
+                <form id="julitaRegisterForm" enctype="multipart/form-data" novalidate>
                     <!-- Personal Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
+                        <div class="section-title">
                             <div class="section-icon">
                                 <i class="fas fa-user"></i>
                             </div>
                             <span>Personal Information</span>
-                        </h3>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="julitaFirstName" class="form-label">
                                     <i class="fas fa-signature"></i>
-                                    First Name *
+                                    First Name <span class="required">*</span>
                                 </label>
-                                <input type="text" id="julitaFirstName" name="firstName" class="form-input" required placeholder="Enter first name">
+                                <input type="text" id="julitaFirstName" name="firstName" class="form-control" required placeholder="Enter first name" autocomplete="given-name">
                             </div>
                             <div class="form-group">
                                 <label for="julitaMiddleName" class="form-label">
                                     <i class="fas fa-signature"></i>
                                     Middle Name
                                 </label>
-                                <input type="text" id="julitaMiddleName" name="middleName" class="form-input" placeholder="Enter middle name (optional)">
+                                <input type="text" id="julitaMiddleName" name="middleName" class="form-control" placeholder="Enter middle name (optional)" autocomplete="additional-name">
                             </div>
                             <div class="form-group">
                                 <label for="julitaLastName" class="form-label">
                                     <i class="fas fa-signature"></i>
-                                    Last Name *
+                                    Last Name <span class="required">*</span>
                                 </label>
-                                <input type="text" id="julitaLastName" name="lastName" class="form-input" required placeholder="Enter last name">
+                                <input type="text" id="julitaLastName" name="lastName" class="form-control" required placeholder="Enter last name" autocomplete="family-name">
                             </div>
                             <div class="form-group">
                                 <label for="julitaAge" class="form-label">
                                     <i class="fas fa-birthday-cake"></i>
-                                    Age *
+                                    Age <span class="required">*</span>
                                 </label>
-                                <input type="number" id="julitaAge" name="age" class="form-input" min="1" max="150" required placeholder="Enter age">
+                                <input type="number" id="julitaAge" name="age" class="form-control" min="1" max="150" required placeholder="Enter age">
                             </div>
                         </div>
                     </div>
                     <!-- Address Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
+                        <div class="section-title">
                             <div class="section-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
                             <span>Address Information</span>
-                        </h3>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="julitaHouseNumber" class="form-label">
                                     <i class="fas fa-home"></i>
                                     House Number
                                 </label>
-                                <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-input" placeholder="Enter house number">
+                                <input type="text" id="julitaHouseNumber" name="houseNumber" class="form-control" placeholder="Enter house number" autocomplete="address-line1">
                             </div>
                             <div class="form-group">
                                 <label for="julitaStreet" class="form-label">
                                     <i class="fas fa-road"></i>
                                     Street
                                 </label>
-                                <input type="text" id="julitaStreet" name="street" class="form-input" placeholder="Enter street name">
+                                <input type="text" id="julitaStreet" name="street" class="form-control" placeholder="Enter street name" autocomplete="address-line2">
                             </div>
                             <div class="form-group">
                                 <label for="julitaBarangay" class="form-label">
                                     <i class="fas fa-map"></i>
-                                    Barangay *
+                                    Barangay <span class="required">*</span>
                                 </label>
-                                <select id="julitaBarangay" name="barangay" class="form-input" required>
+                                <select id="julitaBarangay" name="barangay" class="form-control" required autocomplete="address-level3">
                                     <option value="" disabled selected>Select Barangay</option>
                                     <option>Alegria</option>
                                     <option>Anibong</option>
@@ -3543,52 +4720,52 @@
                             <div class="form-group">
                                 <label for="julitaMunicipality" class="form-label">
                                     <i class="fas fa-city"></i>
-                                    Municipality *
+                                    Municipality <span class="required">*</span>
                                 </label>
-                                <input type="text" id="julitaMunicipality" name="municipality" class="form-input" value="Julita" readonly>
+                                <input type="text" id="julitaMunicipality" name="municipality" class="form-control" value="Julita" readonly autocomplete="address-level2">
                             </div>
                             <div class="form-group">
                                 <label for="julitaProvince" class="form-label">
                                     <i class="fas fa-globe-asia"></i>
-                                    Province *
+                                    Province <span class="required">*</span>
                                 </label>
-                                <input type="text" id="julitaProvince" name="province" class="form-input" value="Leyte" readonly>
+                                <input type="text" id="julitaProvince" name="province" class="form-control" value="Leyte" readonly autocomplete="address-level1">
                             </div>
                         </div>
                     </div>
                     <!-- Contact Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
+                        <div class="section-title">
                             <div class="section-icon">
                                 <i class="fas fa-phone"></i>
                             </div>
                             <span>Contact Information</span>
-                        </h3>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="julitaContactNumber" class="form-label">
                                     <i class="fas fa-mobile-alt"></i>
-                                    Contact Number *
+                                    Contact Number <span class="required">*</span>
                                 </label>
-                                <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required placeholder="09XXXXXXXXX">
+                                <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-control" pattern="[0-9]{11}" maxlength="11" required placeholder="09XXXXXXXXX" autocomplete="tel">
                             </div>
                             <div class="form-group">
                                 <label for="julitaSchool" class="form-label">
                                     <i class="fas fa-school"></i>
                                     School/Institution
                                 </label>
-                                <input type="text" id="julitaSchool" name="school" class="form-input" placeholder="Enter school or institution name">
+                                <input type="text" id="julitaSchool" name="school" class="form-control" placeholder="Enter school or institution name" autocomplete="organization">
                             </div>
                         </div>
                     </div>
                     <!-- Photo Upload Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
+                        <div class="section-title">
                             <div class="section-icon">
                                 <i class="fas fa-camera"></i>
                             </div>
                             <span>Upload Photo</span>
-                        </h3>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="fas fa-image"></i>
@@ -3611,14 +4788,15 @@
                     </div>
                 </form>
             </div>
+            <!-- Enhanced Footer with Better Button Layout -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeJulitaRegisterModal()">
                     <i class="fas fa-times"></i>
-                    Cancel
+                    <span>Cancel</span>
                 </button>
                 <button type="button" class="btn btn-primary" onclick="submitJulitaRegister()">
                     <i class="fas fa-save"></i>
-                    Register Member
+                    <span>Register Member</span>
                 </button>
             </div>
         </div>
@@ -3626,100 +4804,156 @@
     <!-- REGISTER MODAL (Non-Julita Residents) -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-container">
+            <!-- Enhanced Header with Gradient Background -->
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-user-plus"></i>
-                    Register New Member
-                </h2>
-                <button class="modal-close" onclick="closeRegisterModal()">
+                <div class="modal-header-content">
+                    <div class="modal-icon-wrapper">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="modal-title-section">
+                        <h2 class="modal-title">Register New Member</h2>
+                        <p class="modal-subtitle">Add a new member from any location</p>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeRegisterModal()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            <!-- Scrollable Body -->
             <div class="modal-body">
-                <form id="registerForm">
+                <form id="registerForm" novalidate>
                     <!-- Personal Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-user"></i>
-                            Personal Information
-                        </h3>
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span>Personal Information</span>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="firstName" class="form-label">First Name *</label>
-                                <input type="text" id="firstName" name="firstName" class="form-input" required>
+                                <label for="firstName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    First Name <span class="required">*</span>
+                                </label>
+                                <input type="text" id="firstName" name="firstName" class="form-control" required placeholder="Enter first name" autocomplete="given-name">
                             </div>
                             <div class="form-group">
-                                <label for="middleName" class="form-label">Middle Name</label>
-                                <input type="text" id="middleName" name="middleName" class="form-input">
+                                <label for="middleName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    Middle Name
+                                </label>
+                                <input type="text" id="middleName" name="middleName" class="form-control" placeholder="Enter middle name (optional)" autocomplete="additional-name">
                             </div>
                             <div class="form-group">
-                                <label for="lastName" class="form-label">Last Name *</label>
-                                <input type="text" id="lastName" name="lastName" class="form-input" required>
+                                <label for="lastName" class="form-label">
+                                    <i class="fas fa-signature"></i>
+                                    Last Name <span class="required">*</span>
+                                </label>
+                                <input type="text" id="lastName" name="lastName" class="form-control" required placeholder="Enter last name" autocomplete="family-name">
                             </div>
                             <div class="form-group">
-                                <label for="age" class="form-label">Age *</label>
-                                <input type="number" id="age" name="age" class="form-input" min="1" max="150" required>
+                                <label for="age" class="form-label">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    Age <span class="required">*</span>
+                                </label>
+                                <input type="number" id="age" name="age" class="form-control" min="1" max="150" required placeholder="Enter age">
                             </div>
                         </div>
                     </div>
                     <!-- Address Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Address Information
-                        </h3>
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>Address Information</span>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="houseNumber" class="form-label">House Number</label>
-                                <input type="text" id="houseNumber" name="houseNumber" class="form-input">
+                                <label for="houseNumber" class="form-label">
+                                    <i class="fas fa-home"></i>
+                                    House Number   
+                                </label>
+                                <input type="text" id="houseNumber" name="houseNumber" class="form-control" placeholder="Enter house number" autocomplete="address-line1">
                             </div>
                             <div class="form-group">
-                                <label for="street" class="form-label">Street</label>
-                                <input type="text" id="street" name="street" class="form-input">
+                                <label for="street" class="form-label">
+                                    <i class="fas fa-road"></i>
+                                    Street
+                                </label>
+                                <input type="text" id="street" name="street" class="form-control" placeholder="Enter street name" autocomplete="address-line2">
                             </div>
                             <div class="form-group">
-                                <label for="barangay" class="form-label">Barangay *</label>
-                                <input type="text" id="barangay" name="barangay" class="form-input" required>
+                                <label for="barangay" class="form-label">
+                                    <i class="fas fa-map"></i>
+                                    Barangay <span class="required">*</span>
+                                </label>
+                                <input type="text" id="barangay" name="barangay" class="form-control" required placeholder="Enter barangay" autocomplete="address-level3">
                             </div>
                             <div class="form-group">
-                                <label for="municipality" class="form-label">Municipality/City *</label>
-                                <input type="text" id="municipality" name="municipality" class="form-input" required>
+                                <label for="municipality" class="form-label">
+                                    <i class="fas fa-city"></i>
+                                    Municipality/City <span class="required">*</span>
+                                </label>
+                                <input type="text" id="municipality" name="municipality" class="form-control" required placeholder="Enter municipality/city" autocomplete="address-level2">
                             </div>
                             <div class="form-group">
-                                <label for="province" class="form-label">Province *</label>
-                                <input type="text" id="province" name="province" class="form-input" required>
+                                <label for="province" class="form-label">
+                                    <i class="fas fa-globe-asia"></i>
+                                    Province <span class="required">*</span>
+                                </label>
+                                <input type="text" id="province" name="province" class="form-control" required placeholder="Enter province" autocomplete="address-level1">
                             </div>
                         </div>
                     </div>
                     <!-- Contact Information Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-phone"></i>
-                            Contact Information
-                        </h3>
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>Contact Information</span>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="contactNumber" class="form-label">Contact Number *</label>
-                                <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+                                <label for="contactNumber" class="form-label">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Contact Number <span class="required">*</span>
+                                </label>
+                                <input type="tel" id="contactNumber" name="contactNumber" class="form-control" pattern="[0-9]{11}" maxlength="11" required placeholder="09XXXXXXXXX" autocomplete="tel">
                             </div>
                             <div class="form-group">
-                                <label for="school" class="form-label">School/Institution</label>
-                                <input type="text" id="school" name="school" class="form-input">
+                                <label for="school" class="form-label">
+                                    <i class="fas fa-school"></i>
+                                    School/Institution
+                                </label>
+                                <input type="text" id="school" name="school" class="form-control" placeholder="Enter school or institution name" autocomplete="organization">
                             </div>
                         </div>
                     </div>
                     <!-- Photo Upload Section -->
                     <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-camera"></i>
-                            Upload Photo
-                        </h3>
+                        <div class="section-title">
+                            <div class="section-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <span>Upload Photo</span>
+                        </div>
                         <div class="form-group">
-                            <label class="form-label">Profile Photo</label>
+                            <label class="form-label">
+                                <i class="fas fa-image"></i>
+                                Profile Photo
+                            </label>
                             <div class="photo-upload-container">
                                 <div class="photo-upload">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Click to upload or drag and drop</p>
+                                    <div class="upload-icon-wrapper">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="upload-main-text">Click to upload or drag and drop</p>
+                                        <p class="upload-sub-text">JPG, PNG, GIF up to 5MB</p>
+                                    </div>
                                     <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
                                 </div>
                                 <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
@@ -3728,14 +4962,15 @@
                     </div>
                 </form>
             </div>
+            <!-- Enhanced Footer with Better Button Layout -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">
                     <i class="fas fa-times"></i>
-                    Cancel
+                    <span>Cancel</span>
                 </button>
                 <button type="button" class="btn btn-primary" onclick="submitRegister()">
                     <i class="fas fa-save"></i>
-                    Register Member
+                    <span>Register Member</span>
                 </button>
             </div>
         </div>
@@ -3773,63 +5008,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-    <!-- MEDIA PICKER MODAL -->
-    <div class="modal" id="mediaPickerModal">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-images"></i>
-                    Select Book Cover
-                </h3>
-                <button class="close-modal" onclick="closeMediaPicker()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="mediaSearch">Search Images</label>
-                        <input type="text" id="mediaSearch" class="form-control" placeholder="Search by filename...">
-                    </div>
-                </div>
-                <!-- Upload Area -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        Or Upload New Image
-                    </h4>
-                    <div id="media-upload-area" style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 2rem; text-align: center; cursor: pointer; background: var(--glass-bg); margin-bottom: 1.5rem; transition: var(--transition);">
-                        <div id="media-upload-content">
-                            <i id="media-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
-                            <p style="color: var(--text-muted); margin: 0; font-weight: 500; font-size: 1rem;">Drag and drop image here or click to browse</p>
-                            <small style="color: var(--text-muted); margin-top: 8px; display: block;">Supports JPG, PNG, GIF (max 5MB)</small>
-                            <input type="file" id="media-file-input" accept="image/*" style="display: none;">
-                        </div>
-                    </div>
-                </div>
-                <!-- Image Gallery -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-th"></i>
-                        Available Images
-                    </h4>
-                    <div id="media-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; max-height: 300px; overflow-y: auto; padding: 1rem; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--glass-bg);">
-                        <!-- Images will be loaded here -->
-                        <div id="media-loading" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                            <p>Loading images...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-cancel" onclick="closeMediaPicker()">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </button>
             </div>
         </div>
     </div>
@@ -3924,41 +5102,6 @@
     </div>
     <!-- Scripts -->
     <script>
-        function closeRegisterModal() {
-            const registerModal = document.getElementById("registerModal");
-            const julitaModal = document.getElementById("julitaRegisterModal");
-            if (registerModal) {
-                registerModal.classList.remove("active");
-            }
-            if (julitaModal) {
-                julitaModal.classList.remove("active");
-            }
-            document.body.classList.remove("modal-open");
-        }
-        function closeJulitaRegisterModal() {
-            closeRegisterModal();
-        }
-        function openRegisterModal() {
-            const modal = document.getElementById("registerModal");
-            if (modal) {
-                modal.classList.add("active");
-                document.body.classList.add("modal-open");
-            }
-        }
-        function openJulitaRegisterModal() {
-            const modal = document.getElementById("julitaRegisterModal");
-            if (modal) {
-                modal.classList.add("active");
-                document.body.classList.add("modal-open");
-            }
-        }
-        // Close modal when clicking on overlay
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-                document.body.classList.remove('modal-open');
-            }
-        });
         // Media Picker Functions
         function openMediaPicker() {
             const modal = document.getElementById('mediaPickerModal');
@@ -4060,12 +5203,12 @@
                 imageItem.addEventListener('mouseenter', () => {
                     imageItem.style.borderColor = 'var(--primary)';
                     imageItem.style.transform = 'translateY(-2px)';
-                    imageItem.style.boxShadow = 'var(--shadow-md)';
+                    imageItem.style.box-shadow = 'var(--shadow-md)';
                 });
                 imageItem.addEventListener('mouseleave', () => {
                     imageItem.style.borderColor = 'var(--border-light)';
                     imageItem.style.transform = '';
-                    imageItem.style.boxShadow = '';
+                    imageItem.style.box-shadow = '';
                 });
                 gallery.appendChild(imageItem);
             });
@@ -4192,52 +5335,16 @@
             };
             reader.readAsDataURL(file);
         }
+
         function updateFormWithUploadedFile(file) {
-            // Set the file to the cover input
-            const coverInput = document.getElementById('cover-input');
-            if (coverInput) {
+            const activeModal = document.querySelector('.modal-overlay.active');
+            if (!activeModal) return;
+            const fileInput = activeModal.querySelector('#cover-input') || activeModal.querySelector('#photo') || activeModal.querySelector('#julitaPhoto');
+            if (fileInput) {
                 const dt = new DataTransfer();
                 dt.items.add(file);
-                coverInput.files = dt.files;
-                console.log('Updated form with uploaded file:', file.name);
+                fileInput.files = dt.files;
             }
-        }
-        function selectUploadedMediaFile() {
-            if (!window.uploadedMediaFile) return;
-            const file = window.uploadedMediaFile;
-            // Update the cover preview area with uploaded file
-            const coverPreviewContent = document.getElementById('cover-preview-content');
-            if (coverPreviewContent) {
-                // Create preview using FileReader
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    coverPreviewContent.innerHTML = `
-                        <img src="${e.target.result}" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover; border-radius: var(--radius); margin-bottom: 10px;">
-                        <p style="color: var(--text-primary); font-weight: 600;">${file.name}</p>
-                        <small style="color: var(--text-muted);">Click to change</small>
-                    `;
-                };
-                reader.readAsDataURL(file);
-            }
-            // Update form with uploaded file
-            updateFormWithUploadedFile(file);
-            // Close media picker
-            closeMediaPicker();
-            showToast(`Selected: ${file.name}`, 'success');
-        }
-        // Media search functionality
-        function initializeMediaSearch() {
-            const searchInput = document.getElementById('mediaSearch');
-            if (!searchInput) return;
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                const mediaItems = document.querySelectorAll('.media-item');
-                mediaItems.forEach(item => {
-                    const imageName = item.querySelector('div').textContent.toLowerCase();
-                    const shouldShow = imageName.includes(searchTerm);
-                    item.style.display = shouldShow ? 'block' : 'none';
-                });
-            });
         }
         // Initialize media picker when modal opens
         document.addEventListener('DOMContentLoaded', function() {
@@ -4285,7 +5392,6 @@
         function switchDemographicsView(viewType) {
             const julitaView = document.getElementById('julitaDemographics');
             const nonJulitaView = document.getElementById('nonJulitaDemographics');
-
             if (viewType === 'julita') {
                 julitaView.style.display = 'block';
                 nonJulitaView.style.display = 'none';
@@ -4294,23 +5400,19 @@
                 nonJulitaView.style.display = 'block';
             }
         }
-
         // Function to switch between activity views
         function switchActivityView(viewType) {
             loadTopBooks();
             loadActiveMembers(viewType);
         }
-
         // Load top 10 most borrowed books
         function loadTopBooks() {
             const topBooks = @json($analytics['topBooks']);
             const container = document.getElementById('topBooksList');
-
             if (topBooks.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin: 2rem 0;">No borrowing data available</p>';
                 return;
             }
-
             container.innerHTML = topBooks.map((book, index) => `
                 <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
                     <div style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">
@@ -4326,21 +5428,17 @@
                 </div>
             `).join('');
         }
-
         // Load most active members
         function loadActiveMembers(viewType = 'borrowing') {
             const members = viewType === 'borrowing'
                 ? @json($analytics['mostActiveMembers'])
                 : @json($analytics['mostActiveTimeLogMembers']);
             const container = document.getElementById('activeMembersList');
-
             if (members.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin: 2rem 0;">No activity data available</p>';
                 return;
             }
-
             const countLabel = viewType === 'borrowing' ? 'borrows' : 'visits';
-
             container.innerHTML = members.map((member, index) => `
                 <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
                     <div style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">
@@ -4356,12 +5454,10 @@
                 </div>
             `).join('');
         }
-
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadTopBooks();
             loadActiveMembers('borrowing');
-
             // Check for Christmas effects preference on load
             const christmasPreference = localStorage.getItem('christmasEffects');
             if (christmasPreference === 'true') {
@@ -4373,158 +5469,308 @@
     <script src="{{ asset('js/bookadd.js') }}"></script>
     <script src="{{ asset('js/memberscript.js') }}"></script>
     <script src="{{ asset('js/borrow.js') }}"></script>
-    <!-- ✅ ENHANCED COVER UPLOAD LOGIC FOR ADD BOOK MODAL -->
+
+    <!-- ✅ FIXED MODAL IMAGE UPLOAD/STACKING ISSUES – FULLY FUNCTIONAL -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const coverPreviewArea = document.getElementById('cover-preview-area');
-      const coverInput = document.getElementById('cover-input');
-      const coverPreviewContent = document.getElementById('cover-preview-content');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize upload handlers for all modals
+            initializeUploadHandler('addBookModal', 'cover-input', 'cover-preview');
+            initializeUploadHandler('julitaRegisterModal', 'julitaPhoto', 'julitaPhotoPreview');
+            initializeUploadHandler('registerModal', 'photo', 'photoPreview');
+        });
 
-      if (!coverPreviewArea || !coverInput || !coverPreviewContent) return;
+        function initializeUploadHandler(modalId, inputId, previewId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
 
-      // Style the drop zone
-      Object.assign(coverPreviewArea.style, {
-        height: '250px',
-        border: '3px dashed var(--gray-light, #d1d5db)',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        marginTop: '1rem',
-        marginBottom: '1.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      });
+            const uploadArea = modal.querySelector('.photo-upload') || modal.querySelector('.premium-upload-area');
+            const fileInput = document.getElementById(inputId);
+            const previewImg = document.getElementById(previewId);
 
-      // Update preview with image
-      function updateCoverPreview(file) {
-        if (!file) return;
+            if (!uploadArea || !fileInput || !previewImg) return;
 
-        if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/gif')) {
-          alert('Only JPG, PNG, and GIF images are allowed.');
-          return;
+            // Style the upload area
+            const isMemberModal = modalId.includes('Register') || modalId === 'registerModal';
+            Object.assign(uploadArea.style, {
+                border: '3px dashed var(--border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--spacing-lg)',
+                textAlign: 'center',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                background: 'var(--surface)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: isMemberModal ? '200px' : '260px',
+                width: isMemberModal ? '200px' : 'auto',
+                overflow: 'hidden'
+            });
+
+            // Function to clear the preview area before showing a new image
+            function clearPreviewArea() {
+                const uploadZone = modal.querySelector('.upload-zone');
+                const uploadAreaElement = modal.querySelector('.premium-upload-area') || modal.querySelector('.photo-upload');
+
+                if (!uploadAreaElement) return;
+
+                // Handle book modal (premium-upload-area with upload-zone)
+                if (uploadZone) {
+                    // Show the upload zone
+                    uploadZone.style.display = 'flex';
+
+                    // Remove existing preview elements
+                    if (uploadAreaElement._previewElements) {
+                        uploadAreaElement._previewElements.forEach(el => el.remove());
+                    }
+
+                    // Reset styles
+                    uploadAreaElement.style.position = '';
+                    uploadAreaElement.style.padding = uploadAreaElement._originalPadding || 'var(--spacing-lg)';
+                    delete uploadAreaElement._blobUrl;
+                    delete uploadAreaElement._previewElements;
+                }
+                // Handle member modals (photo-upload without upload-zone)
+                else {
+                    // Hide preview elements
+                    if (uploadAreaElement._previewElements) {
+                        uploadAreaElement._previewElements.forEach(el => el.remove());
+                    }
+
+                    // Show original content
+                    const iconWrapper = uploadAreaElement.querySelector('.upload-icon-wrapper');
+                    const uploadText = uploadAreaElement.querySelector('.upload-text');
+                    if (iconWrapper) iconWrapper.style.display = 'flex';
+                    if (uploadText) uploadText.style.display = 'flex';
+
+                    // Reset styles
+                    uploadAreaElement.style.position = '';
+                    uploadAreaElement.style.padding = uploadAreaElement._originalPadding || 'var(--spacing-lg)';
+                    delete uploadAreaElement._blobUrl;
+                    delete uploadAreaElement._previewElements;
+                }
+            }
+
+            // Update preview with image
+            function updatePreview(file) {
+              if (!file) return;
+              if (!file.type.match('image/')) {
+                showToast('Only image files are allowed.', 'error');
+                return;
+              }
+              if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large! Maximum size is 5MB.', 'error');
+                return;
+              }
+
+              // Store the file globally for form submission
+              window.uploadedMediaFile = file;
+
+              const url = URL.createObjectURL(file);
+              const uploadAreaElement = modal.querySelector('.premium-upload-area') || modal.querySelector('.photo-upload');
+
+              if (uploadAreaElement) {
+                // Store original padding
+                const originalPadding = uploadAreaElement.style.padding || 'var(--spacing-lg)';
+                uploadAreaElement._originalPadding = originalPadding;
+
+                // Set position relative for absolute positioning
+                uploadAreaElement.style.position = 'relative';
+                // Remove padding to fit image perfectly
+                uploadAreaElement.style.padding = '0';
+
+                // Clear the area first
+                clearPreviewArea();
+
+                // Hide upload zone (for book modal) or original content (for member modals)
+                const uploadZone = modal.querySelector('.upload-zone');
+                if (uploadZone) {
+                    uploadZone.style.display = 'none';
+                } else {
+                    // For member modals, hide the original content
+                    const iconWrapper = uploadAreaElement.querySelector('.upload-icon-wrapper');
+                    const uploadText = uploadAreaElement.querySelector('.upload-text');
+                    if (iconWrapper) iconWrapper.style.display = 'none';
+                    if (uploadText) uploadText.style.display = 'none';
+                }
+
+                // Create and append the preview image
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Photo Preview';
+                img.style.cssText = 'width: 100%; height: 100%; object-fit: contain; border-radius: var(--radius-md); cursor: pointer;';
+                img.onclick = () => fileInput.click(); // Clicking image reopens file dialog
+                uploadAreaElement.appendChild(img);
+
+                // Add filename
+                const p = document.createElement('p');
+                p.textContent = file.name;
+                p.style.cssText = 'color: var(--gray-800); font-weight: 600; margin: 0; position: absolute; bottom: 5px; left: 5px; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; font-size: 0.8rem;';
+                uploadAreaElement.appendChild(p);
+
+                // Add change text
+                const small = document.createElement('small');
+                small.textContent = 'Click to change';
+                small.style.cssText = 'color: var(--text-muted); position: absolute; bottom: 5px; left: 5px; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; font-size: 0.7rem;';
+                uploadAreaElement.appendChild(small);
+
+                // Add clear button
+                const clearBtn = document.createElement('button');
+                clearBtn.textContent = '×';
+                clearBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(239, 68, 68, 0.8); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; z-index: 10;';
+                clearBtn.title = 'Clear image';
+                clearBtn.onclick = (e) => {
+                  e.stopPropagation();
+                  clearPreviewArea();
+                  fileInput.value = '';
+                  window.uploadedMediaFile = null; // Clear the stored file
+                };
+                uploadAreaElement.appendChild(clearBtn);
+
+                // Store for cleanup
+                uploadAreaElement._blobUrl = url;
+                uploadAreaElement._previewElements = [img, p, small, clearBtn];
+              }
+            }
+
+            // Click to open file picker
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Handle file selection
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) updatePreview(file);
+            });
+
+            // Prevent default drag behaviors
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Visual feedback
+            uploadArea.addEventListener('dragenter', () => {
+                uploadArea.style.borderColor = 'var(--primary)';
+                uploadArea.style.backgroundColor = 'rgba(47, 185, 235, 0.05)';
+            });
+            uploadArea.addEventListener('dragover', () => {
+                uploadArea.style.borderColor = 'var(--primary)';
+                uploadArea.style.backgroundColor = 'rgba(47, 185, 235, 0.1)';
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadArea.style.backgroundColor = 'var(--surface)';
+            });
+
+            // Handle drop
+            uploadArea.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    fileInput.files = dt.files;
+                    updatePreview(files[0]);
+                }
+                uploadArea.style.borderColor = 'var(--border)';
+                uploadArea.style.backgroundColor = 'var(--surface)';
+            });
+
+            // Add remove button functionality for Add Book Modal
+            if (modalId === 'addBookModal') {
+                const removeBtn = document.getElementById('remove-cover-preview');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', () => {
+                        clearPreviewArea();
+                        fileInput.value = '';
+                    });
+                }
+            }
+
+            // Define reset function for this specific modal
+            const resetFunctionName = `reset${modalId.charAt(0).toUpperCase() + modalId.slice(1)}Preview`;
+            window[resetFunctionName] = function () {
+                clearPreviewArea();
+                fileInput.value = '';
+                window.uploadedMediaFile = null;
+            };
         }
 
-        if (file.size > 5 * 1024 * 1024) {
-          alert('Image too large! Maximum size is 5MB.');
-          return;
+        // Toast notification function removed - using consolidated version
+
+        // Custom Christmas toast function positioned near dashboard title
+        function showChristmasToast(message) {
+            const toastContainer = document.getElementById('christmasToastContainer');
+            if (!toastContainer) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification toast-success christmas-toast';
+            toast.style.cssText = 'position: absolute; top: 10px; right: 10px; min-width: 350px; max-width: 450px; height: auto; pointer-events: auto; z-index: 1000;';
+            toast.innerHTML = '<div class="toast-content"><div class="toast-icon">🎄</div><div class="toast-text">' + message + '</div><button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button></div>';
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000); // 5 seconds for Christmas toast
         }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          coverPreviewContent.innerHTML = `
-            <img src="${e.target.result}" alt="Book Cover Preview" style="
-              max-width: 100%;
-              max-height: 100%;
-              width: auto;
-              height: auto;
-              border-radius: 12px;
-              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-              object-fit: contain;
-            ">
-            <p style="
-              position: absolute;
-              bottom: 10px;
-              left: 50%;
-              transform: translateX(-50%);
-              background: rgba(0, 0, 0, 0.7);
-              color: white;
-              padding: 4px 8px;
-              border-radius: 6px;
-              font-size: 0.8rem;
-              margin: 0;
-              max-width: 90%;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-            ">${file.name}</p>
-          `;
-          coverPreviewContent.style.position = 'relative';
-          coverPreviewContent.style.backgroundColor = '#f1f5f9';
-          coverPreviewArea.style.borderColor = 'var(--primary, #2fb9eb)';
-        };
-        reader.readAsDataURL(file);
-      }
-
-      // Click to open file picker
-      coverPreviewContent.addEventListener('click', () => {
-        coverInput.click();
-      });
-
-      // Handle file selection
-      coverInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) updateCoverPreview(file);
-      });
-
-      // Prevent default drag behaviors
-      function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        coverPreviewArea.addEventListener(eventName, preventDefaults, false);
-        document.body.addEventListener(eventName, preventDefaults, false);
-      });
-
-      // Visual feedback
-      coverPreviewArea.addEventListener('dragenter', () => {
-        coverPreviewArea.style.borderColor = 'var(--accent, #0891b2)';
-      });
-
-      coverPreviewArea.addEventListener('dragover', () => {
-        coverPreviewArea.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
-      });
-
-      coverPreviewArea.addEventListener('dragleave', () => {
-        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-        coverPreviewArea.style.backgroundColor = '';
-      });
-
-      // Handle drop
-      coverPreviewArea.addEventListener('drop', (e) => {
-        const files = e.dataTransfer.files;
-        if (files.length) {
-          const dt = new DataTransfer();
-          dt.items.add(files[0]);
-          coverInput.files = dt.files;
-          updateCoverPreview(files[0]);
+        // Ensure reset functions are called on modal close
+        function closeAddBookModal() {
+            const modal = document.getElementById('addBookModal');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                // Reset form and preview
+                document.getElementById('addBookForm').reset();
+                if (typeof resetAddBookModalPreview === 'function') resetAddBookModalPreview();
+            }
         }
-        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-        coverPreviewArea.style.backgroundColor = '';
-      });
 
-      // Expose reset function globally
-      window.resetCoverPreview = function () {
-        coverPreviewContent.innerHTML = `
-          <i id="cover-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted, #6b7280); margin-bottom: 12px;"></i>
-          <p id="cover-preview-text" style="color: var(--text-muted, #6b7280); margin: 0; font-weight: 500; font-size: 1.1rem;">
-            Click or drag image here...
-          </p>
-          <small style="color: var(--text-muted, #6b7280); margin-top: 8px; display: block;">
-            Supports JPG, PNG, GIF (max 5MB)
-          </small>
-        `;
-        coverInput.value = '';
-        coverPreviewArea.style.borderColor = 'var(--gray-light, #d1d5db)';
-        coverPreviewContent.style.backgroundColor = '';
-      };
-    });
+        function closeJulitaRegisterModal() {
+            closeRegisterModal();
+            if (typeof resetJulitaRegisterModalPreview === 'function') resetJulitaRegisterModalPreview();
+        }
 
-    // Ensure resetCoverPreview is called on modal close
-    function closeAddBookModal() {
-      const modal = document.getElementById('addBookModal');
-      if (modal) {
-        modal.classList.remove('active');
-        modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
-        // Reset form and preview
-        document.getElementById('addBookForm').reset();
-        if (typeof resetCoverPreview === 'function') resetCoverPreview();
-      }
-    }
+        function closeRegisterModal() {
+            const registerModal = document.getElementById("registerModal");
+            const julitaModal = document.getElementById("julitaRegisterModal");
+            if (registerModal) {
+                registerModal.classList.remove("active");
+                // Force hide after transition
+                setTimeout(() => {
+                    registerModal.style.display = 'none';
+                }, 300);
+            }
+            if (julitaModal) {
+                julitaModal.classList.remove("active");
+                // Force hide after transition
+                setTimeout(() => {
+                    julitaModal.style.display = 'none';
+                }, 300);
+            }
+            document.body.classList.remove("modal-open");
+            if (typeof resetRegisterModalPreview === 'function') resetRegisterModalPreview();
+        }
+
+        // Close modal on overlay click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active');
+                document.body.classList.remove('modal-open');
+                // Auto-reset based on which modal was open
+                if (e.target.id === 'addBookModal') closeAddBookModal();
+                else if (e.target.id === 'julitaRegisterModal') closeJulitaRegisterModal();
+                else if (e.target.id === 'registerModal') closeRegisterModal();
+            }
+        });
     </script>
-  </body>
+
+</body>
 </html>

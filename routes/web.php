@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\MemberController;
@@ -17,14 +18,26 @@ Route::get('/', function () {
 });
 
 // ===========================
+// LOGIN ROUTES
+// ===========================
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+});
+
+// Logout route (accessible when authenticated)
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+
+// ===========================
 // ADMIN DASHBOARD ROUTES
 // ===========================
-Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-Route::get('/dashboard/books-data', [AdminController::class, 'getBooksData'])->name('dashboard.books-data');
-Route::get('/dashboard/members-data', [AdminController::class, 'getMembersData'])->name('dashboard.members-data');
-Route::get('/dashboard/borrowers-data', [AdminController::class, 'getBorrowersData'])->name('dashboard.borrowers-data');
-Route::get('/dashboard/weekly-data', [AdminController::class, 'getWeeklyData'])->name('dashboard.weekly-data');
-Route::get('/dashboard/recent-members', [AdminController::class, 'getRecentMembers'])->name('dashboard.recent-members');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/books-data', [AdminController::class, 'getBooksData'])->name('dashboard.books-data');
+    Route::get('/dashboard/members-data', [AdminController::class, 'getMembersData'])->name('dashboard.members-data');
+    Route::get('/dashboard/borrowers-data', [AdminController::class, 'getBorrowersData'])->name('dashboard.borrowers-data');
+    Route::get('/dashboard/weekly-data', [AdminController::class, 'getWeeklyData'])->name('dashboard.weekly-data');
+    Route::get('/dashboard/recent-members', [AdminController::class, 'getRecentMembers'])->name('dashboard.recent-members');
 
 // ===========================
 // NOTIFICATION ROUTES
@@ -41,11 +54,20 @@ Route::get('/api/notifications/overdue', [BorrowController::class, 'getOverdueAn
 Route::post('/chatbot/message', [ChatbotController::class, 'send']);
 
 // ===========================
+// AUDIO ROUTES
+// ===========================
+Route::middleware('auth')->group(function () {
+    Route::get('/api/audio/files', [AdminController::class, 'getAudioFiles'])->name('api.audio.files');
+});
+
+// ===========================
 // BOOKS ROUTES
 // ===========================
 Route::resource('books', BookController::class);
 Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
 Route::get('/api/media/images', [BookController::class, 'getMediaImages'])->name('api.media.images');
+Route::post('/api/media/upload-temp', [BookController::class, 'uploadTempImage'])->name('api.media.upload-temp');
+Route::post('/api/media/cleanup-temp', [BookController::class, 'cleanupTempImages'])->name('api.media.cleanup-temp');
 
 // ===========================
 // MEMBERS ROUTES
@@ -53,6 +75,7 @@ Route::get('/api/media/images', [BookController::class, 'getMediaImages'])->name
 Route::resource('members', MemberController::class);
 Route::get('/members/search', [BorrowController::class, 'search']);
 Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
+});
 
 // Card JSON endpoint
 Route::get('/members/{id}/json', function ($id) {

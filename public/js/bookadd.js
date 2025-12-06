@@ -5,6 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
+    // Client-side validation for required fields
+    const requiredFields = ['title', 'author', 'published_year', 'availability'];
+    let allFilled = true;
+
+    for (const fieldName of requiredFields) {
+      const field = form.querySelector(`[name="${fieldName}"]`);
+      if (!field || !field.value.trim()) {
+        allFilled = false;
+        break;
+      }
+    }
+
+    if (!allFilled) {
+      showCornerPopup('Please fill in all required fields.');
+      return;
+    }
+
     // Create FormData and manually append all fields including file
     const formData = new FormData();
     
@@ -25,61 +42,68 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('=== COVER IMAGE DEBUG ===');
     console.log('window.selectedCoverImage:', window.selectedCoverImage);
     console.log('window.uploadedMediaFile:', window.uploadedMediaFile);
+    console.log('window.selectedTempImage:', window.selectedTempImage);
     console.log('coverInput exists:', !!coverInput);
     console.log('coverInput.files:', coverInput?.files);
     if (coverInput?.files[0]) {
       console.log('coverInput file:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
     }
 
-    if (window.selectedCoverImage) {
-      // Use selected image from media picker - convert URL to file
-      console.log('Using selected cover image from media picker:', window.selectedCoverImage);
-
-      try {
-        // Fetch the image and convert to File object for proper upload
-        const response = await fetch(window.selectedCoverImage);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const blob = await response.blob();
-        const fileName = window.selectedCoverImage.split('/').pop() || 'cover-image.jpg';
-        const file = new File([blob], fileName, { type: blob.type });
-        formData.append('cover', file);
-        console.log('✅ Successfully converted media picker URL to File object:', fileName, 'Size:', file.size, 'Type:', file.type);
-      } catch (error) {
-        console.error('❌ Error converting media picker URL to File:', error);
-        showCornerPopup('Error processing selected cover image: ' + error.message);
-        return;
-      }
-    } else if (window.uploadedMediaFile) {
-      // Use uploaded file from media picker
-      console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name, 'Size:', window.uploadedMediaFile.size);
-      formData.append('cover', window.uploadedMediaFile);
-      console.log('✅ Using uploaded media file');
+    // Priority order: 1. Temp image (from media picker), 2. File input (from media picker selection), 3. Uploaded file, 4. Selected URL, 5. Preview image
+    if (window.selectedTempImage) {
+        // Use temp uploaded image from media picker
+        console.log('Using temp uploaded image from media picker:', window.selectedTempImage.name, 'Temp name:', window.selectedTempImage.temp_name);
+        formData.append('temp_image', JSON.stringify(window.selectedTempImage));
+        console.log('✅ Using temp uploaded image');
     } else if (coverInput && coverInput.files && coverInput.files[0]) {
-      // Fallback to direct file input
-      console.log('Using direct file input:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
-      formData.append('cover', coverInput.files[0]);
-      console.log('✅ Using direct file input');
-    } else {
-      console.log('⚠️ No cover image selected or available');
+        // Use file from input (set by media picker selection)
+        console.log('Using file from input (media picker):', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+        formData.append('cover', coverInput.files[0]);
+        console.log('✅ Using file from input');
+    } else if (window.uploadedMediaFile) {
+        // Use uploaded file from media picker
+        console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name, 'Size:', window.uploadedMediaFile.size);
+        formData.append('cover', window.uploadedMediaFile);
+        console.log('✅ Using uploaded media file');
+    } else if (window.selectedCoverImage) {
+        // Fallback: convert selected URL to file (only if no file in input)
+        console.log('Using selected cover image from media picker:', window.selectedCoverImage);
 
-      // Additional check: try to get file from preview area data attribute
-      const previewImg = document.querySelector('#cover-preview-content img');
-      if (previewImg && previewImg.src) {
-        console.log('Found preview image, attempting to use it');
         try {
-          // If preview exists, try to fetch it and create a file
-          const response = await fetch(previewImg.src);
-          const blob = await response.blob();
-          const fileName = 'cover-image.jpg';
-          const file = new File([blob], fileName, { type: blob.type });
-          formData.append('cover', file);
-          console.log('✅ Created file from preview image');
+            // Fetch the image and convert to File object for proper upload
+            const response = await fetch(window.selectedCoverImage);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            const blob = await response.blob();
+            const fileName = window.selectedCoverImage.split('/').pop() || 'cover-image.jpg';
+            const file = new File([blob], fileName, { type: blob.type });
+            formData.append('cover', file);
+            console.log('✅ Successfully converted media picker URL to File object:', fileName, 'Size:', file.size, 'Type:', file.type);
         } catch (error) {
-          console.error('❌ Failed to create file from preview:', error);
+            console.error('❌ Error converting media picker URL to File:', error);
+            showCornerPopup('Error processing selected cover image: ' + error.message);
+            return;
         }
-      }
+    } else {
+        console.log('⚠️ No cover image selected or available');
+
+        // Additional check: try to get file from preview area data attribute
+        const previewImg = document.querySelector('#cover-preview-content img');
+        if (previewImg && previewImg.src) {
+            console.log('Found preview image, attempting to use it');
+            try {
+                // If preview exists, try to fetch it and create a file
+                const response = await fetch(previewImg.src);
+                const blob = await response.blob();
+                const fileName = 'cover-image.jpg';
+                const file = new File([blob], fileName, { type: blob.type });
+                formData.append('cover', file);
+                console.log('✅ Created file from preview image');
+            } catch (error) {
+                console.error('❌ Failed to create file from preview:', error);
+            }
+        }
     }
 
     // Debug: Log all FormData entries
@@ -128,9 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
       showCornerPopup(result.message || 'Book added successfully!');
       closeAddBookModal();
       form.reset();
-      resetCoverPreview(); // Clear preview after submit
 
-      setTimeout(() => location.reload(), 1000);
+      // Clear media picker selections if they exist
+      if (typeof window.resetCoverPreview === 'function') {
+          window.resetCoverPreview();
+      } else {
+          // Fallback: clear global variables
+          window.selectedCoverImage = null;
+          window.uploadedMediaFile = null;
+          window.selectedTempImage = null;
+      }
+
+      // Close modal and refresh page immediately
+      location.reload();
     } catch (error) {
       console.error('Error:', error);
       showCornerPopup('Error occurred while adding book.');
@@ -138,6 +172,185 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+
+// === Helper Functions ===
+function submitAddBook() {
+    const form = document.getElementById('addBookForm');
+    if (form) {
+        form.dispatchEvent(new Event('submit'));
+    }
+}
+
+// === Separate Submit Function from Books Index ===
+async function submitAddBookFromBooksIndex() {
+    const form = document.getElementById('addBookForm');
+    if (!form) return;
+
+    // Client-side validation for required fields
+    const requiredFields = ['title', 'author', 'published_year', 'availability'];
+    let allFilled = true;
+
+    for (const fieldName of requiredFields) {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (!field || !field.value.trim()) {
+            allFilled = false;
+            break;
+        }
+    }
+
+    if (!allFilled) {
+        showCornerPopup('Please fill in all required fields.');
+        return;
+    }
+
+    // Create FormData and manually append all fields including file
+    const formData = new FormData();
+
+    // Add all regular form fields
+    const formElements = form.elements;
+    for (let i = 0; i < formElements.length; i++) {
+        const element = formElements[i];
+
+        if (element.name && element.type !== 'file') {
+            formData.append(element.name, element.value);
+        }
+    }
+
+    // Handle cover image - check for media picker selection or file input
+    const coverInput = document.getElementById('cover-input');
+
+    // Debug: Check all possible sources
+    console.log('=== COVER IMAGE DEBUG ===');
+    console.log('window.selectedCoverImage:', window.selectedCoverImage);
+    console.log('window.uploadedMediaFile:', window.uploadedMediaFile);
+    console.log('window.selectedTempImage:', window.selectedTempImage);
+    console.log('coverInput exists:', !!coverInput);
+    console.log('coverInput.files:', coverInput?.files);
+    if (coverInput?.files[0]) {
+      console.log('coverInput file:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+    }
+
+    // Priority order: 1. Temp image (from media picker), 2. File input (from media picker selection), 3. Uploaded file, 4. Selected URL, 5. Preview image
+    if (window.selectedTempImage) {
+        // Use temp uploaded image from media picker
+        console.log('Using temp uploaded image from media picker:', window.selectedTempImage.name, 'Temp name:', window.selectedTempImage.temp_name);
+        formData.append('temp_image', JSON.stringify(window.selectedTempImage));
+        console.log('✅ Using temp uploaded image');
+    } else if (coverInput && coverInput.files && coverInput.files[0]) {
+        // Use file from input (set by media picker selection)
+        console.log('Using file from input (media picker):', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+        formData.append('cover', coverInput.files[0]);
+        console.log('✅ Using file from input');
+    } else if (window.uploadedMediaFile) {
+        // Use uploaded file from media picker
+        console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name, 'Size:', window.uploadedMediaFile.size);
+        formData.append('cover', window.uploadedMediaFile);
+        console.log('✅ Using uploaded media file');
+    } else if (window.selectedCoverImage) {
+        // Fallback: convert selected URL to file (only if no file in input)
+        console.log('Using selected cover image from media picker:', window.selectedCoverImage);
+
+        try {
+            // Fetch the image and convert to File object for proper upload
+            const response = await fetch(window.selectedCoverImage);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            const blob = await response.blob();
+            const fileName = window.selectedCoverImage.split('/').pop() || 'cover-image.jpg';
+            const file = new File([blob], fileName, { type: blob.type });
+            formData.append('cover', file);
+            console.log('✅ Successfully converted media picker URL to File object:', fileName, 'Size:', file.size, 'Type:', file.type);
+        } catch (error) {
+            console.error('❌ Error converting media picker URL to File:', error);
+            showCornerPopup('Error processing selected cover image: ' + error.message);
+            return;
+        }
+    } else {
+        console.log('⚠️ No cover image selected or available');
+
+        // Additional check: try to get file from preview area data attribute
+        const previewImg = document.querySelector('#cover-preview-content img');
+        if (previewImg && previewImg.src) {
+            console.log('Found preview image, attempting to use it');
+            try {
+                // If preview exists, try to fetch it and create a file
+                const response = await fetch(previewImg.src);
+                const blob = await response.blob();
+                const fileName = 'cover-image.jpg';
+                const file = new File([blob], fileName, { type: blob.type });
+                formData.append('cover', file);
+                console.log('✅ Created file from preview image');
+            } catch (error) {
+                console.error('❌ Failed to create file from preview:', error);
+            }
+        }
+    }
+
+    // Debug: Log all FormData entries
+    console.log('=== FORMDATA DEBUG ===');
+    for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+            console.log(`${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
+        } else {
+            console.log(`${key}: ${value}`);
+        }
+    }
+
+    // Additional validation for cover field
+    const coverFiles = [];
+    formData.forEach((value, key) => {
+        if (key === 'cover' && value instanceof File) {
+            coverFiles.push(value);
+        }
+    });
+
+    if (coverFiles.length > 0) {
+        console.log('✅ Cover file ready for upload:', coverFiles[0].name, 'Size:', coverFiles[0].size);
+    } else {
+        console.log('❌ No cover file in FormData');
+    }
+
+    try {
+        const response = await fetch('/books', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                // Note: Don't set Content-Type header when sending FormData with files
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error Response:', errorText);
+            showCornerPopup('Failed to add book. Check the console for details.');
+            return;
+        }
+
+        const result = await response.json();
+        showCornerPopup(result.message || 'Book added successfully!');
+        closeAddBookModal();
+        form.reset();
+
+        // Clear media picker selections if they exist
+        if (typeof window.resetCoverPreview === 'function') {
+            window.resetCoverPreview();
+        } else {
+            // Fallback: clear global variables
+            window.selectedCoverImage = null;
+            window.uploadedMediaFile = null;
+            window.selectedTempImage = null;
+        }
+
+        // Close modal and refresh page immediately
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        showCornerPopup('Error occurred while adding book.');
+    }
+}
 
 // === Modal Controls ===
 function openAddBookModal() {
@@ -411,6 +624,177 @@ function stopQRScan() {
   } else {
     console.log('ℹ️ No QR scanner instance to stop');
   }
+}
+
+// === Submit Function for Dashboard addBookModal ===
+async function submitAddBookFromDashboard() {
+    const form = document.getElementById('addBookForm');
+    if (!form) return;
+
+    // Client-side validation for required fields
+    const requiredFields = ['title', 'author', 'published_year', 'availability'];
+    let allFilled = true;
+
+    for (const fieldName of requiredFields) {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (!field || !field.value.trim()) {
+            allFilled = false;
+            break;
+        }
+    }
+
+    if (!allFilled) {
+        showCornerPopup('Please fill in all required fields.');
+        return;
+    }
+
+    // Create FormData and manually append all fields including file
+    const formData = new FormData();
+
+    // Add all regular form fields
+    const formElements = form.elements;
+    for (let i = 0; i < formElements.length; i++) {
+        const element = formElements[i];
+
+        if (element.name && element.type !== 'file') {
+            formData.append(element.name, element.value);
+        }
+    }
+
+    // Handle cover image - check for media picker selection or file input
+    const coverInput = document.getElementById('cover-input');
+
+    // Debug: Check all possible sources
+    console.log('=== COVER IMAGE DEBUG ===');
+    console.log('window.selectedCoverImage:', window.selectedCoverImage);
+    console.log('window.uploadedMediaFile:', window.uploadedMediaFile);
+    console.log('window.selectedTempImage:', window.selectedTempImage);
+    console.log('coverInput exists:', !!coverInput);
+    console.log('coverInput.files:', coverInput?.files);
+    if (coverInput?.files[0]) {
+      console.log('coverInput file:', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+    }
+
+    // Priority order: 1. Temp image (from media picker), 2. File input (from media picker selection), 3. Uploaded file, 4. Selected URL, 5. Preview image
+    if (window.selectedTempImage) {
+        // Use temp uploaded image from media picker
+        console.log('Using temp uploaded image from media picker:', window.selectedTempImage.name, 'Temp name:', window.selectedTempImage.temp_name);
+        formData.append('temp_image', JSON.stringify(window.selectedTempImage));
+        console.log('✅ Using temp uploaded image');
+    } else if (coverInput && coverInput.files && coverInput.files[0]) {
+        // Use file from input (set by media picker selection)
+        console.log('Using file from input (media picker):', coverInput.files[0].name, 'Size:', coverInput.files[0].size);
+        formData.append('cover', coverInput.files[0]);
+        console.log('✅ Using file from input');
+    } else if (window.uploadedMediaFile) {
+        // Use uploaded file from media picker
+        console.log('Using uploaded file from media picker:', window.uploadedMediaFile.name, 'Size:', window.uploadedMediaFile.size);
+        formData.append('cover', window.uploadedMediaFile);
+        console.log('✅ Using uploaded media file');
+    } else if (window.selectedCoverImage) {
+        // Fallback: convert selected URL to file (only if no file in input)
+        console.log('Using selected cover image from media picker:', window.selectedCoverImage);
+
+        try {
+            // Fetch the image and convert to File object for proper upload
+            const response = await fetch(window.selectedCoverImage);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            const blob = await response.blob();
+            const fileName = window.selectedCoverImage.split('/').pop() || 'cover-image.jpg';
+            const file = new File([blob], fileName, { type: blob.type });
+            formData.append('cover', file);
+            console.log('✅ Successfully converted media picker URL to File object:', fileName, 'Size:', file.size, 'Type:', file.type);
+        } catch (error) {
+            console.error('❌ Error converting media picker URL to File:', error);
+            showCornerPopup('Error processing selected cover image: ' + error.message);
+            return;
+        }
+    } else {
+        console.log('⚠️ No cover image selected or available');
+
+        // Additional check: try to get file from preview area data attribute
+        const previewImg = document.querySelector('#cover-preview-content img');
+        if (previewImg && previewImg.src) {
+            console.log('Found preview image, attempting to use it');
+            try {
+                // If preview exists, try to fetch it and create a file
+                const response = await fetch(previewImg.src);
+                const blob = await response.blob();
+                const fileName = 'cover-image.jpg';
+                const file = new File([blob], fileName, { type: blob.type });
+                formData.append('cover', file);
+                console.log('✅ Created file from preview image');
+            } catch (error) {
+                console.error('❌ Failed to create file from preview:', error);
+            }
+        }
+    }
+
+    // Debug: Log all FormData entries
+    console.log('=== FORMDATA DEBUG ===');
+    for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+            console.log(`${key}: [File] ${value.name} (${value.size} bytes, ${value.type})`);
+        } else {
+            console.log(`${key}: ${value}`);
+        }
+    }
+
+    // Additional validation for cover field
+    const coverFiles = [];
+    formData.forEach((value, key) => {
+        if (key === 'cover' && value instanceof File) {
+            coverFiles.push(value);
+        }
+    });
+
+    if (coverFiles.length > 0) {
+        console.log('✅ Cover file ready for upload:', coverFiles[0].name, 'Size:', coverFiles[0].size);
+    } else {
+        console.log('❌ No cover file in FormData');
+    }
+
+    try {
+        const response = await fetch('/books', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                // Note: Don't set Content-Type header when sending FormData with files
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error Response:', errorText);
+            showCornerPopup('Failed to add book. Check the console for details.');
+            return;
+        }
+
+        const result = await response.json();
+        showCornerPopup(result.message || 'Book added successfully!');
+        closeAddBookModal();
+        form.reset();
+
+        // Clear media picker selections if they exist
+        if (typeof window.resetCoverPreview === 'function') {
+            window.resetCoverPreview();
+        } else {
+            // Fallback: clear global variables
+            window.selectedCoverImage = null;
+            window.uploadedMediaFile = null;
+            window.selectedTempImage = null;
+        }
+
+        // Close modal and refresh page immediately
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        showCornerPopup('Error occurred while adding book.');
+    }
 }
 
 // Update confirm button state for borrow modal

@@ -200,10 +200,10 @@ private function getAnalyticsData()
         'Hindang' => [10.9974, 124.9730],
         'Inawangan' => [11.0035, 124.9740],
         'Jurao' => [10.9574, 124.9253],
-        'Poblacion District I' => [10.9718, 124.9595],
-        'Poblacion District II' => [10.9729, 124.9621],
-        'Poblacion District III' => [10.9740, 124.9637],
-        'Poblacion District IV' => [10.9740, 124.9637],
+        'Poblacion District I' => [10.9730251,124.9584698],
+        'Poblacion District II' => [10.962516,124.9664024],
+        'Poblacion District III' => [10.9789252,124.9475884],
+        'Poblacion District IV' => [10.974231,124.961458],
         'San Andres' => [10.9580, 124.9358],
         'San Pablo' => [11.0019, 124.9683],
         'Santa Cruz' => [11.0073, 124.9530],
@@ -334,6 +334,31 @@ private function getAnalyticsData()
         'mostActiveMembers' => $mostActiveMembers,
         'mostActiveTimeLogMembers' => $mostActiveTimeLogMembers,
     ];
+}
+
+public function getAudioFiles()
+{
+    $audioPath = public_path('audio');
+    $audioFiles = [];
+
+    if (is_dir($audioPath)) {
+        $files = scandir($audioPath);
+        foreach ($files as $file) {
+            if ($file !== '.' && $file !== '..' && is_file($audioPath . '/' . $file)) {
+                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if (in_array($extension, ['mp3', 'wav', 'ogg', 'm4a', 'aac'])) {
+                    $audioFiles[] = [
+                        'filename' => $file,
+                        'title' => pathinfo($file, PATHINFO_FILENAME),
+                        'url' => asset('audio/' . $file),
+                        'size' => filesize($audioPath . '/' . $file)
+                    ];
+                }
+            }
+        }
+    }
+
+    return response()->json($audioFiles);
 }
 
 }

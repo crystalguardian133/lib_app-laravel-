@@ -44,23 +44,55 @@ public function store(Request $request)
         'genre' => 'nullable|string|max:50',
         'published_year' => 'required|integer|min:1000|max:3000',
         'availability' => 'required|integer|min:0',
-        'cover' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:5120' // 5MB to match your JS, consistent mimes order
+        'cover' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:5120', // 5MB to match your JS, consistent mimes order
+        'temp_image' => 'nullable|string' // For temp uploaded images
     ]);
 
-    // Remove cover from validated data to avoid mass assignment issues
-    $bookData = collect($validated)->except('cover')->toArray();
-    
+    // Remove cover and temp_image from validated data to avoid mass assignment issues
+    $bookData = collect($validated)->except(['cover', 'temp_image'])->toArray();
+
     try {
         // Create the book record first
         $book = Book::create($bookData);
         \Log::info('Book created with ID: ' . $book->id);
 
-        // Handle cover upload if exists
-        if ($request->hasFile('cover')) {
+        // Handle cover upload - check for temp image first, then regular upload
+        if ($request->has('temp_image') && $request->temp_image) {
+            \Log::info('Temp image specified: ' . $request->temp_image);
+
+            // Parse temp image data (should be JSON)
+            $tempImageData = json_decode($request->temp_image, true);
+            if ($tempImageData && isset($tempImageData['temp_name'])) {
+                $tempPath = public_path('temp_uploads/' . $tempImageData['temp_name']);
+                $coverPath = public_path('cover');
+
+                if (file_exists($tempPath)) {
+                    // Generate new filename for cover
+                    $ext = pathinfo($tempImageData['temp_name'], PATHINFO_EXTENSION);
+                    $fileName = 'book-' . $book->id . '-' . time() . '.' . $ext;
+
+                    // Ensure cover directory exists
+                    if (!file_exists($coverPath)) {
+                        mkdir($coverPath, 0755, true);
+                    }
+
+                    // Move temp file to cover directory
+                    if (rename($tempPath, $coverPath . '/' . $fileName)) {
+                        $book->cover_image = 'cover/' . $fileName;
+                        $book->save();
+                        \Log::info('Temp image moved to cover successfully: ' . $fileName);
+                    } else {
+                        \Log::error('Failed to move temp image to cover directory');
+                    }
+                } else {
+                    \Log::error('Temp image file not found: ' . $tempPath);
+                }
+            }
+        } elseif ($request->hasFile('cover')) {
             \Log::info('Cover file detected');
-            
+
             $file = $request->file('cover');
-            
+
             // Additional file validation
             if (!$file->isValid()) {
                 \Log::error('Invalid file upload');
@@ -171,13 +203,52 @@ public function store(Request $request)
         return response()->json(['success' => true, 'message' => 'Book deleted']);
     }
 
+    public function uploadTempImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120' // 5MB max
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+
+            // Create temp directory if it doesn't exist
+            $tempDir = public_path('temp_uploads');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            // Generate unique filename with temp_ prefix
+            $filename = 'temp_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($tempDir, $filename);
+
+            $tempPath = $tempDir . '/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'image' => [
+                    'name' => $file->getClientOriginalName(),
+                    'temp_name' => $filename,
+                    'path' => 'temp_uploads/' . $filename,
+                    'url' => asset('temp_uploads/' . $filename),
+                    'size' => filesize($tempPath),
+                    'modified' => date('Y-m-d H:i:s', filemtime($tempPath)),
+                    'is_temp' => true
+                ]
+            ]);
+        }
+
+        return response()->json(['success' => false, 'error' => 'No image uploaded'], 400);
+    }
+
     public function getMediaImages()
     {
         $imageDirectories = [
             public_path('images'),
             public_path('cover'),
             public_path('qrcode/books'),
-            public_path('resource/member_images')
+            public_path('resource/member_images'),
+            public_path('temp_uploads') // Include temp uploads
         ];
 
         $images = [];
@@ -197,12 +268,15 @@ public function store(Request $request)
                         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
                         if (in_array($extension, $imageExtensions)) {
+                            $isTemp = strpos($directory, 'temp_uploads') !== false;
                             $images[] = [
-                                'name' => $fileName,
+                                'name' => $isTemp ? str_replace('temp_' . preg_replace('/^temp_\d+_/', '', $fileName), '', $fileName) : $fileName,
+                                'temp_name' => $isTemp ? $fileName : null,
                                 'path' => str_replace(public_path(), '', $filePath),
-                                'url' => asset($fileName),
+                                'url' => asset(ltrim(str_replace(public_path(), '', $filePath), '/')),
                                 'size' => filesize($filePath),
-                                'modified' => date('Y-m-d H:i:s', filemtime($filePath))
+                                'modified' => date('Y-m-d H:i:s', filemtime($filePath)),
+                                'is_temp' => $isTemp
                             ];
                         }
                     }
@@ -216,6 +290,36 @@ public function store(Request $request)
         });
 
         return response()->json($images);
+    }
+
+    public function cleanupTempImages()
+    {
+        $tempDir = public_path('temp_uploads');
+        if (!file_exists($tempDir)) {
+            return response()->json(['message' => 'No temp directory found']);
+        }
+
+        $files = scandir($tempDir);
+        $deletedCount = 0;
+        $cutoffTime = time() - (24 * 60 * 60); // 24 hours ago
+
+        foreach ($files as $file) {
+            $filePath = $tempDir . '/' . $file;
+
+            // Skip directories and hidden files
+            if (is_file($filePath) && !str_starts_with($file, '.')) {
+                // Delete files older than 24 hours
+                if (filemtime($filePath) < $cutoffTime) {
+                    if (unlink($filePath)) {
+                        $deletedCount++;
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => "Cleaned up {$deletedCount} old temp files"
+        ]);
     }
 
     private function generateQrFile(Book $book)

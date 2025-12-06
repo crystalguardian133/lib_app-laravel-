@@ -30,22 +30,77 @@ function closeRegisterModal() {
 
   document.body.classList.remove("modal-open");
 
-  // Clear forms
+  // Reset forms
+  resetAllRegistrationForms();
+}
+
+function closeJulitaRegisterModal() {
+ closeRegisterModal(); // Use the same close function
+}
+
+// Comprehensive form reset function
+function resetAllRegistrationForms() {
+  // Reset forms
   const registerForm = document.getElementById("registerForm");
   const julitaForm = document.getElementById("julitaRegisterForm");
   if (registerForm) registerForm.reset();
   if (julitaForm) julitaForm.reset();
 
-  // Clear photo previews
-  const previews = document.querySelectorAll("#photoPreview");
-  previews.forEach(preview => {
-    preview.src = "";
-    preview.style.display = "none";
+  // Clear photo previews for both modals
+  const photoPreviewIds = ["photoPreview", "julitaPhotoPreview"];
+  photoPreviewIds.forEach(id => {
+    const preview = document.getElementById(id);
+    if (preview) {
+      preview.src = "";
+      preview.style.display = "none";
+    }
   });
-}
 
-function closeJulitaRegisterModal() {
- closeRegisterModal(); // Use the same close function
+  // Clear file inputs for both modals
+  const fileInputs = ["photo", "julitaPhoto"];
+  fileInputs.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.value = "";
+    }
+  });
+
+  // Reset dropdown selections to default (disabled option)
+  const dropdowns = [
+    "julitaBarangay", "julitaMunicipality", "julitaProvince",
+    "barangay", "municipality", "province"
+  ];
+  dropdowns.forEach(id => {
+    const dropdown = document.getElementById(id);
+    if (dropdown) {
+      dropdown.selectedIndex = 0;
+    }
+  });
+
+  // Clear any stored photo data
+  if (window.uploadedMediaFile) {
+    delete window.uploadedMediaFile;
+  }
+  
+  if (window.selectedCoverImage) {
+    delete window.selectedCoverImage;
+  }
+
+  // Force browser to clear any cached form state
+  setTimeout(() => {
+    // Additional reset for stubborn browsers
+    const allInputs = document.querySelectorAll('#registerForm input, #julitaRegisterForm input');
+    allInputs.forEach(input => {
+      if (input.type !== 'hidden') {
+        input.value = '';
+      }
+    });
+    
+    const allSelects = document.querySelectorAll('#registerForm select, #julitaRegisterForm select');
+    allSelects.forEach(select => {
+      select.selectedIndex = 0;
+    });
+  }, 50);
 }
 
 // Close all modals function
@@ -61,7 +116,23 @@ function closeAllModals() {
 // Add name formatting function
 function formatName(name) {
  if (!name) return '';
- 
+
+ // Check if name contains Roman numerals (I, V, X, L, C, D, M)
+ const hasRomanNumerals = /\b(?:I|V|X|L|C|D|M)+\b/.test(name);
+
+ // If it has Roman numerals, preserve original case
+ if (hasRomanNumerals) {
+   return name;
+ }
+
+ // Check if name is already properly formatted (first letter capital, rest lowercase)
+ const isProperlyFormatted = /^[A-Z][a-z]*(\s[A-Z][a-z]*)*$/.test(name.trim());
+
+ // If already properly formatted, return as is
+ if (isProperlyFormatted) {
+   return name;
+ }
+
  // Handle hyphenated names and apostrophes
  return name.toLowerCase()
    .split(/[\s-]/)
@@ -155,8 +226,17 @@ function submitRegister() {
  })
  .then(data => {
    alert("✅ Member registered successfully!");
+   
+   // Reset forms and clear any cached data before reload
+   resetAllRegistrationForms();
+   
+   // Close modal
    closeRegisterModal();
-   location.reload();
+   
+   // Reload page to refresh data with slight delay to ensure reset
+   setTimeout(() => {
+     location.reload();
+   }, 200);
  })
  .catch(error => {
    console.error("Registration error:", error);
@@ -440,8 +520,17 @@ function submitRegister() {
  })
  .then(data => {
    alert("✅ Member registered successfully!");
+   
+   // Reset forms and clear any cached data before reload
+   resetAllRegistrationForms();
+   
+   // Close modal
    closeRegisterModal();
-   location.reload();
+   
+   // Reload page to refresh data with slight delay to ensure reset
+   setTimeout(() => {
+     location.reload();
+   }, 200);
  })
  .catch(error => {
    console.error("Registration error:", error);

@@ -3,45 +3,90 @@
 /* Christmas Theme - Clean Implementation */
 body.christmas-theme {
   position: relative;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Christmas Snow Animation - Snow piles at bottom and disappears */
+/* Christmas Snow Animation - Background layer (behind elements) */
 body.christmas-theme::before {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-image:
-    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(1.5px 1.5px at 40px 70px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.8), transparent),
-    radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 160px 30px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(1.5px 1.5px at 60px 90px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 200px 60px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(2px 2px at 80px 120px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 250px 80px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1.5px 1.5px at 120px 150px, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.5), transparent),
-    radial-gradient(2px 2px at 180px 120px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(1.5px 1.5px at 220px 160px, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 50px 200px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(2px 2px at 280px 40px, rgba(255,255,255,0.4), transparent);
+    radial-gradient(3px 3px at 20px 30px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2.5px 2.5px at 160px 30px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 200px 60px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(3px 3px at 250px 80px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(2.5px 2.5px at 300px 80px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 50px 200px, rgba(255,255,255,0.5), transparent);
   background-repeat: repeat;
-  background-size: 350px 250px;
+  background-size: 500px 350px;
   animation: christmasSnow 30s linear infinite;
+  animation-play-state: running !important;
+  animation-fill-mode: forwards;
   pointer-events: none;
-  z-index: 999;
-  opacity: 0.4;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+body.christmas-theme::before {
+  opacity: 0.3;
+}
+
+/* Christmas Snow Animation - Foreground layer (on top of elements) */
+body.christmas-theme::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image:
+    radial-gradient(4px 4px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(3.5px 3.5px at 130px 80px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(3px 3px at 60px 90px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(4px 4px at 80px 120px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(3px 3px at 120px 150px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(4px 4px at 180px 120px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(3.5px 3.5px at 220px 160px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(3px 3px at 280px 40px, rgba(255,255,255,0.5), transparent);
+  background-repeat: repeat;
+  background-size: 500px 350px;
+  animation: christmasSnowForeground 25s linear infinite;
+  animation-play-state: running !important;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+body.christmas-theme::after {
+  opacity: 0.5;
 }
 
 @keyframes christmasSnow {
-  0% { transform: translateY(-50px) translateX(0); }
-  70% { transform: translateY(100vh) translateX(0); opacity: 0.4; }
-  85% { transform: translateY(calc(100vh + 20px)) translateX(0); opacity: 0.2; }
-  100% { transform: translateY(calc(100vh + 20px)) translateX(0); opacity: 0; }
+  0% { transform: translateY(-50px) translateX(0); opacity: 0.3; }
+  90% { transform: translateY(calc(100vh - 80px)) translateX(0); opacity: 0.3; }
+  100% {
+    transform: translateY(calc(100vh - 80px)) translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes christmasSnowForeground {
+  0% { transform: translateY(-50px) translateX(0); opacity: 0.5; }
+  90% { transform: translateY(calc(100vh - 80px)) translateX(0); opacity: 0.5; }
+  100% {
+    transform: translateY(calc(100vh - 80px)) translateX(0);
+    opacity: 0;
+  }
 }
 
 /* Christmas Card Enhancements */
@@ -50,12 +95,14 @@ body.christmas-theme .card {
   box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15), 0 0 20px rgba(220, 38, 38, 0.1) !important;
   position: relative;
   overflow: visible !important;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.christmas-theme .card:hover {
   border-color: #16a34a !important;
   box-shadow: 0 12px 35px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.15) !important;
   transform: translateY(-5px) scale(1.02) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Christmas Button Enhancements */
@@ -65,6 +112,7 @@ body.christmas-theme .btn-primary {
   box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3), 0 0 20px rgba(220, 38, 38, 0.2) !important;
   position: relative;
   overflow: hidden;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Removed Santa emoji from buttons */
@@ -74,6 +122,7 @@ body.christmas-theme .btn-primary:hover {
   border-color: #166534 !important;
   box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4), 0 0 25px rgba(22, 163, 74, 0.3) !important;
   transform: translateY(-2px) scale(1.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Christmas Sidebar Enhancements */
@@ -82,6 +131,7 @@ body.christmas-theme .sidebar {
   border-right: 3px solid #dc2626 !important;
   position: fixed !important;
   overflow: visible !important;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.christmas-theme .sidebar::after {
@@ -109,6 +159,7 @@ body.christmas-theme .sidebar nav a {
   position: relative;
   border-radius: 12px;
   margin: 4px 8px;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.christmas-theme .sidebar nav a::before {
@@ -133,6 +184,7 @@ body.christmas-theme .sidebar nav a.active {
   background: rgba(220, 38, 38, 0.1) !important;
   border: 1px solid rgba(220, 38, 38, 0.3) !important;
   box-shadow: 0 0 15px rgba(220, 38, 38, 0.2) !important;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Christmas Logo Enhancement */

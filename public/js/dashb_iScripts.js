@@ -106,10 +106,23 @@ function submitJulitaRegister() {
         return;
     }
 
-    // Submit form
+    // Reset form before submission to prevent browser from retaining values on reload
     const form = julitaModal.querySelector('#julitaRegisterForm');
     if (form) {
-        form.submit();
+        // Clear all form fields before submission
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        // Use setTimeout to ensure form clearing happens before submission
+        setTimeout(() => {
+            form.submit();
+        }, 100);
     }
 }
 
@@ -171,10 +184,23 @@ function submitRegister() {
         return;
     }
 
-    // Submit form
+    // Reset form before submission to prevent browser from retaining values on reload
     const form = modal.querySelector('form');
     if (form) {
-        form.submit();
+        // Clear all form fields before submission
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+        });
+
+        // Use setTimeout to ensure form clearing happens before submission
+        setTimeout(() => {
+            form.submit();
+        }, 100);
     }
 }
 
@@ -226,8 +252,36 @@ function closeBooksTable() {
 
 async function loadBooksData() {
     try {
-        const response = await fetch('/dashboard/books-data');
-        const books = await response.json();
+        const token = document.querySelector('meta[name="csrf-token"]');
+        const response = await fetch('/dashboard/books-data', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        let books;
+        try {
+            books = JSON.parse(text);
+        } catch (parseError) {
+            if (text.includes('login') || text.includes('<html') || text.includes('<!DOCTYPE')) {
+                window.location.href = '/login';
+                return;
+            }
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response');
+        }
+
         const tbody = document.getElementById('booksTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -290,8 +344,36 @@ function closeMembersTable() {
 
 async function loadMembersData() {
     try {
-        const response = await fetch('/dashboard/members-data');
-        const members = await response.json();
+        const token = document.querySelector('meta[name="csrf-token"]');
+        const response = await fetch('/dashboard/members-data', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        let members;
+        try {
+            members = JSON.parse(text);
+        } catch (parseError) {
+            if (text.includes('login') || text.includes('<html') || text.includes('<!DOCTYPE')) {
+                window.location.href = '/login';
+                return;
+            }
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response');
+        }
+
         const tbody = document.getElementById('membersTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -337,8 +419,36 @@ async function loadBorrowersData() {
     }
     tbody.innerHTML = '<tr><td colspan="9" class="loading">Loading borrowers...</td></tr>';
     try {
-        const response = await fetch('/dashboard/borrowers-data');
-        const borrowers = await response.json();
+        const token = document.querySelector('meta[name="csrf-token"]');
+        const response = await fetch('/dashboard/borrowers-data', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        let borrowers;
+        try {
+            borrowers = JSON.parse(text);
+        } catch (parseError) {
+            if (text.includes('login') || text.includes('<html') || text.includes('<!DOCTYPE')) {
+                window.location.href = '/login';
+                return;
+            }
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response');
+        }
+
         if (borrowers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="9" class="loading">No borrowers found</td></tr>';
             originalBorrowersData = [];
@@ -660,8 +770,36 @@ function searchBorrowers(searchTerm) {
 
 async function filterBorrowers(filter) {
     try {
-        const response = await fetch(`/dashboard/borrowers-data?filter=${filter}`);
-        const borrowers = await response.json();
+        const token = document.querySelector('meta[name="csrf-token"]');
+        const response = await fetch(`/dashboard/borrowers-data?filter=${filter}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        let borrowers;
+        try {
+            borrowers = JSON.parse(text);
+        } catch (parseError) {
+            if (text.includes('login') || text.includes('<html') || text.includes('<!DOCTYPE')) {
+                window.location.href = '/login';
+                return;
+            }
+            console.error('JSON parse error:', parseError);
+            throw new Error('Invalid JSON response');
+        }
+
         originalBorrowersData = [...borrowers];
         document.getElementById('borrowerSearch').value = '';
         const returnStatusFilter = document.getElementById('returnStatusFilter').value;
@@ -1358,7 +1496,30 @@ async function updateWeeklyChart() {
     const month = document.getElementById('monthFilter').value;
     const year = document.getElementById('yearFilter').value;
     try {
-        const response = await fetch(`/dashboard/weekly-data?month=${month}&year=${year}`);
+        const token = document.querySelector('meta[name="csrf-token"]');
+        const response = await fetch(`/dashboard/weekly-data?month=${month}&year=${year}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const errorText = await response.text();
+            console.error('Expected JSON but got:', errorText);
+            throw new Error('Server returned non-JSON response');
+        }
+
         const data = await response.json();
         if (window.weeklyChart) {
             window.weeklyChart.data.labels = data.map(item => item.week);
@@ -1541,6 +1702,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('returned') === 'success') {
         showToast('Book returned successfully!', 'success');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Check for member registration success and reset modal
+    if (urlParams.get('member_registered') === 'success') {
+        // Reset member registration modals using the same logic as memberscript.js
+        const registerForm = document.getElementById("registerForm");
+        const julitaForm = document.getElementById("julitaRegisterForm");
+        if (registerForm) registerForm.reset();
+        if (julitaForm) julitaForm.reset();
+
+        // Clear photo previews
+        const previews = document.querySelectorAll("#photoPreview");
+        previews.forEach(preview => {
+            preview.src = "";
+            preview.style.display = "none";
+        });
+
+        // Show success message
+        showToast('Member registered successfully!', 'success');
+
+        // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 

@@ -219,7 +219,7 @@ function openBorrowModal() {
 
     const modal = document.getElementById('borrowModal');
     if (modal) {
-        modal.classList.add('show');
+        modal.classList.add('active');
         modal.style.display = 'flex';
     }
 
@@ -236,7 +236,7 @@ function openBorrowModal() {
 function closeBorrowModal() {
     const modal = document.getElementById('borrowModal');
     if (modal) {
-        modal.classList.remove('show');
+        modal.classList.remove('active');
         setTimeout(() => {
             modal.style.display = 'none';
         }, 300);
@@ -1282,7 +1282,7 @@ function processBookQR(qrData) {
 
     // Check if borrow modal is open, if not, open it
     const borrowModal = document.getElementById('borrowModal');
-    const isModalOpen = borrowModal && borrowModal.classList.contains('show');
+    const isModalOpen = borrowModal && borrowModal.classList.contains('active');
 
     if (!isModalOpen) {
         // If no books are currently selected, select this one and open modal

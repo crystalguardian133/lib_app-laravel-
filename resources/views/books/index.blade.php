@@ -281,6 +281,36 @@
     color: #3b82f6;
     border-left: 3px solid #3b82f6;
   }
+  /* Logout Button */
+  .logout-section {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .logout-btn {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+  }
+  .logout-btn:hover {
+    background: linear-gradient(135deg, var(--danger), #dc2626) !important;
+    color: white !important;
+    border-color: var(--danger) !important;
+    box-shadow: var(--shadow) !important;
+    transform: translateY(-2px);
+  }
+  .logout-btn:hover .logout-text {
+    color: white !important;
+  }
   /* Dark Mode Toggle - Simple Slider Design */
   .dark-toggle {
     margin-top: auto;
@@ -998,6 +1028,27 @@
     transition: opacity 0.3s ease;
   }
 
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+  }
+
   .modal.show {
     display: flex !important;
     opacity: 1;
@@ -1253,6 +1304,10 @@
     border: 2px solid var(--glass-border);
     color: var(--text-primary);
     transition: var(--transition);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 1rem;
+    font-weight: 500;
   }
 
   .custom-time-picker select:focus {
@@ -1260,6 +1315,45 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     background: var(--surface-elevated);
+  }
+
+  /* Books List Styling */
+  .books-list-container ul li {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition);
+  }
+
+  .books-list-container ul li:hover {
+    background: var(--surface-elevated);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  .books-list-container ul li button {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 12px;
+  }
+
+  .books-list-container ul li button:hover {
+    background: #dc2626;
+    transform: scale(1.1);
   }
 
   /* Cover Preview Area */
@@ -1504,6 +1598,533 @@
         padding: 2px 3px;
     }
 }
+
+/* Modern Modal Styles */
+.modern-modal-container {
+  background: var(--surface-elevated);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 800px;
+  max-height: 450px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.modal-overlay.active .modern-modal-container {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.modern-modal-header {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.header-gradient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+  z-index: 1;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.modal-icon-container {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-lg);
+  animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.icon-glow {
+  animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modal-main-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.modal-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.modern-close-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--text-muted);
+  position: relative;
+  z-index: 2;
+}
+
+.modern-close-btn:hover {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.modern-modal-body {
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.modern-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modern-modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius);
+}
+
+.modern-modal-body::-webkit-scrollbar-track {
+  background: var(--border-light);
+}
+
+.modern-modal-footer {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.footer-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btn-cancel-premium {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  color: white;
+  box-shadow: var(--shadow);
+  transition: var(--transition-spring);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cancel-premium:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.btn-submit-premium {
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: white;
+  box-shadow: var(--shadow);
+  transition: var(--transition-spring);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit-premium:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-submit-premium:hover .btn-glow {
+  left: 100%;
+}
+
+/* Premium Form Styles */
+.premium-form-section {
+  margin-bottom: 2rem;
+  animation: slideInFromLeft 0.6s ease-out;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  box-shadow: var(--glass-shadow);
+  transition: var(--transition);
+}
+
+.premium-form-section:nth-child(even) {
+  animation: slideInFromRight 0.6s ease-out;
+}
+
+.premium-form-section:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.section-icon-box {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.section-info h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.section-info p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.premium-upload-area {
+  border: 3px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-upload-area:hover {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-icon-circle {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-md);
+  animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.upload-animations .floating-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+  animation: floatingDots 2s ease-in-out infinite;
+}
+
+.upload-animations .floating-dots span:nth-child(1) { animation-delay: 0s; }
+.upload-animations .floating-dots span:nth-child(2) { animation-delay: 0.2s; }
+.upload-animations .floating-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes floatingDots {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-10px); opacity: 1; }
+}
+
+.upload-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.upload-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.upload-requirements {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.req-item i {
+  color: var(--success);
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.elegant-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.premium-form-group {
+  display: flex;
+  flex-direction: column;
+  animation: bounceIn 0.5s ease-out;
+  padding: 0 var(--spacing-sm);
+}
+
+.premium-form-group:nth-child(1) { animation-delay: 0.1s; }
+.premium-form-group:nth-child(2) { animation-delay: 0.2s; }
+.premium-form-group:nth-child(3) { animation-delay: 0.3s; }
+.premium-form-group:nth-child(4) { animation-delay: 0.4s; }
+.premium-form-group:nth-child(5) { animation-delay: 0.5s; }
+
+.premium-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.premium-label i {
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.required-indicator {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.premium-input {
+  padding: 12px 16px;
+  border: 2px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+  width: 100%;
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.premium-input:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.input-focus-line {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.premium-input:focus + .input-focus-line {
+  width: 100%;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Dark mode adjustments for modern modal */
+body.dark-mode .modern-modal-container {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--glass-border);
+}
+
+body.dark-mode .modern-modal-header {
+  background: rgba(30, 30, 30, 0.8);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .modern-close-btn {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(71, 85, 105, 0.5);
+  color: var(--text-muted);
+}
+
+body.dark-mode .modern-close-btn:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+body.dark-mode .premium-input {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(71, 85, 105, 0.5);
+  color: var(--text-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .premium-input:focus {
+  background: rgba(30, 41, 59, 1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .premium-input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .premium-upload-area {
+  background: rgba(30, 41, 59, 0.3);
+  border-color: #9ca3af;
+}
+
+body.dark-mode .premium-upload-area:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: var(--accent);
+}
+
+/* Animations */
+@keyframes iconBounce {
+  0% { transform: scale(0) rotate(-180deg); }
+  50% { transform: scale(1.3) rotate(-90deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
 </style>
 </head>
 <body>
@@ -1531,7 +2152,35 @@
                 <span class="label">Member Time-in/out</span>
             </a>
         </nav>
-        <div class="dark-toggle">
+         <!-- Logout Button -->
+         <div class="logout-section" style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; justify-content: center;">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
+                @csrf
+                <button type="submit" class="logout-btn" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    width: 160px;
+                    padding: 10px 12px;
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: none;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                ">
+                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
+                </button>
+            </form>
+        </div>
+          <div class="dark-toggle">
             <label class="switch" title="Toggle Dark Mode">
                 <input type="checkbox" id="darkModeToggle">
                 <span class="slider">
@@ -1542,8 +2191,8 @@
                 </span>
             </label>
             <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light Mode</span>
+          </div>
         </div>
-    </div>
 
     <!-- Main Content -->
     <div class="main" id="mainContent">
@@ -1685,82 +2334,160 @@
       </div>
     </div>
 
-    <!-- ADD BOOK MODAL -->
-    <div class="modal" id="addBookModal">
-      <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-          <div class="modal-header-content">
-            <div class="modal-icon-wrapper">
-              <i class="fas fa-plus"></i>
+    <!-- ADD BOOK MODAL - FULLY REDESIGNED -->
+    <div class="modal-overlay" id="addBookModal">
+      <div class="modern-modal-container">
+        <!-- Animated Header with Gradient Background -->
+        <div class="modern-modal-header">
+          <div class="header-gradient-bg"></div>
+          <div class="header-content">
+            <div class="modal-icon-container">
+              <div class="icon-glow">
+                <i class="fas fa-plus-circle"></i>
+              </div>
             </div>
-            <div class="modal-title-section">
-              <h2 class="modal-title">Add New Book</h2>
-              <p class="modal-subtitle">Add a new book to the library collection</p>
+            <div class="title-section">
+              <h1 class="modal-main-title">Add New Book</h1>
+              <p class="modal-description">Expand your library collection with a new book entry</p>
             </div>
           </div>
-          <button class="modal-close" onclick="closeAddBookModal()">
+          <button class="modern-close-btn" onclick="closeAddBookModal()" aria-label="Close modal">
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <div class="modal-body">
-          <form id="addBookForm" enctype="multipart/form-data">
-            <!-- Cover Image Section -->
-            <div class="form-section">
-              <h3 class="section-title">
-                <i class="fas fa-image"></i>
-                Book Cover
-              </h3>
-              <div id="cover-preview-area">
-                <div id="cover-preview-content">
-                  <i id="cover-upload-icon" class="fas fa-cloud-upload-alt"></i>
-                  <p id="cover-preview-text">Click or drag image here...</p>
-                  <small style="color: var(--text-muted); margin-top: 8px; display: block;">
-                    Supports JPG, PNG, GIF (max 5MB)
-                  </small>
-                  <input type="file" id="cover-input" name="cover" class="cover-input" accept="image/*">
+
+        <!-- Enhanced Scrollable Body -->
+        <div class="modern-modal-body">
+          <form id="addBookForm" enctype="multipart/form-data" novalidate>
+
+            <!-- Premium Cover Upload Section -->
+            <div class="premium-form-section cover-section">
+              <div class="section-header">
+                <div class="section-icon-box">
+                  <i class="fas fa-camera-retro"></i>
+                </div>
+                <div class="section-info">
+                  <h3 class="section-title">Book Cover Image</h3>
+                  <p class="section-subtitle">Upload a stunning cover image for your book</p>
+                </div>
+              </div>
+
+              <div class="premium-upload-area" id="cover-preview-area">
+                <div class="upload-zone" id="cover-preview-content">
+                  <div class="upload-visual">
+                    <div class="upload-icon-circle">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-animations">
+                      <div class="floating-dots">
+                        <span></span><span></span><span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="upload-text-content">
+                    <h4 class="upload-title">Drop your image here</h4>
+                    <p class="upload-subtitle">or click to browse files</p>
+                    <div class="upload-requirements">
+                      <span class="req-item"><i class="fas fa-check-circle"></i> JPG, PNG, GIF</span>
+                      <span class="req-item"><i class="fas fa-check-circle"></i> Max 5MB</span>
+                      <span class="req-item"><i class="fas fa-check-circle"></i> High quality</span>
+                    </div>
+                  </div>
+                  <input type="file" id="cover-input" name="cover" class="hidden-file-input" accept="image/*">
                 </div>
               </div>
             </div>
-            <!-- Book Information Section -->
-            <div class="form-section">
-              <h3 class="section-title">
-                <i class="fas fa-book"></i>
-                Book Information
-              </h3>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="bookTitle">Title *</label>
-                  <input type="text" id="bookTitle" name="title" class="form-control" required>
+
+            <!-- Elegant Book Details Section -->
+            <div class="premium-form-section details-section">
+              <div class="section-header">
+                <div class="section-icon-box">
+                  <i class="fas fa-book-open"></i>
                 </div>
-                <div class="form-group">
-                  <label for="bookAuthor">Author *</label>
-                  <input type="text" id="bookAuthor" name="author" class="form-control" required>
+                <div class="section-info">
+                  <h3 class="section-title">Book Details</h3>
+                  <p class="section-subtitle">Enter the essential information about your book</p>
                 </div>
-                <div class="form-group">
-                  <label for="bookGenre">Genre</label>
-                  <input type="text" id="bookGenre" name="genre" class="form-control">
+              </div>
+
+              <div class="elegant-form-grid">
+                <div class="premium-form-group">
+                  <label for="bookTitle" class="premium-label">
+                    <i class="fas fa-heading"></i>
+                    <span class="label-text">Book Title</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookTitle" name="title" class="premium-input" required placeholder="Enter the book title" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="bookYear">Published Year *</label>
-                  <input type="number" id="bookYear" name="published_year" class="form-control" required min="1000" max="2099">
+
+                <div class="premium-form-group">
+                  <label for="bookAuthor" class="premium-label">
+                    <i class="fas fa-user-edit"></i>
+                    <span class="label-text">Author Name</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookAuthor" name="author" class="premium-input" required placeholder="Enter author name" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="bookAvailability">Availability *</label>
-                  <input type="number" id="bookAvailability" name="availability" class="form-control" required min="0">
+
+                <div class="premium-form-group">
+                  <label for="bookGenre" class="premium-label">
+                    <i class="fas fa-tags"></i>
+                    <span class="label-text">Genre/Category</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="text" id="bookGenre" name="genre" class="premium-input" placeholder="e.g., Fiction, Science, History" autocomplete="off">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+
+                <div class="premium-form-group">
+                  <label for="bookYear" class="premium-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="label-text">Publication Year</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="number" id="bookYear" name="published_year" class="premium-input" required min="1000" max="2099" placeholder="e.g., 2023">
+                    <div class="input-focus-line"></div>
+                  </div>
+                </div>
+
+                <div class="premium-form-group full-width">
+                  <label for="bookAvailability" class="premium-label">
+                    <i class="fas fa-hashtag"></i>
+                    <span class="label-text">Available Copies</span>
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-wrapper">
+                    <input type="number" id="bookAvailability" name="availability" class="premium-input" required min="0" placeholder="Number of copies available">
+                    <div class="input-focus-line"></div>
+                  </div>
                 </div>
               </div>
             </div>
+
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeAddBookModal()">
-            <i class="fas fa-times"></i>
-            Cancel
-          </button>
-          <button type="submit" form="addBookForm" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            Add Book
-          </button>
+
+        <!-- Premium Footer with Enhanced Actions -->
+        <div class="modern-modal-footer">
+          <div class="footer-actions">
+            <button type="button" class="btn-cancel-premium" onclick="closeAddBookModal()">
+              <i class="fas fa-times"></i>
+              <span>Cancel</span>
+            </button>
+            <button type="button" class="btn-submit-premium" onclick="submitAddBookFromBooksIndex()">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Book</span>
+              <div class="btn-glow"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1999,59 +2726,97 @@
         </div>
     </div>
 
-    <!-- BORROW MODAL -->
-    <div class="modal" id="borrowModal" style="z-index: 999999900 !important;">
-        <div class="modal-content" style="max-width: 900px !important;">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-hand-holding"></i>
-                    Borrow Books
-                </h3>
-                <button class="close-modal" onclick="closeBorrowModal()">
+    <!-- BORROW MODAL - PREMIUM REDESIGNED -->
+    <div class="modal-overlay" id="borrowModal">
+        <div class="modern-modal-container">
+            <!-- Premium Header with Gradient Background -->
+            <div class="modern-modal-header">
+                <div class="header-gradient-bg"></div>
+                <div class="header-content">
+                    <div class="modal-icon-container">
+                        <div class="icon-glow">
+                            <i class="fas fa-hand-holding"></i>
+                        </div>
+                    </div>
+                    <div class="title-section">
+                        <h1 class="modal-main-title">Borrow Books</h1>
+                        <p class="modal-description">Select books and set borrowing details</p>
+                    </div>
+                </div>
+                <button class="modern-close-btn" onclick="closeBorrowModal()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body">
-                <!-- Member Information Section -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-user"></i>
-                        Member Information
-                    </h4>
-                    <div class="form-group">
-                        <label for="memberName">Member Name</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="memberName" class="form-control" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed; flex: 1;">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="clearMemberInfo()" title="Clear member information">
-                                <i class="fas fa-times"></i>
-                            </button>
+            <!-- Enhanced Scrollable Body -->
+            <div class="modern-modal-body">
+                <!-- Premium Member Information Section -->
+                <div class="premium-form-section member-section">
+                    <div class="section-header">
+                        <div class="section-icon-box">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <input type="hidden" id="memberId">
-                        <small style="display:block; margin-top:5px; color:var(--text-muted); font-size:0.8rem;">
-                            <i class="fas fa-info-circle"></i> This field is automatically filled when you scan a member QR code
-                        </small>
+                        <div class="section-info">
+                            <h3 class="section-title">Member Information</h3>
+                            <p class="section-subtitle">Scan member QR code to identify borrower</p>
+                        </div>
+                    </div>
+
+                    <div class="elegant-form-grid">
+                        <div class="premium-form-group full-width">
+                            <label for="memberName" class="premium-label">
+                                <i class="fas fa-id-card"></i>
+                                <span class="label-text">Member Name</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="memberName" class="premium-input" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed;">
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <input type="hidden" id="memberId">
+                            <small style="display:block; margin-top:8px; color:var(--text-muted); font-size:0.85rem;">
+                                <i class="fas fa-info-circle"></i> This field is automatically filled when you scan a member QR code
+                            </small>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Borrow Details Section -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        Borrow Details
-                    </h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="dueDate">Due Date</label>
-                            <input type="date" id="dueDate" class="form-control">
-                            <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
-                                Only working days (Mon-Fri, excluding holidays) are available
-                            </small>
+                <!-- Premium Borrow Details Section -->
+                <div class="premium-form-section details-section">
+                    <div class="section-header">
+                        <div class="section-icon-box">
+                            <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="dueTime">Due Time</label>
+                        <div class="section-info">
+                            <h3 class="section-title">Borrow Details</h3>
+                            <p class="section-subtitle">Set the due date and time for book return</p>
+                        </div>
+                    </div>
+
+                    <div class="elegant-form-grid">
+                        <div class="premium-form-group">
+                            <label for="dueDate" class="premium-label">
+                                <i class="fas fa-calendar-day"></i>
+                                <span class="label-text">Due Date</span>
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="date" id="dueDate" class="premium-input" min="" onchange="validateDueDate()">
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <small style="display:block; margin-top:8px; color:var(--text-secondary); font-size:0.85rem;">
+                                <i class="fas fa-info-circle"></i> Only working days (Mon-Fri, excluding holidays) are available
+                            </small>
+                            <small id="dateError" style="display:block; margin-top:5px; color:var(--danger); font-size:0.8rem; display:none;"></small>
+                        </div>
+
+                        <div class="premium-form-group">
+                            <label for="dueTime" class="premium-label">
+                                <i class="fas fa-clock"></i>
+                                <span class="label-text">Due Time</span>
+                                <span class="required-indicator">*</span>
+                            </label>
                             <!-- Custom Precise Time Picker -->
                             <div id="customTimePicker" class="custom-time-picker" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
-                                <select id="dueHour" class="form-control" style="flex: 1; max-width: 80px;">
+                                <select id="dueHour" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -2065,64 +2830,146 @@
                                     <option value="11">11</option>
                                     <option value="12">12</option>
                                 </select>
-                                <span style="color: var(--text-secondary);">:</span>
-                                <select id="dueMinute" class="form-control" style="flex: 1; max-width: 80px;">
+                                <span style="color: var(--text-secondary); font-weight: 600; font-size: 1.1rem;">:</span>
+                                <select id="dueMinute" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
                                     <option value="00">00</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
                                     <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
                                     <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    <option value="32">32</option>
+                                    <option value="33">33</option>
+                                    <option value="34">34</option>
+                                    <option value="35">35</option>
+                                    <option value="36">36</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                    <option value="42">42</option>
+                                    <option value="43">43</option>
+                                    <option value="44">44</option>
                                     <option value="45">45</option>
+                                    <option value="46">46</option>
+                                    <option value="47">47</option>
+                                    <option value="48">48</option>
+                                    <option value="49">49</option>
+                                    <option value="50">50</option>
+                                    <option value="51">51</option>
+                                    <option value="52">52</option>
+                                    <option value="53">53</option>
+                                    <option value="54">54</option>
+                                    <option value="55">55</option>
+                                    <option value="56">56</option>
+                                    <option value="57">57</option>
+                                    <option value="58">58</option>
+                                    <option value="59">59</option>
                                 </select>
-                                <select id="dueAmPm" class="form-control" style="flex: 1; max-width: 80px;">
+                                <select id="dueAmPm" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
                                     <option value="AM">AM</option>
                                     <option value="PM">PM</option>
                                 </select>
                             </div>
                             <!-- Hidden input to store the actual time value -->
                             <input type="hidden" id="dueTime" name="dueTime">
-                            <small style="display:block; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
-                                Select hour, minute, and AM/PM precisely
+                            <small style="display:block; margin-top:8px; color:var(--text-secondary); font-size:0.85rem;">
+                                <i class="fas fa-mouse-pointer"></i> Use mouse wheel or type numbers to adjust time
                             </small>
                         </div>
                     </div>
                 </div>
 
-                <!-- Selected Books Section -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Selected Books
-                    </h4>
-                    <div class="form-group">
-                        <ul id="selectedBooksList" style="list-style: none; padding: 0; max-height: 150px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px; background: var(--glass-bg); min-height: 50px;"></ul>
-                        <small style="display:block; margin-top:5px; color:var(--text-muted); font-size:0.8rem;">
-                            <i class="fas fa-info-circle"></i> Books will appear here when selected
-                        </small>
+                <!-- Premium Selected Books Section -->
+                <div class="premium-form-section books-section">
+                    <div class="section-header">
+                        <div class="section-icon-box">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="section-info">
+                            <h3 class="section-title">Selected Books</h3>
+                            <p class="section-subtitle">Books selected for borrowing</p>
+                        </div>
+                    </div>
+
+                    <div class="elegant-form-grid">
+                        <div class="premium-form-group full-width">
+                            <div class="books-list-container" style="border: 2px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--spacing-lg); background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); min-height: 120px; max-height: 200px; overflow-y: auto;">
+                                <ul id="selectedBooksList" style="list-style: none; padding: 0; margin: 0;"></ul>
+                                <div id="emptyBooksMessage" style="text-align: center; color: var(--text-muted); padding: var(--spacing);">
+                                    <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 8px; display: block;"></i>
+                                    <p style="margin: 0; font-size: 0.9rem;">No books selected yet</p>
+                                    <small style="color: var(--text-secondary);">Use the buttons below to scan books</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons Section -->
-                <div class="form-section">
-                    <h4 class="section-title">
-                        <i class="fas fa-qrcode"></i>
-                        Quick Actions
-                    </h4>
-                    <div style="display: flex; gap: 10px; margin-top: 1rem;">
-                        <button type="button" class="btn btn-primary" onclick="openQRScanner('member')" style="flex: 1;">
-                            <i class="fas fa-qrcode"></i> Scan Member QR
+                <!-- Premium Quick Actions Section -->
+                <div class="premium-form-section actions-section">
+                    <div class="section-header">
+                        <div class="section-icon-box">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="section-info">
+                            <h3 class="section-title">Quick Actions</h3>
+                            <p class="section-subtitle">Scan QR codes to quickly add members and books</p>
+                        </div>
+                    </div>
+
+                    <div class="footer-actions" style="margin-top: var(--spacing-lg);">
+                        <button type="button" class="btn-submit-premium" onclick="openQRScanner('member')" style="flex: 1; margin-right: 8px;">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Scan Member QR</span>
                         </button>
-                        <button type="button" class="btn btn-outline" onclick="openQRScanner('book')" style="flex: 1;">
-                            <i class="fas fa-qrcode"></i> Scan Books
+                        <button type="button" class="btn-cancel-premium" onclick="openQRScanner('book')" style="flex: 1; margin-left: 8px;">
+                            <i class="fas fa-qrcode"></i>
+                            <span>Scan Books</span>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="closeBorrowModal()">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button class="btn btn-confirm" onclick="confirmBorrow()" id="confirmBorrowBtn">
-                    <i class="fas fa-check"></i> Confirm Borrow
-                </button>
+            <!-- Premium Footer with Enhanced Actions -->
+            <div class="modern-modal-footer">
+                <div class="footer-actions">
+                    <button type="button" class="btn-cancel-premium" onclick="closeBorrowModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button type="button" class="btn-submit-premium" onclick="confirmBorrow()" id="confirmBorrowBtn">
+                        <i class="fas fa-check"></i>
+                        <span>Confirm Borrow</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2186,8 +3033,20 @@
                 window.uploadedMediaFile = null;
             };
 
+            // Philippine holidays for 2025
+            const philippineHolidays = [
+                '2025-01-01', '2025-02-25', '2025-04-17', '2025-04-18', '2025-04-19',
+                '2025-05-01', '2025-06-12', '2025-08-25', '2025-11-01', '2025-11-30',
+                '2025-12-25', '2025-12-30', '2025-12-31'
+            ];
+
+            window.isPhilippineHoliday = function(dateString) {
+                return philippineHolidays.includes(dateString);
+            };
+
             // Set default due date and time using Philippine timezone and business days
             function calculatePhilippineBusinessDueDate() {
+
                 // Get current date in Philippine timezone (Asia/Manila, UTC+8)
                 const now = new Date();
                 const philippineOffset = 8 * 60; // 8 hours in minutes
@@ -2197,7 +3056,7 @@
                 // Start from current date for due date calculation
                 const startDate = new Date(philippineTime);
 
-                // Calculate 10 working days (Monday to Friday, excluding weekends)
+                // Calculate 10 working days (Monday to Friday, excluding weekends and holidays)
                 let workingDaysCount = 0;
                 let currentDate = new Date(startDate);
 
@@ -2205,9 +3064,10 @@
                     // Move to next day
                     currentDate.setDate(currentDate.getDate() + 1);
 
-                    // Check if it's a weekday (Monday = 1, Friday = 5)
+                    // Check if it's a weekday (Monday = 1, Friday = 5) and not a holiday
                     const dayOfWeek = currentDate.getDay();
-                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    if (dayOfWeek >= 1 && dayOfWeek <= 5 && !isPhilippineHoliday(dateString)) {
                         workingDaysCount++;
                     }
                 }
@@ -2218,23 +3078,283 @@
                 };
             }
 
-            // Set current date as default (user can change it)
-            const today = new Date(philippineTime);
-            const currentDate = today.toISOString().split('T')[0];
-            document.getElementById('dueDate').value = currentDate;
+            // Calculate and set business due date
+            const dueDateResult = calculatePhilippineBusinessDueDate();
+            const dueDateInput = document.getElementById('dueDate');
 
-            // Set current time as default
-            const currentHour = today.getHours();
-            const currentMinute = Math.floor(today.getMinutes() / 15) * 15; // Round to nearest 15 minutes
-            const hour12 = currentHour === 0 ? 12 : currentHour > 12 ? currentHour - 12 : currentHour;
-            const ampm = currentHour >= 12 ? 'PM' : 'AM';
-            const minuteStr = currentMinute.toString().padStart(2, '0');
+            // Set minimum date to tomorrow (no past dates or today)
+            const today = new Date();
+            const philippineOffset = 8 * 60;
+            const utcTime = today.getTime() + (today.getTimezoneOffset() * 60000);
+            const philippineTime = new Date(utcTime + (philippineOffset * 60000));
+            const tomorrow = new Date(philippineTime);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            dueDateInput.min = tomorrowStr;
+
+            // Set maximum date to 10 business days ahead (no dates beyond this)
+            dueDateInput.max = dueDateResult.date;
+
+            dueDateInput.value = dueDateResult.date;
+
+            // Set due time to current Philippine time rounded to nearest 15-minute interval
+            const currentHour = philippineTime.getHours();
+            const currentMinute = philippineTime.getMinutes();
+            const roundedMinute = Math.round(currentMinute / 15) * 15; // Round to nearest 15-minute interval
+
+            let adjustedHour = currentHour;
+            let adjustedMinute = roundedMinute;
+
+            // Handle minute overflow (e.g., 60 becomes 00 of next hour)
+            if (roundedMinute >= 60) {
+                adjustedMinute = 0;
+                adjustedHour = (currentHour + 1) % 24;
+            }
+
+            // Convert to 12-hour format
+            const hour12 = adjustedHour === 0 ? 12 : adjustedHour > 12 ? adjustedHour - 12 : adjustedHour;
+            const ampm = adjustedHour >= 12 ? 'PM' : 'AM';
 
             // Set time picker values
             document.getElementById('dueHour').value = hour12.toString();
-            document.getElementById('dueMinute').value = minuteStr;
+            document.getElementById('dueMinute').value = adjustedMinute.toString().padStart(2, '0');
             document.getElementById('dueAmPm').value = ampm;
-            document.getElementById('dueTime').value = `${currentHour.toString().padStart(2, '0')}:${minuteStr}`;
+            document.getElementById('dueTime').value = `${adjustedHour.toString().padStart(2, '0')}:${adjustedMinute.toString().padStart(2, '0')}`;
+
+            // Add scroll wheel functionality to time selectors
+            function addScrollWheelToTimeSelectors() {
+                const dueHour = document.getElementById('dueHour');
+                const dueMinute = document.getElementById('dueMinute');
+                const dueAmPm = document.getElementById('dueAmPm');
+
+                // Hour selector scroll
+                dueHour.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    const currentValue = parseInt(this.value);
+                    let newValue;
+
+                    if (e.deltaY < 0) { // Scroll up - increase
+                        newValue = currentValue < 12 ? currentValue + 1 : 1;
+                    } else { // Scroll down - decrease
+                        newValue = currentValue > 1 ? currentValue - 1 : 12;
+                    }
+
+                    this.value = newValue.toString();
+                    updateHiddenTimeInput();
+                });
+
+                // Minute selector scroll
+                dueMinute.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    const currentValue = parseInt(this.value);
+                    let newValue;
+
+                    if (e.deltaY < 0) { // Scroll up - increase
+                        newValue = currentValue < 59 ? currentValue + 1 : 0;
+                    } else { // Scroll down - decrease
+                        newValue = currentValue > 0 ? currentValue - 1 : 59;
+                    }
+
+                    this.value = newValue.toString().padStart(2, '0');
+                    updateHiddenTimeInput();
+                });
+
+                // AM/PM selector scroll
+                dueAmPm.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    this.value = this.value === 'AM' ? 'PM' : 'AM';
+                    updateHiddenTimeInput();
+                });
+            }
+
+            // Function to update hidden time input when selectors change
+            function updateHiddenTimeInput() {
+                const dueHour = document.getElementById('dueHour');
+                const dueMinute = document.getElementById('dueMinute');
+                const dueAmPm = document.getElementById('dueAmPm');
+                const dueTimeHidden = document.getElementById('dueTime');
+
+                if (!dueHour || !dueMinute || !dueAmPm || !dueTimeHidden) return;
+
+                const hour = parseInt(dueHour.value);
+                const minute = dueMinute.value;
+                const ampm = dueAmPm.value;
+
+                let hour24 = hour;
+                if (ampm === 'PM' && hour !== 12) {
+                    hour24 = hour + 12;
+                } else if (ampm === 'AM' && hour === 12) {
+                    hour24 = 0;
+                }
+
+                const timeString = `${hour24.toString().padStart(2, '0')}:${minute}`;
+                dueTimeHidden.value = timeString;
+            }
+
+            // Add keyboard input functionality to time selectors
+            function addKeyboardInputToTimeSelectors() {
+                const dueHour = document.getElementById('dueHour');
+                const dueMinute = document.getElementById('dueMinute');
+                const dueAmPm = document.getElementById('dueAmPm');
+
+                let hourInputBuffer = '';
+                let minuteInputBuffer = '';
+
+                // Hour selector keyboard input
+                dueHour.addEventListener('keydown', function(e) {
+                    // Allow backspace, delete, tab, escape, enter, and arrow keys
+                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
+                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
+                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
+                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
+                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
+                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
+                        return;
+                    }
+
+                    // Only allow numbers
+                    if (e.key < '0' || e.key > '9') {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    e.preventDefault(); // Prevent default typing
+
+                    hourInputBuffer += e.key;
+
+                    // Validate and set hour
+                    let hourValue = parseInt(hourInputBuffer);
+                    if (hourValue >= 1 && hourValue <= 12) {
+                        this.value = hourValue.toString();
+                        updateHiddenTimeInput();
+                        hourInputBuffer = ''; // Clear buffer after successful input
+                    } else if (hourInputBuffer.length >= 2) {
+                        // Invalid input, clear buffer
+                        hourInputBuffer = '';
+                    }
+                });
+
+                // Clear hour buffer when focus changes
+                dueHour.addEventListener('blur', function() {
+                    hourInputBuffer = '';
+                });
+
+                // Minute selector keyboard input
+                dueMinute.addEventListener('keydown', function(e) {
+                    // Allow backspace, delete, tab, escape, enter, and arrow keys
+                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
+                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
+                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
+                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
+                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
+                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
+                        return;
+                    }
+
+                    // Only allow numbers
+                    if (e.key < '0' || e.key > '9') {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    e.preventDefault(); // Prevent default typing
+
+                    minuteInputBuffer += e.key;
+
+                    // Validate and set minute
+                    let minuteValue = parseInt(minuteInputBuffer);
+                    if (minuteValue >= 0 && minuteValue <= 59) {
+                        this.value = minuteValue.toString().padStart(2, '0');
+                        updateHiddenTimeInput();
+                        minuteInputBuffer = ''; // Clear buffer after successful input
+                    } else if (minuteInputBuffer.length >= 2) {
+                        // Invalid input, clear buffer
+                        minuteInputBuffer = '';
+                    }
+                });
+
+                // Clear minute buffer when focus changes
+                dueMinute.addEventListener('blur', function() {
+                    minuteInputBuffer = '';
+                });
+
+                // AM/PM selector keyboard input
+                dueAmPm.addEventListener('keydown', function(e) {
+                    // Allow backspace, delete, tab, escape, enter, and arrow keys
+                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
+                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
+                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
+                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
+                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
+                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
+                        return;
+                    }
+
+                    const key = e.key.toLowerCase();
+                    if (key === 'a' || key === 'p') {
+                        e.preventDefault();
+                        this.value = key === 'a' ? 'AM' : 'PM';
+                        updateHiddenTimeInput();
+                    }
+                });
+            }
+
+            // Initialize scroll wheel functionality
+            addScrollWheelToTimeSelectors();
+
+            // Add keyboard input functionality
+            addKeyboardInputToTimeSelectors();
+
+            // Add change event listeners to update hidden time input
+            document.getElementById('dueHour').addEventListener('change', updateHiddenTimeInput);
+            document.getElementById('dueMinute').addEventListener('change', updateHiddenTimeInput);
+            document.getElementById('dueAmPm').addEventListener('change', updateHiddenTimeInput);
+
+            // Date validation function
+            window.validateDueDate = function() {
+                const selectedDate = new Date(dueDateInput.value);
+                const dayOfWeek = selectedDate.getDay();
+                const dateString = selectedDate.toISOString().split('T')[0];
+                const dateError = document.getElementById('dateError');
+
+                // Check if it's a weekend
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    dateError.textContent = 'Weekends are not allowed. Please select a weekday.';
+                    dateError.style.display = 'block';
+                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
+                    return false;
+                }
+
+                // Check if it's a holiday
+                if (isPhilippineHoliday(dateString)) {
+                    dateError.textContent = 'This date is a Philippine holiday. Please select a different date.';
+                    dateError.style.display = 'block';
+                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
+                    return false;
+                }
+
+                // Check if it's before tomorrow (minimum allowed date)
+                const tomorrowCheck = new Date(tomorrowStr);
+                if (selectedDate < tomorrowCheck) {
+                    dateError.textContent = 'Dates before tomorrow are not allowed.';
+                    dateError.style.display = 'block';
+                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
+                    return false;
+                }
+
+                // Check if it's beyond the maximum allowed date (10 business days)
+                const maxDateCheck = new Date(dueDateResult.date);
+                if (selectedDate > maxDateCheck) {
+                    dateError.textContent = 'Dates beyond 10 business days are not allowed.';
+                    dateError.style.display = 'block';
+                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
+                    return false;
+                }
+
+                // Valid date
+                dateError.style.display = 'none';
+                return true;
+            };
 
             // Initialize search functionality
             initializeSearch();
@@ -2246,13 +3366,22 @@
 
             // Add event listeners for selected books list changes
             const selectedBooksList = document.getElementById('selectedBooksList');
+            const emptyBooksMessage = document.getElementById('emptyBooksMessage');
+
+            function updateBooksListDisplay() {
+                if (selectedBooksList && emptyBooksMessage) {
+                    const hasBooks = selectedBooksList.children.length > 0;
+                    emptyBooksMessage.style.display = hasBooks ? 'none' : 'block';
+                }
+                if (typeof window.updateConfirmButtonState === 'function') {
+                    window.updateConfirmButtonState();
+                }
+            }
+
             if (selectedBooksList) {
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
-                        if (typeof window.updateConfirmButtonState === 'function') {
-                            console.log('Books list changed, updating button state');
-                            window.updateConfirmButtonState();
-                        }
+                        updateBooksListDisplay();
                     });
                 });
                 observer.observe(selectedBooksList, { childList: true });
@@ -2261,14 +3390,14 @@
                 selectedBooksList.addEventListener('click', function(e) {
                     if (e.target && e.target.matches('button')) {
                         setTimeout(() => {
-                            if (typeof window.updateConfirmButtonState === 'function') {
-                                console.log('Book removal detected, updating button state');
-                                window.updateConfirmButtonState();
-                            }
+                            updateBooksListDisplay();
                         }, 100);
                     }
                 });
             }
+
+            // Initialize empty message display
+            updateBooksListDisplay();
         });
 
         // Search functionality
@@ -2383,13 +3512,13 @@
         // Modal functions
         function openAddBookModal() {
             const modal = document.getElementById('addBookModal');
-            modal.classList.add('show');
+            modal.classList.add('active');
             modal.style.display = 'flex';
         }
 
         function closeAddBookModal() {
             const modal = document.getElementById('addBookModal');
-            modal.classList.remove('show');
+            modal.classList.remove('active');
             setTimeout(() => {
                 modal.style.display = 'none';
                 document.getElementById('addBookForm').reset();
@@ -2819,6 +3948,14 @@
             if (e.target.classList.contains('modal') && e.target.id !== 'qrScannerModal') {
                 const modal = e.target;
                 modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+            // Handle modal-overlay (borrow modal) click outside
+            if (e.target.classList.contains('modal-overlay') && e.target.id !== 'qrScannerModal') {
+                const modal = e.target;
+                modal.classList.remove('active');
                 setTimeout(() => {
                     modal.style.display = 'none';
                 }, 300);
