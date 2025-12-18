@@ -12,7 +12,12 @@ class TimeLogController extends Controller
     public function index()
     {
         $logs = TimeLog::with('member')->whereNull('time_out')->get();
-        return view('timelog.index', compact('logs'));
+        $historyLogs = TimeLog::with('member')
+            ->whereNotNull('time_out')
+            ->orderBy('time_out', 'desc')
+            ->take(50)
+            ->get();
+        return view('timelog.index', compact('logs', 'historyLogs'));
     }
 
     public function search(Request $request)

@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>🕒 Member Time Logs | Julita Leyte</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <meta name="csrf-token" content="{{ csrf_token() }}">
+ <title>🕒 Member Time Logs | Julita Leyte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
   :root {
-    /* Shared Color Palette */
-    --primary: #2fb9eb;           /* Indigo */
-    --primary-dark: #4f46e5
-    --secondary: #8b5cf6;         /* Purple */
-    --accent: #06b6d4;            /* Cyan */
+    /* Color Palette */
+    --primary: #2fb9eb;
+    --primary-dark: #1a9bcf;
+    --secondary: #8b5cf6;
+    --accent: #06b6d4;
     --accent-dark: #0891b2;
-    --success: #10b981;           /* Green */
-    --warning: #f59e0b;           /* Amber */
-    --danger: #ef4444;            /* Red */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    
     /* Neutral Scale */
     --white: #ffffff;
     --gray-50: #f8fafc;
@@ -31,795 +31,847 @@
     --gray-700: #334155;
     --gray-800: #1e293b;
     --gray-900: #0f172a;
-    /* 🌞 LIGHT MODE DEFAULT */
+    
+    /* Light Mode */
     --background: #f8fafc;
-    --surface: rgba(255, 255, 255, 0.85);
+    --surface: rgba(255, 255, 255, 0.9);
     --surface-elevated: rgba(255, 255, 255, 0.95);
     --text-primary: var(--gray-900);
     --text-secondary: var(--gray-600);
     --text-muted: var(--gray-500);
     --border: rgba(226, 232, 240, 0.7);
     --border-light: rgba(241, 245, 249, 0.8);
-    /* Glassmorphism (Light) */
-    --glass-bg: rgba(255, 255, 255, 0.35);
-    --glass-border: rgba(255, 255, 255, 0.25);
-    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
-    --glass-blur: blur(10px);
-    /* Shadows & Effects */
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --glass-blur: blur(12px);
+    
+    /* Shadows */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.12);
+    
     /* Border Radius */
     --radius-sm: 8px;
     --radius: 12px;
-    --radius-md: 16px;
-    --radius-lg: 20px;
+    --radius-lg: 16px;
     --radius-xl: 24px;
+    
     /* Transitions */
-    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 0.75rem;
     --spacing: 1rem;
-    --spacing-md: 1.25rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
-    --spacing-2xl: 2.5rem;
+    --spacing-2xl: 3rem;
   }
-  /* 🌙 DARK MODE - With Dark Gray Background */
+
+  /* Dark Mode */
   body.dark-mode {
-    --background: #121212;          /* Sleek dark gray */
-    --surface: rgba(30, 30, 30, 0.8);
-    --surface-elevated: rgba(40, 40, 40, 0.85);
+    --background: #0a0a0a;
+    --surface: rgba(20, 20, 20, 0.85);
+    --surface-elevated: rgba(30, 30, 30, 0.9);
     --text-primary: var(--gray-100);
     --text-secondary: var(--gray-300);
     --text-muted: var(--gray-400);
     --border: rgba(255, 255, 255, 0.1);
     --border-light: rgba(255, 255, 255, 0.05);
-    /* Glassmorphism for dark gray */
-    --glass-bg: rgba(40, 40, 40, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-    --glass-blur: blur(10px);
-    /* Stronger glow to pop on neutral dark */
-    --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
-  }
-  /* Additional dark mode styles */
-  body.dark-mode .sidebar {
-    background: rgba(20, 20, 20, 0.9);
-    border-right-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .card {
-    background: rgba(30, 30, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .btn-outline {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: var(--text-secondary);
-  }
-  body.dark-mode .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-  body.dark-mode .data-table th {
-    background: rgba(20, 20, 20, 0.8);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode .data-table td {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
-  }
-  body.dark-mode .data-table tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  body.dark-mode .form-control {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(71, 85, 105, 0.5);
-    color: var(--text-primary);
-  }
-  body.dark-mode .form-control:focus {
-    background: rgba(30, 41, 59, 1);
-    border-color: var(--accent);
-  }
-  body.dark-mode .form-control:hover {
-    border-color: rgba(255, 255, 255, 0.2);
+    --glass-bg: rgba(30, 30, 30, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
-  /* Global Reset */
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
   }
 
-  html {
-    font-size: 16px;
-    zoom: 1;
-  }
-
   body {
-    font-family: 'Outfit', 'Inter', sans-serif;
-    font-size: 16px;
-    background: linear-gradient(135deg, var(--background), #f1f5f9);
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--background), var(--gray-100));
     color: var(--text-primary);
     line-height: 1.6;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    position: relative;
-    zoom: 1;
+    transition: var(--transition-slow);
+    height: 100vh;
+    overflow: hidden;
   }
-  /* Dark mode transition overlay */
-  body::before {
-    content: '';
+
+  body.dark-mode {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+  }
+
+  /* Sidebar - Legacy Code */
+  .sidebar {
+    width: 280px;
+    background: #1a1a1a;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-lg);
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 9999;
-  }
-  body.dark-mode::before {
-    opacity: 1;
-  }
-  /* Animated elements during transition */
-  body.dark-mode-transition * {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
-  }
-  body.dark-mode {
-    background: linear-gradient(135deg, #121212, #1a1a1a);
-  }
-
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background: #1a1a1a;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-      padding: var(--spacing-lg);
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      color: #ffffff;
-      transform: translateZ(0);
-      /* Glassmorphism */
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
-    /* Light mode sidebar */
-    body:not(.dark-mode) .sidebar {
-      background: var(--glass-bg);
-      border-right: 1px solid var(--glass-border);
-      color: #1a1a1a;
-    }
-
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: var(--spacing-xl);
-      transition: var(--transition);
-    }
-    .sidebar-header .logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      border-radius: var(--radius);
-      transition: var(--transition-spring);
-      filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
-    }
-    .sidebar-header .logo:hover {
-      transform: scale(1.05) rotate(2deg);
-    }
-
-    /* Ensure sidebar header text is visible */
-    .sidebar-header .label {
-      color: var(--primary) !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      font-weight: 700 !important;
-      display: block !important;
-      background: none !important;
-      -webkit-text-fill-color: var(--primary) !important;
-    }
-
-    /* Light mode sidebar header */
-    body:not(.dark-mode) .sidebar-header .label {
-      color: var(--primary) !important;
-      -webkit-text-fill-color: var(--primary) !important;
-    }
-    .label {
-      font-weight: 700;
-      font-size: 1.1rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transition: var(--transition);
-    }
-    /* Toast Notification */
-.toast-notification {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    background: var(--danger);
-    color: white;
-    padding: 16px;
-    border-radius: var(--border-radius-sm);
-    box-shadow: var(--modal-shadow);
-    z-index: 2000;
-    max-width: 380px;
-    opacity: 0;
-    transform: translateY(-20px);
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #ffffff;
+    transform: translateZ(0);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  body:not(.dark-mode) .sidebar {
+    background: var(--glass-bg);
+    border-right: 1px solid var(--glass-border);
+    color: #1a1a1a;
+  }
+
+  .sidebar.collapsed {
+    width: 80px;
+  }
+
+  .sidebar.collapsed .label {
+    display: none !important;
+  }
+
+  .sidebar.collapsed .sidebar-header {
+    justify-content: center;
+  }
+
+  .sidebar:not(.collapsed) .label {
+    display: inline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .sidebar-header {
     display: flex;
-    align-items: flex-start;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--spacing-xl);
+    transition: var(--transition);
+  }
 
-.toast-notification.show {
-    opacity: 1;
-    transform: translateY(0);
-}
+  .sidebar-header .logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+  }
 
-.toast-content {
+  .sidebar-header .logo:hover {
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  .sidebar-header .label {
+    color: var(--primary) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-weight: 700 !important;
+    display: block !important;
+    background: none !important;
+    -webkit-text-fill-color: var(--primary) !important;
+  }
+
+  body:not(.dark-mode) .sidebar-header .label {
+    color: var(--primary) !important;
+    -webkit-text-fill-color: var(--primary) !important;
+  }
+
+  .label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: var(--transition);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+  }
+
+  .nav-item {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .nav-link {
     display: flex;
-    gap: 10px;
-    width: 100%;
-}
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 14px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
 
-.toast-icon {
-    font-size: 1.4rem;
-    flex-shrink: 0;
-}
+  .nav-link span {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-.toast-text strong {
-    display: block;
-    margin-top: 4px;
-}
+  .nav-link:hover {
+    background: var(--glass-bg);
+    color: #ffffff;
+    transform: translateX(6px);
+  }
 
-.toast-close {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
+  .nav-link:hover span {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .nav-link.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border-left: 3px solid #3b82f6;
+  }
+
+  .nav-link.active span {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .dark-toggle {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    gap: 12px;
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #darkModeLabel {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+  }
+
+  body:not(.dark-mode) #darkModeLabel {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .switch {
+    position: relative;
+    width: 60px;
+    height: 34px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    border-radius: 34px;
+    transition: var(--transition);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+  }
+
+  body.dark-mode .slider {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  }
+
+  .slider-thumb {
+    position: absolute;
     width: 28px;
     height: 28px;
+    background: white;
     border-radius: 50%;
-    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    z-index: 2;
+  }
+
+  .icon-sun, .icon-moon {
+    position: absolute;
+    transition: var(--transition);
+  }
+
+  .icon-sun {
+    opacity: 1;
+  }
+
+  .icon-moon {
+    opacity: 0;
+  }
+
+  input:not(:checked) + .slider .slider-thumb {
+    transform: translateX(0);
+  }
+
+  input:checked + .slider .slider-thumb {
+    transform: translateX(26px);
+  }
+
+  input:checked + .slider .icon-sun {
+    opacity: 0;
+  }
+
+  input:checked + .slider .icon-moon {
+    opacity: 1;
+  }
+
+  .logout-btn {
+    margin-top: var(--spacing);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    gap: 12px;
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Main Content */
+  .main {
+    margin-left: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .main::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .main::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+  }
+
+  .main::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+
+  .main-content-wrapper {
+    padding: var(--spacing-lg);
+  }
+
+  /* Hero Section */
+  .hero-section {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing);
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing);
+  }
+
+  .search-wrapper {
+    flex: 1;
+    max-width: 500px;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--spacing);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: var(--spacing) var(--spacing) var(--spacing) 3rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: var(--spacing);
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: white;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  }
+
+  .action-btn.secondary {
+    background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Dashboard Grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  .dashboard-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .card-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .card-content {
+    padding: var(--spacing-lg);
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .card-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .card-content::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+  }
+
+  /* Active Members List */
+  .active-member-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+    padding: var(--spacing);
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing);
+    transition: var(--transition);
+  }
+
+  .active-member-item:hover {
+    background: rgba(47, 185, 235, 0.1);
+  }
+
+  .member-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .member-details {
+    flex: 1;
+  }
+
+  .member-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .member-school {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing);
+    opacity: 0.5;
+  }
+
+  /* IMPROVED MODAL */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: var(--spacing-xl);
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .modal-container {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 90vw;
+    max-width: 1400px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+    overflow: hidden;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header {
+    padding: var(--spacing-xl);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-elevated);
+  }
+
+  .modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing);
+  }
+
+  .modal-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border-light);
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -4px;
-}
+    font-size: 1.5rem;
+    transition: var(--transition);
+  }
 
-.toast-close:hover {
-    background: rgba(255,255,255,0.3);
-}
+  .modal-close:hover {
+    background: var(--danger);
+    color: white;
+    transform: rotate(90deg);
+  }
 
-    .sidebar.collapsed {
-      width: 60px;
+  .modal-body {
+    padding: var(--spacing-xl);
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 8px;
+  }
+
+  /* Enhanced Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+  }
+
+  .data-table th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: var(--spacing) var(--spacing-lg);
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .data-table td {
+    padding: var(--spacing) var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+  }
+
+  .data-table tr:hover {
+    background: rgba(47, 185, 235, 0.05);
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .duration-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .sidebar {
+      width: 80px;
     }
 
-    .sidebar.collapsed .label {
+    .sidebar .label,
+    .nav-link span,
+    .logout-btn span,
+    #darkModeLabel {
       display: none !important;
     }
 
-    .sidebar.collapsed .sidebar-header {
-      justify-content: center;
-    }
-
-    /* Ensure labels are visible in normal sidebar */
-    .sidebar:not(.collapsed) .label {
-      display: inline !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-    }
-
-    .nav-item {
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-      padding: 14px 16px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-    .nav-link span {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav-link:hover {
-      background: var(--glass-bg);
-      color: #ffffff;
-      transform: translateX(6px);
-    }
-    .nav-link:hover span {
-      background: linear-gradient(135deg, #ffffff, #f8fafc);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav-link.active {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border-left: 3px solid #3b82f6;
-    }
-    .nav-link.active span {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    /* Dark Mode Toggle - Simple Slider Design */
-    .dark-toggle {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      gap: 12px;
-      align-self: center;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    /* Animated label */
-    #darkModeLabel {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 14px;
-    }
-    /* Light mode label */
-    body:not(.dark-mode) #darkModeLabel {
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    .switch {
-      position: relative;
-      width: 60px;
-      height: 34px;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-      border-radius: 34px;
-      transition: var(--transition);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      padding: 0 6px;
-    }
-    body.dark-mode .slider {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    }
-    .slider-thumb {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      box-shadow: var(--shadow);
-      transition: var(--transition-spring);
-      z-index: 2;
-    }
-    .icon-sun, .icon-moon {
-      position: absolute;
-      transition: var(--transition);
-    }
-    .icon-sun {
-      opacity: 1;
-    }
-    .icon-moon {
-      opacity: 0;
-    }
-    input:not(:checked) + .slider .slider-thumb {
-      transform: translateX(0);
-    }
-    input:checked + .slider .slider-thumb {
-      transform: translateX(26px);
-    }
-    input:checked + .slider .icon-sun {
-      opacity: 0;
-    }
-    input:checked + .slider .icon-moon {
-      opacity: 1;
-    }
-
-    /* Main Content */
     .main {
-      margin-left: 280px;
-      padding: var(--spacing-lg);
-      flex-grow: 1;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      min-width: calc(100% - 280px);
-      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
+      margin-left: 80px;
+    }
+
+    .modal-container {
+      width: 95vw;
+      max-height: 90vh;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 1.75rem;
+    }
+
+    .quick-actions {
       flex-direction: column;
-      transform: translateZ(0);
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
-    /* Dashboard Content */
-    .dashboard-content {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 8px;
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      margin: var(--spacing-sm) 0;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
-    .dashboard-content::-webkit-scrollbar {
-      width: 6px;
-    }
-    .dashboard-content::-webkit-scrollbar-thumb {
-      background: var(--text-muted);
-      border-radius: 8px;
-    }
-    .dashboard-content::-webkit-scrollbar-track {
-      background: var(--border-light);
-    }
-    .heading {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: var(--spacing-xl);
-      animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .dashboard-title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: var(--spacing-xl);
-      animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    h2 {
-      text-align: center;
-      color: var(--primary);
-    }
-  
-
-    .top-controls {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 1.5rem;
+    .search-wrapper {
+      max-width: none;
     }
 
-    .top-controls input {
-      width: 300px;
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
-      border-radius: var(--radius);
-      border: 2px solid var(--glass-border);
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      color: var(--text-primary);
-      transition: var(--transition);
+    .dashboard-grid {
+      grid-template-columns: 1fr;
     }
 
-    .top-controls button {
-      background: var(--accent);
-      color: white;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
+    .modal-container {
+      width: 100vw;
+      max-height: 100vh;
+      border-radius: 0;
     }
 
-    #suggestionBox {
-      position: absolute;
-      width: 300px;
-      max-height: 180px;
-      overflow-y: auto;
-      border: 1px solid var(--glass-border);
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-radius: var(--radius);
-      box-shadow: var(--glass-shadow);
-      z-index: 999;
+    .modal-header,
+    .modal-body {
+      padding: var(--spacing);
     }
-
-    #suggestionBox div {
-      padding: 10px;
-      cursor: pointer;
-    }
-
-    #suggestionBox div:hover {
-      background-color: var(--highlight);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5rem;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
-
-    th, td {
-      padding: 16px 14px;
-      border-bottom: 1px solid var(--border-light);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
-    th {
-      background: var(--glass-bg);
-      color: var(--text-primary);
-      font-weight: 600;
-      text-align: left;
-      border-bottom: 2px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-    }
-
-    .logout {
-      background: var(--danger);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .corner-popup {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--accent);
-      color: white;
-      padding: 12px 18px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      font-size: 0.95rem;
-      z-index: 1000;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-
-    .modal-content {
-      background: var(--white);
-      padding: 1.5rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-content label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: 600;
-    }
-
-    .modal-content input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.4rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .cancel {
-      background: #94a3b8;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      color: white;
-    }
-    body.dark-mode .modal-content {
-  background-color: #1e293b;
-  color: var(--text-dark);
-}
-
-body.dark-mode .modal-content input {
-  background-color: #0f172a;
-  color: var(--text-dark);
-  border: 1px solid #475569;
-}
-
-body.dark-mode .modal-content input::placeholder {
-  color: #9ca3af;
-}
-
-body.dark-mode .actions .cancel {
-  background: #475569;
-  color: #e2e8f0;
-}
-
-body.dark-mode .actions .submit {
-  background: var(--accent);
-  color: white;
-}
-
-body.dark-mode .actions .delete {
-  background: #ef4444;
-  color: white;
-}
-
-    .submit {
-      background: var(--accent);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      color: white;
-    }
-
-    /* Custom Button Styles for Modals */
-    .btn-cancel {
-      background: linear-gradient(135deg, #9ca3af, #6b7280);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-cancel:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      background: linear-gradient(135deg, #6b7280, #4b5563);
-    }
-
-    .btn-confirm {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-confirm:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      background: linear-gradient(135deg, #059669, #047857);
-    }
-    /* Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 80px;
-        padding: var(--spacing);
-      }
-      .sidebar-header .label,
-      .nav-link span {
-        display: none !important;
-      }
-      .main {
-        margin-left: 80px;
-        min-width: calc(100% - 80px);
-        padding: var(--spacing-lg);
-      }
-      .dashboard-title {
-        font-size: 1.75rem;
-      }
-      .heading {
-        font-size: 1.75rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .main {
-        padding: var(--spacing);
-      }
-      .dashboard-content {
-        padding: var(--spacing);
-      }
-      .dashboard-title {
-        font-size: 1.5rem;
-      }
-      .heading {
-        font-size: 1.5rem;
-      }
-    }
+  }
   </style>
 </head>
 <body>
@@ -855,15 +907,6 @@ body.dark-mode .actions .delete {
         </a>
       </div>
     </div>
-    <div class="logout-btn" style="margin-top: auto; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; gap: 12px; align-self: center; margin-left: auto; margin-right: auto; background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; width: 100%; max-width: 200px;">
-      <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
-        @csrf
-        <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
-          <i class="fas fa-sign-out-alt"></i>
-          <span class="logout-text">Logout</span>
-        </button>
-      </form>
-    </div>
     <div class="dark-toggle">
       <label class="switch" title="Toggle Dark Mode">
         <input type="checkbox" id="darkModeToggle">
@@ -876,130 +919,364 @@ body.dark-mode .actions .delete {
       </label>
       <span id="darkModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Light Mode</span>
     </div>
-  </div>
-  <!-- Overdue Toast Notification -->
-<div id="overdueToast" class="toast-notification">
-    <div class="toast-content">
-        <div class="toast-icon">⚠️</div>
-        <div class="toast-text">
-            <strong>Overdue Alert!</strong><br>
-            <span id="toastMessage">Loading...</span>
-        </div>
-        <button id="closeToast" class="toast-close">×</button>
+    <div class="logout-btn" style="margin-top: auto; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; gap: 12px; align-self: center; margin-left: auto; margin-right: auto; background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; width: 100%; max-width: 200px;">
+      <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+        @csrf
+        <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="logout-text">Logout</span>
+        </button>
+      </form>
     </div>
-</div>
+  </div>
 
   <!-- Main Content -->
-  <div class="main" id="mainContent">
-    <div class="dashboard-title" style="position: sticky; top: 0; z-index: 100; background: transparent; padding: 1rem 0; margin: -1rem 0 1rem 0;">MEMBER TIME LOGS</div>
-    <div class="dashboard-content">
-      <div class="heading"><i class="fas fa-clock"></i> Time In / Time Out</div>
-      <div class="top-controls">
-        <div style="position: relative;">
-          <input type="text" id="memberInput" placeholder="Search member..." autocomplete="off">
-          <div id="suggestionBox"></div>
-        </div>
+  <div class="main">
+    <div class="main-content-wrapper">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <i class="fas fa-clock"></i>
+          Member Time Logs
+        </h1>
+        <p class="hero-subtitle">Monitor and manage library member attendance with real-time tracking and comprehensive session history</p>
         
-      <button onclick="openScanQRModal()" id="scanQRBtn"><i class="fas fa-qrcode"></i> Scan QR</button>
-
-
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>School</th>
-            <th>Time In</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($logs as $log)
-          <tr>
-            <td>{{ $log->member->name }}</td>
-            <td>{{ $log->member->school }}</td>
-            <td>{{ \Carbon\Carbon::parse($log->time_in)->format('h:i A') }}</td>
-            <td><button class="logout" onclick="timeOut({{ $log->id }}, this)">Time Out</button></td>
-          </tr>
-          @endforeach
-        </tbody>
-      </table>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <i class="fas fa-user-check" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+            <div class="stat-number">{{ $logs->count() }}</div>
+            <div class="stat-label">Active Now</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-calendar-day" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+            <div class="stat-number">{{ ($historyLogs ?? collect())->where('time_in', '>=', now()->startOfDay())->count() }}</div>
+            <div class="stat-label">Sessions Today</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-clock" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+            <div class="stat-number" id="currentTime">{{ now()->format('H:i') }}</div>
+            <div class="stat-label">Current Time</div>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-history" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+            <div class="stat-number">{{ ($historyLogs ?? collect())->count() }}</div>
+            <div class="stat-label">Total Sessions</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search member by name...">
+      </div>
+      <div class="action-buttons">
+        <button class="action-btn primary" onclick="openScanQRModal()">
+          <i class="fas fa-qrcode"></i>
+          <span>Scan QR</span>
+        </button>
+        <button class="action-btn secondary" onclick="location.reload()">
+          <i class="fas fa-sync"></i>
+          <span>Refresh</span>
+        </button>
+        <button class="action-btn secondary">
+          <i class="fas fa-download"></i>
+          <span>Export</span>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div class="modal" id="registerModal">
-    <div class="modal-content">
-      <h3>Register New Member</h3>
-      <label>Full Name</label>
-      <input type="text" id="name">
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Active Sessions -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-user-check"></i>
+            Active Sessions
+          </div>
+          <button style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+        <div class="card-content">
+          @if($logs->count() > 0)
+            @foreach($logs as $log)
+              <div class="active-member-item">
+                <div class="member-avatar">{{ $log->member->name ? strtoupper(substr($log->member->name, 0, 1)) : '?' }}</div>
+                <div class="member-details">
+                  <div class="member-name">{{ $log->member->name ?? '' }}</div>
+                  <div class="member-school">{{ $log->member->school ?? '-' }}</div>
+                  <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <i class="fas fa-clock"></i> {{ \Carbon\Carbon::parse($log->time_in)->format('g:i A') }} ({{ \Carbon\Carbon::parse($log->time_in)->diffForHumans() }})
+                  </div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="empty-state">
+              <div class="empty-icon">👥</div>
+              <h3>No Active Sessions</h3>
+              <p>No members are currently logged in.</p>
+            </div>
+          @endif
+        </div>
+      </div>
 
-      <label>Age</label>
-      <input type="number" id="age">
-
-      <label>Address</label>
-      <input type="text" id="address">
-
-      <label>Contact Number</label>
-      <input type="text" id="contactnumber" maxlength="11" pattern="\d{11}" oninput="this.value = this.value.replace(/\D/g, '')">
-
-      <label>School</label>
-      <input type="text" id="school">
-
-      <div class="actions">
-        <button class="btn-cancel" onclick="closeRegisterModal()">Cancel</button>
-        <button class="btn-confirm" onclick="submitRegister()">Submit</button>
+      <!-- Recent Activity -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-history"></i>
+            Recent Activity
+          </div>
+          <button onclick="openHistoryModal()" style="background: none; border: none; cursor: pointer; color: var(--primary);">
+            <i class="fas fa-external-link-alt"></i> View All
+          </button>
+        </div>
+        <div class="card-content">
+          @if($historyLogs->count() > 0)
+            @foreach($historyLogs->take(5) as $log)
+              <div style="padding: var(--spacing); background: var(--surface); border-radius: var(--radius); margin-bottom: var(--spacing); border-left: 3px solid var(--success);">
+                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ $log->member->name ?? '' }} completed session</div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">
+                  {{ \Carbon\Carbon::parse($log->time_in)->format('g:i A') }} - {{ \Carbon\Carbon::parse($log->time_out)->format('g:i A') }} • <span style="color: var(--success);">{{ \Carbon\Carbon::parse($log->time_in)->diff(\Carbon\Carbon::parse($log->time_out))->format('%Hh %Im') }}</span>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <h3>No Recent Activity</h3>
+              <p>No completed sessions yet.</p>
+            </div>
+          @endif
+        </div>
       </div>
     </div>
   </div>
-  <div class="modal" id="scanQRModal">
-  <div class="modal-content" style="max-width: 500px;">
-    <h3>📷 Scan Member QR</h3>
-    <div id="qr-reader" style="width: 100%; height: auto;"></div>
-    <div class="actions">
-      <button class="btn-cancel" onclick="closeScanQRModal()">Cancel</button>
+
+  <!-- History Modal -->
+  <div id="historyModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fas fa-history"></i>
+          Complete Session History
+        </h3>
+        <button class="modal-close" onclick="closeHistoryModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        @if(($historyLogs ?? collect())->count() > 0)
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>School</th>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Duration</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($historyLogs ?? [] as $log)
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <div class="member-avatar" style="width: 40px; height: 40px; font-size: 1rem;">{{ strtoupper(substr($log->member->name, 0, 1)) }}</div>
+                      <div>
+                        <div style="font-weight: 600;">{{ $log->member->name }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: {{ $log->member->id }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ $log->member->school }}</td>
+                  <td>{{ \Carbon\Carbon::parse($log->time_in)->format('h:i A') }}</td>
+                  <td>{{ $log->time_out ? \Carbon\Carbon::parse($log->time_out)->format('h:i A') : '-' }}</td>
+                  <td>
+                    @if($log->time_out)
+                      <span class="duration-badge">{{ \Carbon\Carbon::parse($log->time_in)->diff(\Carbon\Carbon::parse($log->time_out))->format('%Hh %Im') }}</span>
+                    @else
+                      <span>-</span>
+                    @endif
+                  </td>
+                  <td>{{ \Carbon\Carbon::parse($log->time_in)->format('M d, Y') }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        @else
+          <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>No History Available</h3>
+            <p>No completed sessions found.</p>
+          </div>
+        @endif
+      </div>
     </div>
   </div>
-</div>
-
-
-
-  <div class="corner-popup" id="popup" style="display:none;"></div>
 
   <script>
-    // Dark mode functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      const darkModeLabel = document.getElementById('darkModeLabel');
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeLabel = document.getElementById('darkModeLabel');
+    const body = document.body;
 
-      // Detect system preference
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const savedMode = localStorage.getItem('darkMode');
-      const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
+    // Detect system preference
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedMode = localStorage.getItem('darkMode');
+    const isDark = savedMode ? savedMode === 'true' : prefersDarkMode;
 
-      // Apply mode
-      document.body.classList.toggle('dark-mode', isDark);
-      darkModeToggle.checked = isDark;
-      darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+    // Apply mode
+    body.classList.toggle('dark-mode', isDark);
+    darkModeToggle.checked = isDark;
+    darkModeLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
 
-      // Toggle dark mode
-      darkModeToggle.addEventListener('change', () => {
-        const isChecked = darkModeToggle.checked;
-        document.body.classList.toggle('dark-mode', isChecked);
-        localStorage.setItem('darkMode', isChecked);
-        darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
+    // Toggle dark mode
+    darkModeToggle.addEventListener('change', () => {
+      const isChecked = darkModeToggle.checked;
+      body.classList.toggle('dark-mode', isChecked);
+      localStorage.setItem('darkMode', isChecked);
+      darkModeLabel.textContent = isChecked ? 'Dark Mode' : 'Light Mode';
 
-        // Add transition class for smooth animation
-        document.body.classList.add('dark-mode-transition');
-        setTimeout(() => {
-          document.body.classList.remove('dark-mode-transition');
-        }, 600);
+      // Add transition class for smooth animation
+      body.classList.add('dark-mode-transition');
+      setTimeout(() => {
+        body.classList.remove('dark-mode-transition');
+      }, 600);
+    });
+
+    // Update Clock
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      document.getElementById('currentTime').textContent = timeString;
+    }
+
+    updateClock();
+    setInterval(updateClock, 60000);
+
+    // Modal Functions
+    function openHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    // QR Modal Functions - These will be overridden by scanqr.js if it loads
+    if (typeof openScanQRModal === 'undefined') {
+      window.openScanQRModal = function() {
+        const modal = document.getElementById('scanQRModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          console.log('QR Modal opened - waiting for scanqr.js to initialize scanner');
+        } else {
+          console.error('QR Modal not found');
+        }
+      }
+    }
+
+    if (typeof closeScanQRModal === 'undefined') {
+      window.closeScanQRModal = function() {
+        const modal = document.getElementById('scanQRModal');
+        if (modal) {
+          modal.style.display = 'none';
+          console.log('QR Modal closed');
+        }
+      }
+    }
+
+    // Export function
+    function exportData() {
+      alert('Export functionality will be implemented with backend');
+    }
+
+    // Close modal on overlay click
+    const historyModal = document.getElementById('historyModal');
+    const scanModal = document.getElementById('scanQRModal');
+    
+    if (historyModal) {
+      historyModal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal') || e.target.id === 'historyModal') {
+          closeHistoryModal();
+        }
       });
+    }
+
+    if (scanModal) {
+      scanModal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal') || e.target.id === 'scanQRModal') {
+          closeScanQRModal();
+        }
+      });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeHistoryModal();
+        closeScanQRModal();
+      }
     });
   </script>
+  
+  <!-- QR Scanner Modal -->
+  <div class="modal" id="scanQRModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <h3>📷 Scan Member QR</h3>
+      <div id="qr-reader" style="width: 100%; height: auto;"></div>
+      <div class="actions">
+        <button class="btn-cancel" onclick="closeScanQRModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Dark mode styles for modals -->
+  <style>
+    body.dark-mode .modal-content {
+      background-color: #1e293b !important;
+      color: var(--text-primary) !important;
+    }
+    
+    body.dark-mode .modal-content h3 {
+      color: var(--text-primary) !important;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 2001;
+    }
+  </style>
+  
   <script src="{{ asset('js/timelog.js') }}"></script>
   <script src="{{ asset('js/memberscript.js') }}"></script>
   <script src="{{ asset('js/sidebarcollapse.js')}}"></script>
-  <script src="{{ asset('js/scanqr.js')}}"></script>
   <script src="{{ asset('js/overdue.js') }}"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="{{ asset('js/scanqr.js')}}"></script>
 </body>
 </html>

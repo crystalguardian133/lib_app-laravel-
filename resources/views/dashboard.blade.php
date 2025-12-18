@@ -14,15 +14,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
 :root {
-    /* Shared Color Palette */
-    --primary: #2fb9eb;           /* Indigo */
-    --primary-dark: #4f46e5;
-    --secondary: #8b5cf6;         /* Purple */
+    /* Legacy Color Palette */
+    --primary: #1e40af;           /* Modern Blue */
+    --primary-dark: #1e3a8a;
+    --secondary: #7c3aed;         /* Vibrant Purple */
     --accent: #06b6d4;            /* Cyan */
     --accent-dark: #0891b2;
-    --success: #10b981;           /* Green */
+    --success: #059669;           /* Emerald */
     --warning: #f59e0b;           /* Amber */
     --danger: #ef4444;            /* Red */
+    --info: #3b82f6;              /* Blue */
     /* Neutral Scale */
     --white: #ffffff
     --gray-50: #f8fafc;
@@ -154,7 +155,7 @@
   }
   body {
     font-family: 'Outfit', 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--background), #f1f5f9);
+    background: linear-gradient(135deg, var(--background), #e0f2fe);
     color: var(--text-primary);
     line-height: 1.6;
     transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -188,10 +189,10 @@
   body.dark-mode {
     background: linear-gradient(135deg, #121212, #1a1a1a);
   }
-  /* Sidebar */
+  /* Sidebar - Legacy Gradient */
   .sidebar {
     width: 280px;
-    background: #1a1a1a;
+    background: linear-gradient(180deg, rgba(30, 64, 175, 0.95), rgba(124, 58, 237, 0.95));
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     padding: var(--spacing-lg);
     position: fixed;
@@ -204,18 +205,19 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     color: #ffffff;
     transform: translateZ(0);
-    /* Glassmorphism */
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
-  /* Light mode sidebar */
+  /* Light mode sidebar - Legacy */
   body:not(.dark-mode) .sidebar {
-    background: var(--glass-bg);
-    border-right: 1px solid var(--glass-border);
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(30, 64, 175, 0.95), rgba(124, 58, 237, 0.95));
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
   body:not(.dark-mode) .sidebar .label {
     color: #1a1a1a;
@@ -242,12 +244,13 @@
     transition: var(--transition);
   }
   .sidebar-header .logo {
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
     border-radius: var(--radius);
     transition: var(--transition-spring);
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+    filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+    margin-bottom: 10px;
   }
   .sidebar-header .logo:hover {
     transform: scale(1.05) rotate(2deg);
@@ -264,7 +267,7 @@
     opacity: 1 !important;
     visibility: visible !important;
   }
-  /* Nav Links */
+  /* Nav Links - Legacy */
   .sidebar nav a {
     display: flex;
     align-items: center;
@@ -280,12 +283,13 @@
     font-size: 14px;
   }
   .sidebar nav a:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: #ffffff;
     transform: translateX(6px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--accent);
   }
   .sidebar nav a.active {
     background: rgba(59, 130, 246, 0.15);
@@ -298,31 +302,33 @@
     text-align: center;
     font-size: 18px;
   }
-  /* Light mode navigation */
+  /* Light mode navigation - Legacy */
   body:not(.dark-mode) .sidebar nav a {
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(255, 255, 255, 0.8);
   }
   body:not(.dark-mode) .sidebar nav a .label {
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(255, 255, 255, 0.8);
     transition: var(--transition);
     opacity: 1 !important;
     visibility: visible !important;
     display: inline !important;
   }
   body:not(.dark-mode) .sidebar nav a:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    color: #1a1a1a;
-    box-shadow: var(--shadow-md);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary);
   }
   body:not(.dark-mode) .sidebar nav a:hover .label {
-    color: #1a1a1a;
+    color: #ffffff;
   }
   body:not(.dark-mode) .sidebar nav a.active {
     background: rgba(59, 130, 246, 0.15);
     color: #3b82f6;
     border-left: 3px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
   }
   /* Dark Mode Toggle - Simple Slider Design */
   .dark-toggle {
@@ -721,7 +727,7 @@
     color: var(--primary);
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Stats Cards */
+  /* Stats Cards - Legacy Glassmorphism */
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -790,15 +796,6 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  /* Enhanced card header visibility */
-  .card-header h3 {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
   .card .count {
     font-size: 2.2rem;
     font-weight: 900;
@@ -845,16 +842,6 @@
     position: relative;
     z-index: 4;
   }
-  .card-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  /* Ensure buttons don't break card hover */
-  .card-actions .btn {
-    flex-shrink: 0;
-  }
   /* Bottom positioned action buttons — GLASSMORPHISM REMOVED */
   .card-actions-bottom {
     display: flex;
@@ -885,7 +872,7 @@
     color: var(--primary) !important;
     border: 2px solid transparent !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-    transition: 
+    transition:
         border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
         color 0.5s cubic-bezier(0.4, 0, 0.2, 1)
         box-shadow 0.25s ease, transform 0.25s ease;
@@ -4044,28 +4031,28 @@
         <div class="stats">
             <div class="card" id="booksCard">
                 <div class="card-header">
-                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Books</h3>
+                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;"><i class="fas fa-book" style="margin-right: 8px; color: var(--primary);"></i>Books</h3>
                 </div>
                 <div class="count">{{ $booksCount }}</div>
                 <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openAddBookModal()">
+                    <button class="btn btn-sm btn-primary" onclick="openAddBookModal()" title="Add New Book">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline" onclick="openBooksTable()">
+                    <button class="btn btn-sm btn-outline" onclick="openBooksTable()" title="View All Books">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
             </div>
             <div class="card" id="membersCard">
                 <div class="card-header">
-                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Members</h3>
+                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;"><i class="fas fa-users" style="margin-right: 8px; color: var(--primary);"></i>Members</h3>
                 </div>
                 <div class="count">{{ $membersCount }}</div>
                 <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()">
+                    <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()" title="Add New Member">
                         <i class="fas fa-plus"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline" onclick="openMembersTable()">
+                    <button class="btn btn-sm btn-outline" onclick="openMembersTable()" title="View All Members">
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
@@ -4190,7 +4177,7 @@
             </div>
             </div>
         <!-- Analytics Section -->
-        <div class="analytics-section" style="margin-top: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem;">
+        <div class="analytics-section" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 2rem;">
             <!-- Book Popularity Analytics (Full Width) -->
             <div class="card">
                 <div class="card-header">
@@ -5400,6 +5387,7 @@
                 nonJulitaView.style.display = 'block';
             }
         }
+
         // Function to switch between activity views
         function switchActivityView(viewType) {
             loadTopBooks();
