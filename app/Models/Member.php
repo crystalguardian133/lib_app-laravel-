@@ -22,10 +22,13 @@ class Member extends Model
         'municipality',
         'province',
         'contactnumber',
+        'email',
+        'email_verified',
         'school',
         'memberdate',
         'member_time',
-        'photo'
+        'photo',
+        'phone_verified'
     ];
 
     // Automatically cast date fields (optional)

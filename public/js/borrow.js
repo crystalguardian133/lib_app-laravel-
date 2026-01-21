@@ -87,6 +87,14 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast-notification toast-${type}`;
     toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100000000000;
+        max-width: 400px;
+        word-wrap: break-word;
+    `;
     document.body.appendChild(toast);
 
     setTimeout(() => {
@@ -99,6 +107,10 @@ function showToast(message, type = 'info') {
 // ======================
 
 function openBorrowModal() {
+    if (typeof window.setAutomaticDueDate === 'function') {
+        window.setAutomaticDueDate();
+    }
+    
     const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
     if (selectedRows.length === 0) {
         showToast("No books selected for borrowing", 'warning');
@@ -164,50 +176,9 @@ function openBorrowModal() {
         });
     }
 
-    // Philippine holidays for 2025
-    const philippineHolidays = [
-        '2025-01-01', '2025-02-25', '2025-04-17', '2025-04-18', '2025-04-19',
-        '2025-05-01', '2025-06-12', '2025-08-25', '2025-11-01', '2025-11-30',
-        '2025-12-25', '2025-12-30', '2025-12-31'
-    ];
-
-    function isPhilippineHoliday(dateString) {
-        return philippineHolidays.includes(dateString);
-    }
-
-    function calculatePhilippineBusinessDueDate() {
-        const now = new Date();
-        const philippineOffset = 8 * 60;
-        const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-        const philippineTime = new Date(utcTime + (philippineOffset * 60000));
-
-        const startDate = new Date(philippineTime);
-        startDate.setDate(startDate.getDate() + 1);
-
-        let workingDaysCount = 0;
-        let currentDate = new Date(startDate);
-        const workingDates = [];
-
-        while (workingDaysCount < 10) {
-            currentDate.setDate(currentDate.getDate() + 1);
-            const dayOfWeek = currentDate.getDay();
-            const dateString = currentDate.toISOString().split('T')[0];
-
-            if (dayOfWeek >= 1 && dayOfWeek <= 5 && !isPhilippineHoliday(dateString)) {
-                workingDaysCount++;
-                workingDates.push(new Date(currentDate));
-            }
-        }
-
-        return { finalDate: currentDate, workingDates: workingDates };
-    }
-
-    const dueDateResult = calculatePhilippineBusinessDueDate();
-    const dueDate = dueDateResult.finalDate;
-
-    const dueDateInput = document.getElementById('dueDate');
-    if (dueDateInput) {
-        dueDateInput.value = dueDate.toISOString().split('T')[0];
+    // Set automatic due date when modal opens
+    if (typeof window.setAutomaticDueDate === 'function') {
+        window.setAutomaticDueDate();
     }
 
     initializeCustomTimePicker();
@@ -270,8 +241,16 @@ function confirmBorrow() {
         return;
     }
 
-    if (!dueDate || !dueTime) {
-        showToast('Please set due date and time', 'warning');
+    if (!dueTime) {
+        showToast('Please set due time', 'warning');
+        return;
+    }
+
+    // Check if due time is within allowed borrowing hours (7:30 AM - 4:30 PM)
+    const minTime = '07:30';
+    const maxTime = '16:30';
+    if (dueTime < minTime || dueTime > maxTime) {
+        showToast('Borrowing is only allowed between 7:30 AM and 4:30 PM', 'warning');
         return;
     }
 
@@ -371,6 +350,8 @@ function borrowOne(bookId) {
     });
 
     row.classList.add('selected');
+    
+    // Open borrow modal - this will now automatically set due date
     openBorrowModal();
 }
 
@@ -429,64 +410,25 @@ function escapeHtml(text) {
 }
 
 function initializeCustomTimePicker() {
-    const dueHour = document.getElementById('dueHour');
-    const dueMinute = document.getElementById('dueMinute');
-    const dueAmPm = document.getElementById('dueAmPm');
     const dueTimeHidden = document.getElementById('dueTime');
+    const dueTimeText = document.getElementById('dueTimeText');
 
-    if (!dueHour || !dueMinute || !dueAmPm || !dueTimeHidden) {
-        console.error('Custom time picker elements not found');
+    if (!dueTimeHidden) {
+        console.error('Due time hidden input not found');
         return;
     }
 
-    const now = new Date();
-    const philippineOffset = 8 * 60;
-    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const philippineTime = new Date(utcTime + (philippineOffset * 60000));
+    // Set to maximum allowed time (4:30 PM / 16:30) - fixed value
+    const maxHour24 = 16; // 4 PM in 24-hour format
+    const maxMinute = 30; // 30 minutes
 
-    let currentHour = philippineTime.getHours();
-    const currentMinute = philippineTime.getMinutes();
-
-    let ampm = 'AM';
-    if (currentHour >= 12) {
-        ampm = 'PM';
-        if (currentHour > 12) {
-            currentHour -= 12;
-        }
-    } else if (currentHour === 0) {
-        currentHour = 12;
+    // Set hidden time input to maximum allowed time
+    dueTimeHidden.value = `${maxHour24.toString().padStart(2, '0')}:${maxMinute.toString().padStart(2, '0')}`;
+    
+    // Update display text if element exists
+    if (dueTimeText) {
+        dueTimeText.textContent = '4:30 PM';
     }
-
-    const minuteOptions = [0, 15, 30, 45];
-    const roundedMinute = minuteOptions.reduce((prev, curr) =>
-        Math.abs(curr - currentMinute) < Math.abs(prev - currentMinute) ? curr : prev
-    );
-
-    dueHour.value = currentHour.toString();
-    dueMinute.value = roundedMinute.toString().padStart(2, '0');
-    dueAmPm.value = ampm;
-
-    function updateHiddenTimeInput() {
-        const hour = parseInt(dueHour.value);
-        const minute = dueMinute.value;
-        const ampm = dueAmPm.value;
-
-        let hour24 = hour;
-        if (ampm === 'PM' && hour !== 12) {
-            hour24 = hour + 12;
-        } else if (ampm === 'AM' && hour === 12) {
-            hour24 = 0;
-        }
-
-        const timeString = `${hour24.toString().padStart(2, '0')}:${minute}`;
-        dueTimeHidden.value = timeString;
-    }
-
-    dueHour.addEventListener('change', updateHiddenTimeInput);
-    dueMinute.addEventListener('change', updateHiddenTimeInput);
-    dueAmPm.addEventListener('change', updateHiddenTimeInput);
-
-    updateHiddenTimeInput();
 }
 
 function clearMemberInfo() {
@@ -928,7 +870,7 @@ function showQRScannerModal(type) {
 
     modal.classList.add('show');
     modal.style.display = 'flex';
-    modal.style.zIndex = '999999999';
+    modal.style.zIndex = '999999';
     modal.style.position = 'fixed';
     modal.style.top = '0';
     modal.style.left = '0';
@@ -940,13 +882,13 @@ function showQRScannerModal(type) {
     const modalContent = modal.querySelector('.modal-content');
     if (modalContent) {
         modalContent.style.position = 'relative';
-        modalContent.style.zIndex = '999999998';
+        modalContent.style.zIndex = '999998';
         modalContent.style.margin = 'auto';
     }
 
     const borrowModal = document.getElementById('borrowModal');
     if (borrowModal) {
-        borrowModal.style.zIndex = '999999900';
+        borrowModal.style.zIndex = '999900';
     }
 
     setTimeout(() => {

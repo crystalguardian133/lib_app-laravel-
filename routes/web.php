@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ChatbotController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\SystemLogsController;
 use App\Models\Member;
 
 // Redirect root to the dashboard
@@ -61,6 +63,18 @@ Route::middleware('auth')->group(function () {
 });
 
 // ===========================
+// ANALYTICS ROUTES
+// ===========================
+Route::middleware('auth')->group(function () {
+    Route::get('/api/analytics/monthly-borrows', [AdminController::class, 'getMonthlyBorrowsApi'])->name('api.analytics.monthly-borrows');
+    Route::get('/api/analytics/active-areas', [AdminController::class, 'getActiveAreasApi'])->name('api.analytics.active-areas');
+    Route::get('/api/analytics/books-trend', [AdminController::class, 'getBooksTrendApi'])->name('api.analytics.books-trend');
+    Route::get('/api/analytics/book-borrowing-frequency', [AdminController::class, 'getBookBorrowingFrequencyApi'])->name('api.analytics.book-borrowing-frequency');
+    Route::get('/api/analytics/peak-hours', [AdminController::class, 'getPeakHoursApi'])->name('api.analytics.peak-hours');
+    Route::get('/api/analytics/age-activity', [AdminController::class, 'getAgeActivityApi'])->name('api.analytics.age-activity');
+});
+
+// ===========================
 // BOOKS ROUTES
 // ===========================
 Route::resource('books', BookController::class);
@@ -73,8 +87,18 @@ Route::post('/api/media/cleanup-temp', [BookController::class, 'cleanupTempImage
 // MEMBERS ROUTES
 // ===========================
 Route::resource('members', MemberController::class);
+Route::get('/members/{memberId}/borrowing-history', [MemberController::class, 'getBorrowingHistory'])->name('members.borrowing-history');
+Route::get('/members/{memberId}/timelog-history', [MemberController::class, 'getTimelogHistory'])->name('members.timelog-history');
+Route::post('/members/{memberId}/send-email-code', [MemberController::class, 'sendEmailCode'])->name('members.send-email-code');
+Route::post('/members/{memberId}/verify-email-code', [MemberController::class, 'verifyEmailCode'])->name('members.verify-email-code');
+Route::post('/members/send-email-code-registration', [MemberController::class, 'sendEmailCodeForRegistration'])->name('members.send-email-code-registration');
+Route::post('/members/verify-email-code-registration', [MemberController::class, 'verifyEmailCodeForRegistration'])->name('members.verify-email-code-registration');
 Route::get('/members/search', [BorrowController::class, 'search']);
 Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
+
+// API Routes for Dashboard
+Route::middleware('auth')->group(function () {
+    // Demographics route moved to api.php
 });
 
 // Card JSON endpoint
@@ -102,12 +126,12 @@ Route::get('/members/{id}/json', function ($id) {
         'barangay'   => $member->barangay ?? '',
         'municipality' => $member->municipality ?? '',
         'province'   => $member->province ?? '',
-        'contactNumber' => $member->contact_number ?? '',
-        'memberdate' => $member->memberdate 
-                        ? \Carbon\Carbon::parse($member->memberdate)->format('Y-m-d') 
+        'contactNumber' => $member->contactnumber ?? '',
+        'memberdate' => $member->memberdate
+                        ? \Carbon\Carbon::parse($member->memberdate)->format('Y-m-d')
                         : '',
-        'photo'      => $member->photo 
-                        ? URL::to('/resource/member_images/' . $member->photo) 
+        'photo'      => $member->photo
+                        ? URL::to('/resource/member_images/' . $member->photo)
                         : '',
         'qr'         => URL::to('/qrcode/members/member-' . $member->id . '.png'),
     ]);
@@ -128,7 +152,24 @@ Route::get('/transactions/overdue', [TransactionController::class, 'overdue'])->
 // TIME LOG ROUTES
 // ===========================
 Route::get('/timelog', [TimeLogController::class, 'index'])->name('timelog.index');
+Route::get('/qr-scanner', [TimeLogController::class, 'qrScanner'])->name('qr-scanner');
 Route::get('/timelog/search', [TimeLogController::class, 'search']);
 Route::post('/timelog/time-in', [TimeLogController::class, 'timeIn']);
 Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);
 Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
+
+// ===========================
+// SYSTEM LOGS ROUTES
+// ===========================
+Route::middleware('auth')->group(function () {
+    Route::get('/system-logs', [SystemLogsController::class, 'index'])->name('system-logs.index');
+    Route::post('/system-logs/clear', [SystemLogsController::class, 'clear'])->name('system-logs.clear');
+});
+
+// ===========================
+// ADMIN SETTINGS ROUTES
+// ===========================
+Route::middleware('auth')->group(function () {
+    Route::post('/admin/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
+});
+});

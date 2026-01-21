@@ -204,24 +204,42 @@
   body:not(.dark-mode) .sidebar .label {
     color: #1a1a1a;
   }
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: var(--spacing-xl);
-    transition: var(--transition);
-  }
-  .sidebar-header .logo {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    border-radius: var(--radius);
-    transition: var(--transition-spring);
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
-  }
-  .sidebar-header .logo:hover {
-    transform: scale(1.05) rotate(2deg);
-  }
+  /* Sidebar Header Styles - Ensure these are in your CSS */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--spacing-xl);
+  transition: var(--transition);
+}
+
+.sidebar-header .logo {
+  width: 170px;
+  height: 170px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  transition: var(--transition-spring);
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+}
+
+.sidebar-header .logo:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.sidebar-header .label {
+  display: block !important;
+  font-weight: 700;
+  font-size: 1.27rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: var(--transition);
+  opacity: 1;
+  color: var(--primary) !important;
+  visibility: visible !important;
+}
   .label {
     font-weight: 700;
     font-size: 1.1rem;
@@ -449,6 +467,7 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
   }
+
 
   .books-content::-webkit-scrollbar {
     width: 6px;
@@ -1021,7 +1040,7 @@
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 2000;
+    z-index: 999997; /* Base modal z-index */
     justify-content: center;
     align-items: center;
     opacity: 0;
@@ -1038,7 +1057,7 @@
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 2000;
+    z-index: 999997; /* Base modal overlay z-index */
     justify-content: center;
     align-items: center;
     opacity: 0;
@@ -1053,64 +1072,16 @@
     display: flex !important;
     opacity: 1;
     animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 9999 !important;
   }
 
-  /* Z-index hierarchy for modals */
+  /* Z-index hierarchy for modals - Highest to Lowest */
   #borrowModal {
-    z-index: 999999900 !important; /* Lower than QR scanner */
+    z-index: 999998 !important; /* Borrow modal above base modals */
   }
 
   #qrScannerModal {
-    z-index: 999999999 !important; /* HIGHEST z-index */
+    z-index: 999999 !important; /* QR scanner modal highest among modals */
   }
-
-  #qrScannerModal.show {
-    z-index: 999999999 !important;
-  }
-
-/* QR SCANNER MODAL - CRITICAL FIXES */
-#qrScannerModal {
-    display: none; /* Remove !important */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 99999;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none; /* Prevent clicks when hidden */
-}
-
-#qrScannerModal.show {
-    display: flex !important;
-    opacity: 1 !important;
-    pointer-events: auto !important; /* Allow clicks when shown */
-}
-
-#qrScannerModal .modal-content {
-    max-width: 500px;
-    background: var(--surface-elevated);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    box-shadow: var(--shadow-xl);
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    z-index: 100000;
-    pointer-events: auto; /* Ensure content is clickable */
-}
-
-/* Prevent other modals from interfering */
-.modal:not(#qrScannerModal) {
-    z-index: 2000;
-}
 @keyframes slideUp {
     from { 
         opacity: 0; 
@@ -1417,7 +1388,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     box-shadow: var(--shadow-lg);
-    z-index: 9999;
+    z-index: 99999999999;
     animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     max-width: 320px;
     backdrop-filter: var(--glass-blur);
@@ -2119,6 +2090,214 @@ body.dark-mode .premium-upload-area:hover {
   border-color: var(--accent);
 }
 
+/* QR Scanner Modal - Right Side */
+.qr-scanner-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 350px;
+  height: 100vh;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+  z-index: 9999;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-scanner-modal.active {
+  transform: translateX(0);
+}
+
+.qr-scanner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-scanner-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-elevated);
+}
+
+.qr-scanner-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-scanner-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.qr-scanner-close:hover {
+  background: var(--glass-bg);
+  color: var(--danger);
+}
+
+.qr-scanner-body {
+  flex: 1;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.qr-reader-container {
+  width: 100%;
+  height: 300px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.qr-placeholder i {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.qr-instruction {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* QR Scanner Modal - Right Side */
+.qr-scanner-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 350px;
+  height: 100vh;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+  z-index: 9999;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-scanner-modal.active {
+  transform: translateX(0);
+}
+
+.qr-scanner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-scanner-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-elevated);
+}
+
+.qr-scanner-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr-scanner-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.qr-scanner-close:hover {
+  background: var(--glass-bg);
+  color: var(--danger);
+}
+
+.qr-scanner-body {
+  flex: 1;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.qr-reader-container {
+  width: 100%;
+  height: 300px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.qr-placeholder i {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.qr-instruction {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 /* Animations */
 @keyframes iconBounce {
   0% { transform: scale(0) rotate(-180deg); }
@@ -2152,33 +2331,38 @@ body.dark-mode .premium-upload-area:hover {
                 <span class="label">Member Time-in/out</span>
             </a>
         </nav>
-         <!-- Logout Button -->
-         <div class="logout-section" style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; justify-content: center;">
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
-                @csrf
-                <button type="submit" class="logout-btn" style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    width: 160px;
-                    padding: 10px 12px;
-                    background: transparent;
-                    color: var(--text-secondary);
-                    border: 1px solid var(--border);
-                    border-radius: var(--radius);
-                    font-size: 12px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: none;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                ">
-                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
-                    <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
-                </button>
-            </form>
+         <!-- Settings and Logout Buttons -->
+         <div style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="logout-section" style="display: flex; justify-content: center; flex: 1;">
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+                    @csrf
+                    <button type="submit" class="logout-btn" style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        width: 100%;
+                        padding: 10px 12px;
+                        background: transparent;
+                        color: var(--text-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: var(--radius);
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: none;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">
+                        <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                        <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
+                    </button>
+                </form>
+            </div>
         </div>
           <div class="dark-toggle">
             <label class="switch" title="Toggle Dark Mode">
@@ -2209,6 +2393,9 @@ body.dark-mode .premium-upload-area:hover {
                         <div class="search-container">
                             <input type="text" class="search-bar" placeholder="Search by title, author, or genre..." id="searchInput">
                         </div>
+                        <button class="btn btn-success" onclick="openQuickBorrowModal()">
+                            <i class="fas fa-hand-holding"></i> Quick Borrow
+                        </button>
                         <button class="btn btn-outline" onclick="enterSelectionMode()" id="selectButton">
                             <i class="fas fa-check-square"></i> Select
                         </button>
@@ -2218,7 +2405,6 @@ body.dark-mode .premium-upload-area:hover {
                     </div>
                 </div>
             </div>
-
             <!-- Books Table -->
             <div class="table-container">
                 <div class="table-wrapper">
@@ -2639,29 +2825,23 @@ body.dark-mode .premium-upload-area:hover {
         </div>
     </div>
 
-
-    <!-- QR SCANNER MODAL -->
-    <div class="modal" id="qrScannerModal" style="display: none; z-index: 999999999 !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; justify-content: center !important; align-items: center !important;">
-        <div class="modal-content" style="max-width: 500px; text-align: center; position: relative; z-index: 999999998 !important; background: var(--surface-elevated); margin: auto;" onclick="event.stopPropagation();">
-            <div class="modal-header" style="position: relative; padding: 20px; border-bottom: 2px solid var(--border-light);">
-                <h3 class="modal-title" style="margin: 0; display: flex; align-items: center; gap: 12px; justify-content: center;">
-                    <i class="fas fa-qrcode"></i>
-                    QR Code Scanner
-                </h3>
-                <button class="close-modal" onclick="closeQRScanner()" style="position: absolute; right: 20px; top: 20px; z-index: 999999999 !important; background: var(--glass-bg); border: 1px solid var(--glass-border); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: var(--text-secondary);">
+    <!-- QR SCANNER MODAL - RIGHT SIDE -->
+    <div class="qr-scanner-modal" id="qrScannerModal">
+        <div class="qr-scanner-content">
+            <div class="qr-scanner-header">
+                <h3><i class="fas fa-qrcode"></i> QR Scanner</h3>
+                <button class="qr-scanner-close" onclick="closeQRScannerModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body" style="padding: 30px;">
-                <div id="qr-reader" style="width: 100%; min-height: 300px; border: 2px solid var(--border); border-radius: var(--radius); background: var(--glass-bg); display: flex; align-items: center; justify-content: center;"></div>
-                <p id="qr-instruction" style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem; text-align: center;">
-                    Point your camera at a QR code to scan
-                </p>
-                <div id="qr-buttons" style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
-                    <button type="button" class="btn btn-outline" onclick="closeQRScanner()" style="min-width: 120px;">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
+            <div class="qr-scanner-body">
+                <div class="qr-reader-container" id="qr-reader-container">
+                    <div class="qr-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Initializing camera...</p>
+                    </div>
                 </div>
+                <p class="qr-instruction">Point camera at QR codes to scan</p>
             </div>
         </div>
     </div>
@@ -2743,14 +2923,14 @@ body.dark-mode .premium-upload-area:hover {
                         <p class="modal-description">Select books and set borrowing details</p>
                     </div>
                 </div>
-                <button class="modern-close-btn" onclick="closeBorrowModal()" aria-label="Close modal">
+                <button class="modern-close-btn" onclick="closeBorrowModalWithScanner()" aria-label="Close modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <!-- Enhanced Scrollable Body -->
             <div class="modern-modal-body">
-                <!-- Premium Member Information Section -->
-                <div class="premium-form-section member-section">
+                    <!-- Premium Member Information Section -->
+                    <div class="premium-form-section member-section">
                     <div class="section-header">
                         <div class="section-icon-box">
                             <i class="fas fa-user"></i>
@@ -2793,19 +2973,23 @@ body.dark-mode .premium-upload-area:hover {
 
                     <div class="elegant-form-grid">
                         <div class="premium-form-group">
-                            <label for="dueDate" class="premium-label">
+                            <label class="premium-label">
                                 <i class="fas fa-calendar-day"></i>
                                 <span class="label-text">Due Date</span>
                                 <span class="required-indicator">*</span>
                             </label>
                             <div class="input-wrapper">
-                                <input type="date" id="dueDate" class="premium-input" min="" onchange="validateDueDate()">
+                                <div id="dueDateDisplay" class="premium-input" style="background: var(--surface-elevated); cursor: default; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; padding: 12px 16px;">
+                                    <i class="fas fa-calendar-check" style="margin-right: 8px; color: var(--primary);"></i>
+                                    <span id="dueDateText">Today</span>
+                                </div>
                                 <div class="input-focus-line"></div>
                             </div>
+                            <!-- Hidden input to store the actual date value -->
+                            <input type="hidden" id="dueDate" name="dueDate" value="">
                             <small style="display:block; margin-top:8px; color:var(--text-secondary); font-size:0.85rem;">
-                                <i class="fas fa-info-circle"></i> Only working days (Mon-Fri, excluding holidays) are available
+                                <i class="fas fa-info-circle"></i> Automatically set to today's date
                             </small>
-                            <small id="dateError" style="display:block; margin-top:5px; color:var(--danger); font-size:0.8rem; display:none;"></small>
                         </div>
 
                         <div class="premium-form-group">
@@ -2814,94 +2998,17 @@ body.dark-mode .premium-upload-area:hover {
                                 <span class="label-text">Due Time</span>
                                 <span class="required-indicator">*</span>
                             </label>
-                            <!-- Custom Precise Time Picker -->
-                            <div id="customTimePicker" class="custom-time-picker" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
-                                <select id="dueHour" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                </select>
-                                <span style="color: var(--text-secondary); font-weight: 600; font-size: 1.1rem;">:</span>
-                                <select id="dueMinute" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
-                                    <option value="00">00</option>
-                                    <option value="01">01</option>
-                                    <option value="02">02</option>
-                                    <option value="03">03</option>
-                                    <option value="04">04</option>
-                                    <option value="05">05</option>
-                                    <option value="06">06</option>
-                                    <option value="07">07</option>
-                                    <option value="08">08</option>
-                                    <option value="09">09</option>
-                                    <option value="10">10</option>
-                                    <option value="11">11</option>
-                                    <option value="12">12</option>
-                                    <option value="13">13</option>
-                                    <option value="14">14</option>
-                                    <option value="15">15</option>
-                                    <option value="16">16</option>
-                                    <option value="17">17</option>
-                                    <option value="18">18</option>
-                                    <option value="19">19</option>
-                                    <option value="20">20</option>
-                                    <option value="21">21</option>
-                                    <option value="22">22</option>
-                                    <option value="23">23</option>
-                                    <option value="24">24</option>
-                                    <option value="25">25</option>
-                                    <option value="26">26</option>
-                                    <option value="27">27</option>
-                                    <option value="28">28</option>
-                                    <option value="29">29</option>
-                                    <option value="30">30</option>
-                                    <option value="31">31</option>
-                                    <option value="32">32</option>
-                                    <option value="33">33</option>
-                                    <option value="34">34</option>
-                                    <option value="35">35</option>
-                                    <option value="36">36</option>
-                                    <option value="37">37</option>
-                                    <option value="38">38</option>
-                                    <option value="39">39</option>
-                                    <option value="40">40</option>
-                                    <option value="41">41</option>
-                                    <option value="42">42</option>
-                                    <option value="43">43</option>
-                                    <option value="44">44</option>
-                                    <option value="45">45</option>
-                                    <option value="46">46</option>
-                                    <option value="47">47</option>
-                                    <option value="48">48</option>
-                                    <option value="49">49</option>
-                                    <option value="50">50</option>
-                                    <option value="51">51</option>
-                                    <option value="52">52</option>
-                                    <option value="53">53</option>
-                                    <option value="54">54</option>
-                                    <option value="55">55</option>
-                                    <option value="56">56</option>
-                                    <option value="57">57</option>
-                                    <option value="58">58</option>
-                                    <option value="59">59</option>
-                                </select>
-                                <select id="dueAmPm" class="premium-input" style="flex: 1; max-width: 80px; height: 44px; font-size: 1rem;">
-                                    <option value="AM">AM</option>
-                                    <option value="PM">PM</option>
-                                </select>
+                            <div class="input-wrapper">
+                                <div id="dueTimeDisplay" class="premium-input" style="background: var(--surface-elevated); cursor: default; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; padding: 12px 16px;">
+                                    <i class="fas fa-clock" style="margin-right: 8px; color: var(--primary);"></i>
+                                    <span id="dueTimeText">4:30 PM</span>
+                                </div>
+                                <div class="input-focus-line"></div>
                             </div>
                             <!-- Hidden input to store the actual time value -->
-                            <input type="hidden" id="dueTime" name="dueTime">
+                            <input type="hidden" id="dueTime" name="dueTime" value="16:30">
                             <small style="display:block; margin-top:8px; color:var(--text-secondary); font-size:0.85rem;">
-                                <i class="fas fa-mouse-pointer"></i> Use mouse wheel or type numbers to adjust time
+                                <i class="fas fa-info-circle"></i> Due time is automatically set to 4:30 PM (maximum allowed)
                             </small>
                         </div>
                     </div>
@@ -2933,47 +3040,31 @@ body.dark-mode .premium-upload-area:hover {
                     </div>
                 </div>
 
-                <!-- Premium Quick Actions Section -->
-                <div class="premium-form-section actions-section">
-                    <div class="section-header">
-                        <div class="section-icon-box">
-                            <i class="fas fa-qrcode"></i>
-                        </div>
-                        <div class="section-info">
-                            <h3 class="section-title">Quick Actions</h3>
-                            <p class="section-subtitle">Scan QR codes to quickly add members and books</p>
-                        </div>
-                    </div>
-
-                    <div class="footer-actions" style="margin-top: var(--spacing-lg);">
-                        <button type="button" class="btn-submit-premium" onclick="openQRScanner('member')" style="flex: 1; margin-right: 8px;">
-                            <i class="fas fa-qrcode"></i>
-                            <span>Scan Member QR</span>
-                        </button>
-                        <button type="button" class="btn-cancel-premium" onclick="openQRScanner('book')" style="flex: 1; margin-left: 8px;">
-                            <i class="fas fa-qrcode"></i>
-                            <span>Scan Books</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- Premium Footer with Enhanced Actions -->
-            <div class="modern-modal-footer">
-                <div class="footer-actions">
-                    <button type="button" class="btn-cancel-premium" onclick="closeBorrowModal()">
-                        <i class="fas fa-times"></i>
-                        <span>Cancel</span>
-                    </button>
-                    <button type="button" class="btn-submit-premium" onclick="confirmBorrow()" id="confirmBorrowBtn">
-                        <i class="fas fa-check"></i>
-                        <span>Confirm Borrow</span>
-                        <div class="btn-glow"></div>
-                    </button>
-                </div>
             </div>
         </div>
     </div>
-  <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
+
+    <!-- QR SCANNER MODAL - RIGHT SIDE -->
+    <div class="qr-scanner-modal" id="qrScannerModal">
+        <div class="qr-scanner-content">
+            <div class="qr-scanner-header">
+                <h3><i class="fas fa-qrcode"></i> QR Scanner</h3>
+                <button class="qr-scanner-close" onclick="closeQRScannerModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="qr-scanner-body">
+                <div class="qr-reader-container" id="qr-reader-container">
+                    <div class="qr-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Initializing camera...</p>
+                    </div>
+                </div>
+                <p class="qr-instruction">Point camera at QR codes to scan</p>
+            </div>
+        </div>
+    </div>
+   <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
   <script src="{{ asset('js/borrow.js') }}"></script>
   <script src="{{ asset('js/bookadd.js') }}"></script>
   <script src="{{ asset('js/bookmanage.js') }}"></script>
@@ -3078,283 +3169,40 @@ body.dark-mode .premium-upload-area:hover {
                 };
             }
 
-            // Calculate and set business due date
-            const dueDateResult = calculatePhilippineBusinessDueDate();
-            const dueDateInput = document.getElementById('dueDate');
+            // Global function to set automatic due date
+            window.setAutomaticDueDate = function() {
+                // Get current date in Philippine timezone (Asia/Manila, UTC+8)
+                const now = new Date();
+                const philippineOffset = 8 * 60; // 8 hours in minutes
+                const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const philippineTime = new Date(utcTime + (philippineOffset * 60000));
+                
+                // Format date to YYYY-MM-DD for the input
+                const year = philippineTime.getFullYear();
+                const month = String(philippineTime.getMonth() + 1).padStart(2, '0');
+                const day = String(philippineTime.getDate()).padStart(2, '0');
+                const dateString = `${year}-${month}-${day}`;
+                
+                const dueDateInput = document.getElementById('dueDate');
+                const dueDateText = document.getElementById('dueDateText');
 
-            // Set minimum date to tomorrow (no past dates or today)
-            const today = new Date();
-            const philippineOffset = 8 * 60;
-            const utcTime = today.getTime() + (today.getTimezoneOffset() * 60000);
-            const philippineTime = new Date(utcTime + (philippineOffset * 60000));
-            const tomorrow = new Date(philippineTime);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
-            dueDateInput.min = tomorrowStr;
-
-            // Set maximum date to 10 business days ahead (no dates beyond this)
-            dueDateInput.max = dueDateResult.date;
-
-            dueDateInput.value = dueDateResult.date;
-
-            // Set due time to current Philippine time rounded to nearest 15-minute interval
-            const currentHour = philippineTime.getHours();
-            const currentMinute = philippineTime.getMinutes();
-            const roundedMinute = Math.round(currentMinute / 15) * 15; // Round to nearest 15-minute interval
-
-            let adjustedHour = currentHour;
-            let adjustedMinute = roundedMinute;
-
-            // Handle minute overflow (e.g., 60 becomes 00 of next hour)
-            if (roundedMinute >= 60) {
-                adjustedMinute = 0;
-                adjustedHour = (currentHour + 1) % 24;
-            }
-
-            // Convert to 12-hour format
-            const hour12 = adjustedHour === 0 ? 12 : adjustedHour > 12 ? adjustedHour - 12 : adjustedHour;
-            const ampm = adjustedHour >= 12 ? 'PM' : 'AM';
-
-            // Set time picker values
-            document.getElementById('dueHour').value = hour12.toString();
-            document.getElementById('dueMinute').value = adjustedMinute.toString().padStart(2, '0');
-            document.getElementById('dueAmPm').value = ampm;
-            document.getElementById('dueTime').value = `${adjustedHour.toString().padStart(2, '0')}:${adjustedMinute.toString().padStart(2, '0')}`;
-
-            // Add scroll wheel functionality to time selectors
-            function addScrollWheelToTimeSelectors() {
-                const dueHour = document.getElementById('dueHour');
-                const dueMinute = document.getElementById('dueMinute');
-                const dueAmPm = document.getElementById('dueAmPm');
-
-                // Hour selector scroll
-                dueHour.addEventListener('wheel', function(e) {
-                    e.preventDefault();
-                    const currentValue = parseInt(this.value);
-                    let newValue;
-
-                    if (e.deltaY < 0) { // Scroll up - increase
-                        newValue = currentValue < 12 ? currentValue + 1 : 1;
-                    } else { // Scroll down - decrease
-                        newValue = currentValue > 1 ? currentValue - 1 : 12;
-                    }
-
-                    this.value = newValue.toString();
-                    updateHiddenTimeInput();
-                });
-
-                // Minute selector scroll
-                dueMinute.addEventListener('wheel', function(e) {
-                    e.preventDefault();
-                    const currentValue = parseInt(this.value);
-                    let newValue;
-
-                    if (e.deltaY < 0) { // Scroll up - increase
-                        newValue = currentValue < 59 ? currentValue + 1 : 0;
-                    } else { // Scroll down - decrease
-                        newValue = currentValue > 0 ? currentValue - 1 : 59;
-                    }
-
-                    this.value = newValue.toString().padStart(2, '0');
-                    updateHiddenTimeInput();
-                });
-
-                // AM/PM selector scroll
-                dueAmPm.addEventListener('wheel', function(e) {
-                    e.preventDefault();
-                    this.value = this.value === 'AM' ? 'PM' : 'AM';
-                    updateHiddenTimeInput();
-                });
-            }
-
-            // Function to update hidden time input when selectors change
-            function updateHiddenTimeInput() {
-                const dueHour = document.getElementById('dueHour');
-                const dueMinute = document.getElementById('dueMinute');
-                const dueAmPm = document.getElementById('dueAmPm');
-                const dueTimeHidden = document.getElementById('dueTime');
-
-                if (!dueHour || !dueMinute || !dueAmPm || !dueTimeHidden) return;
-
-                const hour = parseInt(dueHour.value);
-                const minute = dueMinute.value;
-                const ampm = dueAmPm.value;
-
-                let hour24 = hour;
-                if (ampm === 'PM' && hour !== 12) {
-                    hour24 = hour + 12;
-                } else if (ampm === 'AM' && hour === 12) {
-                    hour24 = 0;
+                if (dueDateInput && dueDateText) {
+                    // Set the hidden input value
+                    dueDateInput.value = dateString;
+                    
+                    // Format date to readable format
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const formattedDate = philippineTime.toLocaleDateString('en-US', options);
+                    dueDateText.textContent = formattedDate;
+                    
+                    console.log('Automatic due date set to today:', formattedDate);
                 }
-
-                const timeString = `${hour24.toString().padStart(2, '0')}:${minute}`;
-                dueTimeHidden.value = timeString;
-            }
-
-            // Add keyboard input functionality to time selectors
-            function addKeyboardInputToTimeSelectors() {
-                const dueHour = document.getElementById('dueHour');
-                const dueMinute = document.getElementById('dueMinute');
-                const dueAmPm = document.getElementById('dueAmPm');
-
-                let hourInputBuffer = '';
-                let minuteInputBuffer = '';
-
-                // Hour selector keyboard input
-                dueHour.addEventListener('keydown', function(e) {
-                    // Allow backspace, delete, tab, escape, enter, and arrow keys
-                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
-                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
-                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
-                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
-                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
-                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
-                        return;
-                    }
-
-                    // Only allow numbers
-                    if (e.key < '0' || e.key > '9') {
-                        e.preventDefault();
-                        return;
-                    }
-
-                    e.preventDefault(); // Prevent default typing
-
-                    hourInputBuffer += e.key;
-
-                    // Validate and set hour
-                    let hourValue = parseInt(hourInputBuffer);
-                    if (hourValue >= 1 && hourValue <= 12) {
-                        this.value = hourValue.toString();
-                        updateHiddenTimeInput();
-                        hourInputBuffer = ''; // Clear buffer after successful input
-                    } else if (hourInputBuffer.length >= 2) {
-                        // Invalid input, clear buffer
-                        hourInputBuffer = '';
-                    }
-                });
-
-                // Clear hour buffer when focus changes
-                dueHour.addEventListener('blur', function() {
-                    hourInputBuffer = '';
-                });
-
-                // Minute selector keyboard input
-                dueMinute.addEventListener('keydown', function(e) {
-                    // Allow backspace, delete, tab, escape, enter, and arrow keys
-                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
-                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
-                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
-                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
-                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
-                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
-                        return;
-                    }
-
-                    // Only allow numbers
-                    if (e.key < '0' || e.key > '9') {
-                        e.preventDefault();
-                        return;
-                    }
-
-                    e.preventDefault(); // Prevent default typing
-
-                    minuteInputBuffer += e.key;
-
-                    // Validate and set minute
-                    let minuteValue = parseInt(minuteInputBuffer);
-                    if (minuteValue >= 0 && minuteValue <= 59) {
-                        this.value = minuteValue.toString().padStart(2, '0');
-                        updateHiddenTimeInput();
-                        minuteInputBuffer = ''; // Clear buffer after successful input
-                    } else if (minuteInputBuffer.length >= 2) {
-                        // Invalid input, clear buffer
-                        minuteInputBuffer = '';
-                    }
-                });
-
-                // Clear minute buffer when focus changes
-                dueMinute.addEventListener('blur', function() {
-                    minuteInputBuffer = '';
-                });
-
-                // AM/PM selector keyboard input
-                dueAmPm.addEventListener('keydown', function(e) {
-                    // Allow backspace, delete, tab, escape, enter, and arrow keys
-                    if ([8, 9, 27, 13, 37, 38, 39, 40].includes(e.keyCode) ||
-                        (e.ctrlKey && e.keyCode === 65) || // Ctrl+A
-                        (e.ctrlKey && e.keyCode === 67) || // Ctrl+C
-                        (e.ctrlKey && e.keyCode === 86) || // Ctrl+V
-                        (e.ctrlKey && e.keyCode === 88) || // Ctrl+X
-                        (e.ctrlKey && e.keyCode === 90)) { // Ctrl+Z
-                        return;
-                    }
-
-                    const key = e.key.toLowerCase();
-                    if (key === 'a' || key === 'p') {
-                        e.preventDefault();
-                        this.value = key === 'a' ? 'AM' : 'PM';
-                        updateHiddenTimeInput();
-                    }
-                });
-            }
-
-            // Initialize scroll wheel functionality
-            addScrollWheelToTimeSelectors();
-
-            // Add keyboard input functionality
-            addKeyboardInputToTimeSelectors();
-
-            // Add change event listeners to update hidden time input
-            document.getElementById('dueHour').addEventListener('change', updateHiddenTimeInput);
-            document.getElementById('dueMinute').addEventListener('change', updateHiddenTimeInput);
-            document.getElementById('dueAmPm').addEventListener('change', updateHiddenTimeInput);
-
-            // Date validation function
-            window.validateDueDate = function() {
-                const selectedDate = new Date(dueDateInput.value);
-                const dayOfWeek = selectedDate.getDay();
-                const dateString = selectedDate.toISOString().split('T')[0];
-                const dateError = document.getElementById('dateError');
-
-                // Check if it's a weekend
-                if (dayOfWeek === 0 || dayOfWeek === 6) {
-                    dateError.textContent = 'Weekends are not allowed. Please select a weekday.';
-                    dateError.style.display = 'block';
-                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
-                    return false;
-                }
-
-                // Check if it's a holiday
-                if (isPhilippineHoliday(dateString)) {
-                    dateError.textContent = 'This date is a Philippine holiday. Please select a different date.';
-                    dateError.style.display = 'block';
-                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
-                    return false;
-                }
-
-                // Check if it's before tomorrow (minimum allowed date)
-                const tomorrowCheck = new Date(tomorrowStr);
-                if (selectedDate < tomorrowCheck) {
-                    dateError.textContent = 'Dates before tomorrow are not allowed.';
-                    dateError.style.display = 'block';
-                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
-                    return false;
-                }
-
-                // Check if it's beyond the maximum allowed date (10 business days)
-                const maxDateCheck = new Date(dueDateResult.date);
-                if (selectedDate > maxDateCheck) {
-                    dateError.textContent = 'Dates beyond 10 business days are not allowed.';
-                    dateError.style.display = 'block';
-                    dueDateInput.value = dueDateResult.date; // Reset to calculated date
-                    return false;
-                }
-
-                // Valid date
-                dateError.style.display = 'none';
-                return true;
             };
+
+            // Initialize automatic due date setting
+            window.setAutomaticDueDate();
+
+
 
             // Initialize search functionality
             initializeSearch();
@@ -3398,7 +3246,536 @@ body.dark-mode .premium-upload-area:hover {
 
             // Initialize empty message display
             updateBooksListDisplay();
+
         });
+
+        // Initialize QR Scanner for Modal
+        function initializeQRScannerModal() {
+            const qrReaderElement = document.getElementById('qr-reader-container');
+            if (!qrReaderElement || typeof Html5Qrcode === 'undefined') {
+                console.log('QR Scanner not available');
+                return;
+            }
+
+            // Stop any existing scanner
+            if (window.modalQrCode) {
+                window.modalQrCode.stop().catch(() => {});
+            }
+
+            // Clear any existing content
+            qrReaderElement.innerHTML = '';
+
+            const html5QrCode = new Html5Qrcode("qr-reader-container");
+
+            // Configure scanner for continuous operation
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                supportedScanTypes: [Html5QrcodeSupportedFormats.QR_CODE]
+            };
+
+            // Start scanning
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText, decodedResult) => {
+                    // Handle successful scan
+                    handleModalQRScan(decodedText);
+                },
+                (errorMessage) => {
+                    // Ignore scanning errors, keep scanner running
+                }
+            ).then(() => {
+                console.log('Modal QR Scanner started successfully');
+                qrReaderElement.style.borderColor = 'var(--success)';
+            }).catch((err) => {
+                console.error('Modal QR Scanner initialization failed:', err);
+                qrReaderElement.innerHTML = `
+                    <div class="qr-placeholder">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Camera access denied or unavailable</p>
+                        <button onclick="initializeQRScannerModal()" class="btn btn-primary btn-sm" style="margin-top: 10px;">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+                qrReaderElement.style.borderColor = 'var(--danger)';
+            });
+
+            // Store scanner instance globally
+            window.modalQrCode = html5QrCode;
+        }
+
+        // Stop modal QR scanner
+        function stopQRScannerModal() {
+            if (window.modalQrCode) {
+                window.modalQrCode.stop().catch(() => {});
+                window.modalQrCode = null;
+            }
+        }
+
+        // Close borrow modal with scanner cleanup
+        function closeBorrowModalWithScanner() {
+            // Stop the QR scanner modal
+            closeQRScannerModal();
+
+            // Call the original close function
+            if (typeof closeBorrowModal === 'function') {
+                closeBorrowModal();
+            } else {
+                // Fallback: manually close modal
+                const modal = document.getElementById('borrowModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
+                }
+            }
+        }
+
+        // Global cooldown flag
+        let qrScanCooldown = false;
+
+        // Handle QR scan result for modal
+        function handleModalQRScan(decodedText) {
+            // Check if we're in cooldown
+            if (qrScanCooldown) {
+                return; // Ignore scans during cooldown
+            }
+
+            // Clean the decoded text
+            const cleanText = decodedText.trim();
+
+            // Try to parse QR code with multiple validation strategies
+            const qrData = parseQRCode(cleanText);
+
+            if (qrData) {
+                if (qrData.type === 'member') {
+                    handleModalMemberQR(qrData);
+                } else if (qrData.type === 'book') {
+                    handleModalBookQR(qrData);
+                } else {
+                    showToast('Unknown QR code type', 'error');
+                }
+            } else {
+                showToast('Invalid QR code format', 'error');
+            }
+
+            // Start cooldown regardless of success/failure
+            startQRScanCooldown();
+        }
+
+        // Robust QR code parsing function
+        function parseQRCode(text) {
+            try {
+                // Strategy 1: Try parsing as JSON
+                const jsonData = JSON.parse(text);
+
+                // Validate JSON structure
+                if (validateQRData(jsonData)) {
+                    return jsonData;
+                }
+            } catch (e) {
+                // Strategy 2: Try parsing as URL-encoded JSON
+                try {
+                    const urlDecoded = decodeURIComponent(text);
+                    const jsonData = JSON.parse(urlDecoded);
+
+                    if (validateQRData(jsonData)) {
+                        return jsonData;
+                    }
+                } catch (e2) {
+                    // Strategy 3: Try parsing as URL (for generated QR codes)
+                    try {
+                        const url = new URL(text);
+
+                        // Check if it's a book URL pattern: /books/{id}
+                        const bookMatch = url.pathname.match(/^\/books\/(\d+)$/);
+                        if (bookMatch) {
+                            return {
+                                type: 'book',
+                                id: parseInt(bookMatch[1])
+                            };
+                        }
+
+                        // Check if it's a member URL pattern: /members/{id}
+                        const memberMatch = url.pathname.match(/^\/members\/(\d+)$/);
+                        if (memberMatch) {
+                            // For members, we need more data, but we can at least identify it as a member
+                            return {
+                                type: 'member',
+                                id: parseInt(memberMatch[1])
+                            };
+                        }
+
+                        // Strategy 4: Try parsing URL parameters
+                        const params = new URLSearchParams(url.search);
+                        const type = params.get('type');
+                        const id = params.get('id');
+
+                        if (type && id) {
+                            return {
+                                type: type,
+                                id: parseInt(id) || id
+                            };
+                        }
+                    } catch (e3) {
+                        // Strategy 5: Try parsing as plain numeric ID (legacy support)
+                        const numericId = parseInt(text.trim());
+                        if (!isNaN(numericId) && numericId > 0) {
+                            return {
+                                type: 'book',
+                                id: numericId
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null; // Could not parse
+        }
+
+        // Validate QR data structure
+        function validateQRData(data) {
+            if (!data || typeof data !== 'object') {
+                return false;
+            }
+
+            // Check for required fields
+            if (!data.type || !data.id) {
+                return false;
+            }
+
+            // Validate type
+            if (!['member', 'book'].includes(data.type)) {
+                return false;
+            }
+
+            // Validate ID
+            if (data.type === 'member' || data.type === 'book') {
+                if (typeof data.id !== 'number' && typeof data.id !== 'string') {
+                    return false;
+                }
+                if (typeof data.id === 'string' && data.id.trim() === '') {
+                    return false;
+                }
+                if (typeof data.id === 'number' && (isNaN(data.id) || data.id <= 0)) {
+                    return false;
+                }
+            }
+
+            // Additional validation for member QR
+            if (data.type === 'member' && !data.name) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Start QR scan cooldown
+        function startQRScanCooldown() {
+            qrScanCooldown = true;
+
+            // Visual feedback - change scanner border to indicate cooldown
+            const scannerContainer = document.getElementById('qr-reader-container');
+            if (scannerContainer) {
+                scannerContainer.style.borderColor = 'var(--warning)';
+                scannerContainer.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+            }
+
+            // Show cooldown message
+            const instruction = document.querySelector('.qr-instruction');
+            if (instruction) {
+                instruction.textContent = 'Scan cooldown... Please wait';
+                instruction.style.color = 'var(--warning)';
+            }
+
+            // End cooldown after 3 seconds
+            setTimeout(() => {
+                qrScanCooldown = false;
+
+                // Reset visual feedback
+                if (scannerContainer) {
+                    scannerContainer.style.borderColor = 'var(--border)';
+                    scannerContainer.style.backgroundColor = '';
+                }
+
+                if (instruction) {
+                    instruction.textContent = 'Point camera at QR codes to scan';
+                    instruction.style.color = 'var(--text-muted)';
+                }
+            }, 3000);
+        }
+
+        // Handle member QR scan for modal
+        function handleModalMemberQR(data) {
+            // Check if borrow modal is open
+            const borrowModal = document.getElementById('borrowModal');
+            if (!borrowModal || borrowModal.style.display === 'none') {
+                showToast('Please open borrow modal first', 'warning');
+                return;
+            }
+
+            // If we have name from QR, use it directly
+            if (data.name) {
+                setMemberInModal(data.id, data.name);
+            } else {
+                // If only ID, fetch member data
+                fetchMemberData(data.id);
+            }
+        }
+
+        // Fetch member data by ID
+        function fetchMemberData(memberId) {
+            console.log('Fetching member data for ID:', memberId);
+
+            fetch(`/api/members/${memberId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    console.log('API response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: Member not found`);
+                    }
+                    return response.json();
+                })
+                .then(member => {
+                    console.log('Member data received:', member);
+
+                    // Construct full name from member data
+                    const first = member.first_name || '';
+                    const middle = member.middle_name || '';
+                    const last = member.last_name || '';
+                    const fullName = `${first} ${middle} ${last}`.trim().replace(/\s+/g, ' ');
+
+                    console.log('Constructed name:', fullName);
+
+                    setMemberInModal(member.id, fullName || 'Unknown Member');
+                })
+                .catch(error => {
+                    console.error('Error fetching member:', error);
+                    showToast('Member not found or network error', 'error');
+                    // Fallback: set with ID only
+                    setMemberInModal(memberId, `Member #${memberId}`);
+                });
+        }
+
+        // Set member information in borrow modal
+        function setMemberInModal(id, name) {
+            const memberName = document.getElementById('memberName');
+            const memberId = document.getElementById('memberId');
+
+            if (memberName && memberId) {
+                memberName.value = name;
+                memberId.value = id;
+                memberName.style.backgroundColor = 'var(--surface-elevated)';
+                memberName.style.cursor = 'default';
+
+                showToast(`Member scanned: ${name}`, 'success');
+
+                // Check for auto-confirm - trigger borrow process when member is scanned
+                checkAutoConfirmBorrow();
+            }
+        }
+
+        // Handle book QR scan for modal
+        function handleModalBookQR(data) {
+            const bookId = data.id;
+
+            // Check if borrow modal is open
+            const borrowModal = document.getElementById('borrowModal');
+            if (!borrowModal || borrowModal.style.display === 'none') {
+                showToast('Please open borrow modal first', 'warning');
+                return;
+            }
+
+            // Add book to selected books
+            if (typeof window.addBookToBorrow === 'function') {
+                window.addBookToBorrow(bookId);
+                showToast(`Book added to borrow list`, 'success');
+            } else {
+                // Fallback: manually add to selectedBooks array
+                if (typeof selectedBooks !== 'undefined') {
+                    if (!selectedBooks.includes(bookId)) {
+                        selectedBooks.push(bookId);
+
+                        // Update the UI manually
+                        updateSelectedBooksUI(bookId);
+
+                        showToast(`Book added to borrow list`, 'success');
+
+                        // Check for auto-confirm
+                        checkAutoConfirmBorrow();
+                    } else {
+                        showToast('Book already in borrow list', 'info');
+                    }
+                }
+            }
+        }
+
+        // Manually update selected books UI
+        function updateSelectedBooksUI(bookId) {
+            const selectedBooksList = document.getElementById('selectedBooksList');
+            if (!selectedBooksList) return;
+
+            // Get book title from the table
+            const bookRow = document.querySelector(`tr[data-id="${bookId}"]`);
+            const bookTitle = bookRow ? bookRow.dataset.title : `Book ${bookId}`;
+
+            // Create list item
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <span>${bookTitle}</span>
+                <button onclick="removeBookFromBorrow(${bookId})" style="background: var(--danger); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;">×</button>
+            `;
+
+            selectedBooksList.appendChild(listItem);
+
+            // Hide empty message
+            const emptyMessage = document.getElementById('emptyBooksMessage');
+            if (emptyMessage) {
+                emptyMessage.style.display = 'none';
+            }
+        }
+
+        // Remove book from borrow list
+        function removeBookFromBorrow(bookId) {
+            // Remove from array
+            if (typeof selectedBooks !== 'undefined') {
+                const index = selectedBooks.indexOf(bookId);
+                if (index > -1) {
+                    selectedBooks.splice(index, 1);
+                }
+            }
+
+            // Remove from UI
+            const selectedBooksList = document.getElementById('selectedBooksList');
+            if (selectedBooksList) {
+                const items = selectedBooksList.querySelectorAll('li');
+                items.forEach(item => {
+                    const button = item.querySelector('button');
+                    if (button && button.onclick.toString().includes(bookId.toString())) {
+                        item.remove();
+                    }
+                });
+
+                // Show empty message if no books left
+                if (selectedBooksList.children.length === 0) {
+                    const emptyMessage = document.getElementById('emptyBooksMessage');
+                    if (emptyMessage) {
+                        emptyMessage.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        // Check for automatic borrow confirmation
+        function checkAutoConfirmBorrow() {
+            const memberId = document.getElementById('memberId')?.value;
+            const hasMember = memberId && memberId.trim() !== '';
+
+            const hasBooks = (typeof selectedBooks !== 'undefined' && selectedBooks.length > 0) ||
+                            (document.getElementById('selectedBooksList')?.children.length > 0);
+
+            if (hasMember && hasBooks) {
+                // Auto-confirm borrow after a short delay
+                setTimeout(() => {
+                    performAutoBorrow();
+                }, 500); // Faster confirmation when member is scanned
+            }
+        }
+
+        // Perform automatic borrow transaction
+        function performAutoBorrow() {
+            const memberName = document.getElementById('memberName')?.value;
+            const memberId = document.getElementById('memberId')?.value;
+            const dueDate = document.getElementById('dueDate')?.value;
+            const dueTime = document.getElementById('dueTime')?.value;
+
+            if (!memberName || !memberId) {
+                showToast('Member information missing', 'error');
+                return;
+            }
+
+            if (!dueTime) {
+                showToast('Due time not set', 'error');
+                return;
+            }
+
+            // Get book IDs from selectedBooks array
+            const bookIds = [];
+            if (typeof selectedBooks !== 'undefined') {
+                bookIds.push(...selectedBooks);
+            }
+
+            if (bookIds.length === 0) {
+                showToast('No books selected', 'error');
+                return;
+            }
+
+            // Get CSRF token
+            const tokenElement = document.querySelector('meta[name="csrf-token"]');
+            if (!tokenElement) {
+                showToast('CSRF token not found', 'error');
+                return;
+            }
+            const token = tokenElement.content;
+
+            // Prepare borrow data
+            const borrowData = {
+                member_name: memberName,
+                member_id: memberId,
+                due_date: dueDate,
+                due_time: dueTime,
+                book_ids: bookIds,
+                books_data: bookIds.map(id => ({ id: id })), // Simple book data
+                books_count: bookIds.length,
+                transaction_summary: {
+                    member: `${memberName} (ID: ${memberId})`,
+                    books: `Selected ${bookIds.length} book(s)`,
+                    due_datetime: `${dueDate} ${dueTime}`,
+                    total_books: bookIds.length
+                }
+            };
+
+            console.log('Performing auto borrow:', borrowData);
+
+            // Send borrow request
+            fetch('/borrow/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(borrowData)
+            })
+            .then(response => {
+                console.log('Borrow response status:', response.status);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Borrow success:', data);
+                showToast(data.message || 'Books borrowed successfully!', 'success');
+
+                // Refresh the page to update book availability
+                setTimeout(() => {
+                    showToast('Refreshing page...', 'info');
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Borrow error:', error);
+                showToast('Failed to borrow books: ' + error.message, 'error');
+            });
+        }
 
         // Search functionality
         function initializeSearch() {
@@ -3507,6 +3884,61 @@ body.dark-mode .premium-upload-area:hover {
             if (typeof window.updateConfirmButtonState === 'function') {
                 window.updateConfirmButtonState();
             }
+        }
+
+        // Quick Borrow Modal function
+        function openQuickBorrowModal() {
+            // Clear member information
+            clearMemberInfo();
+
+            // Clear selected books
+            if (typeof selectedBooks !== 'undefined') {
+                selectedBooks = [];
+            }
+
+            // Clear the selected books list display
+            const selectedBooksList = document.getElementById('selectedBooksList');
+            if (selectedBooksList) {
+                selectedBooksList.innerHTML = '';
+            }
+            const emptyBooksMessage = document.getElementById('emptyBooksMessage');
+            if (emptyBooksMessage) {
+                emptyBooksMessage.style.display = 'block';
+            }
+
+            // Open the borrow modal
+            const modal = document.getElementById('borrowModal');
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+
+            // Open QR scanner modal
+            openQRScannerModal();
+        }
+
+        // Open QR Scanner Modal
+        function openQRScannerModal() {
+            const modal = document.getElementById('qrScannerModal');
+            modal.classList.add('active');
+
+            // Reset cooldown state
+            qrScanCooldown = false;
+
+            // Start QR scanner
+            setTimeout(() => {
+                initializeQRScannerModal();
+            }, 300);
+        }
+
+        // Close QR Scanner Modal
+        function closeQRScannerModal() {
+            const modal = document.getElementById('qrScannerModal');
+            modal.classList.remove('active');
+
+            // Stop QR scanner
+            stopQRScannerModal();
+
+            // Reset cooldown state
+            qrScanCooldown = false;
         }
 
         // Modal functions
@@ -4351,6 +4783,321 @@ body.dark-mode .premium-upload-area:hover {
                 e.preventDefault();
                 selectAllBooks();
             }
+        });
+    </script>
+
+    <!-- System Settings Modal -->
+    <div class="modal-overlay" id="settingsModal" style="z-index: 3000; display: none;">
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-cog" style="color: var(--primary); font-size: 20px;"></i>
+                    <span>System Settings</span>
+                </div>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <!-- Tabs Navigation -->
+                <div class="settings-tabs" style="display: flex; border-bottom: 2px solid var(--border); background: var(--surface-elevated);">
+                    <button class="settings-tab active" onclick="switchSettingsTab('password')" data-tab="password" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-key"></i>
+                        <span>Password</span>
+                    </button>
+                    <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-file-alt"></i>
+                        <span>System Logs</span>
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div style="padding: var(--spacing-xl);">
+                    <!-- Password Tab -->
+                    <div id="passwordTab" class="settings-tab-content active">
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-lock" style="color: var(--primary);"></i>
+                                Change Admin Password
+                            </h3>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg);">
+                                Update your administrator account password. Make sure to use a strong password.
+                            </p>
+                        </div>
+                        <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    Current Password
+                                </label>
+                                <input type="password" id="currentPassword" class="form-input" required placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-key" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    New Password
+                                </label>
+                                <input type="password" id="newPassword" class="form-input" required minlength="4" placeholder="Enter new password (min. 4 characters)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-check-double" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    Confirm New Password
+                                </label>
+                                <input type="password" id="confirmPassword" class="form-input" required minlength="4" placeholder="Confirm new password">
+                            </div>
+                            <button type="submit" class="btn btn-success" style="margin-top: var(--spacing-sm); width: 100%;">
+                                <i class="fas fa-save"></i> 
+                                <span>Change Password</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- System Logs Tab -->
+                    <div id="logsTab" class="settings-tab-content" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-file-alt" style="color: var(--accent);"></i>
+                                System Logs
+                            </h3>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
+                                View and manage system logs to monitor application activity, track errors, and troubleshoot issues. Logs contain detailed information about system events and operations.
+                            </p>
+                        </div>
+                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                                <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                    <i class="fas fa-file-alt" style="color: white; font-size: 20px;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                        Application Logs
+                                    </h4>
+                                    <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                        Access detailed system logs and activity records
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                            <i class="fas fa-external-link-alt"></i> 
+                            <span>Open System Logs Page</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .settings-btn:hover {
+            background: var(--surface-elevated) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .settings-btn:hover i {
+            animation: rotate 0.6s ease;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .settings-tab {
+            position: relative;
+        }
+
+        .settings-tab.active {
+            color: var(--primary) !important;
+            border-bottom-color: var(--primary) !important;
+            background: var(--surface) !important;
+        }
+
+        .settings-tab:hover:not(.active) {
+            background: var(--surface) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .settings-tab-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-tab-content.active {
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+            background: var(--surface-elevated);
+        }
+
+        .form-input:hover {
+            border-color: var(--gray-400);
+        }
+
+        body.dark-mode .form-input {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(71, 85, 105, 0.5);
+        }
+
+        body.dark-mode .form-input:focus {
+            background: rgba(30, 41, 59, 1);
+            border-color: var(--primary);
+        }
+    </style>
+
+    <script>
+        // Settings Modal Functions
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('active');
+                document.body.classList.add('modal-open');
+                // Reset to password tab
+                switchSettingsTab('password');
+            }
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+                const form = document.getElementById('changePasswordForm');
+                if (form) form.reset();
+            }
+        }
+
+        function switchSettingsTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.settings-tab-content').forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + 'Tab');
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`.settings-tab[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+        }
+
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (newPassword.length < 4) {
+                alert('New password must be at least 4 characters');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+
+            fetch('{{ route("admin.change-password") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                    new_password_confirmation: confirmPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password changed successfully!');
+                    closeSettingsModal();
+                } else {
+                    alert(data.message || 'Failed to change password');
+                }
+            })
+            .catch(error => {
+                console.error('Error changing password:', error);
+                alert('Error changing password');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordForm = document.getElementById('changePasswordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    changePassword();
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                const modal = document.getElementById('settingsModal');
+                if (e.target === modal && modal.style.display === 'flex') {
+                    closeSettingsModal();
+                }
+            });
         });
     </script>
 </body>

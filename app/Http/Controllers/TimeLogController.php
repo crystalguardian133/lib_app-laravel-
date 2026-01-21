@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Member;
 use App\Models\TimeLog;
+use App\Models\Transaction;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class TimeLogController extends Controller
@@ -12,7 +15,17 @@ class TimeLogController extends Controller
     public function index()
     {
         $logs = TimeLog::with('member')->whereNull('time_out')->get();
-        return view('timelog.index', compact('logs'));
+        $historyLogs = TimeLog::with('member')
+            ->whereNotNull('time_out')
+            ->orderBy('time_out', 'desc')
+            ->take(50)
+            ->get();
+        return view('timelog.index', compact('logs', 'historyLogs'));
+    }
+
+    public function qrScanner()
+    {
+        return view('timelog.qr-scanner');
     }
 
     public function search(Request $request)
@@ -40,10 +53,23 @@ class TimeLogController extends Controller
             return response()->json(['message' => '⚠️ Already timed in.']);
         }
 
-        TimeLog::create([
+        $timeLog = TimeLog::create([
             'member_id' => $member->id,
             'time_in' => now()
         ]);
+
+        // Log time-in activity
+        SystemLog::log(
+            'member_time_in',
+            "Member '{$member->first_name} {$member->last_name}' timed in",
+            Auth::id(),
+            [
+                'member_id' => $member->id,
+                'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                'time_log_id' => $timeLog->id,
+                'time_in' => $timeLog->time_in
+            ]
+        );
 
         return response()->json(['message' => '✅ Time-in recorded.']);
     }
@@ -57,7 +83,30 @@ class TimeLogController extends Controller
             return response()->json(['message' => '❌ Log not found.'], 404);
         }
 
+        // Check if member has pending books to return
+        $member = $log->member;
+        $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
+
+        if ($pendingBooks > 0) {
+            return response()->json(['message' => '❌ Cannot time out: Member has pending books to return.'], 400);
+        }
+
         $log->update(['time_out' => now()]);
+
+        // Log time-out activity
+        SystemLog::log(
+            'member_time_out',
+            "Member '{$log->member->first_name} {$log->member->last_name}' timed out",
+            Auth::id(),
+            [
+                'member_id' => $log->member->id,
+                'member_name' => trim($log->member->first_name . ' ' . ($log->member->middle_name ?? '') . ' ' . $log->member->last_name),
+                'time_log_id' => $log->id,
+                'time_in' => $log->time_in,
+                'time_out' => $log->time_out
+            ]
+        );
+
         return response()->json(['message' => '✅ Time-out recorded.']);
     }
 
@@ -74,15 +123,53 @@ class TimeLogController extends Controller
                     ->first();
 
         if ($log) {
+            // Check if member has pending books to return before time out
+            $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
+
+            if ($pendingBooks > 0) {
+                return response()->json(['message' => '❌ Cannot time out: Member has pending books to return.'], 400);
+            }
+
             // Time out
             $log->update(['time_out' => now()]);
+
+            // Log time-out activity
+            SystemLog::log(
+                'member_time_out_qr',
+                "Member '{$member->first_name} {$member->last_name}' timed out via QR scan",
+                Auth::id(),
+                [
+                    'member_id' => $member->id,
+                    'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                    'time_log_id' => $log->id,
+                    'time_in' => $log->time_in,
+                    'time_out' => $log->time_out,
+                    'method' => 'qr_scan'
+                ]
+            );
+
             return response()->json(['message' => '✅ Time-Out successful for ' . $member->name]);
         } else {
             // Time in
-            TimeLog::create([
+            $timeLog = TimeLog::create([
                 'member_id' => $member->id,
                 'time_in' => now()
             ]);
+
+            // Log time-in activity
+            SystemLog::log(
+                'member_time_in_qr',
+                "Member '{$member->first_name} {$member->last_name}' timed in via QR scan",
+                Auth::id(),
+                [
+                    'member_id' => $member->id,
+                    'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                    'time_log_id' => $timeLog->id,
+                    'time_in' => $timeLog->time_in,
+                    'method' => 'qr_scan'
+                ]
+            );
+
             return response()->json(['message' => '✅ Time-In successful for ' . $member->name]);
         }
     }
@@ -95,10 +182,56 @@ class TimeLogController extends Controller
         }
 
         if ($this->isMemberTimedIn($member->id)) {
+            // Check if member has pending books to return before time out
+            $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
+
+            if ($pendingBooks > 0) {
+                return response()->json(['message' => '❌ Cannot time out: Member has pending books to return.'], 400);
+            }
+
             $this->logoutMember($member->id);
+
+            // Get the log entry for logging
+            $log = TimeLog::where('member_id', $member->id)
+                          ->whereNull('time_out')
+                          ->latest()
+                          ->first();
+
+            if ($log) {
+                // Log time-out activity
+                SystemLog::log(
+                    'member_time_out_qr',
+                    "Member '{$member->first_name} {$member->last_name}' timed out via QR scan",
+                    Auth::id(),
+                    [
+                        'member_id' => $member->id,
+                        'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                        'time_log_id' => $log->id,
+                        'time_in' => $log->time_in,
+                        'time_out' => $log->time_out,
+                        'method' => 'qr_scan'
+                    ]
+                );
+            }
+
             return response()->json(['message' => '👋 Time-out successful!']);
         } else {
-            $this->logTimeIn($member->id);
+            $timeLog = $this->logTimeIn($member->id);
+
+            // Log time-in activity
+            SystemLog::log(
+                'member_time_in_qr',
+                "Member '{$member->first_name} {$member->last_name}' timed in via QR scan",
+                Auth::id(),
+                [
+                    'member_id' => $member->id,
+                    'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                    'time_log_id' => $timeLog->id,
+                    'time_in' => $timeLog->time_in,
+                    'method' => 'qr_scan'
+                ]
+            );
+
             return response()->json(['message' => '✅ Time-in successful!']);
         }
     }
@@ -112,7 +245,7 @@ class TimeLogController extends Controller
     // ✅ Helper: time in
     private function logTimeIn($memberId)
     {
-        TimeLog::create([
+        return TimeLog::create([
             'member_id' => $memberId,
             'time_in' => now(),
         ]);

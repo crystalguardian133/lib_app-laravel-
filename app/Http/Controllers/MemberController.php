@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Member;
+use App\Models\Transaction;
+use App\Models\TimeLog;
+use App\Models\SystemLog;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use PhpOffice\PhpWord\TemplateProcessor;
-use Illuminate\Support\Facades\URL; 
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
     public function index()
-    {   
+    {
          $members = Member::latest()->get(); // or paginate()
-    return view('members.index', compact('members'));
 
         foreach ($members as $member) {
             $qrFile = 'member-' . $member->id . '.png';
@@ -45,6 +51,7 @@ class MemberController extends Controller
             'municipality'  => 'required|string|max:100',
             'province'      => 'required|string|max:100',
             'contactNumber' => 'required|string|max:15',
+            'email'         => 'required|email|unique:members,email',
             'school'        => 'required|string|max:255',
             'memberdate'    => 'required|date',
             'member_time'   => 'required|integer',
@@ -62,6 +69,8 @@ class MemberController extends Controller
             'municipality'  => $validated['municipality'],
             'province'      => $validated['province'],
             'contactnumber' => $validated['contactNumber'],
+            'email'         => $validated['email'],
+            'email_verified' => Cache::pull("email_verified_registration_{$validated['email']}", false),
             'school'        => $validated['school'],
             'memberdate'    => $validated['memberdate'],
             'member_time'   => $validated['member_time'],
@@ -84,7 +93,20 @@ class MemberController extends Controller
 
         // Generate QR and Card
         $this->generateQrFile($member);
-        
+
+        // Log member creation
+        SystemLog::log(
+            'member_created',
+            "Member '{$member->first_name} {$member->last_name}' was registered",
+            Auth::id(),
+            [
+                'member_id' => $member->id,
+                'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                'member_email' => $member->email,
+                'member_barangay' => $member->barangay,
+                'member_municipality' => $member->municipality
+            ]
+        );
 
         return response()->json([
     'success' => true,
@@ -111,6 +133,7 @@ public function update(Request $request, $id)
         'municipality'  => 'required|string|max:255',
         'province'      => 'required|string|max:255',
         'contactNumber' => 'required|string|max:20',
+        'email'         => 'required|email|unique:members,email,' . $id,
         'school'        => 'nullable|string|max:255',
         'photo'         => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
     ]);
@@ -127,6 +150,7 @@ public function update(Request $request, $id)
         'municipality' => $validated['municipality'],
         'province'     => $validated['province'],
         'contactnumber'=> $validated['contactNumber'],
+        'email'        => $validated['email'],
         'school'       => $validated['school'] ?? null,
     ];
 
@@ -142,6 +166,18 @@ public function update(Request $request, $id)
     }
 
     $member->update($data);
+
+    // Log member update
+    SystemLog::log(
+        'member_updated',
+        "Member '{$member->first_name} {$member->last_name}' was updated",
+        Auth::id(),
+        [
+            'member_id' => $member->id,
+            'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+            'changes' => $data
+        ]
+    );
 
     return response()->json([
         'success' => true,
@@ -174,7 +210,21 @@ public function update(Request $request, $id)
             File::delete($qrPath);
         }
 
+        $memberData = [
+            'member_id' => $member->id,
+            'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+            'member_email' => $member->email
+        ];
+
         $member->delete();
+
+        // Log member deletion
+        SystemLog::log(
+            'member_deleted',
+            "Member '{$memberData['member_name']}' was deleted from the system",
+            Auth::id(),
+            $memberData
+        );
 
         return response()->json([
             'success' => true,
@@ -266,5 +316,236 @@ public function update(Request $request, $id)
         $fullName = trim("{$first} {$middle} {$last}");
 
         return response()->json($member);
+    }
+
+    public function getBorrowingHistory($memberId)
+    {
+        $member = Member::findOrFail($memberId);
+
+        // Get borrowing history from transactions table
+        $borrowingHistory = Transaction::where('member_id', $memberId)
+            ->with('book')
+            ->orderBy('borrowed_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($transaction) {
+                $status = $transaction->status;
+
+                // If status is still 'borrowed' but due date has passed, mark as overdue
+                if ($status === 'borrowed' && $transaction->due_date && now()->isAfter($transaction->due_date)) {
+                    $status = 'overdue';
+                }
+
+                return [
+                    'book_title' => $transaction->book ? $transaction->book->title : 'Unknown Book',
+                    'borrowed_date' => $transaction->borrowed_at,
+                    'due_date' => $transaction->due_date,
+                    'returned_at' => $transaction->returned_at,
+                    'status' => $status
+                ];
+            });
+
+        return response()->json($borrowingHistory);
+    }
+
+    public function getTimelogHistory($memberId)
+    {
+        $member = Member::findOrFail($memberId);
+
+        // Get timelog history
+        $timelogHistory = TimeLog::where('member_id', $memberId)
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($timelog) {
+                return [
+                    'action' => $timelog->action,
+                    'created_at' => $timelog->created_at
+                ];
+            });
+
+        return response()->json($timelogHistory);
+    }
+
+    /**
+     * Get demographics data for dashboard stratification
+     */
+    public function getDemographicsData()
+    {
+        // Get Julita members
+        $julitaMembers = Member::whereRaw('LOWER(TRIM(municipality)) = ?', ['julita'])
+            ->select('barangay', 'age')
+            ->get()
+            ->map(function($member) {
+                return [
+                    'barangay' => trim($member->barangay ?? ''),
+                    'age' => (int) $member->age
+                ];
+            });
+
+        // Get non-Julita members
+        $nonJulitaMembers = Member::whereRaw('LOWER(TRIM(municipality)) != ? OR municipality IS NULL', ['julita'])
+            ->select('municipality', 'province', 'age')
+            ->get()
+            ->map(function($member) {
+                return [
+                    'municipality' => trim($member->municipality ?? ''),
+                    'province' => trim($member->province ?? ''),
+                    'age' => (int) $member->age
+                ];
+            });
+
+        // Get total counts
+        $totalMembers = Member::count();
+        $julitaCount = $julitaMembers->count();
+        $nonJulitaCount = $nonJulitaMembers->count();
+
+        return response()->json([
+            'julitaMembers' => $julitaMembers->toArray(),
+            'nonJulitaMembers' => $nonJulitaMembers->toArray(),
+            'totalMembers' => $totalMembers,
+            'julitaCount' => $julitaCount,
+            'nonJulitaCount' => $nonJulitaCount
+        ]);
+    }
+
+    public function sendEmailCode(Request $request, $memberId)
+    {
+        $member = Member::findOrFail($memberId);
+
+        if (!$member->email) {
+            return response()->json(['success' => false, 'message' => 'No email address found for this member.'], 400);
+        }
+
+        if ($member->email_verified) {
+            return response()->json(['success' => false, 'message' => 'Email is already verified.'], 400);
+        }
+
+        // Generate 6-digit code
+        $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store code in cache for 10 minutes
+        Cache::put("email_verification_{$memberId}", $code, now()->addMinutes(10));
+
+        try {
+            Mail::raw("Hi {$member->first_name},\n\n" .
+                "Your email verification code is: {$code}", function ($message) use ($member) {
+                $message->to($member->email)
+                        ->subject('Email Verification Code - Julita Public Library');
+            });
+
+            Log::info("Email verification code sent to {$member->email} for member ID {$memberId}");
+
+            $response = ['success' => true, 'message' => 'Verification code sent to your email.'];
+
+            // In development/debug mode, include code for testing
+            if (config('app.debug') && config('mail.default') === 'log') {
+                $response['debug_code'] = $code;
+                $response['message'] .= ' (Check logs for code in debug mode)';
+            }
+            
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error("Failed to send email verification code to {$member->email}: " . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false, 
+                'message' => 'Failed to send email: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyEmailCode(Request $request, $memberId)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6'
+        ]);
+
+        $member = Member::findOrFail($memberId);
+        $cachedCode = Cache::get("email_verification_{$memberId}");
+
+        if (!$cachedCode || $cachedCode !== $request->code) {
+            return response()->json(['success' => false, 'message' => 'Invalid or expired verification code.'], 400);
+        }
+
+        // Mark email as verified
+        $member->update(['email_verified' => true]);
+
+        // Clear the cache
+        Cache::forget("email_verification_{$memberId}");
+
+        return response()->json(['success' => true, 'message' => 'Email verified successfully!']);
+    }
+
+    public function sendEmailCodeForRegistration(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $email = $request->email;
+
+        // Check if email already exists
+        if (Member::where('email', $email)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Email already registered.']);
+        }
+
+        // Generate 6-digit code
+        $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Store in cache for 10 minutes
+        Cache::put("email_verification_registration_{$email}", $code, now()->addMinutes(10));
+
+        try {
+            Mail::raw("Your email verification code is: {$code}", function ($message) use ($email) {
+                $message->to($email)->subject('Email Verification Code - Julita Public Library');
+            });
+
+            \Log::info("Email verification code sent to {$email} for registration");
+            
+            $response = ['success' => true, 'message' => 'Verification code sent to your email.'];
+            
+            // In development/debug mode, include code for testing
+            if (config('app.debug') && config('mail.default') === 'log') {
+                $response['debug_code'] = $code;
+                $response['message'] .= ' (Check logs for code in debug mode)';
+            }
+            
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error("Failed to send email verification code to {$email}: " . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false, 
+                'message' => 'Failed to send email: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyEmailCodeForRegistration(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string|size:6'
+        ]);
+
+        $email = $request->email;
+        $cachedCode = Cache::get("email_verification_registration_{$email}");
+
+        if (!$cachedCode || $cachedCode !== $request->code) {
+            return response()->json(['success' => false, 'message' => 'Invalid or expired verification code.'], 400);
+        }
+
+        // Mark as verified for registration
+        Cache::put("email_verified_registration_{$email}", true, now()->addMinutes(10));
+        Cache::forget("email_verification_registration_{$email}");
+
+        return response()->json(['success' => true, 'message' => 'Email verified successfully!']);
     }
 }

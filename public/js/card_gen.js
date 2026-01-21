@@ -9,11 +9,14 @@ async function openCardModal(memberId) {
         const fullName = `${member.lastName.toUpperCase()}, ${member.firstName.toUpperCase()} ${middleInitial}`.trim();
 
         // Store member data globally for download
+        const address = `${member.house_number || ""} ${member.street || ""}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`.replace(/, ,/g, ',').trim();
         window.currentMemberData = {
             fullName: fullName,
             memberdate: member.memberdate || "",
             photo: member.photo || null,
-            id: member.id
+            id: member.id,
+            address: address,
+            contact: member.contactnumber || ""
         };
 
         // Fill overlays for preview
@@ -23,13 +26,14 @@ async function openCardModal(memberId) {
         // Photo
         const photoDiv = document.getElementById("card-photo");
         photoDiv.innerHTML = "";
+        photoDiv.style.cssText += 'border-radius: 0 !important; aspect-ratio: 1 !important; width: 80px !important; height: 80px !important;';
         if (member.photo) {
             const img = document.createElement("img");
             img.src = member.photo;
             img.style.cssText = `
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: fill;
                 object-position: center center;
                 display: block;
             `;
@@ -60,52 +64,34 @@ async function openCardModal(memberId) {
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "anonymous";
+        // Only set crossOrigin for external images (different origin)
+        // For same-origin images, don't set crossOrigin to avoid CORS issues
+        try {
+            // Handle both absolute and relative URLs
+            let url;
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                url = new URL(src);
+            } else {
+                // Relative URL - resolve against current origin
+                url = new URL(src, window.location.origin);
+            }
+            // Only set crossOrigin if image is from different origin
+            if (url.origin !== window.location.origin) {
+                img.crossOrigin = "anonymous";
+            }
+        } catch (e) {
+            // If URL parsing fails, assume same-origin and don't set crossOrigin
+            console.warn('Could not parse image URL, assuming same-origin:', src, e);
+        }
         img.onload = () => resolve(img);
-        img.onerror = reject;
+        img.onerror = (error) => {
+            console.error('Failed to load image:', src, error);
+            reject(new Error(`Failed to load image: ${src}`));
+        };
         img.src = src;
     });
 }
 
-// Draw circular image - 100% FILL
-function drawCircularImage(ctx, img, x, y, radius) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-    
-    // Calculate dimensions to FULLY COVER the circle (100% fill)
-    const imgAspect = img.width / img.height;
-    const circleAspect = 1; // Circle is always 1:1
-    
-    let drawWidth, drawHeight;
-    
-    // Scale image to cover entire circle area
-    if (imgAspect > circleAspect) {
-        // Image is wider - fit to height
-        drawHeight = radius * 2;
-        drawWidth = drawHeight * imgAspect;
-    } else {
-        // Image is taller - fit to width
-        drawWidth = radius * 2;
-        drawHeight = drawWidth / imgAspect;
-    }
-    
-    // Ensure minimum coverage (add 10% buffer for 100% fill guarantee)
-    const minDimension = radius * 2;
-    if (drawWidth < minDimension) drawWidth = minDimension;
-    if (drawHeight < minDimension) drawHeight = minDimension;
-    
-    ctx.drawImage(
-        img,
-        x - drawWidth / 2,
-        y - drawHeight / 2,
-        drawWidth,
-        drawHeight
-    );
-    ctx.restore();
-}
 
 // Wrap text to fit within width
 function wrapText(ctx, text, maxWidth) {
@@ -131,31 +117,31 @@ function wrapText(ctx, text, maxWidth) {
 async function generateFrontCard(memberData) {
     // Philippine Driver's License / CR80 card size
     // 85.6mm × 53.98mm at 300 DPI = 1012px × 638px
-    const cardWidth = 1012;  // pixels at 300 DPI
-    const cardHeight = 638;  // pixels at 300 DPI
+    const cardWidth = 1012;
+    const cardHeight = 638;
     
     const canvas = document.createElement('canvas');
     canvas.width = cardWidth;
     canvas.height = cardHeight;
-    const ctx = canvas.getContext('2d', { alpha: true }); // Enable transparency
+    const ctx = canvas.getContext('2d', { alpha: true });
     
-    // Enable high quality rendering
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    
-    // Clear canvas to ensure transparency
     ctx.clearRect(0, 0, cardWidth, cardHeight);
     
     // Calculate scaling factors
     const scaleX = cardWidth / 380;
     const scaleY = cardHeight / 240;
-    
-    // Scale context to fit card dimensions
     ctx.scale(scaleX, scaleY);
     
     try {
         // Load background image first
-        const bgImg = await loadImage('/card_temp/card-1.png');
+        let bgImg;
+        try {
+            bgImg = await loadImage('/card_temp/card-1.png');
+        } catch (bgError) {
+            throw new Error(`Failed to load front card background image: ${bgError.message || bgError}`);
+        }
         
         // Create rounded rectangle path for clipping
         const borderRadius = 16;
@@ -180,38 +166,56 @@ async function generateFrontCard(memberData) {
         ctx.font = 'bold 11px Inter, Arial, sans-serif';
         ctx.textAlign = 'left';
         ctx.letterSpacing = '0.5px';
-        
+
         const nameLines = wrapText(ctx, memberData.fullName, 180);
         const nameX = 45;
         let nameY = 121;
         const lineHeight = 14;
-        
+
         nameLines.forEach((line, index) => {
             ctx.fillText(line, nameX, nameY + (index * lineHeight));
         });
-        
+
         // Draw membership date - WHITE COLOR, BOLD
         ctx.font = 'bold 13px Inter, Arial, sans-serif';
         ctx.fillStyle = '#FFFFFF';
         ctx.letterSpacing = '0.5px';
         ctx.fillText(memberData.memberdate, 140, 189);
-        
-        // Draw photo if available
+
+        // Draw address - WHITE COLOR, smaller font
+        ctx.font = '10px Inter, Arial, sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.letterSpacing = '0.5px';
+        const addressLines = wrapText(ctx, memberData.address, 180);
+        let addressY = 210;
+        addressLines.forEach((line, index) => {
+            ctx.fillText(line, 45, addressY + (index * 12));
+        });
+
+        // Draw 1:1 square photo if available (ID picture style)
         if (memberData.photo) {
-            const photoImg = await loadImage(memberData.photo);
-            const photoX = 410 - 2.5 - 130;
-            const photoY = 125.5;
-            const photoRadius = 77.3;
-            
-            // Draw subtle border circle
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Draw circular photo
-            drawCircularImage(ctx, photoImg, photoX, photoY, photoRadius);
+            try {
+                const photoImg = await loadImage(memberData.photo);
+                const photoX = 410 - 2.5 - 130; // Right side position
+                const photoY = 125.5; // Center vertically
+                const photoSize = 70; // Further reduced square size for 1:1 ratio
+
+                // Draw square photo with 1:1 aspect ratio
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(photoX - photoSize/2, photoY - photoSize/2, photoSize, photoSize);
+                ctx.clip();
+
+                // Force resize to exact square dimensions
+                const drawWidth = photoSize;
+                const drawHeight = photoSize;
+
+                ctx.drawImage(photoImg, photoX - drawWidth/2, photoY - drawHeight/2, drawWidth, drawHeight);
+                ctx.restore();
+            } catch (photoError) {
+                console.warn('Could not load member photo, continuing without photo:', photoError);
+                // Continue without photo - card will still be generated
+            }
         }
         
         return canvas;
@@ -224,34 +228,34 @@ async function generateFrontCard(memberData) {
 // Generate back card on canvas
 async function generateBackCard(memberData) {
     // Philippine Driver's License / CR80 card size
-    // 85.6mm × 53.98mm at 300 DPI = 1012px × 638px
     const cardWidth = 1012;
     const cardHeight = 638;
     
     const canvas = document.createElement('canvas');
     canvas.width = cardWidth;
     canvas.height = cardHeight;
-    const ctx = canvas.getContext('2d', { alpha: true }); // Enable transparency
+    const ctx = canvas.getContext('2d', { alpha: true });
     
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    
-    // Clear canvas to ensure transparency
     ctx.clearRect(0, 0, cardWidth, cardHeight);
     
     // Calculate scaling factors
     const scaleX = cardWidth / 380;
     const scaleY = cardHeight / 240;
-    
-    // Scale context to fit card dimensions
     ctx.scale(scaleX, scaleY);
     
     try {
-        // Load background image first
-        const bgImg = await loadImage('/card_temp/card-2.png');
+        // Load background image
+        let bgImg;
+        try {
+            bgImg = await loadImage('/card_temp/card-2.png');
+        } catch (bgError) {
+            throw new Error(`Failed to load back card background image: ${bgError.message || bgError}`);
+        }
         
         // Create rounded rectangle path for clipping
-        const borderRadius = 16;
+        const borderRadius = 16; 
         ctx.beginPath();
         ctx.moveTo(borderRadius, 0);
         ctx.lineTo(380 - borderRadius, 0);
@@ -268,19 +272,30 @@ async function generateBackCard(memberData) {
         // Draw background
         ctx.drawImage(bgImg, 0, 0, 380, 240);
         
-        // Draw QR code
+        // Draw QR code shifted to the right
         if (memberData.id) {
-            const qrImg = await loadImage(`/qrcode/members/member-${memberData.id}.png`);
-            const qrSize = 130;
-            const qrX = (380 - qrSize) / 2; // center
-            const qrY = (240 - qrSize) / 2; // center
-            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            try {
+                const qrImg = await loadImage(`/qrcode/members/member-${memberData.id}.png`);
+                const qrSize = 90;
+                const qrX = 380 - qrSize - 10; // Shifted to the right with reduced margin
+                const qrY = (240 - qrSize) / 2; // Center vertically
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            } catch (qrError) {
+                console.warn('Could not load QR code, continuing without QR:', qrError);
+                // Continue without QR code - card will still be generated
+            }
         }
+
+        // Draw contact number on the LEFT side
+        ctx.font = 'bold 12px Inter, Arial, sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Contact: ${memberData.contact}`, 20, 200);
         
         return canvas;
     } catch (error) {
         console.error('Error generating back card:', error);
-        throw error;
+        throw new Error(`Failed to generate back card: ${error.message || error}`);
     }
 }
 

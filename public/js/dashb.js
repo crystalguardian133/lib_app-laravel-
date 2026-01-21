@@ -66,8 +66,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }]
       },
       options: {
+        indexAxis: 'x', // Vertical bars
         responsive: true,
         maintainAspectRatio: false,
+        maxBarThickness: 45, // Moderate bar width
+        categoryPercentage: 0.75, // Moderate category width
+        barPercentage: 0.85, // Moderate bar width within category
         scales: { 
           y: { 
             beginAtZero: true,
@@ -164,74 +168,99 @@ document.addEventListener('DOMContentLoaded', function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { 
-          y: { 
+        scales: {
+          y: {
             beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)',
-              drawBorder: false,
-            },
             ticks: {
-              color: '#6b7280',
+              stepSize: 1,
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              },
+              color: 'var(--text-secondary)',
+              font: { size: 12 }
+            },
+            title: {
+              display: true,
+              text: 'Count',
+              color: 'var(--text-primary)',
               font: {
-                size: 12,
-                weight: '500'
-              }
+                weight: 'bold',
+                size: 14
+              },
+              padding: { bottom: 10 }
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)',
+              drawBorder: false
             }
           },
           x: {
-            grid: {
-              display: false,
-            },
             ticks: {
-              color: '#6b7280',
+              maxRotation: 45,
+              minRotation: 0,
+              autoSkip: false,
+              color: 'var(--text-secondary)',
+              font: { size: 11 }
+            },
+            title: {
+              display: true,
+              text: 'Month',
+              color: 'var(--text-primary)',
               font: {
-                size: 11,
-                weight: '500'
-              }
-            }
+                weight: 'bold',
+                size: 14
+              },
+              padding: { top: 10 }
+            },
+            grid: { display: false }
           }
         },
-        plugins: { 
-          legend: { 
+        plugins: {
+          legend: {
             display: true,
             position: 'top',
             labels: {
               usePointStyle: true,
-              pointStyle: 'circle',
               padding: 20,
               font: {
                 size: 12,
                 weight: '600'
               },
-              color: '#374151'
+              color: 'var(--text-primary)'
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: '#e5e7eb',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: 'rgba(99, 102, 241, 0.5)',
             borderWidth: 1,
             cornerRadius: 8,
+            padding: 12,
             displayColors: true,
             callbacks: {
               title: function(context) {
-                return context[0].label;
+                return `📊 ${context[0].label}`;
               },
               label: function(context) {
-                return context.dataset.label + ': ' + context.parsed.y;
+                return `${context.dataset.label}: ${context.parsed.y}`;
               }
             }
           }
         },
         animation: {
-          duration: 1000,
-          easing: 'easeInOutQuart'
+          duration: 1200,
+          easing: 'easeInOutQuart',
+          delay: function(context) {
+            return context.dataIndex * 50;
+          }
         },
         interaction: {
           intersect: false,
           mode: 'index'
+        },
+        onHover: function(event, elements) {
+          event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
         }
       }
     });

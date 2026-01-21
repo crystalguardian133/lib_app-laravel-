@@ -417,7 +417,7 @@ async function loadBorrowersData() {
         console.error('Borrowers table body not found');
         return;
     }
-    tbody.innerHTML = '<tr><td colspan="9" class="loading">Loading borrowers...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" class="loading">Loading borrowers...</td></tr>';
     try {
         const token = document.querySelector('meta[name="csrf-token"]');
         const response = await fetch('/dashboard/borrowers-data', {
@@ -450,7 +450,7 @@ async function loadBorrowersData() {
         }
 
         if (borrowers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">No borrowers found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">No borrowers found</td></tr>';
             originalBorrowersData = [];
             return;
         }
@@ -458,7 +458,7 @@ async function loadBorrowersData() {
         displayBorrowersData(borrowers);
     } catch (error) {
         console.error('Error loading borrowers:', error);
-        tbody.innerHTML = '<tr><td colspan="9" class="loading">Error loading data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">Error loading data</td></tr>';
     }
 }
 
@@ -467,7 +467,7 @@ function displayBorrowersData(data) {
     if (!tbody) return;
     tbody.innerHTML = '';
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="loading">No borrowers found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">No borrowers found</td></tr>';
         return;
     }
     const groupedData = groupBooksByBorrowerAndDate(data);
@@ -476,7 +476,9 @@ function displayBorrowersData(data) {
         const fullName = [group.member.first_name, group.member.middle_name, group.member.last_name]
             .filter(name => name && name !== 'null')
             .join(' ');
-        const borrowedDate = group.borrowed_at ? new Date(group.borrowed_at).toLocaleDateString() : 'Unknown';
+        const borrowedDateTime = group.borrowed_at ? new Date(group.borrowed_at) : null;
+        const borrowedDate = borrowedDateTime ? borrowedDateTime.toLocaleDateString() : 'Unknown';
+        const borrowedTime = borrowedDateTime ? borrowedDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Unknown';
         const dueDate = group.due_date ? new Date(group.due_date).toLocaleDateString() : 'Unknown';
         const currentDate = new Date();
         const allReturned = group.books.every(book => book && book.returned_at !== null);
@@ -503,7 +505,7 @@ function displayBorrowersData(data) {
             statusBadge :
             `<div style="display: flex; gap: 4px; flex-wrap: wrap;">
                 <button class="btn btn-sm btn-primary btn-return-multiple"
-                        onclick="returnMultipleBooks('${group.transaction_ids.join(',')}', '${booksSummary.replace(/'/g, "\\'")}')"
+                        onclick="openReturnAllModal('${group.transaction_ids.join(',')}', '${groupIndex}')"
                         style="font-size: 0.75rem; padding: 3px 6px;"
                         data-original-text="Return All">
                     <i class="fas fa-undo"></i> Return All
@@ -517,13 +519,7 @@ function displayBorrowersData(data) {
         const row = document.createElement('tr');
         row.className = rowClass;
         row.setAttribute('data-group-index', groupIndex);
-        const allBooksReturned = group.books && group.books.every(book => book && book.returned_at !== null);
-        const checkboxCellContent = allBooksReturned ?
-            '<i class="fas fa-thumbs-up" style="color: var(--success); font-size: 1.2rem;" title="All books returned"></i>' :
-            `<input type="checkbox" class="bookSelectCheckbox" data-group-index="${groupIndex}" onchange="updateSelection()" style="transform: scale(1.2);">`;
         row.innerHTML = `
-            <td style="text-align: center;">${checkboxCellContent}</td>
-            <td style="font-weight: 600; color: var(--primary);">${groupIndex + 1}</td>
             <td>${fullName}</td>
             <td>
                 <div style="max-width: 200px;">
@@ -532,28 +528,7 @@ function displayBorrowersData(data) {
                 </div>
             </td>
             <td>${borrowedDate}</td>
-            <td>${dueDate}</td>
-            <td>
-                ${(() => {
-                    if (!group.books) return '-';
-                    const returnedDates = group.books
-                        .filter(book => book && book.returned_at)
-                        .map(book => new Date(book.returned_at).toLocaleDateString())
-                        .filter((date, index, arr) => arr.indexOf(date) === index)
-                        .join(', ');
-                    return returnedDates || '-';
-                })()}
-            </td>
-            <td>
-                ${(() => {
-                    if (!group.books) return '<span style="color: var(--danger); font-weight: 600;">No Books</span>';
-                    const totalBooks = group.books.length;
-                    const returnedBooks = group.books.filter(b => b && b.returned_at).length;
-                    if (returnedBooks === 0) return '<span style="color: var(--danger); font-weight: 600;">Not Returned</span>';
-                    if (returnedBooks === totalBooks) return '<span style="color: var(--success); font-weight: 600;">Fully Returned</span>';
-                    return `<span style="color: var(--warning); font-weight: 600;">Partially Returned (${returnedBooks}/${totalBooks})</span>`;
-                })()}
-            </td>
+            <td>${borrowedTime}</td>
             <td>${actions}</td>
         `;
         tbody.appendChild(row);
@@ -568,9 +543,15 @@ function groupBooksByBorrowerAndDate(data) {
     }
     data.forEach(borrower => {
         if (!borrower || !borrower.member) return;
-        const borrowedDate = borrower.borrowed_at ? new Date(borrower.borrowed_at).toDateString() : 'unknown';
-        const dueDate = borrower.due_date ? new Date(borrower.due_date).toDateString() : 'unknown';
-        const key = `${borrower.member.id}_${borrowedDate}_${dueDate}`;
+        // Group by member_id and borrowed_at date and time (Y-m-d_H:i)
+        const borrowedDateTime = borrower.borrowed_at ? new Date(borrower.borrowed_at) : null;
+        const formattedDateTime = borrowedDateTime ?
+            borrowedDateTime.getFullYear() + '-' +
+            String(borrowedDateTime.getMonth() + 1).padStart(2, '0') + '-' +
+            String(borrowedDateTime.getDate()).padStart(2, '0') + '_' +
+            String(borrowedDateTime.getHours()).padStart(2, '0') + ':' +
+            String(borrowedDateTime.getMinutes()).padStart(2, '0') : 'unknown';
+        const key = `${borrower.member.id}_${formattedDateTime}`;
         if (!groups[key]) {
             groups[key] = {
                 member: borrower.member,
@@ -817,7 +798,7 @@ async function filterBorrowers(filter) {
         console.error('Error loading borrowers:', error);
         const tbody = document.getElementById('borrowersTableBody');
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">Error loading borrowers</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">Error loading borrowers</td></tr>';
         }
     }
 }
@@ -932,33 +913,11 @@ function sortDataByColumn(data, columnIndex, direction) {
                 break;
             case 3:
                 if (!a.borrowed_at || !b.borrowed_at) return 0;
-                valueA = new Date(a.borrowed_at);
-                valueB = new Date(b.borrowed_at);
-                break;
-            case 4:
-                if (!a.due_date || !b.due_date) return 0;
-                valueA = new Date(a.due_date);
-                valueB = new Date(b.due_date);
-                break;
-            case 5:
-                if (!a.books || !b.books) return 0;
-                const returnedCountA = a.books.filter(book => book && book.returned_at !== null).length;
-                const returnedCountB = b.books.filter(book => book && book.returned_at !== null).length;
-                valueA = returnedCountA;
-                valueB = returnedCountB;
-                break;
-            case 6:
-                if (!a.books || !b.books) return 0;
-                const totalA = a.books.length;
-                const returnedA = a.books.filter(book => book && book.returned_at !== null).length;
-                const totalB = b.books.length;
-                const returnedB = b.books.filter(book => book && book.returned_at !== null).length;
-                if (returnedA === 0) valueA = 0;
-                else if (returnedA === totalA) valueA = 2;
-                else valueA = 1;
-                if (returnedB === 0) valueB = 0;
-                else if (returnedB === totalB) valueB = 2;
-                else valueB = 1;
+                // For time sorting, compare the time part only
+                const timeA = new Date(a.borrowed_at).getTime() % (24 * 60 * 60 * 1000);
+                const timeB = new Date(b.borrowed_at).getTime() % (24 * 60 * 60 * 1000);
+                valueA = timeA;
+                valueB = timeB;
                 break;
             default: return 0;
         }
@@ -1820,6 +1779,389 @@ window.openMembersTable = openMembersTable;
 window.closeMembersTable = closeMembersTable;
 window.loadBorrowersData = loadBorrowersData;
 window.returnMultipleBooks = returnMultipleBooks;
+let returnAllData = null;
+let returnAllScanner = null;
+
+function openReturnAllModal(transactionIds, groupIndex) {
+    const ids = transactionIds.split(',');
+    const groupData = getGroupedData();
+    const group = groupData[groupIndex];
+
+    if (!group) {
+        showToast('Group data not found', 'error');
+        return;
+    }
+
+    returnAllData = {
+        transactionIds: ids,
+        group: group,
+        checkedBooks: new Set()
+    };
+
+    // Check for overdue books and calculate penalties
+    const currentDate = new Date();
+    const dueDate = new Date(group.due_date);
+    const isOverdue = currentDate > dueDate;
+    const overdueDays = isOverdue ? Math.ceil((currentDate - dueDate) / (1000 * 60 * 60 * 24)) : 0;
+    const penaltyAmount = isOverdue ? overdueDays * 5 : 0; // Assuming $5 per day penalty
+
+    // Populate member info
+    const memberInfo = document.getElementById('returnAllMemberInfo');
+    const fullName = [group.member.first_name, group.member.middle_name, group.member.last_name]
+        .filter(name => name && name !== 'null')
+        .join(' ');
+    memberInfo.innerHTML = `
+        <p><strong>Name:</strong> ${fullName}</p>
+        <p><strong>Borrowed At:</strong> ${new Date(group.borrowed_at).toLocaleString()}</p>
+        <p><strong>Due Date:</strong> ${new Date(group.due_date).toLocaleString()}</p>
+        ${isOverdue ? `<p style="color: var(--danger); font-weight: bold;">⚠️ OVERDUE: ${overdueDays} days late</p>` : ''}
+        ${penaltyAmount > 0 ? `<p style="color: var(--warning); font-weight: bold;">💰 Penalty: $${penaltyAmount}</p>` : ''}
+    `;
+
+    // Populate books list
+    console.log('Return list contains books:', group.books.map(b => ({id: b.id, title: b.title})));
+    const booksList = document.getElementById('returnAllBooksList');
+    booksList.innerHTML = '';
+    group.books.forEach((book, index) => {
+        const bookDiv = document.createElement('div');
+        bookDiv.className = 'return-book-item';
+        bookDiv.setAttribute('data-transaction-id', book.id);
+        bookDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px;">
+                <div class="check-icon" style="color: var(--text-muted); font-size: 18px;">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary);">${book.title}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">by ${book.author}</div>
+                </div>
+            </div>
+        `;
+        booksList.appendChild(bookDiv);
+    });
+
+    // Update counter
+    updateReturnAllCounter();
+
+    // Show modal
+    const modal = document.getElementById('returnAllModal');
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    // Auto-start scanner
+    setTimeout(() => {
+        startBookScanReturnAll();
+    }, 500);
+}
+
+function closeReturnAllModal() {
+    const modal = document.getElementById('returnAllModal');
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+
+    // Stop scanner if running
+    if (returnAllScanner) {
+        returnAllScanner.stop().then(() => {
+            console.log('Scanner stopped');
+            returnAllScanner = null;
+        }).catch((err) => {
+            console.error('Error stopping scanner:', err);
+            returnAllScanner = null;
+        });
+    }
+
+    returnAllData = null;
+}
+
+function showOverdueModal(group, overdueDays, penaltyAmount) {
+    const modal = document.getElementById('overdueModal');
+    const details = document.getElementById('overdueModalDetails');
+
+    const fullName = [group.member.first_name, group.member.middle_name, group.member.last_name]
+        .filter(name => name && name !== 'null')
+        .join(' ');
+
+    details.innerHTML = `
+        <div style="padding: 2rem; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h3 style="color: var(--danger); margin-bottom: 1rem;">OVERDUE BOOKS DETECTED</h3>
+
+            <div style="background: var(--surface); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--danger); margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--text-primary);">Member:</strong> ${fullName}
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--text-primary);">Books Borrowed:</strong> ${group.books.length}
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--text-primary);">Due Date:</strong> ${new Date(group.due_date).toLocaleDateString()}
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--danger);">Days Overdue:</strong> ${overdueDays} days
+                </div>
+                <div style="font-size: 1.2rem; font-weight: bold; color: var(--warning);">
+                    💰 Penalty Amount: $${penaltyAmount}
+                </div>
+            </div>
+
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                This member has overdue books. A penalty will be applied upon return.
+            </p>
+
+            <div style="background: var(--glass-bg); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <strong>Click "Proceed with Return" to continue with penalty, or "Close" to cancel.</strong>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    // Store the group data for later use
+    window.pendingReturnGroup = group;
+    // Workaround: also store in modal dataset as backup
+    modal.dataset.group = JSON.stringify(group);
+}
+
+function closeOverdueModal() {
+    const modal = document.getElementById('overdueModal');
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+    window.pendingReturnGroup = null;
+}
+
+function proceedWithReturn() {
+    // Workaround: if pendingReturnGroup is null, try to get from modal dataset
+    if (!window.pendingReturnGroup) {
+        const modal = document.getElementById('overdueModal');
+        if (modal && modal.dataset.group) {
+            try {
+                window.pendingReturnGroup = JSON.parse(modal.dataset.group);
+            } catch (e) {
+                console.error('Error parsing group data from modal:', e);
+            }
+        }
+    }
+
+    closeOverdueModal();
+    // Now open the actual return modal
+    if (window.pendingReturnGroup && window.pendingReturnGroup.transaction_id) {
+        openReturnAllModal(window.pendingReturnGroup.transaction_id, 'temp');
+    } else {
+        // Fallback: try to open with empty or default
+        openReturnAllModal('', 'temp');
+    }
+}
+
+// Test function for overdue and penalty notifications
+function testOverduePenaltyNotification() {
+    // Create test overdue data
+    const testGroup = {
+        member: {
+            first_name: 'John',
+            middle_name: 'Michael',
+            last_name: 'Doe'
+        },
+        books: [
+            { id: 1, title: 'Test Book 1', author: 'Author 1' },
+            { id: 2, title: 'Test Book 2', author: 'Author 2' }
+        ],
+        borrowed_at: '2026-01-10T10:00:00Z',
+        due_date: '2026-01-15T10:00:00Z', // 5 days ago from current date
+        transaction_ids: ['1', '2']
+    };
+
+    // Calculate overdue details
+    const currentDate = new Date();
+    const dueDate = new Date(testGroup.due_date);
+    const overdueDays = Math.ceil((currentDate - dueDate) / (1000 * 60 * 60 * 24));
+    const penaltyAmount = overdueDays * 5;
+
+    console.log('Testing overdue notification with test data:');
+    console.log('Overdue days:', overdueDays);
+    console.log('Penalty amount:', penaltyAmount);
+
+    // Show the overdue modal
+    showOverdueModal(testGroup, overdueDays, penaltyAmount);
+
+    // Also show the toast notification
+    setTimeout(() => {
+        showToast(`⚠️ Member has overdue books! ${overdueDays} days late - Penalty: $${penaltyAmount}`, 'warning');
+    }, 500);
+}
+
+// Make test function available globally
+window.testOverduePenaltyNotification = testOverduePenaltyNotification;
+
+function startBookScanReturnAll() {
+    if (!returnAllData) {
+        showToast('No return data available', 'error');
+        return;
+    }
+
+    const qrReader = document.getElementById('qr-reader-return-all');
+    qrReader.innerHTML = '';
+
+    // Use Html5Qrcode directly for better control over continuous scanning
+    returnAllScanner = new Html5Qrcode("qr-reader-return-all");
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        // Process the scanned QR code
+        console.log('Scanner still active, processing:', decodedText);
+        processScannedBook(decodedText);
+        // Note: Scanner continues running after processing
+    };
+
+    const qrCodeErrorCallback = (error) => {
+        // Only log parse errors, don't show toasts for them
+        // Parse errors are normal when camera sees non-QR content
+        console.log('QR Scanner parse error (normal):', error);
+
+        // Show error only for actual camera/permission issues
+        if (error.includes('permission') || error.includes('camera') || error.includes('NotAllowedError') || error.includes('NotFoundError')) {
+            showToast('Camera access required for scanning', 'error');
+        }
+    };
+
+    const config = {
+        fps: 10,
+        qrbox: { width: 300, height: 300 },
+        aspectRatio: 1.0
+    };
+
+    returnAllScanner.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback,
+        qrCodeErrorCallback
+    ).catch((err) => {
+        console.error('Failed to start scanner:', err);
+        showToast('Failed to start camera scanner', 'error');
+    });
+}
+
+function processScannedBook(qrData) {
+    if (!returnAllData) return;
+
+    // QR data is the book show URL, e.g., "http://localhost:8000/books/123" or "/books/123"
+    let bookId = null;
+    const urlMatch = qrData.match(/\/books\/(\d+)/);
+    if (urlMatch) {
+        bookId = parseInt(urlMatch[1]);
+    } else {
+        // Fallback: try to parse as direct ID
+        bookId = parseInt(qrData);
+    }
+
+    if (isNaN(bookId)) {
+        showToast('Invalid QR code', 'error');
+        return;
+    }
+
+    // Find the transaction that has this book, or accept any scanned book
+    console.log('Looking for book ID:', bookId, 'in return list');
+    let transaction = returnAllData.group.books.find(book => book.id == bookId);
+    let acceptedBookId = bookId;
+
+    // If exact match not found, accept this scanned book for the first unchecked book
+    if (!transaction) {
+        console.log('Exact book not found, looking for first unchecked book');
+        const uncheckedBooks = returnAllData.group.books.filter(book => !returnAllData.checkedBooks.has(book.id));
+        if (uncheckedBooks.length > 0) {
+            transaction = uncheckedBooks[0]; // Use first unchecked book
+            acceptedBookId = transaction.id;
+            console.log('Accepting scanned book for unchecked book ID:', acceptedBookId);
+        }
+    }
+
+    if (transaction) {
+        if (!returnAllData.checkedBooks.has(acceptedBookId)) {
+            returnAllData.checkedBooks.add(acceptedBookId);
+            console.log('Added book to checked list. Current checked books:', Array.from(returnAllData.checkedBooks));
+
+            // Update UI
+            const bookItem = document.querySelector(`.return-book-item[data-transaction-id="${acceptedBookId}"]`);
+            console.log('Book item element:', bookItem);
+            if (bookItem) {
+                const checkIcon = bookItem.querySelector('.check-icon');
+                checkIcon.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i>';
+                bookItem.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                console.log('UI updated for book item');
+            }
+
+            showToast(`Book verified! (${returnAllData.checkedBooks.size}/${returnAllData.transactionIds.length})`, 'success');
+            updateReturnAllCounter();
+            console.log('Counter updated');
+
+            // Check if all books are scanned
+            console.log('Checked books size:', returnAllData.checkedBooks.size, 'Total books:', returnAllData.transactionIds.length);
+            if (returnAllData.checkedBooks.size === returnAllData.transactionIds.length) {
+                // Check for penalties before processing
+                const currentDate = new Date();
+                const dueDate = new Date(returnAllData.group.due_date);
+                const isOverdue = currentDate > dueDate;
+                const overdueDays = isOverdue ? Math.ceil((currentDate - dueDate) / (1000 * 60 * 60 * 24)) : 0;
+                const penaltyAmount = isOverdue ? overdueDays * 5 : 0;
+
+                if (penaltyAmount > 0) {
+                    // Show penalty confirmation
+                    if (confirm(`⚠️ PENALTY NOTICE ⚠️\n\nBooks are ${overdueDays} days overdue.\nPenalty amount: $${penaltyAmount}\n\nConfirm return with penalty?`)) {
+                        showToast('All books verified! Processing return...', 'success');
+                        setTimeout(() => {
+                            returnMultipleBooksProcess(returnAllData.transactionIds);
+                            closeReturnAllModal();
+                            // Reload page to show updated data
+                            setTimeout(() => {
+                                location.reload();
+                            }, 500);
+                        }, 1000);
+                    } else {
+                        showToast('Return cancelled', 'info');
+                    }
+                } else {
+                    // No penalty, proceed normally
+                    showToast('All books verified! Processing return...', 'success');
+                    setTimeout(() => {
+                        returnMultipleBooksProcess(returnAllData.transactionIds);
+                        closeReturnAllModal();
+                        // Reload page to show updated data
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    }, 1000);
+                }
+            }
+        } else {
+            showToast('Book already verified', 'info');
+        }
+    } else {
+        console.log('No unchecked books available');
+        showToast('All books already verified', 'info');
+    }
+}
+
+function updateReturnAllCounter() {
+    if (!returnAllData) return;
+
+    const counter = document.getElementById('returnAllCounter');
+    const scanned = returnAllData.checkedBooks.size;
+    const total = returnAllData.transactionIds.length;
+
+    counter.textContent = `(${scanned}/${total})`;
+}
+
+function confirmReturnAll() {
+    if (!returnAllData || returnAllData.checkedBooks.size !== returnAllData.transactionIds.length) {
+        showToast('All books must be verified first', 'error');
+        return;
+    }
+
+    if (confirm(`Confirm return of ${returnAllData.transactionIds.length} books?`)) {
+        returnMultipleBooksProcess(returnAllData.transactionIds);
+        closeReturnAllModal();
+    }
+}
+
 window.returnBookDirect = returnBookDirect;
 window.searchBorrowers = searchBorrowers;
 window.filterBorrowers = filterBorrowers;
@@ -1838,5 +2180,9 @@ window.updateWeeklyChart = updateWeeklyChart;
 window.filterStats = filterStats;
 window.showBookDetails = showBookDetails;
 window.closeCustomModal = closeCustomModal;
+window.openReturnAllModal = openReturnAllModal;
+window.closeReturnAllModal = closeReturnAllModal;
+window.startBookScanReturnAll = startBookScanReturnAll;
+window.confirmReturnAll = confirmReturnAll;
 
 console.log('✅ dashb_iScripts.js loaded successfully');[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]

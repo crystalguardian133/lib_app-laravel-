@@ -95,6 +95,15 @@ function resetAllRegistrationForms() {
         input.value = '';
       }
     });
+
+    // Clear email fields specifically
+    const emailFields = ['#email', '#julitaEmail'];
+    emailFields.forEach(selector => {
+      const emailInput = document.querySelector(selector);
+      if (emailInput) {
+        emailInput.value = '';
+      }
+    });
     
     const allSelects = document.querySelectorAll('#registerForm select, #julitaRegisterForm select');
     allSelects.forEach(select => {
@@ -148,105 +157,6 @@ function formatName(name) {
    .replace(/\s-\s/g, '-'); // Fix spacing around hyphens
 }
 
-// Submit member registration form - Updated to handle modal closing properly
-function submitRegister() {
- const julitaModal = document.getElementById("julitaRegisterModal");
- const registerModal = document.getElementById("registerModal");
- 
- const isJulitaOpen = julitaModal.classList.contains("active") || julitaModal.style.display === "flex";
- const modal = isJulitaOpen ? julitaModal : registerModal;
-
- const getTrimmedValue = (selectors) => {
-   if (typeof selectors === 'string') selectors = [selectors];
-   for (const selector of selectors) {
-     const element = modal.querySelector(selector);
-     if (element) return element.value.trim();
-   }
-   return '';
- };
-
- // Get form values
- const formData = new FormData();
- 
- // Required fields with name formatting
- formData.append("firstName", formatName(getTrimmedValue(['#julitaFirstName', '#firstName'])));
- formData.append("lastName", formatName(getTrimmedValue(['#julitaLastName', '#lastName'])));
- formData.append("middleName", formatName(getTrimmedValue(['#julitaMiddleName', '#middleName'])) || "null");
- formData.append("age", getTrimmedValue(['#julitaAge', '#age']));
- formData.append("barangay", formatName(getTrimmedValue(['#julitaBarangay', '#barangay'])));
- formData.append("municipality", formatName(getTrimmedValue(['#julitaMunicipality', '#municipality'])));
- formData.append("province", formatName(getTrimmedValue(['#julitaProvince', '#province'])));
- formData.append("contactNumber", getTrimmedValue(['#julitaContactNumber', '#contactNumber']));
-
- // Optional fields - explicitly set to null if empty
- formData.append("houseNumber", getTrimmedValue(['#julitaHouseNumber', '#houseNumber']) || "null");
- formData.append("street", formatName(getTrimmedValue(['#julitaStreet', '#street'])) || "null");
- formData.append("school", formatName(getTrimmedValue(['#julitaSchool', '#school'])) || "null");
-
- // Additional fields
- formData.append("memberdate", new Date().toISOString().split("T")[0]);
- formData.append("member_time", "60");
-
- // Handle photo
- const photoInput = modal.querySelector('#photo') || modal.querySelector('#julitaPhoto');
- if (photoInput?.files[0]) {
-   formData.append("photo", photoInput.files[0]);
- }
-
- // Show loading state
- const submitBtn = modal.querySelector('button[onclick="submitRegister()"]');
- const originalText = submitBtn.innerHTML;
- submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
- submitBtn.disabled = true;
-
- // Submit the form
- fetch("/members", {
-   method: "POST",
-   headers: {
-     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-     'Accept': 'application/json'
-   },
-   body: formData
- })
- .then(async response => {
-   const data = await response.json();
-   
-   if (!response.ok) {
-     // Format validation errors nicely
-     if (data.errors) {
-       const errorMessages = Object.values(data.errors)
-         .flat()
-         .join('\n');
-       throw new Error(errorMessages);
-     }
-     throw new Error(data.message || 'Registration failed');
-   }
-   
-   return data;
- })
- .then(data => {
-   alert("✅ Member registered successfully!");
-   
-   // Reset forms and clear any cached data before reload
-   resetAllRegistrationForms();
-   
-   // Close modal
-   closeRegisterModal();
-   
-   // Reload page to refresh data with slight delay to ensure reset
-   setTimeout(() => {
-     location.reload();
-   }, 200);
- })
- .catch(error => {
-   console.error("Registration error:", error);
-   alert("🚫 " + error.message);
- })
- .finally(() => {
-   submitBtn.innerHTML = originalText;
-   submitBtn.disabled = false;
- });
-}
 
 // Photo preview is now handled by photoprev.js
 
@@ -411,7 +321,8 @@ function submitRegister() {
      { selector: '#julitaBarangay', label: 'Barangay' },
      { selector: '#julitaMunicipality', label: 'Municipality' },
      { selector: '#julitaProvince', label: 'Province' },
-     { selector: '#julitaContactNumber', label: 'Contact Number' }
+     { selector: '#julitaContactNumber', label: 'Contact Number' },
+     { selector: '#julitaEmail', label: 'Email Address' }
    ];
  } else {
    requiredFields = [
@@ -421,7 +332,8 @@ function submitRegister() {
      { selector: '#barangay', label: 'Barangay' },
      { selector: '#municipality', label: 'Municipality' },
      { selector: '#province', label: 'Province' },
-     { selector: '#contactNumber', label: 'Contact Number' }
+     { selector: '#contactNumber', label: 'Contact Number' },
+     { selector: '#email', label: 'Email Address' }
    ];
  }
 
@@ -476,6 +388,12 @@ function submitRegister() {
  formData.append("houseNumber", getTrimmedValue(['#julitaHouseNumber', '#houseNumber']) || "null");
  formData.append("street", formatName(getTrimmedValue(['#julitaStreet', '#street'])) || "null");
  formData.append("school", formatName(getTrimmedValue(['#julitaSchool', '#school'])) || "null");
+
+ // Email field
+ const email = getTrimmedValue(['#julitaEmail', '#email']);
+ formData.append("email", email);
+
+ // Note: Email verification is optional - removed requirement check
 
  // Additional fields
  formData.append("memberdate", new Date().toISOString().split("T")[0]);

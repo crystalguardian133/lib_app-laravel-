@@ -1,9 +1,24 @@
 let qrScanner;
 
-  function openScanQRModal() {
-    document.getElementById('scanQRModal').style.display = 'flex';
+document.addEventListener('DOMContentLoaded', function() {
+  const startBtn = document.getElementById('startScannerBtn');
+  const stopBtn = document.getElementById('stopScannerBtn');
+  const qrReader = document.getElementById('qr-reader');
+  const instruction = document.getElementById('qr-instruction');
 
-    const qrRegion = document.getElementById("qr-reader");
+  if (startBtn && stopBtn && qrReader) {
+    startBtn.addEventListener('click', startScanner);
+    stopBtn.addEventListener('click', stopScanner);
+
+    // Autostart the scanner
+    startScanner();
+  }
+
+  function startScanner() {
+    if (qrScanner) {
+      qrScanner.stop().catch(err => console.error("Stop existing scanner error:", err));
+    }
+
     qrScanner = new Html5Qrcode("qr-reader");
 
     qrScanner.start(
@@ -15,7 +30,10 @@ let qrScanner;
       (decodedText, decodedResult) => {
         // On QR code success
         qrScanner.stop().then(() => {
-          document.getElementById('scanQRModal').style.display = 'none';
+          qrScanner = null;
+          startBtn.style.display = 'inline-flex';
+          stopBtn.style.display = 'none';
+          instruction.textContent = 'Point your camera at a QR code to scan';
 
           // Auto-post to time-log endpoint (assumes route exists)
           const memberId = decodedText.split("/").pop(); // extract ID from route
@@ -41,12 +59,24 @@ let qrScanner;
         // Optional debug logs
         // console.log(`Scan error: ${errorMessage}`);
       }
-    );
+    ).then(() => {
+      startBtn.style.display = 'none';
+      stopBtn.style.display = 'inline-flex';
+      instruction.textContent = 'Scanning... Point your camera at a QR code';
+    }).catch(err => {
+      console.error("Start scanner error:", err);
+      alert("❌ Error starting scanner. Please check camera permissions.");
+    });
   }
 
-  function closeScanQRModal() {
-    document.getElementById('scanQRModal').style.display = 'none';
+  function stopScanner() {
     if (qrScanner) {
-      qrScanner.stop().catch(err => console.error("Stop scanner error:", err));
+      qrScanner.stop().then(() => {
+        qrScanner = null;
+        startBtn.style.display = 'inline-flex';
+        stopBtn.style.display = 'none';
+        instruction.textContent = 'Point your camera at a QR code to scan';
+      }).catch(err => console.error("Stop scanner error:", err));
     }
   }
+});

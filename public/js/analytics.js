@@ -271,6 +271,10 @@ function initializeMunicipalityChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: 'x', // Vertical bars
+            maxBarThickness: 40, // Moderate bar width
+            categoryPercentage: 0.7, // Moderate category width
+            barPercentage: 0.8, // Moderate bar width within category
             plugins: {
                 legend: {
                     display: false
@@ -308,20 +312,7 @@ function initializeMunicipalityChart() {
                         minRotation: 45
                     }
                 }
-            },
-            indexAxis: 'x', // Vertical bars
-            barThickness: function(context) {
-                // Dynamic bar width based on number of bars
-                const dataLength = context.chart.data.labels.length;
-                if (dataLength === 1) {
-                    return 60; // Narrow bar for single data point
-                } else if (dataLength <= 3) {
-                    return 40; // Medium width for few bars
-                } else {
-                    return undefined; // Let Chart.js auto-calculate for many bars
-                }
-            },
-            maxBarThickness: 50 // Maximum bar width
+            }
         }
     };
 
@@ -352,8 +343,12 @@ function initializeAgeDistributionChart() {
         type: 'bar',
         data: data,
         options: {
+            indexAxis: 'x', // Vertical bars
             responsive: true,
             maintainAspectRatio: false,
+            maxBarThickness: 45, // Moderate bar width
+            categoryPercentage: 0.75, // Moderate category width
+            barPercentage: 0.85, // Moderate bar width within category
             plugins: {
                 legend: {
                     display: false

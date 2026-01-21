@@ -192,6 +192,7 @@ class EditModalHandler {
 
          // Contact Information
          this.setFieldValue('editContactNumber', member.contactnumber);
+         this.setFieldValue('editEmail', member.email);
          this.setFieldValue('editSchool', member.school);
 
          // Restore form from loading state
@@ -397,7 +398,10 @@ class EditModalHandler {
              if (data.success) {
                  this.showSuccess('Member updated successfully!');
                  this.updateTableRow(data.member);
-                 setTimeout(() => this.closeEditModal(), 1500);
+                 setTimeout(() => {
+                     this.closeEditModal();
+                     location.reload();
+                 }, 1500);
              } else {
                  this.showError(data.message || 'Failed to update member');
              }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\SystemLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 
@@ -14,18 +16,10 @@ class BookController extends Controller
         $books = Book::all();
 
         foreach ($books as $book) {
+            // Always regenerate QR codes regardless of whether they exist or not
+            $this->generateQrFile($book);
+
             $qrFileName = 'book-' . $book->id . '.png';
-            $qrDirectory = public_path('qrcode/books/');
-            $qrPath = $qrDirectory . $qrFileName;
-
-            if (!file_exists($qrDirectory)) {
-                mkdir($qrDirectory, 0755, true);
-            }
-
-            if (!file_exists($qrPath)) {
-                $this->generateQrFile($book);
-            }
-
             $book->qr_url = asset('qrcode/books/' . $qrFileName);
         }
 
@@ -150,7 +144,22 @@ public function store(Request $request)
 
         // Refresh the model to get all updated data
         $book = $book->fresh();
-        
+
+        // Log book creation
+        SystemLog::log(
+            'book_created',
+            "Book '{$book->title}' by {$book->author} was added to the library",
+            Auth::id(),
+            [
+                'book_id' => $book->id,
+                'book_title' => $book->title,
+                'book_author' => $book->author,
+                'book_genre' => $book->genre,
+                'published_year' => $book->published_year,
+                'availability' => $book->availability
+            ]
+        );
+
         return response()->json([
             'message' => 'Book added successfully!',
             'book' => $book
@@ -194,13 +203,74 @@ public function store(Request $request)
         $book->update($validated);
         $this->generateQrFile($book);
 
+        // Log book update
+        SystemLog::log(
+            'book_updated',
+            "Book '{$book->title}' by {$book->author} was updated",
+            Auth::id(),
+            [
+                'book_id' => $book->id,
+                'book_title' => $book->title,
+                'book_author' => $book->author,
+                'changes' => $validated
+            ]
+        );
+
         return response()->json(['success' => true, 'message' => 'Book updated']);
     }
 
     public function destroy($id)
     {
-        Book::destroy($id);
-        return response()->json(['success' => true, 'message' => 'Book deleted']);
+        try {
+            $book = Book::findOrFail($id);
+
+            // Check if the book is currently borrowed
+            $activeTransactions = \DB::table('transactions')
+                ->where('book_id', $id)
+                ->where('status', 'borrowed')
+                ->count();
+
+            if ($activeTransactions > 0) {
+                return response()->json([
+                    'error' => 'Cannot delete book: It is currently borrowed by ' . $activeTransactions . ' member(s).'
+                ], 400);
+            }
+
+            $bookData = [
+                'book_id' => $book->id,
+                'book_title' => $book->title,
+                'book_author' => $book->author
+            ];
+
+            // Delete related records manually to avoid cascade issues
+            \DB::table('returns')->whereIn('transaction_id', function ($query) use ($id) {
+                $query->select('id')->from('transactions')->where('book_id', $id);
+            })->delete();
+
+            \DB::table('transactions')->where('book_id', $id)->delete();
+
+            Book::destroy($id);
+
+            // Log book deletion (optional, don't fail if logging fails)
+            try {
+                SystemLog::log(
+                    'book_deleted',
+                    "Book '{$bookData['book_title']}' by {$bookData['book_author']} was deleted from the library",
+                    Auth::id()
+                );
+            } catch (\Exception $e) {
+                \Log::warning('Failed to log book deletion: ' . $e->getMessage());
+            }
+
+            return response()->json(['success' => true, 'message' => 'Book deleted']);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting book: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'error' => 'Failed to delete book: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function uploadTempImage(Request $request)
@@ -331,16 +401,19 @@ public function store(Request $request)
             mkdir(dirname($qrPath), 0755, true);
         }
 
-        if (!file_exists($qrPath)) {
-            $options = new QROptions([
-                'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-                'eccLevel' => QRCode::ECC_H,
-                'scale' => 10,
-            ]);
-
-            $qrData = route('books.show', $book->id); // QR code links to book details
-            (new QRCode($options))->render($qrData, $qrPath);
+        // Always regenerate QR code - delete existing file if it exists
+        if (file_exists($qrPath)) {
+            unlink($qrPath);
         }
+
+        $options = new QROptions([
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_H,
+            'scale' => 10,
+        ]);
+
+        $qrData = route('books.show', $book->id); // QR code links to book details
+        (new QRCode($options))->render($qrData, $qrPath);
 
         $book->qr_url = asset('qrcode/books/' . $qrFileName);
         $book->save();

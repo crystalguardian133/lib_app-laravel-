@@ -18,7 +18,11 @@
         }]
       },
       options: {
+        indexAxis: 'x', // Vertical bars
         responsive: true,
+        maxBarThickness: 45, // Moderate bar width
+        categoryPercentage: 0.75, // Moderate category width
+        barPercentage: 0.85, // Moderate bar width within category
         plugins: {
           legend: {
             display: false
@@ -48,7 +52,11 @@
       }]
     },
     options: {
+      indexAxis: 'x', // Vertical bars
       responsive: true,
+      maxBarThickness: 45, // Moderate bar width
+      categoryPercentage: 0.75, // Moderate category width
+      barPercentage: 0.85, // Moderate bar width within category
       scales: {
         y: {
           beginAtZero: true,

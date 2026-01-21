@@ -21,5 +21,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => bcrypt('1234'),
         ]);
+
+        // Run member seeder to create sample member data
+        $this->call(MemberSeeder::class);
+
+        // Run book seeder to create sample books
+        $this->call(BookSeeder::class);
+
+        // Run transaction seeder to create sample borrowing data
+        $this->call(TransactionSeeder::class);
     }
 }

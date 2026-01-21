@@ -144,6 +144,44 @@
     margin-bottom: var(--spacing-xl);
   }
 
+  /* Sidebar Header Styles - Ensure these are in your CSS */
+  .sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--spacing-xl);
+  transition: var(--transition);
+  }
+
+  .sidebar-header .logo {
+  width: 170px;
+  height: 170px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  transition: var(--transition-spring);
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+  }
+
+  .sidebar-header .logo:hover {
+  transform: scale(1.05) rotate(2deg);
+  }
+
+  .sidebar-header .label {
+  display: block !important;
+  font-weight: 700;
+  font-size: 1.27rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: var(--transition);
+  opacity: 1;
+  color: var(--primary) !important;
+  visibility: visible !important;
+  }
+  
+
   .sidebar-logo {
     width: 40px;
     height: 40px;
@@ -469,7 +507,10 @@
   }
 
   .data-table th:last-child {
-    border-right: none;
+    text-align: center;
+    width: 160px;
+    min-width: 160px;
+    font-weight: 600;
   }
 
   /* Dark mode table header */
@@ -933,6 +974,20 @@
   body:not(.dark-mode) .sidebar .label {
     color: #1a1a1a;
   }
+  
+  .sidebar-header .label {
+    display: block !important;
+    font-weight: 700;
+    font-size: 1.27rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: var(--transition);
+    opacity: 1;
+    color: var(--primary) !important;
+    visibility: visible !important;
+  }
 
   .sidebar-header {
     display: flex;
@@ -942,8 +997,8 @@
     transition: var(--transition);
   }
   .sidebar-header .logo {
-    width: 40px;
-    height: 40px;
+    width: 170px;
+    height: 170px;
     object-fit: contain;
     border-radius: var(--radius);
     transition: var(--transition-spring);
@@ -954,7 +1009,7 @@
   }
   .label {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.27rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     background-clip: text;
     -webkit-background-clip: text;
@@ -1333,9 +1388,9 @@
   }
 
   .data-table td:last-child {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
     padding-left: 8px;
     padding-right: 12px;
   }
@@ -1350,77 +1405,207 @@
     border-bottom: none;
   }
 
-  /* Action Buttons in Table */
+  /* Modern Action Buttons in Table */
   .action-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 4px;
+    display: flex;
     align-items: center;
-    justify-items: center;
-    width: 110px;
-    height: 55px;
-    padding: 3px;
+    gap: 8px;
+    padding: 4px;
     position: relative;
-    margin: 0 0 0 8px;
-    justify-self: start;
+    justify-content: center;
+    min-width: 200px;
   }
 
-  /* Grid layout for action buttons */
+  /* Primary and Secondary Action Layout */
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    justify-content: center;
+    padding: 8px;
+    min-width: 120px;
+  }
+
+  /* Primary Actions Row */
+  .primary-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  /* Secondary Actions Row */
+  .secondary-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  /* Action Button Styling */
   .action-buttons .btn {
-    width: 100%;
-    height: 100%;
-    min-height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
-    padding: 3px 4px;
+    gap: 4px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 8px;
     cursor: pointer;
-    pointer-events: auto;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 32px;
+    height: 32px;
     position: relative;
-    z-index: 1;
+    overflow: hidden;
   }
 
-  /* Enhanced button hover effects for scroll */
-  .action-buttons .btn {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-  }
-
+  /* Button Hover Effects */
   .action-buttons .btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   }
 
-  /* Grid button hover effects */
-  .action-buttons .btn:hover {
-    transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-    z-index: 10;
-  }
-
-  /* Active button state */
   .action-buttons .btn:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.3);
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  /* Button click animation */
-  .action-buttons .btn.clicked {
-    animation: buttonClick 0.2s ease-out;
+  /* Primary Actions Styling */
+  .primary-actions .btn {
+    background: var(--primary);
+    color: white;
   }
 
-  @keyframes buttonClick {
-    0% {
-      transform: translateY(0) scale(1);
+  .primary-actions .btn:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Secondary Actions Styling */
+  .secondary-actions .btn {
+    background: var(--surface);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .secondary-actions .btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* Info Button Special Styling */
+  .btn-info {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-info:hover {
+    background: var(--accent-dark);
+    box-shadow: 0 3px 8px rgba(6, 182, 212, 0.3);
+  }
+
+  /* Danger Button Special Styling */
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
+  }
+
+  /* Icon Styling */
+  .action-buttons .btn i {
+    font-size: 0.8rem;
+  }
+
+  /* Button Text */
+  .action-buttons .btn .btn-text {
+    display: none;
+  }
+
+  /* Responsive Design for Action Buttons */
+  @media (min-width: 768px) {
+    .action-buttons .btn .btn-text {
+      display: inline;
     }
-    50% {
-      transform: translateY(1px) scale(0.95);
+    
+    .action-buttons {
+      min-width: 160px;
     }
-    100% {
-      transform: translateY(0) scale(1);
+  }
+
+  /* Mobile Responsive Layout */
+  @media (max-width: 767px) {
+    .action-buttons {
+      flex-direction: row;
+      gap: 4px;
+      padding: 4px;
+      min-width: 120px;
     }
+    
+    .primary-actions,
+    .secondary-actions {
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .action-buttons .btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 4px;
+    }
+    
+    .action-buttons .btn i {
+      font-size: 0.7rem;
+    }
+    
+    .data-table td:last-child {
+      width: 120px;
+      min-width: 120px;
+      padding: 8px 4px;
+    }
+  }
+
+  /* Tooltip Styling */
+  .action-buttons .btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-900);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 2px;
+  }
+
+  /* Button Loading State */
+  .action-buttons .btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .action-buttons .btn.loading::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 4px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .data-table tr:last-child td {
@@ -2024,6 +2209,7 @@
     display: flex;
     gap: var(--spacing-sm);
     justify-content: flex-end;
+    align-items: center;
     background: var(--glass-bg);
   }
 
@@ -2737,6 +2923,446 @@
     border: 3px solid #9ca3af;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   }
+
+  /* Redesigned Activity History Modal Styles */
+  .activity-modal-container {
+    background: var(--surface-elevated);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: var(--transition);
+    border: 1px solid var(--glass-border);
+  }
+
+  .modal-overlay.active .activity-modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .activity-modal-header {
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, var(--glass-bg), rgba(99, 102, 241, 0.05));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+
+  .member-info-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex: 1;
+  }
+
+  .member-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    box-shadow: var(--shadow-lg);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .member-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+    display: block;
+  }
+
+  .member-details {
+    flex: 1;
+  }
+
+  .member-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .member-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .activity-modal-close {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .activity-modal-close:hover {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+    transform: rotate(90deg);
+  }
+
+  .activity-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    position: relative;
+  }
+
+  .tab-button:hover {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+  }
+
+  .tab-button.active {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+    border-bottom: 3px solid var(--primary);
+  }
+
+  .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary);
+  }
+
+  .activity-content {
+    max-height: 500px;
+    overflow: hidden;
+  }
+
+  .tab-content {
+    display: none;
+    padding: var(--spacing-xl);
+    max-height: 450px;
+    overflow-y: auto;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .activity-timeline {
+    position: relative;
+  }
+
+  .timeline-container {
+    position: relative;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: var(--spacing-xs);
+    transition: var(--transition-fast);
+    position: relative;
+  }
+
+  .timeline-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    width: 2px;
+    height: calc(100% + var(--spacing-md));
+    background: var(--border);
+    z-index: 1;
+  }
+
+  .timeline-item:last-child::before {
+    height: 50%;
+  }
+
+  .timeline-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-md);
+  }
+
+  .timeline-icon.book {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+  }
+
+  .timeline-icon.time-in {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+  }
+
+  .timeline-icon.time-out {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    color: white;
+  }
+
+  .timeline-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timeline-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+  }
+
+  .timeline-details {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .timeline-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .timeline-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .timeline-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-returned {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .status-overdue {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
+  }
+
+  .loading-spinner {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .loading-spinner i {
+    font-size: 2.5rem;
+    color: var(--primary);
+  }
+
+  .no-activity {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
+  }
+
+  .no-activity i {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--gray-300);
+  }
+
+  .no-activity h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.1rem;
+  }
+
+  /* Dark mode styles */
+  body.dark-mode .activity-modal-container {
+    background: var(--surface-elevated);
+    border-color: var(--glass-border);
+  }
+
+  body.dark-mode .activity-modal-header {
+    background: rgba(30, 30, 30, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-mode .timeline-item {
+    background: rgba(40, 40, 40, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-mode .timeline-item::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-mode .tab-button.active {
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  /* Button info style */
+  .btn-info {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-info:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .activity-modal-container {
+      max-width: 95vw;
+      margin: 10px;
+    }
+
+    .activity-modal-header {
+      padding: var(--spacing-lg);
+      flex-direction: column;
+      gap: var(--spacing-md);
+      text-align: center;
+    }
+
+    .member-info-section {
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .member-avatar-large {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+
+    .member-name {
+      font-size: 1.5rem;
+    }
+
+    .member-stats {
+      justify-content: center;
+    }
+
+    .activity-tabs {
+      flex-direction: column;
+    }
+
+    .tab-button {
+      justify-content: flex-start;
+      padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .timeline-item {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      text-align: center;
+    }
+
+    .timeline-meta {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+  }
   </style>
 </head>
 <body>
@@ -2764,14 +3390,19 @@
         <span class="label">Member Time-in/out</span>
       </a>
     </nav>
-    <div class="logout-btn" style="margin-top: auto; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; gap: 12px; align-self: center; margin-left: auto; margin-right: auto; background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer; width: 100%; max-width: 200px;">
-      <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
-        @csrf
-        <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
-          <i class="fas fa-sign-out-alt"></i>
-          <span class="logout-text">Logout</span>
-        </button>
-      </form>
+    <div style="margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 200px; margin-left: auto; margin-right: auto;">
+      <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
+        <i class="fas fa-cog"></i>
+      </button>
+      <div class="logout-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer;">
+        <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+          @csrf
+          <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Logout</span>
+          </button>
+        </form>
+      </div>
     </div>
     <div class="dark-toggle">
       <label class="switch" title="Toggle Dark Mode">
@@ -2864,23 +3495,50 @@
                   @endif
                 </td>
                 <td>
-                  <span class="status-badge active">Active</span>
+                  @if(empty($member->email) || $member->email === 'null')
+                    <span class="status-badge inactive" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: No Email">No Email</span>
+                  @elseif(!$member->email_verified)
+                    <span class="status-badge pending" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Unverified">Unverified Email</span>
+                  @else
+                    <span class="status-badge active" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Verified">Verified Email</span>
+                  @endif
                 </td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-primary btn-sm" onclick="editMember({{ $member->id }})" title="Edit Member">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-outline btn-sm" onclick="openCardModal({{ $member->id }})" title="View Card">
-                      <i class="fas fa-id-card"></i>
-                    </button>
+                    <div class="primary-actions">
+                      <button class="btn" onclick="editMember({{ $member->id }})" title="Edit Member">
+                        <i class="fas fa-edit"></i>
+                        <span class="btn-text">Edit</span>
+                      </button>
+                      @if(!$member->email_verified && $member->email)
+                        <button class="btn btn-success" id="verifyEmailBtn_{{ $member->id }}" onclick="openEmailVerificationModal({{ $member->id }}, '{{ $member->email }}')" title="Verify Email">
+                          <i class="fas fa-envelope"></i>
+                          <span class="btn-text">Verify Email</span>
+                        </button>
+                      @elseif($member->email_verified)
+                        <button class="btn" disabled style="background: #10b981; color: white; cursor: not-allowed;" title="Email Verified">
+                          <i class="fas fa-check"></i>
+                          <span class="btn-text">Verified</span>
+                        </button>
+                      @endif
+                    </div>
+                    <div class="secondary-actions">
+                      <button class="btn btn-info" onclick="viewMemberActivity({{ $member->id }})" title="View Activity History">
+                        <i class="fas fa-history"></i>
+                        <span class="btn-text">Activity</span>
+                      </button>
+                      <button class="btn" onclick="openCardModal({{ $member->id }})" title="View Membership Card">
+                        <i class="fas fa-id-card"></i>
+                        <span class="btn-text">Card</span>
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
             @endforeach
           @else
             <tr>
-              <td colspan="8" style="text-align: center; padding: 2rem;">
+              <td colspan="9" style="text-align: center; padding: 2rem;">
                 <i class="fas fa-users" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
                 <h3 style="color: #6b7280; margin-bottom: 0.5rem;">No Members Found</h3>
                 <p style="color: #9ca3af; margin-bottom: 1.5rem;">Start by registering your first member to get started.</p>
@@ -2896,6 +3554,83 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- MEMBER ACTIVITY HISTORY MODAL -->
+  <div class="modal-overlay" id="activityModal">
+    <div class="activity-modal-container">
+      <!-- Enhanced Header with Member Info -->
+      <div class="activity-modal-header">
+        <div class="member-info-section">
+          <div class="member-avatar-large" id="memberAvatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="member-details">
+            <h1 class="member-name" id="activityMemberName">Loading member details...</h1>
+            <div class="member-stats">
+              <div class="stat-item">
+                <span class="stat-label">Total Books Borrowed:</span>
+                <span class="stat-value" id="totalBorrowed">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Active Borrowings:</span>
+                <span class="stat-value" id="activeBorrowings">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Library Visits:</span>
+                <span class="stat-value" id="totalVisits">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="activity-modal-close" onclick="closeActivityModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Activity Tabs -->
+      <div class="activity-tabs">
+        <button class="tab-button active" onclick="switchActivityTab('borrowing')">
+          <i class="fas fa-book"></i>
+          <span>Borrowing History</span>
+        </button>
+        <button class="tab-button" onclick="switchActivityTab('timelog')">
+          <i class="fas fa-clock"></i>
+          <span>Time-in/out History</span>
+        </button>
+      </div>
+
+      <!-- Activity Content -->
+      <div class="activity-content">
+        <!-- Borrowing History Tab -->
+        <div id="borrowingTab" class="tab-content active">
+          <div class="activity-timeline">
+            <div id="borrowingHistory" class="timeline-container">
+              <div class="loading-state">
+                <div class="loading-spinner">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Loading borrowing history...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time-in/out History Tab -->
+        <div id="timelogTab" class="tab-content">
+          <div class="activity-timeline">
+            <div id="timelogHistory" class="timeline-container">
+              <div class="loading-state">
+                <div class="loading-spinner">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Loading time-in/out history...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
  <!-- REGISTER MODAL (Non-Julita Residents) -->
@@ -2981,6 +3716,15 @@
              <div class="form-group">
                <label for="contactNumber">Contact Number *</label>
                <input type="tel" id="contactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
+             </div>
+             <div class="form-group">
+               <label for="email">Email Address * <span id="emailVerifiedCheck" style="display: none; color: green;">✓</span></label>
+               <input type="email" id="email" name="email" class="form-input" required>
+               <button type="button" class="btn btn-info btn-sm" onclick="sendRegistrationEmailCode()">Send Code</button>
+               <div id="emailVerificationSection" style="display: none; margin-top: 10px;">
+                 <input type="text" id="registrationEmailCode" class="form-input" maxlength="6" placeholder="Enter 6-digit code" autocomplete="off" pattern="[0-9]{6}">
+                 <button type="button" class="btn btn-success btn-sm" onclick="verifyRegistrationEmailCode()">Verify Code</button>
+               </div>
              </div>
              <div class="form-group">
                <label for="school">School/Institution</label>
@@ -3164,6 +3908,18 @@
                 <input type="tel" id="julitaContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
               </div>
               <div class="form-group">
+                <label for="julitaEmail" class="form-label">
+                  <i class="fas fa-envelope"></i>
+                  Email Address * <span id="julitaEmailVerifiedCheck" style="display: none; color: green;">✓</span>
+                </label>
+                <input type="email" id="julitaEmail" name="email" class="form-input">
+                <button type="button" class="btn btn-info btn-sm" onclick="sendRegistrationEmailCode()">Send Code</button>
+                <div id="emailVerificationSection" style="display: none; margin-top: 10px;">
+                  <input type="text" id="registrationEmailCode" class="form-input" maxlength="6" placeholder="Enter 6-digit code">
+                  <button type="button" class="btn btn-success btn-sm" onclick="verifyRegistrationEmailCode()">Verify Code</button>
+                </div>
+              </div>
+              <div class="form-group">
                 <label for="julitaSchool" class="form-label">
                   <i class="fas fa-school"></i>
                   School/Institution
@@ -3209,6 +3965,241 @@
           <i class="fas fa-save"></i>
           Register Member
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMS Verification Modal -->
+  <div class="modal-overlay" id="smsVerificationModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">Verify Phone Number</div>
+        <button class="modal-close" onclick="closeSmsVerificationModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="smsModalMessage">We will send a verification code to <strong id="smsPhoneNumber"></strong></p>
+        <div id="smsCodeSection" style="display: none;">
+          <label for="smsCode" class="form-label">Enter Verification Code:</label>
+          <input type="text" id="smsCode" class="form-input" maxlength="6" placeholder="000000">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSmsVerificationModal()">Cancel</button>
+        <button class="btn btn-primary" id="sendSmsBtn" onclick="sendSmsCode()">Send Code</button>
+        <button class="btn btn-success" id="verifySmsBtn" style="display: none;" onclick="verifySmsCode()">Verify</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" style="z-index: 3000; display: none;">
+    <div class="modal-container" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-cog" style="color: var(--primary); font-size: 20px;"></i>
+          <span>System Settings</span>
+        </div>
+        <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <!-- Tabs Navigation -->
+        <div class="settings-tabs" style="display: flex; border-bottom: 2px solid var(--border); background: var(--surface-elevated);">
+          <button class="settings-tab active" onclick="switchSettingsTab('password')" data-tab="password" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-key"></i>
+            <span>Password</span>
+          </button>
+          <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-file-alt"></i>
+            <span>System Logs</span>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div style="padding: var(--spacing-xl);">
+          <!-- Password Tab -->
+          <div id="passwordTab" class="settings-tab-content active">
+            <div style="margin-bottom: var(--spacing-lg);">
+              <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-lock" style="color: var(--primary);"></i>
+                Change Admin Password
+              </h3>
+              <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg);">
+                Update your administrator account password. Make sure to use a strong password.
+              </p>
+            </div>
+            <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                  <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
+                  Current Password
+                </label>
+                <input type="password" id="currentPassword" class="form-input" required placeholder="Enter current password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                  <i class="fas fa-key" style="color: var(--text-muted); font-size: 14px;"></i>
+                  New Password
+                </label>
+                <input type="password" id="newPassword" class="form-input" required minlength="4" placeholder="Enter new password (min. 4 characters)">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                  <i class="fas fa-check-double" style="color: var(--text-muted); font-size: 14px;"></i>
+                  Confirm New Password
+                </label>
+                <input type="password" id="confirmPassword" class="form-input" required minlength="4" placeholder="Confirm new password">
+              </div>
+              <button type="submit" class="btn btn-success" style="margin-top: var(--spacing-sm); width: 100%;">
+                <i class="fas fa-save"></i> 
+                <span>Change Password</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- System Logs Tab -->
+          <div id="logsTab" class="settings-tab-content" style="display: none;">
+            <div style="margin-bottom: var(--spacing-lg);">
+              <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-file-alt" style="color: var(--accent);"></i>
+                System Logs
+              </h3>
+              <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
+                View and manage system logs to monitor application activity, track errors, and troubleshoot issues. Logs contain detailed information about system events and operations.
+              </p>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                  <i class="fas fa-file-alt" style="color: white; font-size: 20px;"></i>
+                </div>
+                <div style="flex: 1;">
+                  <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                    Application Logs
+                  </h4>
+                  <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                    Access detailed system logs and activity records
+                  </p>
+                </div>
+              </div>
+            </div>
+            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+              <i class="fas fa-external-link-alt"></i> 
+              <span>Open System Logs Page</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .settings-btn:hover {
+      background: var(--surface-elevated) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md) !important;
+    }
+
+    .settings-btn:hover i {
+      animation: rotate 0.6s ease;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .settings-tab {
+      position: relative;
+    }
+
+    .settings-tab.active {
+      color: var(--primary) !important;
+      border-bottom-color: var(--primary) !important;
+      background: var(--surface) !important;
+    }
+
+    .settings-tab:hover:not(.active) {
+      background: var(--surface) !important;
+      color: var(--text-primary) !important;
+    }
+
+    .settings-tab-content {
+      animation: fadeIn 0.3s ease;
+    }
+
+    .settings-tab-content.active {
+      display: block !important;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: var(--transition);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+      background: var(--surface-elevated);
+    }
+
+    .form-input:hover {
+      border-color: var(--gray-400);
+    }
+
+    body.dark-mode .form-input {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(71, 85, 105, 0.5);
+    }
+
+    body.dark-mode .form-input:focus {
+      background: rgba(30, 41, 59, 1);
+      border-color: var(--primary);
+    }
+  </style>
+
+  <!-- Email Verification Modal -->
+  <div class="modal-overlay" id="emailVerificationModal" style="z-index: 3000;">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">Verify Email Address</div>
+        <button class="modal-close" onclick="closeEmailVerificationModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="emailModalMessage">We will send a verification code to <strong id="emailAddress"></strong></p>
+        <div id="emailCodeSection" style="display: none;">
+          <label for="emailCode" class="form-label">Enter 6-digit Verification Code:</label>
+          <input type="text" id="emailCode" class="form-input" maxlength="6" placeholder="000000" pattern="[0-9]{6}" autocomplete="off">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEmailVerificationModal()">Cancel</button>
+        <button class="btn btn-primary" id="sendEmailBtn" onclick="sendEmailCode()">Send Code</button>
+        <button class="btn btn-success" id="verifyEmailBtn" style="display: none;" onclick="verifyEmailCode()">Verify</button>
       </div>
     </div>
   </div>
@@ -3321,6 +4312,10 @@
                 <input type="tel" id="editContactNumber" name="contactNumber" class="form-input" pattern="[0-9]{11}" maxlength="11" required>
               </div>
               <div class="form-group">
+                <label for="editEmail" class="form-label">Email Address *</label>
+                <input type="email" id="editEmail" name="email" class="form-input" required>
+              </div>
+              <div class="form-group">
                 <label for="editSchool" class="form-label">School/Institution</label>
                 <input type="text" id="editSchool" name="school" class="form-input">
               </div>
@@ -3329,11 +4324,11 @@
         </form>
       </div>
       <div class="edit-modal-footer">
-        <button type="button" class="btn btn-danger" onclick="deleteMember()">
-          <i class="fas fa-trash"></i> Delete
-        </button>
         <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
           <i class="fas fa-times"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" onclick="deleteMember()" style="margin-left: auto;">
+          <i class="fas fa-trash"></i> Delete Member
         </button>
         <button type="submit" class="btn btn-primary" form="editForm">
           <i class="fas fa-save"></i> Save Changes
@@ -3357,6 +4352,847 @@
 <script src="{{ asset('js/showqr.js') }}"></script>
 <script src="{{ asset('js/qrgen.js') }}"></script>
 <script src="{{ asset('js/card_gen.js') }}"></script>
+
+<!-- Member Activity History Functions -->
+<script>
+let currentActivityMemberId = null;
+
+function viewMemberActivity(memberId) {
+    const modal = document.getElementById('activityModal');
+    currentActivityMemberId = memberId;
+
+    // Show modal
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+
+    // Set loading state
+    document.getElementById('activityMemberName').textContent = 'Loading member details...';
+    document.getElementById('totalBorrowed').textContent = '-';
+    document.getElementById('activeBorrowings').textContent = '-';
+    document.getElementById('totalVisits').textContent = '-';
+
+    // Show borrowing tab by default
+    switchActivityTab('borrowing');
+
+    // Fetch member activity data
+    fetchMemberActivity(memberId);
+}
+
+function closeActivityModal() {
+    const modal = document.getElementById('activityModal');
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentActivityMemberId = null;
+}
+
+function switchActivityTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[onclick="switchActivityTab('${tabName}')"]`).classList.add('active');
+
+    // Update tab content
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById(tabName + 'Tab').classList.add('active');
+}
+
+async function fetchMemberActivity(memberId) {
+    try {
+        // Fetch member basic info
+        const memberResponse = await fetch(`/members/${memberId}`);
+        if (!memberResponse.ok) throw new Error('Failed to fetch member data');
+
+        const member = await memberResponse.json();
+        const fullName = [member.last_name, member.first_name, member.middle_name].filter(n => n && n !== 'null').join(' ');
+        document.getElementById('activityMemberName').textContent = fullName || 'Unknown Member';
+
+        // Update member avatar
+        updateMemberAvatar(member.photo);
+
+        // Fetch borrowing history
+        const borrowingResponse = await fetch(`/members/${memberId}/borrowing-history`);
+        const borrowingData = borrowingResponse.ok ? await borrowingResponse.json() : [];
+
+        // Fetch timelog history
+        const timelogResponse = await fetch(`/members/${memberId}/timelog-history`);
+        const timelogData = timelogResponse.ok ? await timelogResponse.json() : [];
+
+        // Calculate statistics
+        const stats = calculateMemberStats(borrowingData, timelogData);
+        updateMemberStats(stats);
+
+        // Render the data
+        renderBorrowingHistory(borrowingData);
+        renderTimelogHistory(timelogData);
+
+    } catch (error) {
+        console.error('Error fetching member activity:', error);
+        showNotification('Failed to load member activity data', 'error');
+        closeActivityModal();
+    }
+}
+
+function calculateMemberStats(borrowingData, timelogData) {
+    const totalBorrowed = borrowingData.length;
+    const activeBorrowings = borrowingData.filter(item => item.status === 'pending' || item.status === 'borrowed').length;
+    const totalVisits = timelogData.length;
+
+    return {
+        totalBorrowed,
+        activeBorrowings,
+        totalVisits
+    };
+}
+
+function updateMemberStats(stats) {
+    document.getElementById('totalBorrowed').textContent = stats.totalBorrowed;
+    document.getElementById('activeBorrowings').textContent = stats.activeBorrowings;
+    document.getElementById('totalVisits').textContent = stats.totalVisits;
+}
+
+function updateMemberAvatar(photoFilename) {
+    const avatarContainer = document.getElementById('memberAvatar');
+
+    if (photoFilename && photoFilename !== 'null' && photoFilename !== '') {
+        // Member has a photo, display it
+        const photoUrl = `/resource/member_images/${photoFilename}`;
+        avatarContainer.innerHTML = `<img src="${photoUrl}" alt="Member Photo" class="member-photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+    } else {
+        // No photo, show default icon
+        avatarContainer.innerHTML = '<i class="fas fa-user"></i>';
+    }
+}
+
+function renderBorrowingHistory(borrowingData) {
+    const container = document.getElementById('borrowingHistory');
+
+    if (!borrowingData || borrowingData.length === 0) {
+        container.innerHTML = '<div class="no-activity"><i class="fas fa-book-open"></i><h4>No Borrowing History</h4><p>This member has not borrowed any books yet.</p></div>';
+        return;
+    }
+
+    const html = borrowingData.map((item, index) => {
+        const statusClass = item.status === 'returned' ? 'status-returned' :
+                           item.status === 'pending' ? 'status-pending' : 'status-overdue';
+
+        const statusText = item.status === 'returned' ? 'Returned' :
+                          item.status === 'pending' ? 'Pending Return' :
+                          item.status === 'borrowed' ? 'Borrowed' : 'Overdue';
+
+        return `
+            <div class="timeline-item">
+                <div class="timeline-icon book">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${item.book_title || 'Unknown Book'}</div>
+                    <div class="timeline-details">
+                        <strong>Borrowed:</strong> ${formatDate(item.borrowed_date)}<br>
+                        <strong>Due:</strong> ${formatDate(item.due_date)}<br>
+                        ${item.returned_at ? `<strong>Returned:</strong> ${formatDate(item.returned_at)}` : '<strong>Status:</strong> Not yet returned'}
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="timeline-date">${formatRelativeTime(item.borrowed_date)}</div>
+                        <div class="timeline-status ${statusClass}">${statusText}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+function renderTimelogHistory(timelogData) {
+    const container = document.getElementById('timelogHistory');
+
+    if (!timelogData || timelogData.length === 0) {
+        container.innerHTML = '<div class="no-activity"><i class="fas fa-clock"></i><h4>No Time-in/out History</h4><p>This member has no recorded time-in/out activity.</p></div>';
+        return;
+    }
+
+    const html = timelogData.map(item => {
+        const action = item.action === 'time_in' ? 'Time In' : 'Time Out';
+        const iconClass = item.action === 'time_in' ? 'time-in' : 'time-out';
+        const icon = item.action === 'time_in' ? 'fas fa-sign-in-alt' : 'fas fa-sign-out-alt';
+
+        return `
+            <div class="timeline-item">
+                <div class="timeline-icon ${iconClass}">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${action}</div>
+                    <div class="timeline-details">
+                        Library visit recorded
+                    </div>
+                    <div class="timeline-meta">
+                        <div class="timeline-date">${formatDateTime(item.created_at)}</div>
+                        <div class="timeline-status" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2);">
+                            ${formatRelativeTime(item.created_at)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+function formatRelativeTime(dateString) {
+    if (!dateString) return '';
+    try {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        return `${Math.floor(diffDays / 30)} months ago`;
+    } catch (e) {
+        return '';
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+            <div>
+                <div style="font-weight: 600;">${message}</div>
+            </div>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+// Enhanced button click handlers with visual feedback
+function addButtonClickEffect(button) {
+    button.classList.add('loading');
+    
+    // Remove loading state after a short delay
+    setTimeout(() => {
+        button.classList.remove('loading');
+    }, 1000);
+}
+
+// Override existing functions to add visual feedback
+const originalEditMember = editMember;
+editMember = function(memberId) {
+    const button = event.target.closest('.btn');
+    addButtonClickEffect(button);
+    originalEditMember(memberId);
+};
+
+const originalOpenCardModal = openCardModal;
+openCardModal = function(memberId) {
+    const button = event.target.closest('.btn');
+    addButtonClickEffect(button);
+    originalOpenCardModal(memberId);
+};
+
+const originalViewMemberActivity = viewMemberActivity;
+viewMemberActivity = function(memberId) {
+    const button = event.target.closest('.btn');
+    addButtonClickEffect(button);
+    originalViewMemberActivity(memberId);
+};
+
+// SMS Verification Functions
+let currentSmsMemberId = null;
+
+function openSmsVerificationModal(memberId, phoneNumber) {
+    currentSmsMemberId = memberId;
+    document.getElementById('smsPhoneNumber').textContent = phoneNumber;
+    document.getElementById('smsVerificationModal').classList.add('active');
+    document.getElementById('smsCodeSection').style.display = 'none';
+    document.getElementById('sendSmsBtn').style.display = 'inline-block';
+    document.getElementById('verifySmsBtn').style.display = 'none';
+    document.body.classList.add('modal-open');
+}
+
+function closeSmsVerificationModal() {
+    document.getElementById('smsVerificationModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentSmsMemberId = null;
+}
+
+async function sendSmsCode() {
+    if (!currentSmsMemberId) return;
+
+    try {
+        const response = await fetch(`/members/${currentSmsMemberId}/send-sms-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+
+        if (response.ok) {
+            document.getElementById('smsModalMessage').textContent = 'Code sent! Enter the 6-digit code below.';
+            document.getElementById('smsCodeSection').style.display = 'block';
+            document.getElementById('sendSmsBtn').style.display = 'none';
+            document.getElementById('verifySmsBtn').style.display = 'inline-block';
+        } else {
+            showNotification('Failed to send SMS code', 'error');
+        }
+    } catch (error) {
+        showNotification('Error sending SMS code', 'error');
+    }
+}
+
+async function verifySmsCode() {
+    const code = document.getElementById('smsCode').value;
+    if (!code || code.length !== 6) {
+        showNotification('Please enter a valid 6-digit code', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/members/${currentSmsMemberId}/verify-sms-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ code })
+        });
+
+        if (response.ok) {
+            showNotification('Phone number verified successfully!', 'success');
+            closeSmsVerificationModal();
+            // Reload the page to update the status
+            location.reload();
+        } else {
+            showNotification('Invalid verification code', 'error');
+        }
+    } catch (error) {
+        showNotification('Error verifying code', 'error');
+    }
+}
+
+// ============================================
+// EMAIL VERIFICATION FUNCTIONS
+// ============================================
+
+// For existing members (via modal)
+let currentEmailMemberId = null;
+
+function openEmailVerificationModal(memberId, email) {
+    currentEmailMemberId = memberId;
+    window.registrationEmail = null; // Clear registration email if set
+    
+    // Update modal content
+    document.getElementById('emailAddress').textContent = email;
+    document.getElementById('emailModalMessage').textContent = `We will send a verification code to <strong>${email}</strong>`;
+    
+    // Reset modal state
+    const codeInput = document.getElementById('emailCode');
+    if (codeInput) codeInput.value = '';
+    document.getElementById('emailCodeSection').style.display = 'none';
+    document.getElementById('sendEmailBtn').style.display = 'inline-block';
+    document.getElementById('verifyEmailBtn').style.display = 'none';
+    
+    // Show modal
+    document.getElementById('emailVerificationModal').classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeEmailVerificationModal() {
+    document.getElementById('emailVerificationModal').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    
+    // Reset state
+    const codeInput = document.getElementById('emailCode');
+    if (codeInput) codeInput.value = '';
+    document.getElementById('emailCodeSection').style.display = 'none';
+    document.getElementById('sendEmailBtn').style.display = 'inline-block';
+    document.getElementById('verifyEmailBtn').style.display = 'none';
+    
+    currentEmailMemberId = null;
+}
+
+// Close settings modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('settingsModal');
+    if (e.target === modal && modal.style.display === 'flex') {
+        closeSettingsModal();
+    }
+});
+
+async function sendEmailCode() {
+    if (!currentEmailMemberId) {
+        showNotification('No member selected', 'error');
+        return;
+    }
+
+    const sendBtn = document.getElementById('sendEmailBtn');
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+    }
+
+    try {
+        const response = await fetch(`/members/${currentEmailMemberId}/send-email-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            document.getElementById('emailModalMessage').textContent = 'Code sent! Enter the 6-digit code below.';
+            document.getElementById('emailCodeSection').style.display = 'block';
+            document.getElementById('sendEmailBtn').style.display = 'none';
+            document.getElementById('verifyEmailBtn').style.display = 'inline-block';
+            
+            // Focus on code input
+            const codeInput = document.getElementById('emailCode');
+            if (codeInput) {
+                setTimeout(() => codeInput.focus(), 100);
+            }
+            
+            showNotification('Verification code sent to your email!', 'success');
+        } else {
+            const errorMsg = result.message || 'Failed to send email code';
+            console.error('Email send error:', result);
+            showNotification(errorMsg + (result.error ? ' (' + result.error + ')' : ''), 'error');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send Code';
+            }
+        }
+    } catch (error) {
+        console.error('Error sending email code:', error);
+        showNotification('Error sending email code: ' + error.message, 'error');
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send Code';
+        }
+    }
+}
+
+async function verifyEmailCode() {
+    if (!currentEmailMemberId) {
+        showNotification('No member selected', 'error');
+        return;
+    }
+
+    const codeInput = document.getElementById('emailCode');
+    const code = codeInput ? codeInput.value.trim() : '';
+    
+    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showNotification('Please enter a valid 6-digit code', 'error');
+        if (codeInput) codeInput.focus();
+        return;
+    }
+
+    const verifyBtn = document.getElementById('verifyEmailBtn');
+    if (verifyBtn) {
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
+    }
+
+    try {
+        const response = await fetch(`/members/${currentEmailMemberId}/verify-email-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ code })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            showNotification('Email verified successfully!', 'success');
+            closeEmailVerificationModal();
+
+            // Update the button to show verified state
+            const verifyBtn = document.getElementById(`verifyEmailBtn_${currentEmailMemberId}`);
+            if (verifyBtn) {
+                verifyBtn.outerHTML = '<button class="btn" disabled style="background: #10b981; color: white; cursor: not-allowed;" title="Email Verified"><i class="fas fa-check"></i><span class="btn-text">Verified</span></button>';
+            }
+
+            // Reload the page to update the status
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(result.message || 'Invalid verification code', 'error');
+            if (codeInput) {
+                codeInput.value = '';
+                codeInput.focus();
+            }
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify';
+            }
+        }
+    } catch (error) {
+        console.error('Error verifying code:', error);
+        showNotification('Error verifying code', 'error');
+        if (verifyBtn) {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify';
+        }
+    }
+}
+
+// For registration (inline in form)
+let lastEmailSend = 0;
+
+function sendRegistrationEmailCode() {
+    // Prevent spam: allow only once per minute
+    const now = Date.now();
+    if (now - lastEmailSend < 60000) {
+        const remaining = Math.ceil((60000 - (now - lastEmailSend)) / 1000);
+        showNotification(`Please wait ${remaining} seconds before sending another code`, 'error');
+        return;
+    }
+
+    const modal = document.getElementById('registerModal')?.classList.contains('active') 
+        ? document.getElementById('registerModal') 
+        : document.getElementById('julitaRegisterModal');
+    
+    if (!modal) {
+        showNotification('Registration modal not found', 'error');
+        return;
+    }
+
+    const emailInput = modal.querySelector('#email') || modal.querySelector('#julitaEmail');
+    if (!emailInput || !emailInput.value.trim()) {
+        showNotification('Please enter an email address first', 'error');
+        if (emailInput) emailInput.focus();
+        return;
+    }
+
+    const email = emailInput.value.trim();
+    
+    // Basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showNotification('Please enter a valid email address', 'error');
+        if (emailInput) emailInput.focus();
+        return;
+    }
+
+    const sendBtn = modal.querySelector('button[onclick="sendRegistrationEmailCode()"]');
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+    }
+
+    fetch('/members/send-email-code-registration', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            lastEmailSend = Date.now();
+            
+            // Show verification section
+            const section = modal.querySelector('#emailVerificationSection');
+            if (section) {
+                section.style.display = 'block';
+                // Focus on code input
+                const codeInput = section.querySelector('#registrationEmailCode') || section.querySelector('#julitaRegistrationEmailCode');
+                if (codeInput) {
+                    setTimeout(() => codeInput.focus(), 100);
+                }
+            }
+            
+            // Hide send button
+            if (sendBtn) sendBtn.style.display = 'none';
+            
+            // Store email for verification
+            window.registrationEmail = email;
+            window.emailVerified = false; // Reset verification status
+            
+            // Show debug code if available (development mode)
+            let notificationMsg = 'Verification code sent to your email!';
+            if (data.debug_code) {
+                notificationMsg += ` (Debug code: ${data.debug_code})`;
+                console.log('Debug verification code:', data.debug_code);
+            }
+            showNotification(notificationMsg, 'success');
+        } else {
+            const errorMsg = data.message || 'Failed to send verification code';
+            console.error('Email send error:', data);
+            showNotification(errorMsg + (data.error ? ' (' + data.error + ')' : ''), 'error');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send Code';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error sending verification code:', error);
+        showNotification('Error sending verification code: ' + error.message, 'error');
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send Code';
+        }
+    });
+}
+
+function verifyRegistrationEmailCode() {
+    const modal = document.getElementById('registerModal')?.classList.contains('active') 
+        ? document.getElementById('registerModal') 
+        : document.getElementById('julitaRegisterModal');
+    
+    if (!modal) {
+        showNotification('Registration modal not found', 'error');
+        return;
+    }
+
+    if (!window.registrationEmail) {
+        showNotification('Please send a verification code first', 'error');
+        return;
+    }
+
+    const codeInput = modal.querySelector('#registrationEmailCode') || modal.querySelector('#julitaRegistrationEmailCode');
+    const code = codeInput ? codeInput.value.trim() : '';
+    
+    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showNotification('Please enter a valid 6-digit code', 'error');
+        if (codeInput) codeInput.focus();
+        return;
+    }
+
+    const verifyBtn = modal.querySelector('button[onclick="verifyRegistrationEmailCode()"]');
+    if (verifyBtn) {
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Verifying...';
+    }
+
+    fetch('/members/verify-email-code-registration', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ email: window.registrationEmail, code })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Email verified successfully!', 'success');
+            
+            // Update UI
+            const section = modal.querySelector('#emailVerificationSection');
+            if (section) section.style.display = 'none';
+            
+            const check = modal.querySelector('#emailVerifiedCheck') || modal.querySelector('#julitaEmailVerifiedCheck');
+            if (check) check.style.display = 'inline';
+            
+            // Show send button again (disabled state)
+            const sendBtn = modal.querySelector('button[onclick="sendRegistrationEmailCode()"]');
+            if (sendBtn) {
+                sendBtn.style.display = 'inline-block';
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Verified';
+                sendBtn.classList.remove('btn-info');
+                sendBtn.classList.add('btn-success');
+            }
+            
+            window.emailVerified = true;
+        } else {
+            showNotification(data.message || 'Invalid verification code', 'error');
+            if (codeInput) {
+                codeInput.value = '';
+                codeInput.focus();
+            }
+            if (verifyBtn) {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verify Code';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error verifying code:', error);
+        showNotification('Error verifying code', 'error');
+        if (verifyBtn) {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify Code';
+        }
+    });
+}
+
+// Allow Enter key to submit code in modal
+document.addEventListener('DOMContentLoaded', function() {
+    const emailCodeInput = document.getElementById('emailCode');
+    if (emailCodeInput) {
+        emailCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyEmailCode();
+            }
+        });
+    }
+
+    // Setup password change form
+    const passwordForm = document.getElementById('changePasswordForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            changePassword();
+        });
+    }
+});
+
+// Settings Modal Functions
+function openSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'flex';
+    document.body.classList.add('modal-open');
+    // Reset to password tab
+    switchSettingsTab('password');
+}
+
+function closeSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'none';
+    document.body.classList.remove('modal-open');
+    // Reset form
+    const form = document.getElementById('changePasswordForm');
+    if (form) form.reset();
+}
+
+function switchSettingsTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.settings-tab-content').forEach(content => {
+        content.classList.remove('active');
+        content.style.display = 'none';
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(tabName + 'Tab');
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+        selectedContent.style.display = 'block';
+    }
+    
+    // Add active class to selected tab
+    const selectedTab = document.querySelector(`.settings-tab[data-tab="${tabName}"]`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+}
+
+function changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+
+    if (newPassword.length < 4) {
+        showNotification('New password must be at least 4 characters', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        showNotification('New passwords do not match', 'error');
+        return;
+    }
+
+    const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+
+    fetch('{{ route("admin.change-password") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+            new_password_confirmation: confirmPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Password changed successfully!', 'success');
+            closeSettingsModal();
+        } else {
+            showNotification(data.message || 'Failed to change password', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error changing password:', error);
+        showNotification('Error changing password', 'error');
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+}
+
+</script>
 
 
 </body>

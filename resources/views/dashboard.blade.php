@@ -6,23 +6,39 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>📚 Library Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ asset('css/christmas-effects.css') }}">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
+        /* Fix for chart container expansion */
+        .chart-container-fixed {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        .chart-container-fixed canvas {
+            max-width: 100%;
+            max-height: 300px;--shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            height: 300px;
+        }
+    </style>
+    <style>
 :root {
-    /* Shared Color Palette */
+    /* Legacy Color Palette */
     --primary: #2fb9eb;           /* Indigo */
     --primary-dark: #4f46e5;
-    --secondary: #8b5cf6;         /* Purple */
+    --secondary: #8b5cf6;        /* Vibrant Purple */
     --accent: #06b6d4;            /* Cyan */
     --accent-dark: #0891b2;
-    --success: #10b981;           /* Green */
+    --success: #059669;           /* Emerald */
     --warning: #f59e0b;           /* Amber */
     --danger: #ef4444;            /* Red */
+    --info: #3b82f6;              /* Blue */
     /* Neutral Scale */
     --white: #ffffff
     --gray-50: #f8fafc;
@@ -72,6 +88,7 @@
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+ 
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 0.75rem;
@@ -127,9 +144,13 @@
   body.dark-mode .data-table th {
     background: rgba(20, 20, 20, 0.8);
     border-bottom-color: rgba(255, 255, 255, 0.1);
+    opacity: 1 !important;
+    color: var(--text-primary) !important;
   }
   body.dark-mode .data-table td {
     border-bottom-color: rgba(255, 255, 255, 0.05);
+    opacity: 1 !important;
+    color: var(--text-primary) !important;
   }
   body.dark-mode .data-table tr:hover {
     background: rgba(255, 255, 255, 0.05);
@@ -154,7 +175,7 @@
   }
   body {
     font-family: 'Outfit', 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--background), #f1f5f9);
+    background: linear-gradient(135deg, var(--background), #e0f2fe);
     color: var(--text-primary);
     line-height: 1.6;
     transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -163,6 +184,51 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     position: relative;
+  }
+  /* Ensure table data is always fully visible - exclude modals and toasts */
+  .data-table:not(.modal .data-table):not(.toast .data-table):not(.toast-notification .data-table) td,
+  .data-table:not(.modal .data-table):not(.toast .data-table):not(.toast-notification .data-table) th,
+  .data-table:not(.modal .data-table):not(.toast .data-table):not(.toast-notification .data-table) tr,
+  .data-table:not(.modal .data-table):not(.toast .data-table):not(.toast-notification .data-table) td *,
+  .data-table:not(.modal .data-table):not(.toast .data-table):not(.toast-notification .data-table) th * {
+    opacity: 1 !important;
+  }
+  /* Exception for disabled buttons and loading states */
+  .btn:disabled {
+    opacity: 0.6 !important;
+  }
+  .loading-shimmer {
+    opacity: inherit !important;
+  }
+  /* Ensure modals, overlays, and toasts can control their own opacity and visibility */
+  .modal,
+  .modal-overlay,
+  .modal-container,
+  .toast,
+  .toast-notification,
+  .modal *,
+  .modal-overlay *,
+  .modal-container *,
+  .toast *,
+  .toast-notification * {
+    opacity: inherit !important;
+  }
+  /* Specific fix for register modals - respect display property */
+  #registerModal:not(.active),
+  #julitaRegisterModal:not(.active),
+  #addBookModal:not(.active) {
+    display: none !important;
+  }
+  #registerModal.active,
+  #julitaRegisterModal.active,
+  #addBookModal.active {
+    display: flex !important;
+  }
+  /* Ensure modal content inside respects parent visibility */
+  #registerModal:not(.active) *,
+  #julitaRegisterModal:not(.active) *,
+  #addBookModal:not(.active) * {
+    opacity: inherit !important;
   }
   /* Dark mode transition overlay */
   body::before {
@@ -188,10 +254,10 @@
   body.dark-mode {
     background: linear-gradient(135deg, #121212, #1a1a1a);
   }
-  /* Sidebar */
+  /* Sidebar - Legacy Gradient */
   .sidebar {
     width: 280px;
-    background: #1a1a1a;
+    background: linear-gradient(180deg, rgba(30, 64, 175, 0.95), rgba(124, 58, 237, 0.95));
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     padding: var(--spacing-lg);
     position: fixed;
@@ -204,18 +270,19 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     color: #ffffff;
     transform: translateZ(0);
-    /* Glassmorphism */
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
-  /* Light mode sidebar */
+  /* Light mode sidebar - Legacy */
   body:not(.dark-mode) .sidebar {
-    background: var(--glass-bg);
-    border-right: 1px solid var(--glass-border);
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(30, 64, 175, 0.95), rgba(124, 58, 237, 0.95));
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
   body:not(.dark-mode) .sidebar .label {
     color: #1a1a1a;
@@ -224,7 +291,7 @@
   .sidebar-header .label {
     display: block !important;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.27rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     background-clip: text;
     -webkit-background-clip: text;
@@ -235,19 +302,20 @@
     visibility: visible !important;
   }
   .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: var(--spacing-xl);
-    transition: var(--transition);
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 12px;
+   margin-bottom: var(--spacing-xl);
+   transition: var(--transition);
   }
   .sidebar-header .logo {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    border-radius: var(--radius);
-    transition: var(--transition-spring);
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+   width: 170px;
+   height: 170px;
+   object-fit: contain;
+   border-radius: var(--radius);
+   transition: var(--transition-spring);
+   filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
   }
   .sidebar-header .logo:hover {
     transform: scale(1.05) rotate(2deg);
@@ -264,7 +332,7 @@
     opacity: 1 !important;
     visibility: visible !important;
   }
-  /* Nav Links */
+  /* Nav Links - Legacy */
   .sidebar nav a {
     display: flex;
     align-items: center;
@@ -280,12 +348,13 @@
     font-size: 14px;
   }
   .sidebar nav a:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: #ffffff;
     transform: translateX(6px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--accent);
   }
   .sidebar nav a.active {
     background: rgba(59, 130, 246, 0.15);
@@ -298,31 +367,33 @@
     text-align: center;
     font-size: 18px;
   }
-  /* Light mode navigation */
+  /* Light mode navigation - Legacy */
   body:not(.dark-mode) .sidebar nav a {
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(255, 255, 255, 0.8);
   }
   body:not(.dark-mode) .sidebar nav a .label {
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(255, 255, 255, 0.8);
     transition: var(--transition);
     opacity: 1 !important;
     visibility: visible !important;
     display: inline !important;
   }
   body:not(.dark-mode) .sidebar nav a:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    color: #1a1a1a;
-    box-shadow: var(--shadow-md);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary);
   }
   body:not(.dark-mode) .sidebar nav a:hover .label {
-    color: #1a1a1a;
+    color: #ffffff;
   }
   body:not(.dark-mode) .sidebar nav a.active {
     background: rgba(59, 130, 246, 0.15);
     color: #3b82f6;
     border-left: 3px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
   }
   /* Dark Mode Toggle - Simple Slider Design */
   .dark-toggle {
@@ -591,19 +662,6 @@
     background: rgba(30, 30, 30, 0.95);
     border-color: rgba(255, 255, 255, 0.1);
   }
-  /* Multiple book return button styling */
-  .btn-return-multiple {
-    background: linear-gradient(135deg, var(--success), #059669);
-    border: none;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  .btn-return-multiple:hover {
-    background: linear-gradient(135deg, #059669, var(--success));
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  }
   /* Enhanced book display in table cells */
   .books-cell {
     position: relative;
@@ -721,7 +779,7 @@
     color: var(--primary);
     animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Stats Cards */
+  /* Stats Cards - Legacy Glassmorphism */
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -790,15 +848,6 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  /* Enhanced card header visibility */
-  .card-header h3 {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
   .card .count {
     font-size: 2.2rem;
     font-weight: 900;
@@ -845,16 +894,6 @@
     position: relative;
     z-index: 4;
   }
-  .card-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  /* Ensure buttons don't break card hover */
-  .card-actions .btn {
-    flex-shrink: 0;
-  }
   /* Bottom positioned action buttons — GLASSMORPHISM REMOVED */
   .card-actions-bottom {
     display: flex;
@@ -885,7 +924,7 @@
     color: var(--primary) !important;
     border: 2px solid transparent !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-    transition: 
+    transition:
         border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
         color 0.5s cubic-bezier(0.4, 0, 0.2, 1)
         box-shadow 0.25s ease, transform 0.25s ease;
@@ -1944,16 +1983,15 @@
   }
   /* Table Styles */
   .table-container {
-    max-height: 450px;
-    overflow-y: auto;
-    border-radius: var(--radius-lg);
-    border: 2px solid rgba(99, 102, 241, 0.2);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.1);
-    position: relative;
-    overflow: hidden;
+   max-height: 450px;
+   overflow-y: auto;
+   border-radius: var(--radius-lg);
+   border: 2px solid rgba(99, 102, 241, 0.2);
+   background: var(--glass-bg);
+   backdrop-filter: var(--glass-blur);
+   -webkit-backdrop-filter: var(--glass-blur);
+   position: relative;
+   overflow: hidden;
   }
   .table-container::before {
     content: '';
@@ -1987,6 +2025,7 @@
     letter-spacing: 0.5px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+    opacity: 1 !important;
   }
   .data-table td {
     padding: 14px 12px;
@@ -1995,11 +2034,11 @@
     font-size: 0.95rem;
     font-weight: 500;
     transition: var(--transition);
+    opacity: 1 !important;
   }
   .data-table tr:hover {
-    background: rgba(99, 102, 241, 0.08);
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+   background: rgba(99, 102, 241, 0.08);
+   transform: translateX(2px);
   }
   .data-table tr:last-child td {
     border-bottom: none;
@@ -2301,7 +2340,7 @@
     opacity: 0;
     transform: translateY(-30px) scale(0.9);
     transition: var(--transition-spring);
-    display: flex;
+    display: none; /* Hidden by default */
     align-items: center;
     font-size: 0.95rem;
     cursor: pointer;
@@ -2309,12 +2348,20 @@
     border-left: 4px solid transparent;
     position: relative;
     overflow: hidden;
+    visibility: hidden;
   }
   .toast-notification.show {
-    opacity: 1;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     transform: translateY(0) scale(1);
     animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
                toastGlow 2s ease-in-out infinite alternate;
+  }
+  .toast-notification.toast-hidden {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
   @keyframes toastSlideIn {
     0% { opacity: 0; transform: translateY(-30px) scale(0.8) rotate(-2deg); }
@@ -2943,7 +2990,11 @@
     backdrop-filter: var(--glass-blur) !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
     border: 1px solid var(--glass-border) !important;
-    box-shadow: var(--glass-shadow) !important;
+    opacity: 1 !important;
+  }
+  .data-table th *,
+  .data-table td * {
+    opacity: 1 !important;
   }
   /* Override for modal footer buttons to ensure visibility */
   .modal-footer .btn,
@@ -3366,11 +3417,6 @@
       max-width: none;
       z-index: 9999;
     }
-    /* Mobile action buttons */
-    .btn-return-multiple {
-      font-size: 0.7rem;
-      padding: 4px 8px;
-    }
     /* Compact book display on mobile */
     .books-cell {
       max-width: 120px;
@@ -3378,19 +3424,18 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    /* Mobile bulk return section */
-    #bulkReturnSection {
-      margin: 0.5rem;
-      padding: 0.75rem;
-    }
-    #bulkReturnSection .btn {
-      font-size: 0.7rem;
-      padding: 6px 10px;
-    }
   }
   /* Enhanced table row hover effects for grouped data */
   .data-table tr {
     transition: all 0.3s ease;
+  }
+  .data-table tr td,
+  .data-table tr th {
+    opacity: 1 !important;
+  }
+  .data-table tr:not(:hover) td,
+  .data-table tr:not(:hover) th {
+    opacity: 1 !important;
   }
   .data-table tr:hover .books-tooltip {
     display: block !important;
@@ -3409,10 +3454,6 @@
   .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-  .btn-return-multiple:disabled {
-    background: var(--warning) !important;
-    color: white !important;
   }
   /* Enhanced tooltip positioning */
   .books-tooltip {
@@ -3452,6 +3493,69 @@
     accent-color: var(--primary);
     transform: scale(1.2);
   }
+  /* Notification Styles */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 16px 20px;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 400px;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .notification.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .notification-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+  }
+  .notification-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .notification-success {
+    background: linear-gradient(135deg, var(--success), #059669);
+  }
+  .notification-error {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+  }
+  .notification-info {
+    background: linear-gradient(135deg, var(--info), #2563eb);
+  }
+  .notification-warning {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+  }
 </style>
 <body>
     <!-- Sidebar -->
@@ -3478,33 +3582,38 @@
                 <span class="label">Member Time-in/out</span>
             </a>
         </nav>
-        <!-- Logout Button -->
-        <div class="logout-section" style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; justify-content: center;">
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
-                @csrf
-                <button type="submit" class="logout-btn" style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    width: 160px;
-                    padding: 10px 12px;
-                    background: transparent;
-                    color: var(--text-secondary);
-                    border: 1px solid var(--border);
-                    border-radius: var(--radius);
-                    font-size: 12px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: none;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                ">
-                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
-                    <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
-                </button>
-            </form>
+        <!-- Settings and Logout Buttons -->
+        <div style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="logout-section" style="display: flex; justify-content: center; flex: 1;">
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+                    @csrf
+                    <button type="submit" class="logout-btn" style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        width: 100%;
+                        padding: 10px 12px;
+                        background: transparent;
+                        color: var(--text-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: var(--radius);
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: none;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">
+                        <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                        <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
+                    </button>
+                </form>
+            </div>
         </div>
         <div class="dark-toggle">
             <label class="switch" title="Toggle Dark Mode">
@@ -3523,7 +3632,7 @@
             <span class="icon">🎄</span>
             <span id="christmasToggleText" class="christmas-text">Enable Christmas</span>
         </div>
-        <script>
+            <script>
             // Christmas Effects Manager - Refactored for better organization
             class ChristmasEffectsManager {
                 constructor() {
@@ -3533,19 +3642,17 @@
                     this.isInitialized = false;
                     this.init();
                 }
-                async init() {
-                    if (this.isInitialized) return;
-                    // Get DOM elements
-                    this.christmasToggle = document.getElementById('christmasToggle');
-                    this.christmasToggleText = document.getElementById('christmasToggleText');
-                    // Initialize music player
-                    this.musicPlayer = new ChristmasMusicPlayer();
-                    // Setup toggle functionality
-                    this.setupToggle();
-                    // Load saved preference
-                    this.loadSavedPreference();
-                    this.isInitialized = true;
-                }
+                                init() {
+                                    this.christmasToggle = document.getElementById('christmasToggle');
+                                    this.christmasToggleText = document.getElementById('christmasToggleText');
+                                    // Initialize music player
+                                    this.musicPlayer = new ChristmasMusicPlayer();
+                                    // Setup toggle functionality
+                                    this.setupToggle();
+                                    // Load saved preference
+                                    this.loadSavedPreference();
+                                    this.isInitialized = true;
+                                }
                 setupToggle() {
                     if (!this.christmasToggle) return;
                     this.christmasToggle.addEventListener('click', () => this.toggleChristmasEffects());
@@ -4026,6 +4133,10 @@
             }
             // Initialize Christmas effects when DOM is ready - ensure single instance
             document.addEventListener('DOMContentLoaded', () => {
+                // Initialize new charts first
+                createMonthlyBooksChart();
+                createActiveAreasChart();
+
                 if (!window.christmasEffectsManager) {
                     window.christmasEffectsManager = new ChristmasEffectsManager();
                 }
@@ -4034,43 +4145,21 @@
     </div>
     <!-- Main Content -->
     <div class="main" id="mainContent">
-        <div style="position: relative;">
-            <div class="dashboard-title">DASHBOARD</div>
-            <!-- Christmas Toast Container (positioned to the right of dashboard title) -->
-            <div id="christmasToastContainer" style="position: absolute; top: 0; right: 0; z-index: 1000; pointer-events: none;"></div>
+        <!-- Dashboard Header -->
+        <div class="dashboard-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <i style="margin-right: 0.5rem;"></i>
+                DASHBOARD
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="realTimeClock" style="font-size: 1.2rem; font-weight: 600; color: var(--primary); background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 0.5rem 1rem; box-shadow: var(--glass-shadow);">
+                    Loading...
+                </div>
+            </div>
         </div>
+        <!-- Christmas Toast Container -->
+        <div id="christmasToastContainer" style="position: fixed; top: 100px; right: 24px; z-index: 1000; pointer-events: none;"></div>
         <div class="dashboard-content">
-        <!-- Stats Cards -->
-        <div class="stats">
-            <div class="card" id="booksCard">
-                <div class="card-header">
-                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Books</h3>
-                </div>
-                <div class="count">{{ $booksCount }}</div>
-                <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openAddBookModal()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="openBooksTable()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card" id="membersCard">
-                <div class="card-header">
-                    <h3 style="font-size: 0.9rem; color: var(--text-muted); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 1;">Members</h3>
-                </div>
-                <div class="count">{{ $membersCount }}</div>
-                <div class="card-actions-bottom">
-                    <button class="btn btn-sm btn-primary" onclick="openJulitaRegisterModal()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="openMembersTable()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
         <!-- Combined Borrowers Table and Weekly Chart -->
         <div class="card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
@@ -4103,48 +4192,27 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); text-align: center; width: 50px;">
-                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" style="transform: scale(1.2); cursor: pointer;" title="Select All">
-                                </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(0)" data-sort="number" class="sortable-header">
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        #
-                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
-                                    </div>
-                                </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(1)" data-sort="text" class="sortable-header">
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(0)" data-sort="text" class="sortable-header">
                                     <div style="display: flex; align-items: center; gap: 4px;">
                                         Name
                                         <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
                                     </div>
                                 </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(2)" data-sort="text" class="sortable-header">
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(1)" data-sort="text" class="sortable-header">
                                     <div style="display: flex; align-items: center; gap: 4px;">
                                         Title
                                         <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
                                     </div>
                                 </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(3)" data-sort="date" class="sortable-header">
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(2)" data-sort="date" class="sortable-header">
                                     <div style="display: flex; align-items: center; gap: 4px;">
-                                        Borrowed Date
+                                        Borrow Date
                                         <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
                                     </div>
                                 </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(4)" data-sort="date" class="sortable-header">
+                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(3)" data-sort="time" class="sortable-header">
                                     <div style="display: flex; align-items: center; gap: 4px;">
-                                        Due Date
-                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
-                                    </div>
-                                </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(5)" data-sort="date" class="sortable-header">
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        Returned At
-                                        <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
-                                    </div>
-                                </th>
-                                <th style="font-size: 1rem; font-weight: 700; color: var(--primary); cursor: pointer;" onclick="sortTable(6)" data-sort="status" class="sortable-header">
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        Return Status
+                                        Borrow Time
                                         <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8rem;">↕</span>
                                     </div>
                                 </th>
@@ -4153,130 +4221,268 @@
                         </thead>
                         <tbody id="borrowersTableBody">
                             <tr>
-                                <td colspan="9" class="loading">Loading borrowers...</td>
+                                <td colspan="5" class="loading">Loading borrowers...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!-- Weekly Chart -->
-            <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                    <h4 style="margin: 0; color: var(--text-primary); font-size: 0.9rem; font-weight: 600;">📈 Borrower Statistics</h4>
-                    <div style="display: flex; gap: 6px;">
-                        <select id="monthFilter" class="form-control" style="width: auto; padding: 3px 6px; font-size: 0.75rem;" onchange="updateWeeklyChart()">
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                        <select id="yearFilter" class="form-control" style="width: auto; padding: 3px 6px; font-size: 0.75rem;" onchange="updateWeeklyChart()">
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="position: relative; height: 150px;">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
             </div>
-            </div>
-        <!-- Analytics Section -->
-        <div class="analytics-section" style="margin-top: 2rem; display: grid; grid-template-columns: 1fr; gap: 2rem;">
-            <!-- Book Popularity Analytics (Full Width) -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 style="opacity: 1; color: var(--text-muted);">📚 Book Popularity by Genre</h3>
-                </div>
-                <div style="padding: 1rem; height: 400px; position: relative;">
-                    <div style="display: flex; height: 360px; gap: 2rem;">
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                            <canvas id="bookPopularityChart" style="height: 300px; width: 300px; margin-bottom: 10px;"></canvas>
-                            <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
-                                Genre Distribution
-                            </div>
-                        </div>
-                        <div id="bookLegend" style="width: 280px; height: 360px; overflow-y: auto; padding: 15px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
-                            <h4 style="margin: 0 0 15px 0; color: var(--text-primary); font-size: 1rem; font-weight: 600; text-align: center;">📊 Genre Breakdown</h4>
-                            <div id="legendItems" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Age Distribution -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 style="opacity: 1; color: var(--text-muted);">🎂 Age Distribution</h3>
-                </div>
-                <div style="padding: 1rem; height: 300px;">
-                    <canvas id="ageDistributionChart"></canvas>
-                </div>
-            </div>
-            <!-- Top Books and Active Members -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 style="opacity: 1; color: var(--text-muted);">🏆 Top Books & Active Members</h3>
-                    <div class="card-actions">
-                        <select id="activityFilter" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="switchActivityView(this.value)">
-                            <option value="borrowing">By Borrowing Frequency</option>
-                            <option value="timelog">By Time-in/out Frequency</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="padding: 1rem;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <!-- Top 10 Most Borrowed Books -->
-                        <div>
-                            <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1rem; font-weight: 600;">📖 Top 10 Most Borrowed Books</h4>
-                            <div style="max-height: 300px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
-                                <div id="topBooksList" style="display: flex; flex-direction: column; gap: 8px;">
-                                    <!-- Books will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Most Active Members -->
-                        <div>
-                            <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1rem; font-weight: 600;">👤 Most Active Members</h4>
-                            <div style="max-height: 300px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
-                                <div id="activeMembersList" style="display: flex; flex-direction: column; gap: 8px;">
-                                    <!-- Members will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Member Demographics (Full Width) -->
+        <!-- Enhanced Member Demographics (Full Width) -->
         <div class="card" style="margin-top: 2rem;">
             <div class="card-header">
-                <h3 style="opacity: 1; color: var(--text-muted);">👥 Member Demographics</h3>
+                <h3 style="opacity: 1; color: var(--text-muted);">👥 Member Demographics & Stratification</h3>
                 <div class="card-actions">
+                    <button class="btn btn-sm btn-outline" onclick="refreshDemographicsData()" title="Refresh Data" style="margin-right: 8px;">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                     <select id="demographicsFilter" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="switchDemographicsView(this.value)">
-                        <option value="julita">Julita Residents</option>
+                        <option value="julita" selected>Julita Residents (by Barangay)</option>
                         <option value="non-julita">Other Municipalities</option>
+                        <option value="overview">Demographics Overview</option>
                     </select>
                 </div>
             </div>
             <div style="padding: 1rem;">
-                <div id="julitaDemographics" style="height: 450px;">
-                    <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Julita Barangay Distribution</h4>
-                    <div id="barangayMap" style="height: 400px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border);"></div>
+                <!-- Overview Statistics -->
+                <div id="demographicsOverview" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                        <div class="stats-subcard" style="text-align: center; padding: 1rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <div class="count" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary);" id="julitaTotalCount">-</div>
+                            <p style="margin: 0; color: var(--text-muted); font-weight: 600;">Julita Residents</p>
+                            <small style="color: var(--text-secondary);" id="julitaPercentage">-</small>
+                        </div>
+                        <div class="stats-subcard" style="text-align: center; padding: 1rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <div class="count" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--secondary);" id="nonJulitaTotalCount">-</div>
+                            <p style="margin: 0; color: var(--text-muted); font-weight: 600;">Other Municipalities</p>
+                            <small style="color: var(--text-secondary);" id="nonJulitaPercentage">-</small>
+                        </div>
+                        <div class="stats-subcard" style="text-align: center; padding: 1rem; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <div class="count" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--accent);" id="totalMembersCount">-</div>
+                            <p style="margin: 0; color: var(--text-muted); font-weight: 600;">Total Members</p>
+                            <small style="color: var(--text-secondary);">100%</small>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Geographic Distribution</h4>
+                            <canvas id="overviewChart" style="max-height: 350px;"></canvas>
+                        </div>
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Top 5 Areas</h4>
+                            <div id="topAreasList" style="max-height: 350px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                <!-- Top areas will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="nonJulitaDemographics" style="height: 450px; display: none;">
-                    <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Other Municipalities</h4>
-                    <canvas id="municipalityChart" style="max-height: 400px;"></canvas>
+
+                <!-- Julita Detailed Breakdown -->
+                <div id="julitaDemographics" style="display: block;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Julita Barangay Distribution</h4>
+                            <canvas id="barangayChart" style="max-height: 400px;"></canvas>
+                        </div>
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Barangay Statistics</h4>
+                            <div id="barangayStats" style="max-height: 400px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                <!-- Barangay stats will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrated Map Container - DISABLED -->
+                    <div style="margin-bottom: 2rem; display: none;">
+                        <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Julita Geographic Distribution Map</h4>
+                        <div class="map-container-wrapper" style="position: relative;">
+                            <div id="julitaMapContainer" class="demographic-map" style="height: 400px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); position: relative; overflow: hidden;">
+                                <!-- Map will be loaded here -->
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted);">
+                                    <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>Interactive map loading...</p>
+                                    <small>Barangay boundaries and member density visualization</small>
+                                </div>
+                            </div>
+                            <!-- Map Controls -->
+                            <div class="map-controls" style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 100;">
+                                <button class="btn btn-sm btn-outline" onclick="toggleMapView('julita')" title="Toggle Map View" style="padding: 5px 8px; font-size: 0.8rem;">
+                                    <i class="fas fa-map"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="refreshJulitaMap()" title="Refresh Map" style="padding: 5px 8px; font-size: 0.8rem;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Barangay Table -->
+                    <div style="margin-top: 1rem;">
+                        <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Complete Barangay Breakdown</h4>
+                        <div style="overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border);">
+                            <table class="data-table" style="min-width: 600px;">
+                                <thead>
+                                    <tr>
+                                        <th>Barangay</th>
+                                        <th>Members</th>
+                                        <th>Percentage</th>
+                                        <th>Age Distribution</th>
+                                        <th>Most Active Age Group</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="barangayTableBody">
+                                    <tr>
+                                        <td colspan="5" class="loading">Loading barangay data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Non-Julita Municipalities -->
+                <div id="nonJulitaDemographics" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Other Municipalities Distribution</h4>
+                            <canvas id="municipalityChart" style="max-height: 400px;"></canvas>
+                        </div>
+                        <div>
+                            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Municipality Statistics</h4>
+                            <div id="municipalityStats" style="max-height: 400px; overflow-y: auto; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);">
+                                <!-- Municipality stats will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrated Map Container for Non-Julita Areas - DISABLED -->
+                    <div style="margin-bottom: 2rem; display: none;">
+                        <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Geographic Distribution Map (Outside Julita)</h4>
+                        <div class="map-container-wrapper" style="position: relative;">
+                            <div id="nonJulitaMapContainer" class="demographic-map" style="height: 400px; width: 100%; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); position: relative; overflow: hidden;">
+                                <!-- Map will be loaded here -->
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted);">
+                                    <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>Interactive map loading...</p>
+                                    <small>Municipality locations and member density visualization</small>
+                                </div>
+                            </div>
+                            <!-- Map Controls -->
+                            <div class="map-controls" style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 100;">
+                                <button class="btn btn-sm btn-outline" onclick="toggleMapView('non-julita')" title="Toggle Map View" style="padding: 5px 8px; font-size: 0.8rem;">
+                                    <i class="fas fa-map"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="refreshNonJulitaMap()" title="Refresh Map" style="padding: 5px 8px; font-size: 0.8rem;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Municipality Table -->
+                    <div style="margin-top: 1rem;">
+                        <h4 style="text-align: center; margin-bottom: 1rem; color: var(--text-primary);">Complete Municipality Breakdown</h4>
+                        <div style="overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border);">
+                            <table class="data-table" style="min-width: 600px;">
+                                <thead>
+                                    <tr>
+                                        <th>Municipality/City</th>
+                                        <th>Province</th>
+                                        <th>Members</th>
+                                        <th>Percentage</th>
+                                        <th>Age Distribution</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="municipalityTableBody">
+                                    <tr>
+                                        <td colspan="5" class="loading">Loading municipality data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <!-- Activity Analytics Charts Side by Side -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+            <!-- Comparative Book Borrowing Analytics Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">📊 Book Borrowing Frequency Comparison</h3>
+                    <div class="card-actions">
+                        <select id="monthlyChartMonthFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="updateMonthlyChart()">
+                            <option value="current" selected>Current Month</option>
+                            <option value="last">Last Month</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: 1rem;">
+                    <div class="chart-container-fixed" style="height: 310px;">
+                        <canvas id="monthlyBooksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Most Active Barangay & Municipality Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">📊 Most Active Barangay & Municipality</h3>
+                    <div class="card-actions">
+                        <select id="activeAreasFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="filterActiveAreas(this.value)">
+                            <option value="all">All Areas</option>
+                            <option value="julita">Julita Only</option>
+                            <option value="non-julita">Non-Julita Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: 1rem;">
+                    <div class="chart-container-fixed" style="height: 310px;">
+                        <canvas id="activeAreasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Activity & Retention Analytics -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+            <!-- Peak Hours Activity Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">🕐 Peak Hours Activity</h3>
+                    <div class="card-actions">
+                        <select id="peakHoursFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="updatePeakHoursChart()">
+                            <option value="today">Today</option>
+                            <option value="week" selected>This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: 1rem;">
+                    <div class="chart-container-fixed" style="height: 310px;">
+                        <canvas id="peakHoursChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Age Group Activity Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="opacity: 1; color: var(--text-muted);">👥 Age Group Visit Frequency</h3>
+                    <div class="card-actions">
+                        <select id="ageActivityFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onchange="updateAgeActivityChart()">
+                            <option value="week" selected>This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="quarter">Last 3 Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: 1rem;">
+                    <div class="chart-container-fixed" style="height: 310px;">
+                        <canvas id="ageActivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Consolidated Statistics with Line Graph -->
         <div class="card stats-overview-card" style="margin-top: 2rem; display: flex; flex-direction: column;">
             <div class="card-header">
@@ -4311,6 +4517,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Christmas Music Player Overlay -->
         <div id="christmasMusicPlayer" style="
             position: fixed;
@@ -5371,6 +5578,8 @@
         const visitsData = @json($visitsData);
         const borrowersData = @json($borrowers);
         const analyticsData = @json($analytics);
+        const monthlyBorrowsData = @json($monthlyBorrows);
+        const activeAreasData = @json($activeAreas);
         window.dashboardStats = {
             lifetimeCount: {{ $lifetimeCount }},
             booksCount: {{ $booksCount }},
@@ -5388,18 +5597,2256 @@
     <script src="{{ asset('js/analytics.js') }}"></script>
     <script src="{{ asset('js/chatbot.js') }}"></script>
     <script>
+        // Enhanced demographics data structure
+        const demographicsData = {
+            julitaBarangays: {
+                'Poblacion District I': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Poblacion District II': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Poblacion District III': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Poblacion District IV': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Alegria': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Anibong': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Aslum': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Balante': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Bongdo': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Bonifacio': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Bugho': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Calbasag': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Caridad': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Cuya-e': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Dita': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Gitabla': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Hindang': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Inawangan': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Jurao': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'San Andres': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'San Pablo': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Santa Cruz': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Santo Niño': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Tagkip': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Tolosahay': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } },
+                'Villa Hermosa': { count: 0, ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 } }
+            },
+            municipalities: {}
+        };
+
+        // Load demographics data immediately when the script runs
+        loadDemographicsData();
+
         // Function to switch between demographics views
         function switchDemographicsView(viewType) {
+            const overviewView = document.getElementById('demographicsOverview');
             const julitaView = document.getElementById('julitaDemographics');
             const nonJulitaView = document.getElementById('nonJulitaDemographics');
-            if (viewType === 'julita') {
-                julitaView.style.display = 'block';
-                nonJulitaView.style.display = 'none';
-            } else {
-                julitaView.style.display = 'none';
-                nonJulitaView.style.display = 'block';
+            
+            // Hide all views first
+            if (overviewView) overviewView.style.display = 'none';
+            if (julitaView) julitaView.style.display = 'none';
+            if (nonJulitaView) nonJulitaView.style.display = 'none';
+            
+            if (viewType === 'overview') {
+                if (overviewView) overviewView.style.display = 'block';
+                loadDemographicsOverview();
+            } else if (viewType === 'julita') {
+                if (julitaView) julitaView.style.display = 'block';
+                loadJulitaDemographics();
+            } else if (viewType === 'non-julita') {
+                if (nonJulitaView) nonJulitaView.style.display = 'block';
+                // Ensure data is loaded before displaying
+                if (Object.keys(demographicsData.municipalities).length === 0) {
+                    // If no data, try to reload
+                    loadDemographicsData().then(() => {
+                        loadNonJulitaDemographics();
+                    });
+                } else {
+                    loadNonJulitaDemographics();
+                }
             }
         }
+
+        // Load demographics overview
+        function loadDemographicsOverview() {
+            // Sample data - replace with actual API call
+            const julitaTotal = Object.values(demographicsData.julitaBarangays).reduce((sum, brgy) => sum + brgy.count, 0);
+            const nonJulitaTotal = Object.values(demographicsData.municipalities).reduce((sum, muni) => sum + muni.count, 0);
+            const totalMembers = julitaTotal + nonJulitaTotal;
+            
+            document.getElementById('julitaTotalCount').textContent = julitaTotal || '0';
+            document.getElementById('nonJulitaTotalCount').textContent = nonJulitaTotal || '0';
+            document.getElementById('totalMembersCount').textContent = totalMembers || '0';
+            
+            const julitaPercent = totalMembers > 0 ? ((julitaTotal / totalMembers) * 100).toFixed(1) : '0';
+            const nonJulitaPercent = totalMembers > 0 ? ((nonJulitaTotal / totalMembers) * 100).toFixed(1) : '0';
+            
+            document.getElementById('julitaPercentage').textContent = `${julitaPercent}% of total`;
+            document.getElementById('nonJulitaPercentage').textContent = `${nonJulitaPercent}% of total`;
+            
+            // Create overview chart
+            createOverviewChart(julitaTotal, nonJulitaTotal);
+            loadTopAreas();
+        }
+
+        // Load Julita demographics by barangay
+        function loadJulitaDemographics() {
+            const barangays = Object.entries(demographicsData.julitaBarangays)
+                .filter(([name, data]) => data.count > 0)
+                .sort((a, b) => b[1].count - a[1].count);
+
+            // Create barangay chart with delay to ensure DOM is ready
+            setTimeout(() => {
+                createBarangayChart(barangays);
+            }, 100);
+
+            // Maps are disabled - skip initialization
+
+            // Populate barangay statistics
+            const statsContainer = document.getElementById('barangayStats');
+            statsContainer.innerHTML = barangays.map(([name, data]) => {
+                const total = Object.values(demographicsData.julitaBarangays).reduce((sum, brgy) => sum + brgy.count, 0);
+                const percentage = total > 0 ? ((data.count / total) * 100).toFixed(1) : '0';
+                const topAgeGroup = Object.entries(data.ageGroups).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+                return `
+                    <div style="padding: 8px 12px; margin-bottom: 8px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: var(--text-primary);">${name}</span>
+                            <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${data.count}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                            ${percentage}% of Julita residents • Top age: ${topAgeGroup}
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p style="color: var(--text-muted); text-align: center;">No Julita residents data available</p>';
+
+            // Populate barangay table
+            const tableBody = document.getElementById('barangayTableBody');
+            tableBody.innerHTML = barangays.map(([name, data]) => {
+                const total = Object.values(demographicsData.julitaBarangays).reduce((sum, brgy) => sum + brgy.count, 0);
+                const percentage = total > 0 ? ((data.count / total) * 100).toFixed(1) : '0';
+                const ageDistribution = Object.entries(data.ageGroups)
+                    .filter(([age, count]) => count > 0)
+                    .map(([age, count]) => `${age}: ${count}`)
+                    .join(', ') || 'No data';
+                const topAgeGroup = Object.entries(data.ageGroups).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${name}</td>
+                        <td>${data.count}</td>
+                        <td>${percentage}%</td>
+                        <td style="font-size: 0.9rem;">${ageDistribution}</td>
+                        <td>${topAgeGroup}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No barangay data available</td></tr>';
+        }
+
+        // Load non-Julita demographics
+        function loadNonJulitaDemographics() {
+            console.log('Loading non-Julita demographics...');
+            console.log('Full demographicsData:', demographicsData);
+            console.log('Municipalities object:', demographicsData.municipalities);
+            console.log('Municipalities keys:', Object.keys(demographicsData.municipalities || {}));
+            
+            const municipalities = Object.entries(demographicsData.municipalities || {})
+                .filter(([name, data]) => data && data.count > 0)
+                .sort((a, b) => b[1].count - a[1].count);
+            
+            console.log('Filtered municipalities data:', municipalities);
+            console.log('Municipalities count:', municipalities.length);
+            
+            // Create municipality chart
+            createMunicipalityChart(municipalities);
+            
+            // Maps are disabled - skip initialization
+            
+            // Populate municipality statistics
+            const statsContainer = document.getElementById('municipalityStats');
+            if (!statsContainer) {
+                console.error('municipalityStats container not found');
+                return;
+            }
+            
+            if (municipalities.length === 0) {
+                statsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No non-Julita members data available</p>';
+            } else {
+                const total = Object.values(demographicsData.municipalities).reduce((sum, muni) => sum + (muni.count || 0), 0);
+                statsContainer.innerHTML = municipalities.map(([name, data]) => {
+                    const percentage = total > 0 ? ((data.count / total) * 100).toFixed(1) : '0';
+                    
+                    return `
+                        <div style="padding: 8px 12px; margin-bottom: 8px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-weight: 600; color: var(--text-primary);">${name}</span>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${data.province || 'Unknown Province'}</div>
+                                </div>
+                                <span style="background: var(--secondary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${data.count}</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                                ${percentage}% of non-Julita members
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Populate municipality table
+            const tableBody = document.getElementById('municipalityTableBody');
+            if (!tableBody) {
+                console.error('municipalityTableBody container not found');
+                return;
+            }
+            
+            if (municipalities.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No municipality data available</td></tr>';
+            } else {
+                const total = Object.values(demographicsData.municipalities).reduce((sum, muni) => sum + (muni.count || 0), 0);
+                tableBody.innerHTML = municipalities.map(([name, data]) => {
+                    const percentage = total > 0 ? ((data.count / total) * 100).toFixed(1) : '0';
+                    const ageDistribution = Object.entries(data.ageGroups || {})
+                        .filter(([age, count]) => count > 0)
+                        .map(([age, count]) => `${age}: ${count}`)
+                        .join(', ') || 'No data';
+                    
+                    return `
+                        <tr>
+                            <td style="font-weight: 600;">${name}</td>
+                            <td>${data.province || 'Unknown'}</td>
+                            <td>${data.count}</td>
+                            <td>${percentage}%</td>
+                            <td style="font-size: 0.9rem;">${ageDistribution}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Create overview pie chart
+        function createOverviewChart(julitaTotal, nonJulitaTotal) {
+            const ctx = document.getElementById('overviewChart');
+            if (!ctx) {
+                console.error('Overview chart canvas not found');
+                return;
+            }
+
+            try {
+                // Destroy existing chart if any
+                if (window.overviewChartInstance) {
+                    window.overviewChartInstance.destroy();
+                }
+
+                window.overviewChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Julita Residents', 'Other Municipalities'],
+                        datasets: [{
+                            data: [julitaTotal, nonJulitaTotal],
+                            backgroundColor: [
+                                'rgba(99, 102, 241, 0.8)',
+                                'rgba(139, 92, 246, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(99, 102, 241, 1)',
+                                'rgba(139, 92, 246, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    color: document.body.classList.contains('dark-mode') ? '#FFFFFF' : undefined
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = julitaTotal + nonJulitaTotal;
+                                        const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0';
+                                        return `${context.label}: ${context.raw} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating overview chart:', error);
+            }
+        }
+
+        // Create barangay chart
+        function createBarangayChart(barangays) {
+            const ctx = document.getElementById('barangayChart');
+            if (!ctx) {
+                console.error('Barangay chart canvas not found');
+                return;
+            }
+
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+
+            // Check if canvas is visible
+            if (ctx.offsetParent === null) {
+                console.warn('Barangay chart canvas not visible');
+                return;
+            }
+
+            try {
+                // Destroy existing chart if any
+                if (window.barangayChartInstance) {
+                    window.barangayChartInstance.destroy();
+                }
+
+                const labels = barangays.map(([name]) => name);
+                const data = barangays.map(([, data]) => data.count);
+
+                window.barangayChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Members',
+                            data: data,
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'x', // Vertical bars
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        maxBarThickness: 15, // More narrow bar width
+                        categoryPercentage: 0.8, // Moderate category width
+                        barPercentage: 0.35, // More narrow bar width within category
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    color: document.body.classList.contains('dark-mode') ? '#FFFFFF' : undefined
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Members',
+                                    color: document.body.classList.contains('dark-mode') ? '#FFFFFF' : undefined,
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    color: document.body.classList.contains('dark-mode') ? '#FFFFFF' : undefined
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Barangay',
+                                    color: document.body.classList.contains('dark-mode') ? '#FFFFFF' : undefined,
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const total = data.reduce((sum, val) => sum + val, 0);
+                                        const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0';
+                                        return `Members: ${context.raw} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating barangay chart:', error);
+            }
+        }
+
+        // Create barangay chart
+        function createBarangayChart(barangays) {
+            const ctx = document.getElementById('barangayChart');
+            if (!ctx) {
+                console.error('Barangay chart canvas not found');
+                return;
+            }
+
+            try {
+                // Destroy existing chart if any
+                if (window.barangayChartInstance) {
+                    window.barangayChartInstance.destroy();
+                }
+
+                const labels = barangays.map(([name]) => name);
+                const data = barangays.map(([, data]) => data.count);
+
+                window.barangayChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Members',
+                            data: data,
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'x', // Vertical bars
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        maxBarThickness: 45, // Moderate bar width
+                        categoryPercentage: 0.75, // Moderate category width
+                        barPercentage: 0.85, // Moderate bar width within category
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const total = data.reduce((sum, val) => sum + val, 0);
+                                        const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0';
+                                        return `Members: ${context.raw} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating barangay chart:', error);
+            }
+        }
+
+        // Create municipality chart
+        function createMunicipalityChart(municipalities) {
+            const ctx = document.getElementById('municipalityChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart if any - check both window instance and canvas chart property
+            if (window.municipalityChartInstance) {
+                window.municipalityChartInstance.destroy();
+                window.municipalityChartInstance = null;
+            }
+            
+            // Also check if Chart.js has attached a chart instance to the canvas
+            if (ctx.chart) {
+                ctx.chart.destroy();
+                ctx.chart = null;
+            }
+            
+            // Use Chart.getChart to find any existing chart on this canvas
+            const existingChart = Chart.getChart(ctx);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            
+            const labels = municipalities.map(([name]) => name);
+            const data = municipalities.map(([, data]) => data.count);
+            
+            window.municipalityChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(168, 85, 247, 0.8)',
+                            'rgba(236, 72, 153, 0.8)',
+                            'rgba(20, 184, 166, 0.8)',
+                            'rgba(251, 146, 60, 0.8)'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0';
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== UNIFIED DATA SOURCE =====
+        // Enhanced caching system for analytics data
+        class AnalyticsCache {
+            constructor() {
+                this.cache = new Map();
+                this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+            }
+
+            set(key, data) {
+                this.cache.set(key, {
+                    data,
+                    timestamp: Date.now()
+                });
+            }
+
+            get(key) {
+                const cached = this.cache.get(key);
+                if (cached && (Date.now() - cached.timestamp) < this.cacheTimeout) {
+                    return cached.data;
+                }
+                this.cache.delete(key);
+                return null;
+            }
+
+            clear() {
+                this.cache.clear();
+            }
+        }
+
+        const analyticsCache = new AnalyticsCache();
+
+        // ===== ENHANCED API FUNCTIONS =====
+        // Fetch Monthly Books Data from Backend with improved error handling
+        async function fetchMonthlyBorrowsData(forceRefresh = false) {
+            const cacheKey = 'monthlyBorrows';
+
+            if (!forceRefresh) {
+                const cached = analyticsCache.get(cacheKey);
+                if (cached) {
+                    console.log('📊 Using cached monthly borrows data');
+                    return cached;
+                }
+            }
+
+            try {
+                console.log('🔄 Fetching fresh monthly borrows data...');
+                const response = await fetch('/api/analytics/monthly-borrows', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched monthly borrows data:', data);
+
+                    // Validate data structure
+                    if (this.validateMonthlyData(data)) {
+                        analyticsCache.set(cacheKey, data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid data structure, using fallback');
+                        return getFallbackMonthlyData();
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getFallbackMonthlyData();
+                }
+            } catch (error) {
+                console.error('❌ Error fetching monthly borrows data:', error);
+                return getFallbackMonthlyData();
+            }
+        }
+
+        // Validate monthly data structure
+        function validateMonthlyData(data) {
+            return data &&
+                   Array.isArray(data.labels) &&
+                   Array.isArray(data.data) &&
+                   data.labels.length === data.data.length &&
+                   data.labels.length > 0;
+        }
+
+        // Enhanced fallback data for monthly borrows
+        function getFallbackMonthlyData() {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const labels = [];
+            const data = [];
+
+            // Generate last 12 months
+            for (let i = 11; i >= 0; i--) {
+                const date = new Date(currentYear, currentDate.getMonth() - i, 1);
+                const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                labels.push(monthName);
+                data.push(0); // Default to 0 for fallback
+            }
+
+            return { labels, data };
+        }
+
+        // Fetch Active Areas Data from Backend with enhanced caching
+        async function fetchActiveAreasData(forceRefresh = false) {
+            const cacheKey = 'activeAreas';
+
+            if (!forceRefresh) {
+                const cached = analyticsCache.get(cacheKey);
+                if (cached) {
+                    console.log('📊 Using cached active areas data');
+                    return cached;
+                }
+            }
+
+            try {
+                console.log('🔄 Fetching fresh active areas data...');
+                const response = await fetch('/api/analytics/active-areas', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched active areas data:', data);
+
+                    // Validate and structure data
+                    if (this.validateActiveAreasData(data)) {
+                        analyticsCache.set(cacheKey, data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid active areas data structure, using fallback');
+                        return getFallbackActiveAreasData();
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getFallbackActiveAreasData();
+                }
+            } catch (error) {
+                console.error('❌ Error fetching active areas data:', error);
+                return getFallbackActiveAreasData();
+            }
+        }
+
+        // Validate active areas data structure
+        function validateActiveAreasData(data) {
+            return data &&
+                   Array.isArray(data.labels) &&
+                   Array.isArray(data.data) &&
+                   data.labels.length === data.data.length &&
+                   data.labels.length > 0;
+        }
+
+        // Enhanced fallback data for active areas
+        function getFallbackActiveAreasData() {
+            return {
+                labels: ['No Activity Data'],
+                data: [0]
+            };
+        }
+
+        // ===== CHART LOADING & ERROR HANDLING =====
+        // Show loading state on chart canvas
+        function showChartLoading(canvas, message = 'Loading...') {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Set background
+            ctx.fillStyle = 'var(--surface, #ffffff)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw loading text
+            ctx.fillStyle = 'var(--text-muted, #64748b)';
+            ctx.font = '14px Outfit, Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(message, centerX, centerY);
+
+            // Draw spinner
+            ctx.save();
+            ctx.translate(centerX, centerY - 30);
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'var(--primary, #6366f1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Animated arc
+            const time = Date.now() * 0.005;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, time, time + Math.PI);
+            ctx.strokeStyle = 'var(--accent, #06b6d4)';
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Clear loading state
+        function clearChartLoading(canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Show error state on chart canvas
+        function showChartError(canvas, message = 'Error loading chart') {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Set background
+            ctx.fillStyle = 'var(--surface, #ffffff)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw error icon
+            ctx.fillStyle = 'var(--danger, #ef4444)';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚠️', centerX, centerY - 20);
+
+            // Draw error text
+            ctx.fillStyle = 'var(--text-primary, #1e293b)';
+            ctx.font = '14px Outfit, Inter, sans-serif';
+            ctx.fillText(message, centerX, centerY + 10);
+
+            // Draw retry hint
+            ctx.fillStyle = 'var(--text-muted, #64748b)';
+            ctx.font = '12px Outfit, Inter, sans-serif';
+            ctx.fillText('Please refresh the page', centerX, centerY + 30);
+        }
+
+        // ===== THEME-AWARE CHART COLORS =====
+        function getChartThemeColors() {
+            const isDark = document.body.classList.contains('dark-mode');
+            return {
+                primary: isDark ? 'rgba(139, 92, 246, 1)' : 'rgba(99, 102, 241, 1)',
+                primaryLight: isDark ? 'rgba(139, 92, 246, 0.2)' : 'rgba(99, 102, 241, 0.1)',
+                text: isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+                grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                tooltipBg: 'rgba(0, 0, 0, 0.9)',
+                tooltipText: '#ffffff'
+            };
+        }
+
+        // Generate bell curve data for time distribution visualization
+        function generateBellCurve(data) {
+            const n = data.length;
+            if (n === 0) return [];
+
+            // Find the peak hour and its value
+            const maxValue = Math.max(...data);
+            const peakIndex = data.indexOf(maxValue);
+
+            // Create a bell curve centered around the peak hour
+            const bellCurve = [];
+            const stdDev = 3; // Controls the width of the bell curve
+
+            for (let i = 0; i < n; i++) {
+                // Calculate distance from peak (in hours)
+                const distance = Math.abs(i - peakIndex);
+                // Normalize distance
+                const normalizedDistance = distance / stdDev;
+
+                // Bell curve formula: e^(-0.5 * x^2)
+                const bellValue = Math.exp(-0.5 * normalizedDistance * normalizedDistance);
+
+                // Scale by the actual data value at this point, but ensure minimum visibility
+                const actualValue = data[i] || 0.1; // Minimum value to show something
+                const scaledValue = bellValue * actualValue * 1.5; // Boost for better visualization
+
+                bellCurve.push(scaledValue);
+            }
+
+            // Apply additional smoothing for a more natural curve
+            const smoothed = [];
+            for (let i = 0; i < n; i++) {
+                let sum = 0;
+                let count = 0;
+                const smoothingRadius = 1; // Smooth with neighboring points
+
+                for (let j = Math.max(0, i - smoothingRadius); j <= Math.min(n - 1, i + smoothingRadius); j++) {
+                    sum += bellCurve[j];
+                    count++;
+                }
+
+                smoothed.push(sum / count);
+            }
+
+            return smoothed;
+        }
+
+        // ===== PEAK HOURS ACTIVITY CHART =====
+        async function createPeakHoursChart(filterValue = 'week', forceRefresh = false) {
+            const ctx = document.getElementById('peakHoursChart');
+            if (!ctx) {
+                console.error('❌ Peak hours chart canvas not found');
+                return;
+            }
+
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js not loaded');
+                return;
+            }
+
+            // Destroy existing chart
+            if (window.peakHoursChartInstance) {
+                window.peakHoursChartInstance.destroy();
+                window.peakHoursChartInstance = null;
+            }
+
+            showChartLoading(ctx, 'Loading peak hours data...');
+
+            try {
+                const peakHoursData = await fetchPeakHoursData(filterValue);
+                clearChartLoading(ctx);
+
+                if (!peakHoursData || !peakHoursData.labels || !peakHoursData.data) {
+                    console.error('❌ Invalid peak hours data:', peakHoursData);
+                    showChartError(ctx, 'No peak hours data available');
+                    return;
+                }
+
+                const totalVisits = peakHoursData.data.reduce((sum, val) => sum + val, 0);
+                console.log('📊 Creating peak hours chart with:', {
+                    hours: peakHoursData.labels.length,
+                    totalVisits
+                });
+
+                const colors = getChartThemeColors();
+                const isDarkMode = document.body.classList.contains('dark-mode');
+
+                const chartData = {
+                    labels: peakHoursData.labels,
+                    datasets: [{
+                        label: `Visits (${filterValue === 'today' ? 'Today' : filterValue === 'week' ? 'This Week' : 'This Month'})`,
+                        data: peakHoursData.data,
+                        backgroundColor: peakHoursData.data.map((value, index) => {
+                            // Color intensity based on visit count
+                            const maxValue = Math.max(...peakHoursData.data);
+                            const intensity = maxValue > 0 ? (value / maxValue) : 0;
+                            const baseColor = isDarkMode ? [139, 92, 246] : [99, 102, 241]; // Purple/Blue
+                            const r = Math.round(baseColor[0] + (intensity * 50));
+                            const g = Math.round(baseColor[1] + (intensity * 50));
+                            const b = Math.round(baseColor[2] + (intensity * 50));
+                            return `rgba(${r}, ${g}, ${b}, 0.8)`;
+                        }),
+                        borderColor: peakHoursData.data.map((value, index) => {
+                            const maxValue = Math.max(...peakHoursData.data);
+                            const intensity = maxValue > 0 ? (value / maxValue) : 0;
+                            const baseColor = isDarkMode ? [139, 92, 246] : [99, 102, 241];
+                            const r = Math.round(baseColor[0] + (intensity * 50));
+                            const g = Math.round(baseColor[1] + (intensity * 50));
+                            const b = Math.round(baseColor[2] + (intensity * 50));
+                            return `rgba(${r}, ${g}, ${b}, 1)`;
+                        }),
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                };
+
+                // Generate bell curve data from the actual data
+                const bellCurveData = generateBellCurve(peakHoursData.data);
+
+                const bellCurveChartData = {
+                    labels: peakHoursData.labels,
+                    datasets: [{
+                        label: `Visit Distribution (${filterValue === 'today' ? 'Today' : filterValue === 'week' ? 'This Week' : 'This Month'})`,
+                        data: bellCurveData,
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 2
+                    }]
+                };
+
+                window.peakHoursChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: bellCurveChartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(99, 102, 241, 0.5)',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `🕐 ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const bellValue = context.raw;
+                                        const actualValue = peakHoursData.data[context.dataIndex];
+                                        return `📊 Distribution: ${bellValue.toFixed(1)} • Actual: ${actualValue} visits`;
+                                    },
+                                    footer: function(context) {
+                                        const maxBell = Math.max(...bellCurveData);
+                                        const maxIndex = bellCurveData.indexOf(maxBell);
+                                        const peakHour = peakHoursData.labels[maxIndex];
+                                        const actualPeak = Math.max(...peakHoursData.data);
+                                        return `🔥 Peak: ${peakHour} (${actualPeak} visits)`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(1);
+                                    },
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 12 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Visit Distribution',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Hour of Day',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                },
+                                grid: { display: false }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeInOutQuart'
+                        },
+                        onHover: function(event, elements) {
+                            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+
+                console.log('✅ Peak hours chart created successfully');
+
+            } catch (error) {
+                console.error('❌ Error creating peak hours chart:', error);
+                clearChartLoading(ctx);
+                showChartError(ctx, 'Failed to load peak hours data');
+            }
+        }
+
+        // ===== AGE GROUP ACTIVITY CHART =====
+        async function createAgeActivityChart(filterValue = 'week', forceRefresh = false) {
+            const ctx = document.getElementById('ageActivityChart');
+            if (!ctx) {
+                console.error('❌ Age activity chart canvas not found');
+                return;
+            }
+
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js not loaded');
+                return;
+            }
+
+            // Destroy existing chart
+            if (window.ageActivityChartInstance) {
+                window.ageActivityChartInstance.destroy();
+                window.ageActivityChartInstance = null;
+            }
+
+            showChartLoading(ctx, 'Loading age activity data...');
+
+            try {
+                const ageActivityData = await fetchAgeActivityData(filterValue);
+                clearChartLoading(ctx);
+
+                if (!ageActivityData || !ageActivityData.labels || !ageActivityData.datasets) {
+                    console.error('❌ Invalid age activity data:', ageActivityData);
+                    showChartError(ctx, 'No age activity data available');
+                    return;
+                }
+
+                console.log('📊 Creating age activity chart with:', {
+                    ageGroups: ageActivityData.labels.length,
+                    datasets: ageActivityData.datasets.length
+                });
+
+                const colors = getChartThemeColors();
+                const isDarkMode = document.body.classList.contains('dark-mode');
+
+                // Enhanced color palette for age groups
+                const ageGroupColors = [
+                    'rgba(239, 68, 68, 0.8)',   // Red - 18-25
+                    'rgba(245, 158, 11, 0.8)',  // Orange - 26-35
+                    'rgba(34, 197, 94, 0.8)',   // Green - 36-50
+                    'rgba(99, 102, 241, 0.8)'   // Blue - 50+
+                ];
+
+                const borderColors = [
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(245, 158, 11, 1)',
+                    'rgba(34, 197, 94, 1)',
+                    'rgba(99, 102, 241, 1)'
+                ];
+
+                window.ageActivityChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ageActivityData.labels,
+                        datasets: ageActivityData.datasets.map((dataset, index) => ({
+                            ...dataset,
+                            backgroundColor: ageGroupColors[index % ageGroupColors.length],
+                            borderColor: borderColors[index % borderColors.length],
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'x',
+                        maxBarThickness: 50,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(99, 102, 241, 0.5)',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `👥 ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const dataset = context.dataset;
+                                        const value = context.raw;
+                                        const total = ageActivityData.datasets.reduce((sum, ds) =>
+                                            sum + (ds.data[context.dataIndex] || 0), 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                                        return `${dataset.label}: ${value} (${percentage}%)`;
+                                    },
+                                    footer: function(context) {
+                                        const ageGroup = context[0].label;
+                                        const totalVisits = ageActivityData.datasets[0].data[context[0].dataIndex] || 0;
+                                        const avgDuration = ageActivityData.datasets[1]?.data[context[0].dataIndex] || 0;
+                                        return `📊 Total: ${totalVisits} visits • Avg: ${avgDuration}min`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        return Number.isInteger(value) ? value : '';
+                                    },
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 12 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Activity Level',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Age Groups',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                },
+                                grid: { display: false }
+                            }
+                        },
+                        animation: {
+                            duration: 1200,
+                            easing: 'easeInOutQuart',
+                            delay: function(context) {
+                                return context.dataIndex * 100;
+                            }
+                        },
+                        onHover: function(event, elements) {
+                            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+
+                console.log('✅ Age activity chart created successfully');
+
+            } catch (error) {
+                console.error('❌ Error creating age activity chart:', error);
+                clearChartLoading(ctx);
+                showChartError(ctx, 'Failed to load age activity data');
+            }
+        }
+
+        // ===== ENHANCED CHART CREATION =====
+        // Create Monthly Books Chart (Comparative Analytics for Book Borrowing Frequency)
+        async function createMonthlyBooksChart(filterValue = 'current', forceRefresh = false) {
+            const ctx = document.getElementById('monthlyBooksChart');
+            if (!ctx) {
+                console.error('❌ Monthly books chart canvas not found');
+                return;
+            }
+
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js not loaded');
+                return;
+            }
+
+            // Destroy existing chart
+            if (window.monthlyBooksChartInstance) {
+                window.monthlyBooksChartInstance.destroy();
+                window.monthlyBooksChartInstance = null;
+            }
+
+            try {
+                // Fetch comparative book borrowing data
+                const comparativeData = await fetchComparativeBookData(filterValue);
+
+                if (!comparativeData || !comparativeData.books || comparativeData.books.length === 0) {
+                    console.error('❌ No comparative book data available');
+                    showChartError(ctx, 'No book borrowing data available');
+                    return;
+                }
+
+                const colors = getChartThemeColors();
+                const isDarkMode = document.body.classList.contains('dark-mode');
+
+                // Get month name for display
+                const now = new Date();
+                let monthName = '';
+                if (filterValue === 'current') {
+                    monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                } else if (filterValue === 'last') {
+                    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    monthName = lastMonthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+
+                console.log('📊 Creating comparative book borrowing chart with:', {
+                    books: comparativeData.books.length,
+                    totalBorrows: comparativeData.totalBorrows,
+                    filter: filterValue,
+                    month: monthName
+                });
+
+                // Generate gradient colors for each book
+                const backgroundColors = comparativeData.books.map((book, index) => {
+                    const hue = Math.floor(360 * (index / comparativeData.books.length));
+                    return `hsla(${hue}, 75%, 60%, 0.7)`;
+                });
+
+                const borderColors = comparativeData.books.map((book, index) => {
+                    const hue = Math.floor(360 * (index / comparativeData.books.length));
+                    return `hsla(${hue}, 75%, 50%, 1)`;
+                });
+
+                const chartData = {
+                    labels: comparativeData.books.map(book => book.title),
+                    datasets: [{
+                        label: `Borrowing Frequency${monthName ? ` (${monthName})` : ''}`,
+                        data: comparativeData.books.map(book => book.borrow_count),
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                };
+
+                window.monthlyBooksChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'x',
+                        maxBarThickness: 50, // Limit bar width
+                        categoryPercentage: 0.6, // Reduce category width (space allocated to each bar group)
+                        barPercentage: 0.7, // Reduce bar width within category // Vertical bars - quantity on vertical axis, book titles on horizontal
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(99, 102, 241, 0.5)',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 9,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `📚 ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const book = comparativeData.books[context.dataIndex];
+                                        const percentage = comparativeData.totalBorrows > 0
+                                            ? ((book.borrow_count / comparativeData.totalBorrows) * 100).toFixed(1)
+                                            : '0';
+                                        return `📖 ${book.borrow_count} borrows (${percentage}% of total)`;
+                                    },
+                                    footer: function(context) {
+                                        const book = comparativeData.books[context[0].dataIndex];
+                                        return `📝 Author: ${book.author || 'Unknown'}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        return Number.isInteger(value) ? value : '';
+                                    },
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 12 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Borrows',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    autoSkip: false,
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Book Titles',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                },
+                                grid: { display: false }
+                            }
+                        },
+                        animation: {
+                            duration: 1200,
+                            easing: 'easeInOutQuart',
+                            delay: function(context) {
+                                return context.dataIndex * 50;
+                            }
+                        },
+                        onHover: function(event, elements) {
+                            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+
+                console.log('✅ Comparative book borrowing chart created successfully');
+
+            } catch (error) {
+                console.error('❌ Error creating comparative book chart:', error);
+                showChartError(ctx, 'Failed to load book data');
+            }
+        }
+
+        // Fetch comparative book borrowing data
+        async function fetchComparativeBookData(filterValue = 'current') {
+            try {
+                // Calculate the month based on filter
+                const now = new Date();
+                let month = null;
+                if (filterValue === 'current') {
+                    month = now.getMonth() + 1; // 1-12
+                } else if (filterValue === 'last') {
+                    month = now.getMonth() === 0 ? 12 : now.getMonth(); // If Jan, last is Dec (12), else current-1
+                }
+
+                // Build URL with month parameter if specified
+                let url = '/api/analytics/book-borrowing-frequency';
+                if (month) {
+                    url += `?month=${month}`;
+                }
+
+                // Call the new API endpoint to get real data from the database
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched book borrowing frequency data:', data);
+
+                    // Validate data structure
+                    if (data && data.books && data.totalBorrows !== undefined) {
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid data structure from API, using fallback');
+                        return getSampleComparativeData();
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getSampleComparativeData();
+                }
+            } catch (error) {
+                console.error('❌ Error fetching comparative book data:', error);
+                return getSampleComparativeData();
+            }
+        }
+
+        // Get sample comparative data
+        function getSampleComparativeData() {
+            return {
+                books: [
+                    { title: 'Sample Book 1', author: 'Author A', borrow_count: 15 },
+                    { title: 'Sample Book 2', author: 'Author B', borrow_count: 12 },
+                    { title: 'Sample Book 3', author: 'Author C', borrow_count: 9 },
+                    { title: 'Sample Book 4', author: 'Author D', borrow_count: 7 },
+                    { title: 'Sample Book 5', author: 'Author E', borrow_count: 5 }
+                ],
+                totalBorrows: 48
+            };
+        }
+
+        // Update monthly chart when filter changes
+        function updateMonthlyChart() {
+            const monthFilter = document.getElementById('monthlyChartMonthFilter');
+            if (monthFilter) {
+                const selectedMonth = monthFilter.value;
+                createMonthlyBooksChart(selectedMonth, true);
+            }
+        }
+
+        // Create Active Areas Chart (Vertical Bar Graph) with enhanced features
+        async function createActiveAreasChart(forceRefresh = false) {
+            const ctx = document.getElementById('activeAreasChart');
+            if (!ctx) {
+                console.error('❌ Active areas chart canvas not found');
+                return;
+            }
+
+            // Destroy existing chart
+            if (window.activeAreasChartInstance) {
+                window.activeAreasChartInstance.destroy();
+                window.activeAreasChartInstance = null;
+            }
+
+            showChartLoading(ctx, 'Loading active areas data...');
+
+            try {
+                const activeAreasData = await fetchActiveAreasData(forceRefresh);
+                clearChartLoading(ctx);
+
+                if (!activeAreasData || !activeAreasData.labels || !activeAreasData.data) {
+                    console.error('❌ Invalid active areas data:', activeAreasData);
+                    showChartError(ctx, 'Invalid areas data');
+                    return;
+                }
+
+                const totalActivities = activeAreasData.data.reduce((sum, val) => sum + val, 0);
+                console.log('📊 Creating active areas chart with:', {
+                    areas: activeAreasData.labels.length,
+                    totalActivities
+                });
+
+                // Check for dark mode
+                const isDarkMode = document.body.classList.contains('dark-mode');
+
+                // Generate enhanced colors based on activity level and dark mode
+                const colors = generateActivityColors(activeAreasData.data, isDarkMode);
+
+                const areasData = {
+                    labels: activeAreasData.labels,
+                    datasets: [{
+                        label: 'Activity Count',
+                        data: activeAreasData.data,
+                        backgroundColor: colors.background,
+                        borderColor: colors.border,
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        hoverBorderWidth: 3,
+                        hoverBorderColor: colors.hover
+                    }]
+                };
+
+                window.activeAreasChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: areasData,
+                    options: {
+                        indexAxis: 'x',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        maxBarThickness: 60,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(139, 92, 246, 0.5)',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `📍 ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const percentage = totalActivities > 0 ? ((value / totalActivities) * 100).toFixed(1) : '0';
+                                        return `🎯 ${value} activities (${percentage}% of total)`;
+                                    },
+                                    footer: function(context) {
+                                        const value = context[0].raw;
+                                        const max = Math.max(...activeAreasData.data);
+                                        const rank = activeAreasData.data.indexOf(value) + 1;
+                                        return `🏆 Rank #${rank} • Peak: ${max} activities`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        return Number.isInteger(value) ? value : '';
+                                    },
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 12 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Activity Count',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: false,
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-secondary)',
+                                    font: { size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Barangay/Municipality',
+                                    color: isDarkMode ? '#FFFFFF' : 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                },
+                                grid: { display: false }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        animation: {
+                            duration: 1200,
+                            easing: 'easeInOutQuart',
+                            delay: function(context) {
+                                return context.dataIndex * 100;
+                            }
+                        },
+                        onHover: function(event, elements) {
+                            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+
+                console.log('✅ Active areas chart created successfully');
+
+                // Apply current filter after chart creation
+                const filterSelect = document.getElementById('activeAreasFilter');
+                if (filterSelect) {
+                    filterActiveAreas(filterSelect.value);
+                }
+
+            } catch (error) {
+                console.error('❌ Error creating active areas chart:', error);
+                clearChartLoading(ctx);
+                showChartError(ctx, 'Failed to load active areas');
+            }
+        }
+
+        // Enhanced color generation based on activity levels and dark mode
+        function generateActivityColors(data, isDarkMode = false) {
+            const maxValue = Math.max(...data);
+            const minValue = Math.min(...data);
+            const backgroundColors = [];
+            const borderColors = [];
+            const hoverColors = [];
+
+            data.forEach(value => {
+                let intensity = 0;
+                if (maxValue > minValue) {
+                    intensity = (value - minValue) / (maxValue - minValue);
+                }
+
+                if (isDarkMode) {
+                    // Dark mode: lighter, more vibrant colors
+                    const r = Math.round(168 + (intensity * 87));  // 168 to 255 (lighter purple to bright)
+                    const g = Math.round(85 + (intensity * 170));   // 85 to 255
+                    const b = Math.round(247 + (intensity * 8));    // 247 to 255 (almost white to purple)
+
+                    backgroundColors.push(`rgba(${r}, ${g}, ${b}, 0.9)`);
+                    borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`);
+                    hoverColors.push(`rgba(${Math.min(r + 30, 255)}, ${Math.min(g + 30, 255)}, ${Math.min(b + 30, 255)}, 1)`);
+                } else {
+                    // Light mode: original colors
+                    const r = Math.round(147 + (intensity * 108)); // 147 to 255
+                    const g = Math.round(51 + (intensity * 204));   // 51 to 255
+                    const b = Math.round(234 + (intensity * 21));   // 234 to 255
+
+                    backgroundColors.push(`rgba(${r}, ${g}, ${b}, 0.8)`);
+                    borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`);
+                    hoverColors.push(`rgba(${Math.min(r + 20, 255)}, ${Math.min(g + 20, 255)}, ${Math.min(b + 20, 255)}, 1)`);
+                }
+            });
+
+            return {
+                background: backgroundColors,
+                border: borderColors,
+                hover: hoverColors
+            };
+        }
+
+        // Load top areas
+        function loadTopAreas() {
+            const allAreas = [];
+            
+            // Add Julita barangays
+            Object.entries(demographicsData.julitaBarangays).forEach(([name, data]) => {
+                if (data.count > 0) {
+                    allAreas.push({ name: name, count: data.count, type: 'Barangay', location: 'Julita' });
+                }
+            });
+            
+            // Add municipalities
+            Object.entries(demographicsData.municipalities).forEach(([name, data]) => {
+                if (data.count > 0) {
+                    allAreas.push({ name: name, count: data.count, type: 'Municipality', location: data.province || 'Unknown' });
+                }
+            });
+            
+            // Sort by count and take top 5
+            const topAreas = allAreas.sort((a, b) => b.count - a.count).slice(0, 5);
+            
+            const container = document.getElementById('topAreasList');
+            container.innerHTML = topAreas.map((area, index) => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: var(--glass-bg); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 8px;">
+                    <div style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">
+                        ${index + 1}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${area.name}</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">${area.type} • ${area.location}</div>
+                    </div>
+                    <div style="background: var(--success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+                        ${area.count}
+                    </div>
+                </div>
+            `).join('') || '<p style="color: var(--text-muted); text-align: center; margin: 2rem 0;">No area data available</p>';
+        }
+
+        // Function to load real data from API
+        async function loadDemographicsData() {
+            console.log('Loading demographics data from API...');
+            try {
+                const response = await fetch('/api/members/demographics', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                console.log('API Response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API Response data:', data);
+                    processDemographicsData(data);
+                } else {
+                    console.warn('Failed to load demographics data (HTTP ' + response.status + ')');
+                }
+            } catch (error) {
+                console.error('Error loading demographics data:', error);
+            }
+
+            // Always refresh the current view after loading data
+            const currentView = document.getElementById('demographicsFilter')?.value || 'julita';
+            switchDemographicsView(currentView);
+
+            // Maps are disabled - skip initialization
+        }
+
+        // Process demographics data from API
+        function processDemographicsData(data) {
+            console.log('Processing demographics data:', data);
+
+            // Reset data
+            Object.keys(demographicsData.julitaBarangays).forEach(barangay => {
+                demographicsData.julitaBarangays[barangay].count = 0;
+                Object.keys(demographicsData.julitaBarangays[barangay].ageGroups).forEach(ageGroup => {
+                    demographicsData.julitaBarangays[barangay].ageGroups[ageGroup] = 0;
+                });
+            });
+
+            demographicsData.municipalities = {};
+
+            // Process Julita members
+            if (data.julitaMembers && Array.isArray(data.julitaMembers)) {
+                data.julitaMembers.forEach(member => {
+                    // Normalize barangay name (remove extra spaces, case insensitive)
+                    const normalizedBarangay = member.barangay ? member.barangay.trim() : '';
+
+                    if (demographicsData.julitaBarangays[normalizedBarangay]) {
+                        demographicsData.julitaBarangays[normalizedBarangay].count++;
+
+                        const ageGroup = getAgeGroup(parseInt(member.age));
+                        if (demographicsData.julitaBarangays[normalizedBarangay].ageGroups[ageGroup] !== undefined) {
+                            demographicsData.julitaBarangays[normalizedBarangay].ageGroups[ageGroup]++;
+                        }
+                    } else {
+                        // If barangay is not in our predefined list, add it dynamically
+                        console.log('Unknown barangay found:', normalizedBarangay);
+                        demographicsData.julitaBarangays[normalizedBarangay] = {
+                            count: 1,
+                            ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 }
+                        };
+
+                        const ageGroup = getAgeGroup(parseInt(member.age));
+                        if (demographicsData.julitaBarangays[normalizedBarangay].ageGroups[ageGroup] !== undefined) {
+                            demographicsData.julitaBarangays[normalizedBarangay].ageGroups[ageGroup]++;
+                        }
+                    }
+                });
+            }
+
+            // Process non-Julita members
+            if (data.nonJulitaMembers && Array.isArray(data.nonJulitaMembers)) {
+                console.log('Processing non-Julita members:', data.nonJulitaMembers.length);
+                data.nonJulitaMembers.forEach(member => {
+                    const municipalityKey = member.municipality && member.province
+                        ? `${member.municipality.trim()}, ${member.province.trim()}`
+                        : member.municipality
+                            ? member.municipality.trim()
+                            : 'Unknown Location';
+
+                    if (!demographicsData.municipalities[municipalityKey]) {
+                        demographicsData.municipalities[municipalityKey] = {
+                            count: 0,
+                            province: member.province ? member.province.trim() : 'Unknown',
+                            ageGroups: { '18-25': 0, '26-35': 0, '36-50': 0, '50+': 0 }
+                        };
+                    }
+
+                    demographicsData.municipalities[municipalityKey].count++;
+
+                    const ageGroup = getAgeGroup(parseInt(member.age));
+                    if (demographicsData.municipalities[municipalityKey].ageGroups[ageGroup] !== undefined) {
+                        demographicsData.municipalities[municipalityKey].ageGroups[ageGroup]++;
+                    }
+                });
+            } else {
+                console.warn('No nonJulitaMembers data found or not an array:', data.nonJulitaMembers);
+            }
+
+            console.log('Processed demographics data:', demographicsData);
+            console.log('Municipalities count:', Object.keys(demographicsData.municipalities).length);
+            console.log('Municipalities data:', demographicsData.municipalities);
+
+            // Reload the current view to refresh data display
+            const currentView = document.getElementById('demographicsFilter')?.value || 'julita';
+            if (currentView === 'non-julita') {
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    loadNonJulitaDemographics();
+                }, 100);
+            }
+        }
+
+        // Helper function to categorize age groups
+        function getAgeGroup(age) {
+            if (age >= 18 && age <= 25) return '18-25';
+            if (age >= 26 && age <= 35) return '26-35';
+            if (age >= 36 && age <= 50) return '36-50';
+            return '50+';
+        }
+
+        // Function to refresh demographics data
+        async function refreshDemographicsData() {
+            const refreshBtn = document.querySelector('[onclick="refreshDemographicsData()"]');
+            const originalIcon = refreshBtn.innerHTML;
+            
+            // Show loading state
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            refreshBtn.disabled = true;
+            
+            try {
+                await loadDemographicsData();
+                // Maps are disabled - skip refresh
+                showToast('Demographics data refreshed successfully', 'success');
+            } catch (error) {
+                showToast('Error refreshing data', 'error');
+            } finally {
+                // Restore button state
+                refreshBtn.innerHTML = originalIcon;
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Map Management Functions - DISABLED
+        let mapInitializationObserver = null;
+        
+        function initializeMapContainers() {
+            // Maps are disabled - do nothing
+            return;
+        }
+
+        function initializeDemographicMap(type, container) {
+            console.log(`Initializing ${type} map container:`, container);
+            
+            // Clear any existing content
+            container.innerHTML = '';
+            
+            // Create map instance
+            const map = L.map(container, {
+                center: type === 'julita' ? [11.0258, 124.9725] : [11.0, 125.0], // Center on Julita/Leyte
+                zoom: type === 'julita' ? 13 : 10,
+                zoomControl: false
+            });
+            
+            // Store map instance for later use
+            container._mapInstance = map;
+            
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add zoom controls
+            L.control.zoom({
+                position: 'topright'
+            }).addTo(map);
+            
+            // Add member data to map
+            addMemberDataToMap(map, type);
+        }
+
+        function addMemberDataToMap(map, type) {
+            const locationData = type === 'julita' ? demographicsData.julitaBarangays : demographicsData.municipalities;
+            const totalMembers = Object.values(locationData).reduce((sum, loc) => sum + loc.count, 0);
+            
+            if (totalMembers === 0) {
+                // Show no data message
+                const noDataDiv = document.createElement('div');
+                noDataDiv.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: var(--surface);
+                    padding: 2rem;
+                    border-radius: var(--radius);
+                    text-align: center;
+                    box-shadow: var(--shadow-lg);
+                    z-index: 1000;
+                `;
+                noDataDiv.innerHTML = `
+                    <i class="fas fa-info-circle" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">No ${type === 'julita' ? 'Barangay' : 'Municipality'} Data</h4>
+                    <p style="color: var(--text-muted);">Member data will appear here once available</p>
+                `;
+                map.getContainer().appendChild(noDataDiv);
+                return;
+            }
+            
+            // Define approximate coordinates for Julita barangays and nearby municipalities
+            const locationCoordinates = {
+                // Julita Barangays (approximate coordinates)
+                'Poblacion District I': [11.0258, 124.9725],
+                'Poblacion District II': [11.0265, 124.9730],
+                'Poblacion District III': [11.0250, 124.9720],
+                'Poblacion District IV': [11.0260, 124.9715],
+                'Alegria': [11.0350, 124.9800],
+                'Anibong': [11.0200, 124.9650],
+                'Aslum': [11.0400, 124.9750],
+                'Balante': [11.0150, 124.9700],
+                'Bongdo': [11.0300, 124.9850],
+                'Bonifacio': [11.0180, 124.9680],
+                'Bugho': [11.0320, 124.9780],
+                'Calbasag': [11.0220, 124.9760],
+                'Caridad': [11.0280, 124.9720],
+                'Cuya-e': [11.0380, 124.9820],
+                'Dita': [11.0160, 124.9640],
+                'Gitabla': [11.0420, 124.9880],
+                'Hindang': [11.0240, 124.9800],
+                'Inawangan': [11.0360, 124.9760],
+                'Jurao': [11.0140, 124.9660],
+                'San Andres': [11.0330, 124.9840],
+                'San Pablo': [11.0190, 124.9720],
+                'Santa Cruz': [11.0370, 124.9700],
+                'Santo Niño': [11.0310, 124.9680],
+                'Tagkip': [11.0270, 124.9860],
+                'Tolosahay': [11.0210, 124.9780],
+                'Villa Hermosa': [11.0290, 124.9740],
+                
+                // Nearby Municipalities (approximate coordinates)
+                'Tacloban City, Leyte': [11.2470, 125.0045],
+                'Ormoc City, Leyte': [11.0069, 124.6111],
+                'Abuyog, Leyte': [10.7500, 125.0333],
+                'Tanauan, Leyte': [11.0667, 125.0667],
+                'Catbalogan, Samar': [11.7750, 124.8861],
+                'Calbayog, Samar': [12.0667, 124.6000]
+            };
+            
+            // Optimized: Batch marker creation and use requestAnimationFrame for smooth rendering
+            const locationsWithData = Object.entries(locationData)
+                .filter(([name, data]) => data.count > 0)
+                .map(([name, data]) => {
+                    const coords = locationCoordinates[name] || locationCoordinates[`${name}, Leyte`];
+                    return coords ? { name, data, coords } : null;
+                })
+                .filter(Boolean);
+            
+            if (locationsWithData.length === 0) return;
+            
+            // Calculate total once
+            const total = Object.values(locationData).reduce((sum, loc) => sum + loc.count, 0);
+            const color = type === 'julita' ? '#6366f1' : '#8b5cf6';
+            
+            // Batch marker creation for better performance
+            const markers = [];
+            locationsWithData.forEach(({ name, data, coords }) => {
+                const percentage = ((data.count / total) * 100).toFixed(1);
+                const iconSize = Math.max(20, Math.min(50, 15 + (data.count * 2)));
+                
+                const customIcon = L.divIcon({
+                    html: `
+                        <div style="
+                            background: ${color};
+                            color: white;
+                            border-radius: 50%;
+                            width: ${iconSize}px;
+                            height: ${iconSize}px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                            font-size: ${Math.max(8, iconSize * 0.3)}px;
+                            border: 2px solid white;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        ">
+                            ${data.count}
+                        </div>
+                    `,
+                    className: 'custom-div-icon',
+                    iconSize: [iconSize, iconSize],
+                    iconAnchor: [iconSize / 2, iconSize / 2]
+                });
+                
+                const marker = L.marker(coords, { icon: customIcon });
+                
+                // Create popup content
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">${name}</h4>
+                        <div style="margin-bottom: 8px;">
+                            <strong>Members:</strong> ${data.count} (${percentage}%)
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong>Age Groups:</strong><br>
+                            ${Object.entries(data.ageGroups).map(([age, count]) => 
+                                count > 0 ? `${age}: ${count}` : null
+                            ).filter(Boolean).join('<br>') || 'No data'}
+                        </div>
+                        ${type === 'julita' ? `<small style="color: var(--text-muted);">Julita Municipality</small>` : 
+                          `<small style="color: var(--text-muted);">${data.province || 'Leyte Province'}</small>`}
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent);
+                markers.push(marker);
+            });
+            
+            // Add all markers at once using a marker group for better performance
+            const markerGroup = L.layerGroup(markers).addTo(map);
+            map._markerGroup = markerGroup; // Store for easy removal later
+            
+            // Add a legend
+            addMapLegend(map, type, totalMembers);
+        }
+
+        function addMapLegend(map, type, totalMembers) {
+            const legend = L.control({ position: 'bottomright' });
+            
+            legend.onAdd = function() {
+                const div = L.DomUtil.create('div', 'info legend');
+                div.style.cssText = `
+                    background: var(--surface);
+                    padding: 10px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                    font-size: 12px;
+                    color: var(--text-primary);
+                `;
+                
+                const title = type === 'julita' ? 'Julita Barangays' : 'External Municipalities';
+                const icon = type === 'julita' ? 'fas fa-map-marker-alt' : 'fas fa-city';
+                
+                div.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 8px;">
+                        <i class="${icon}"></i> ${title}
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Total Members:</strong> ${totalMembers}
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: inline-block; width: 12px; height: 12px; background: ${type === 'julita' ? '#6366f1' : '#8b5cf6'}; border-radius: 50%; margin-right: 5px;"></div>
+                        Member Count
+                    </div>
+                    <small style="color: var(--text-muted);">Circle size = member count</small>
+                `;
+                
+                return div;
+            };
+            
+            legend.addTo(map);
+        }
+
+        function resizeMaps() {
+            // Resize all maps when container size changes
+            const containers = document.querySelectorAll('.demographic-map');
+            containers.forEach(container => {
+                if (container._mapInstance) {
+                    container._mapInstance.invalidateSize();
+                }
+            });
+        }
+
+        // Add window resize handler
+        window.addEventListener('resize', debounce(resizeMaps, 250));
+
+        // Debounce function to limit resize calls
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function refreshJulitaMap() {
+            // Maps are disabled
+            return;
+        }
+
+        function refreshNonJulitaMap() {
+            // Maps are disabled
+            return;
+        }
+
+        function toggleMapView(type) {
+            // Maps are disabled
+            return;
+        }
+
+        function updateMapMode(container, mode, type) {
+            const locationData = type === 'julita' ? demographicsData.julitaBarangays : demographicsData.municipalities;
+            
+            switch (mode) {
+                case 'satellite':
+                    container.style.background = 'linear-gradient(45deg, #2c3e50, #34495e)';
+                    break;
+                case 'heatmap':
+                    container.style.background = 'linear-gradient(45deg, #e74c3c, #f39c12, #f1c40f)';
+                    break;
+                default:
+                    container.style.background = 'var(--surface)';
+            }
+            
+            // Show mode indicator
+            showMapModeIndicator(container, mode, type, locationData);
+        }
+
+        function showMapModeIndicator(container, mode, type, locationData) {
+            const totalMembers = Object.values(locationData).reduce((sum, loc) => sum + loc.count, 0);
+            const modeLabels = {
+                'default': 'Standard View',
+                'satellite': 'Satellite View', 
+                'heatmap': 'Density Heatmap'
+            };
+            
+            const existingIndicator = container.querySelector('.map-mode-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'map-mode-indicator';
+            indicator.style.cssText = `
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                z-index: 1000;
+            `;
+            indicator.innerHTML = `
+                <i class="fas ${mode === 'heatmap' ? 'fa-fire' : mode === 'satellite' ? 'fas fa-satellite' : 'fa-map'}"></i>
+                ${modeLabels[mode]} • ${totalMembers} members
+            `;
+            
+            container.appendChild(indicator);
+        }
+
+        // External Data Integration Functions
+        function loadExternalMapData(dataSource, callback) {
+            // Function to load external data for map integration
+            console.log('Loading external data from:', dataSource);
+            
+            // Placeholder for external API calls
+            // This can be integrated with:
+            // - Google Maps API
+            // - OpenStreetMap
+            // - Government geographic databases
+            // - Census data
+            // - etc.
+            
+            if (typeof callback === 'function') {
+                callback(null); // Simulate successful data load
+            }
+        }
+
+        function integrateExternalMapData(container, externalData, type) {
+            // Function to integrate external data with the map containers
+            console.log('Integrating external data:', externalData, 'for type:', type);
+            
+            // Placeholder for external data integration
+            // This can handle:
+            // - Geographic boundaries
+            // - Population data
+            // - Administrative divisions
+            // - Census information
+            // - etc.
+            
+            if (externalData && container) {
+                // Update map with external data
+                updateMapWithExternalData(container, externalData, type);
+            }
+        }
+
+        function updateMapWithExternalData(container, externalData, type) {
+            // Function to update map display with external data
+            const dataCount = externalData.length || Object.keys(externalData).length;
+            
+            // Show integration status
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--radius);
+                text-align: center;
+                z-index: 1000;
+            `;
+            statusDiv.innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--success); font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                <h4>External Data Integrated</h4>
+                <p>Loaded ${dataCount} records for ${type} mapping</p>
+            `;
+            
+            container.appendChild(statusDiv);
+            
+            // Remove status after 3 seconds
+            setTimeout(() => {
+                if (statusDiv.parentNode) {
+                    statusDiv.remove();
+                }
+            }, 3000);
+        }
+
+
         // Function to switch between activity views
         function switchActivityView(viewType) {
             loadTopBooks();
@@ -5454,17 +7901,541 @@
                 </div>
             `).join('');
         }
+        // Create Most Borrowed Book Line Chart
+        async function createMostBorrowedBookLineChart(months = 12, forceRefresh = false) {
+            const ctx = document.getElementById('mostBorrowedBookChart');
+            if (!ctx) {
+                console.error('❌ Most borrowed book chart canvas not found');
+                return;
+            }
+
+            if (typeof Chart === 'undefined') {
+                console.error('❌ Chart.js not loaded');
+                return;
+            }
+
+            // Destroy existing chart
+            if (window.mostBorrowedBookChartInstance) {
+                window.mostBorrowedBookChartInstance.destroy();
+                window.mostBorrowedBookChartInstance = null;
+            }
+
+            showChartLoading(ctx, 'Loading book borrowing trend...');
+
+            try {
+                const data = await fetchMostBorrowedBookTrendData(months);
+                clearChartLoading(ctx);
+
+                if (!data || !data.labels || !data.data) {
+                    console.error('❌ Invalid book trend data:', data);
+                    showChartError(ctx, 'No trend data available');
+                    return;
+                }
+
+                const totalBorrows = data.data.reduce((a, b) => a + b, 0);
+                const colors = getChartThemeColors();
+
+                console.log('📊 Creating most borrowed book line chart with:', {
+                    book: data.bookTitle,
+                    months: data.labels.length,
+                    totalBorrows
+                });
+
+                const trendData = {
+                    labels: data.labels,
+                    datasets: [{
+                        label: `${data.bookTitle} - Borrowing Trend`,
+                        data: data.data,
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                };
+
+                window.mostBorrowedBookChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: trendData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(99, 102, 241, 0.5)',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `📅 ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const percentage = totalBorrows > 0 ? ((value / totalBorrows) * 100).toFixed(1) : '0';
+                                        return `📚 ${value} borrows (${percentage}% of total)`;
+                                    },
+                                    footer: function(context) {
+                                        const value = context[0].raw;
+                                        const max = Math.max(...data.data);
+                                        const rank = data.data.indexOf(value) + 1;
+                                        return `🏆 Peak month: ${max} borrows`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        return Number.isInteger(value) ? value : '';
+                                    },
+                                    color: 'var(--text-secondary)',
+                                    font: { size: 12 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Borrows',
+                                    color: 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { bottom: 10 }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: false,
+                                    color: 'var(--text-secondary)',
+                                    font: { size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Month',
+                                    color: 'var(--text-primary)',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    padding: { top: 10 }
+                                },
+                                grid: { display: false }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeInOutQuart',
+                            delay: function(context) {
+                                return context.dataIndex * 50;
+                            }
+                        },
+                        onHover: function(event, elements) {
+                            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                        }
+                    }
+                });
+
+                console.log('✅ Most borrowed book line chart created successfully');
+
+            } catch (error) {
+                console.error('❌ Error creating most borrowed book chart:', error);
+                clearChartLoading(ctx);
+                showChartError(ctx, 'Failed to load book trend data');
+            }
+        }
+
+        // Fetch Peak Hours Data
+        async function fetchPeakHoursData(filterValue = 'week', forceRefresh = false) {
+            const cacheKey = `peakHours_${filterValue}`;
+        
+            if (!forceRefresh) {
+                const cached = analyticsCache.get(cacheKey);
+                if (cached) {
+                    console.log('📊 Using cached peak hours data');
+                    return cached;
+                }
+            }
+
+            try {
+                console.log('🔄 Fetching fresh peak hours data for:', filterValue);
+                const response = await fetch(`/api/analytics/peak-hours?period=${filterValue}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched peak hours data:', data);
+
+                    // Validate data structure
+                    if (validatePeakHoursData(data)) {
+                        analyticsCache.set(cacheKey, data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid data structure, using fallback');
+                        return getFallbackPeakHoursData(filterValue);
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getFallbackPeakHoursData(filterValue);
+                }
+            } catch (error) {
+                console.error('❌ Error fetching peak hours data:', error);
+                return getFallbackPeakHoursData(filterValue);
+            }
+        }
+
+        // Validate peak hours data structure
+        function validatePeakHoursData(data) {
+            return data &&
+                   Array.isArray(data.labels) &&
+                   Array.isArray(data.data) &&
+                   data.labels.length === data.data.length &&
+                   data.labels.length > 0;
+        }
+
+        // Enhanced fallback data for peak hours
+        function getFallbackPeakHoursData(filterValue) {
+            // Sample data based on typical library patterns
+            const baseData = {
+                today: {
+                    labels: ['8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
+                    data: [2, 5, 8, 12, 15, 18, 22, 25, 20, 15, 8]
+                },
+                week: {
+                    labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM'],
+                    data: [15, 45, 65, 85, 75, 35]
+                },
+                month: {
+                    labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM'],
+                    data: [120, 340, 480, 520, 450, 180]
+                }
+            };
+
+            return baseData[filterValue] || baseData.week;
+        }
+
+        // Fetch Age Activity Data
+        async function fetchAgeActivityData(filterValue = 'week', forceRefresh = false) {
+            const cacheKey = `ageActivity_${filterValue}`;
+        
+            if (!forceRefresh) {
+                const cached = analyticsCache.get(cacheKey);
+                if (cached) {
+                    console.log('📊 Using cached age activity data');
+                    return cached;
+                }
+            }
+
+            try {
+                console.log('🔄 Fetching fresh age activity data for:', filterValue);
+                const response = await fetch(`/api/analytics/age-activity?period=${filterValue}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched age activity data:', data);
+
+                    // Validate data structure
+                    if (validateAgeActivityData(data)) {
+                        analyticsCache.set(cacheKey, data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid data structure, using fallback');
+                        return getFallbackAgeActivityData(filterValue);
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getFallbackAgeActivityData(filterValue);
+                }
+            } catch (error) {
+                console.error('❌ Error fetching age activity data:', error);
+                return getFallbackAgeActivityData(filterValue);
+            }
+        }
+
+        // Validate age activity data structure
+        function validateAgeActivityData(data) {
+            return data &&
+                   Array.isArray(data.labels) &&
+                   Array.isArray(data.datasets) &&
+                   data.labels.length > 0 &&
+                   data.datasets.length > 0;
+        }
+
+        // Enhanced fallback data for age activity
+        function getFallbackAgeActivityData(filterValue) {
+            const baseMultiplier = filterValue === 'week' ? 1 : filterValue === 'month' ? 4 : 12;
+
+            return {
+                labels: ['18-25', '26-35', '36-50', '50+'],
+                datasets: [
+                    {
+                        label: 'Avg Visits',
+                        data: [8.5 * baseMultiplier, 12.2 * baseMultiplier, 6.8 * baseMultiplier, 4.1 * baseMultiplier]
+                    },
+                    {
+                        label: 'Avg Duration (min)',
+                        data: [45, 62, 38, 55]
+                    }
+                ]
+            };
+        }
+
+        // Update peak hours chart when filter changes
+        function updatePeakHoursChart() {
+            const filterSelect = document.getElementById('peakHoursFilter');
+            if (filterSelect) {
+                const selectedPeriod = filterSelect.value;
+                createPeakHoursChart(selectedPeriod, true);
+            }
+        }
+
+        // Update age activity chart when filter changes
+        function updateAgeActivityChart() {
+            const filterSelect = document.getElementById('ageActivityFilter');
+            if (filterSelect) {
+                const selectedPeriod = filterSelect.value;
+                createAgeActivityChart(selectedPeriod, true);
+            }
+        }
+
+        // Fetch Most Borrowed Book Trend Data
+        async function fetchMostBorrowedBookTrendData(months) {
+            const cacheKey = `mostBorrowedBookTrend_${months}`;
+
+            if (!forceRefresh) {
+                const cached = analyticsCache.get(cacheKey);
+                if (cached) {
+                    console.log('📊 Using cached most borrowed book trend data');
+                    return cached;
+                }
+            }
+
+            try {
+                console.log('🔄 Fetching fresh most borrowed book trend data for:', months, 'months');
+                const response = await fetch(`/api/analytics/most-borrowed-book-trend?months=${months}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Fetched most borrowed book trend data:', data);
+
+                    // Validate data structure
+                    if (validateBookTrendData(data)) {
+                        analyticsCache.set(cacheKey, data);
+                        return data;
+                    } else {
+                        console.warn('⚠️ Invalid data structure, using fallback');
+                        return getFallbackBookTrendData(months);
+                    }
+                } else {
+                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
+                    return getFallbackBookTrendData(months);
+                }
+            } catch (error) {
+                console.error('❌ Error fetching most borrowed book trend data:', error);
+                return getFallbackBookTrendData(months);
+            }
+        }
+
+        // Validate book trend data structure
+        function validateBookTrendData(data) {
+            return data &&
+                   typeof data.bookTitle === 'string' &&
+                   Array.isArray(data.labels) &&
+                   Array.isArray(data.data) &&
+                   data.labels.length === data.data.length &&
+                   data.labels.length > 0;
+        }
+
+        // Enhanced fallback data for most borrowed book trend
+        function getFallbackBookTrendData(months) {
+            const currentDate = new Date();
+            const labels = [];
+            const data = [];
+
+            // Generate last N months
+            for (let i = months - 1; i >= 0; i--) {
+                const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+                const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                labels.push(monthName);
+                // Sample data with some variation
+                data.push(Math.floor(Math.random() * 20) + 5);
+            }
+
+            return {
+                bookTitle: 'Sample Most Borrowed Book',
+                labels,
+                data
+            };
+        }
+
+        // Update book trend chart when filter changes
+        function updateBookTrendChart() {
+            const monthsFilter = document.getElementById('bookTrendFilter');
+            if (monthsFilter) {
+                const selectedMonths = parseInt(monthsFilter.value);
+                createMostBorrowedBookLineChart(selectedMonths, true);
+            }
+        }
+
+        // Filter active areas chart by Julita/Non-Julita
+        function filterActiveAreas(filterValue) {
+            if (!window.activeAreasChartInstance || !activeAreasData) return;
+
+            let filteredLabels = [];
+            let filteredData = [];
+
+            if (filterValue === 'all') {
+                filteredLabels = activeAreasData.labels;
+                filteredData = activeAreasData.data;
+            } else if (filterValue === 'julita') {
+                // Filter to only Julita barangays
+                activeAreasData.labels.forEach((area, index) => {
+                    if (demographicsData.julitaBarangays[area]) {
+                        filteredLabels.push(area);
+                        filteredData.push(activeAreasData.data[index]);
+                    }
+                });
+            } else if (filterValue === 'non-julita') {
+                // Filter to only non-Julita municipalities
+                activeAreasData.labels.forEach((area, index) => {
+                    if (!demographicsData.julitaBarangays[area]) {
+                        filteredLabels.push(area);
+                        filteredData.push(activeAreasData.data[index]);
+                    }
+                });
+            }
+
+            // Update chart with filtered data
+            window.activeAreasChartInstance.data.labels = filteredLabels;
+            window.activeAreasChartInstance.data.datasets[0].data = filteredData;
+            window.activeAreasChartInstance.update();
+        }
+
+        // Function to update monthly chart filter labels with current month names
+        function updateMonthlyChartLabels() {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1; // 1-12
+            const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const currentOption = document.querySelector('#monthlyChartMonthFilter option[value="current"]');
+            const lastOption = document.querySelector('#monthlyChartMonthFilter option[value="last"]');
+
+            if (currentOption) currentOption.textContent = `Current Month (${monthNames[currentMonth - 1]})`;
+            if (lastOption) lastOption.textContent = `Last Month (${monthNames[lastMonth - 1]})`;
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadTopBooks();
-            loadActiveMembers('borrowing');
+            // Update filter labels first
+            updateMonthlyChartLabels();
+    
+            // Initialize new charts first
+            createMonthlyBooksChart('current');
+            createActiveAreasChart();
+            createMostBorrowedBookLineChart(12);
+    
+            // Initialize peak hours and age activity charts
+            createPeakHoursChart('week');
+            createAgeActivityChart('week');
+    
+            // Initialize real-time clock
+            initializeRealTimeClock();
+    
+            // Then the rest
+            // loadTopBooks(); // Commented out as div not present
+            // loadActiveMembers('borrowing'); // Commented out as div not present
+    
             // Check for Christmas effects preference on load
             const christmasPreference = localStorage.getItem('christmasEffects');
             if (christmasPreference === 'true') {
                 document.body.classList.add('christmas-theme');
             }
         });
+    
+        // Real-time clock function
+        function initializeRealTimeClock() {
+            const clockElement = document.getElementById('realTimeClock');
+            if (!clockElement) return;
+    
+            function updateClock() {
+                const now = new Date();
+                const options = {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                };
+                const timeString = now.toLocaleDateString('en-US', options);
+                clockElement.textContent = timeString;
+            }
+    
+            // Update immediately
+            updateClock();
+    
+            // Update every second
+            setInterval(updateClock, 1000);
+        }
     </script>
+    <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
     <script src="{{ asset('js/overdue.js') }}" defer></script>
     <script src="{{ asset('js/bookadd.js') }}"></script>
     <script src="{{ asset('js/memberscript.js') }}"></script>
@@ -5768,9 +8739,462 @@
                 if (e.target.id === 'addBookModal') closeAddBookModal();
                 else if (e.target.id === 'julitaRegisterModal') closeJulitaRegisterModal();
                 else if (e.target.id === 'registerModal') closeRegisterModal();
+                else if (e.target.id === 'settingsModal') closeSettingsModal();
             }
         });
+
+        // Settings Modal Functions
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('active');
+                document.body.classList.add('modal-open');
+                // Reset to password tab
+                switchSettingsTab('password');
+            }
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+                // Reset form
+                const form = document.getElementById('changePasswordForm');
+                if (form) form.reset();
+            }
+        }
+
+        function switchSettingsTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.settings-tab-content').forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabName + 'Tab');
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`.settings-tab[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                    <div>
+                        <div style="font-weight: 600;">${message}</div>
+                    </div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (newPassword.length < 4) {
+                showNotification('New password must be at least 4 characters', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+
+            const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+
+            fetch('{{ route("admin.change-password") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                    new_password_confirmation: confirmPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Password changed successfully!', 'success');
+                    closeSettingsModal();
+                } else {
+                    showNotification(data.message || 'Failed to change password', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error changing password:', error);
+                showNotification('Error changing password', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        }
+
+        // Setup password change form
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordForm = document.getElementById('changePasswordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    changePassword();
+                });
+            }
+        });
+
     </script>
+
+    <!-- System Settings Modal -->
+    <div class="modal-overlay" id="settingsModal" style="z-index: 3000; display: none;">
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-cog" style="color: var(--primary); font-size: 20px;"></i>
+                    <span>System Settings</span>
+                </div>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <!-- Tabs Navigation -->
+                <div class="settings-tabs" style="display: flex; border-bottom: 2px solid var(--border); background: var(--surface-elevated);">
+                    <button class="settings-tab active" onclick="switchSettingsTab('password')" data-tab="password" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-key"></i>
+                        <span>Password</span>
+                    </button>
+                    <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-file-alt"></i>
+                        <span>System Logs</span>
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div style="padding: var(--spacing-xl);">
+                    <!-- Password Tab -->
+                    <div id="passwordTab" class="settings-tab-content active">
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-lock" style="color: var(--primary);"></i>
+                                Change Admin Password
+                            </h3>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg);">
+                                Update your administrator account password. Make sure to use a strong password.
+                            </p>
+                        </div>
+                        <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    Current Password
+                                </label>
+                                <input type="password" id="currentPassword" class="form-input" required placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-key" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    New Password
+                                </label>
+                                <input type="password" id="newPassword" class="form-input" required minlength="4" placeholder="Enter new password (min. 4 characters)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                                    <i class="fas fa-check-double" style="color: var(--text-muted); font-size: 14px;"></i>
+                                    Confirm New Password
+                                </label>
+                                <input type="password" id="confirmPassword" class="form-input" required minlength="4" placeholder="Confirm new password">
+                            </div>
+                            <button type="submit" class="btn btn-success" style="margin-top: var(--spacing-sm); width: 100%;">
+                                <i class="fas fa-save"></i> 
+                                <span>Change Password</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- System Logs Tab -->
+                    <div id="logsTab" class="settings-tab-content" style="display: none;">
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-file-alt" style="color: var(--accent);"></i>
+                                System Logs
+                            </h3>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
+                                View and manage system logs to monitor application activity, track errors, and troubleshoot issues. Logs contain detailed information about system events and operations.
+                            </p>
+                        </div>
+                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                                <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                    <i class="fas fa-file-alt" style="color: white; font-size: 20px;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                        Application Logs
+                                    </h4>
+                                    <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                        Access detailed system logs and activity records
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                            <i class="fas fa-external-link-alt"></i> 
+                            <span>Open System Logs Page</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .settings-btn:hover {
+            background: var(--surface-elevated) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .settings-btn:hover i {
+            animation: rotate 0.6s ease;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .settings-tab {
+            position: relative;
+        }
+
+        .settings-tab.active {
+            color: var(--primary) !important;
+            border-bottom-color: var(--primary) !important;
+            background: var(--surface) !important;
+        }
+
+        .settings-tab:hover:not(.active) {
+            background: var(--surface) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .settings-tab-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-tab-content.active {
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+            background: var(--surface-elevated);
+        }
+
+        .form-input:hover {
+            border-color: var(--gray-400);
+        }
+
+        body.dark-mode .form-input {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(71, 85, 105, 0.5);
+        }
+
+        body.dark-mode .form-input:focus {
+            background: rgba(30, 41, 59, 1);
+            border-color: var(--primary);
+        }
+    </style>
+
+    <!-- QR Scanner Modal -->
+    <div class="modal-overlay" id="qrScannerModal" style="z-index: 3000; display: none;">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-qrcode" style="color: var(--primary); font-size: 20px;"></i>
+                    <span>QR Scanner</span>
+                </div>
+                <button class="modal-close" onclick="stopQRScan()">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div id="qr-reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    Position the QR code within the camera view
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Details Modal -->
+    <div class="modal-overlay" id="overdueModal" style="z-index: 2700; display: none;">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger); font-size: 20px;"></i>
+                    <span>Overdue Notice</span>
+                </div>
+                <button class="modal-close" onclick="closeOverdueModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="overdueModalDetails" style="text-align: center;">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-actions">
+                    <button type="button" class="btn-cancel-premium" onclick="closeOverdueModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Close</span>
+                    </button>
+                    <button type="button" class="btn-submit-premium" onclick="proceedWithReturn()">
+                        <i class="fas fa-check"></i>
+                        <span>Proceed with Return</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return All Modal -->
+    <div class="modal-overlay" id="returnAllModal" style="z-index: 2600; display: none;">
+        <div class="modal-container" style="max-width: 800px; max-height: 80vh;">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-undo" style="color: var(--success); font-size: 20px;"></i>
+                    <span>Return All Books</span>
+                </div>
+                <button class="modal-close" onclick="closeReturnAllModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; height: 100%;">
+                    <!-- Left Side: QR Scanner -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="text-align: center;">
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem;">📱 Scan Book QR Codes</h4>
+                            <div style="background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1rem;">
+                                <div id="qr-reader-return-all" style="width: 100%; max-width: 300px; height: 200px; margin: 0 auto; border-radius: var(--radius); overflow: hidden;"></div>
+                                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                                    Scan each book's QR code to verify return
+                                </p>
+                            </div>
+                            <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; font-style: italic;">
+                                Scanner starting automatically...
+                            </p>
+                        </div>
+                        <div style="background: var(--surface); border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border);">
+                            <h5 style="color: var(--text-primary); margin-bottom: 0.5rem;">📋 Instructions</h5>
+                            <ol style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin: 0; padding-left: 1rem;">
+                                <li>Books to return are pre-filled below</li>
+                                <li>Scan each book's QR code to verify return</li>
+                                <li>Counter shows progress (scanned/total)</li>
+                                <li>Return processes automatically when all books are scanned</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Books List -->
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Member Info -->
+                        <div style="background: var(--surface); border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border);">
+                            <h5 style="color: var(--text-primary); margin-bottom: 0.5rem;">👤 Member Information</h5>
+                            <div id="returnAllMemberInfo" style="color: var(--text-secondary);">
+                                <p>Loading...</p>
+                            </div>
+                        </div>
+
+                        <!-- Books to Return -->
+                        <div style="background: var(--surface); border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border); flex: 1; display: flex; flex-direction: column;">
+                            <h5 style="color: var(--text-primary); margin-bottom: 0.5rem;">📚 Books to Return <span id="returnAllCounter" style="font-size: 0.8rem; color: var(--text-secondary);">(0/?)</span></h5>
+                            <div id="returnAllBooksList" style="flex: 1; overflow-y: auto; max-height: 300px;">
+                                <p style="color: var(--text-muted); font-style: italic;">Loading books...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-actions">
+                    <button type="button" class="btn-cancel-premium" onclick="closeReturnAllModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
+

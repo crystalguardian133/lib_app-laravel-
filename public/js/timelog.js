@@ -58,8 +58,10 @@ function timeOut(id, btn) {
   .then(res => res.json())
   .then(data => {
     showPopup(data.message || "✅ Time-out recorded.");
-    const row = btn.closest("tr");
-    row.remove();
+    if (data.message.includes("✅")) {
+      const row = btn.closest("tr");
+      row.remove();
+    }
   })
   .catch(() => showPopup("❌ Failed to time out."));
 }
