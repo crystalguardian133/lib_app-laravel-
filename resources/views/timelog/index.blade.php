@@ -1290,7 +1290,7 @@
 
   <!-- System Settings Modal -->
   <div class="modal-overlay" id="settingsModal" style="z-index: 3000; display: none;">
-      <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-container" style="max-width: 600px;">
           <div class="modal-header">
               <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
                   <i class="fas fa-cog" style="color: var(--primary); font-size: 20px;"></i>
@@ -1298,64 +1298,112 @@
               </div>
               <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
           </div>
-          <div class="modal-body" style="padding: var(--spacing-xl);">
-              <div style="display: flex; flex-direction: column; gap: var(--spacing-xl);">
-                  <!-- Change Password Section -->
-                  <div class="settings-section">
-                      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: var(--spacing-lg); padding-bottom: var(--spacing-md); border-bottom: 2px solid var(--border);">
-                          <div style="width: 40px; height: 40px; border-radius: var(--radius); background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
-                              <i class="fas fa-key" style="color: white; font-size: 18px;"></i>
-                          </div>
-                          <h3 style="margin: 0; color: var(--text-primary); font-size: 18px; font-weight: 600;">
-                              Change Password
+          <div class="modal-body" style="padding: 0;">
+              <!-- Tabs Navigation -->
+              <div class="settings-tabs" style="display: flex; border-bottom: 2px solid var(--border); background: var(--surface-elevated);">
+                  <button class="settings-tab active" onclick="switchSettingsTab('password')" data-tab="password" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                      <i class="fas fa-key"></i>
+                      <span>Password</span>
+                  </button>
+                  <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                      <i class="fas fa-file-alt"></i>
+                      <span>Logs and History</span>
+                  </button>
+              </div>
+
+              <!-- Tab Content -->
+              <div style="padding: var(--spacing-xl);">
+                  <!-- Password Tab -->
+                  <div id="passwordTab" class="settings-tab-content active">
+                      <div style="margin-bottom: var(--spacing-lg);">
+                          <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                              <i class="fas fa-lock" style="color: var(--primary);"></i>
+                              Change Admin Password
                           </h3>
+                          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg);">
+                              Update your administrator account password. Make sure to use a strong password.
+                          </p>
                       </div>
                       <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
                           <div class="form-group">
-                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm);">
+                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                                   <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
                                   Current Password
                               </label>
                               <input type="password" id="currentPassword" class="form-input" required placeholder="Enter current password">
                           </div>
                           <div class="form-group">
-                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm);">
+                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                                   <i class="fas fa-key" style="color: var(--text-muted); font-size: 14px;"></i>
                                   New Password
                               </label>
                               <input type="password" id="newPassword" class="form-input" required minlength="4" placeholder="Enter new password (min. 4 characters)">
                           </div>
                           <div class="form-group">
-                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm);">
+                              <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                                   <i class="fas fa-check-double" style="color: var(--text-muted); font-size: 14px;"></i>
                                   Confirm New Password
                               </label>
                               <input type="password" id="confirmPassword" class="form-input" required minlength="4" placeholder="Confirm new password">
                           </div>
                           <button type="submit" class="btn btn-success" style="margin-top: var(--spacing-sm); width: 100%;">
-                              <i class="fas fa-save"></i> 
+                              <i class="fas fa-save"></i>
                               <span>Change Password</span>
                           </button>
                       </form>
                   </div>
 
-                  <!-- System Logs Link -->
-                  <div class="settings-section" style="border-top: 2px solid var(--border); padding-top: var(--spacing-xl);">
-                      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: var(--spacing-lg);">
-                          <div style="width: 40px; height: 40px; border-radius: var(--radius); background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
-                              <i class="fas fa-file-alt" style="color: white; font-size: 18px;"></i>
-                          </div>
-                          <h3 style="margin: 0; color: var(--text-primary); font-size: 18px; font-weight: 600;">
-                              System Logs
+                  <!-- Logs and History Tab -->
+                  <div id="logsTab" class="settings-tab-content" style="display: none;">
+                      <div style="margin-bottom: var(--spacing-lg);">
+                          <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
+                              <i class="fas fa-file-alt" style="color: var(--accent);"></i>
+                              Logs and History
                           </h3>
+                          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
+                              View system logs and borrow history to monitor application activity, track book transactions, and review library operations.
+                          </p>
                       </div>
-                      <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md); line-height: 1.6;">
-                          View and manage system logs to monitor application activity and troubleshoot issues.
-                      </p>
-                      <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
-                          <i class="fas fa-external-link-alt"></i> 
-                          <span>View System Logs</span>
-                      </a>
+                      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                              <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--accent), var(--accent-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                  <i class="fas fa-file-alt" style="color: white; font-size: 20px;"></i>
+                              </div>
+                              <div style="flex: 1;">
+                                  <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                      Application Logs
+                                  </h4>
+                                  <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                      Access detailed system logs and activity records
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+                      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                              <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                  <i class="fas fa-history" style="color: white; font-size: 20px;"></i>
+                              </div>
+                              <div style="flex: 1;">
+                                  <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                      Borrow History
+                                  </h4>
+                                  <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                      View complete borrow history with year-based filtering
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+                      <div style="display: flex; gap: var(--spacing-sm);">
+                          <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                              <i class="fas fa-external-link-alt"></i>
+                              <span>Open System Logs</span>
+                          </a>
+                          <a href="{{ route('borrow.history') }}" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                              <i class="fas fa-history"></i>
+                              <span>View Borrow History</span>
+                          </a>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1556,6 +1604,32 @@
               submitBtn.disabled = false;
               submitBtn.innerHTML = originalText;
           });
+      }
+
+      function switchSettingsTab(tabName) {
+          // Hide all tab contents
+          document.querySelectorAll('.settings-tab-content').forEach(content => {
+              content.classList.remove('active');
+              content.style.display = 'none';
+          });
+
+          // Remove active class from all tabs
+          document.querySelectorAll('.settings-tab').forEach(tab => {
+              tab.classList.remove('active');
+          });
+
+          // Show selected tab content
+          const selectedContent = document.getElementById(tabName + 'Tab');
+          if (selectedContent) {
+              selectedContent.classList.add('active');
+              selectedContent.style.display = 'block';
+          }
+
+          // Add active class to selected tab
+          const selectedTab = document.querySelector(`.settings-tab[data-tab="${tabName}"]`);
+          if (selectedTab) {
+              selectedTab.classList.add('active');
+          }
       }
 
       document.addEventListener('DOMContentLoaded', function() {

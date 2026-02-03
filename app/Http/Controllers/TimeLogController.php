@@ -117,12 +117,17 @@ class TimeLogController extends Controller
             return response()->json(['message' => 'Member not found.'], 404);
         }
 
+        $mode = $request->input('mode', 'auto'); // default to auto for backward compatibility
+
         $log = TimeLog::where('member_id', $member->id)
                     ->whereNull('time_out')
                     ->latest()
                     ->first();
 
-        if ($log) {
+        if ($mode === 'time_out') {
+            if (!$log) {
+                return response()->json(['message' => '❌ Member is not timed in. Cannot time out.'], 400);
+            }
             // Check if member has pending books to return before time out
             $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
 
@@ -144,12 +149,16 @@ class TimeLogController extends Controller
                     'time_log_id' => $log->id,
                     'time_in' => $log->time_in,
                     'time_out' => $log->time_out,
-                    'method' => 'qr_scan'
+                    'method' => 'qr_scan',
+                    'mode' => 'time_out'
                 ]
             );
 
             return response()->json(['message' => '✅ Time-Out successful for ' . $member->name]);
-        } else {
+        } elseif ($mode === 'time_in') {
+            if ($log) {
+                return response()->json(['message' => '❌ Member is already timed in. Cannot time in again.'], 400);
+            }
             // Time in
             $timeLog = TimeLog::create([
                 'member_id' => $member->id,
@@ -166,38 +175,25 @@ class TimeLogController extends Controller
                     'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
                     'time_log_id' => $timeLog->id,
                     'time_in' => $timeLog->time_in,
-                    'method' => 'qr_scan'
+                    'method' => 'qr_scan',
+                    'mode' => 'time_in'
                 ]
             );
 
             return response()->json(['message' => '✅ Time-In successful for ' . $member->name]);
-        }
-    }
-
-    public function scanQR($id)
-    {
-        $member = Member::find($id);
-        if (!$member) {
-            return response()->json(['message' => 'Member not found'], 404);
-        }
-
-        if ($this->isMemberTimedIn($member->id)) {
-            // Check if member has pending books to return before time out
-            $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
-
-            if ($pendingBooks > 0) {
-                return response()->json(['message' => '❌ Cannot time out: Member has pending books to return.'], 400);
-            }
-
-            $this->logoutMember($member->id);
-
-            // Get the log entry for logging
-            $log = TimeLog::where('member_id', $member->id)
-                          ->whereNull('time_out')
-                          ->latest()
-                          ->first();
-
+        } else {
+            // Auto mode: original behavior
             if ($log) {
+                // Check if member has pending books to return before time out
+                $pendingBooks = Transaction::where('member_id', $member->id)->where('status', 'borrowed')->count();
+
+                if ($pendingBooks > 0) {
+                    return response()->json(['message' => '❌ Cannot time out: Member has pending books to return.'], 400);
+                }
+
+                // Time out
+                $log->update(['time_out' => now()]);
+
                 // Log time-out activity
                 SystemLog::log(
                     'member_time_out_qr',
@@ -209,31 +205,43 @@ class TimeLogController extends Controller
                         'time_log_id' => $log->id,
                         'time_in' => $log->time_in,
                         'time_out' => $log->time_out,
-                        'method' => 'qr_scan'
+                        'method' => 'qr_scan',
+                        'mode' => 'auto'
                     ]
                 );
-            }
 
-            return response()->json(['message' => '👋 Time-out successful!']);
-        } else {
-            $timeLog = $this->logTimeIn($member->id);
-
-            // Log time-in activity
-            SystemLog::log(
-                'member_time_in_qr',
-                "Member '{$member->first_name} {$member->last_name}' timed in via QR scan",
-                Auth::id(),
-                [
+                return response()->json(['message' => '✅ Time-Out successful for ' . $member->name]);
+            } else {
+                // Time in
+                $timeLog = TimeLog::create([
                     'member_id' => $member->id,
-                    'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
-                    'time_log_id' => $timeLog->id,
-                    'time_in' => $timeLog->time_in,
-                    'method' => 'qr_scan'
-                ]
-            );
+                    'time_in' => now()
+                ]);
 
-            return response()->json(['message' => '✅ Time-in successful!']);
+                // Log time-in activity
+                SystemLog::log(
+                    'member_time_in_qr',
+                    "Member '{$member->first_name} {$member->last_name}' timed in via QR scan",
+                    Auth::id(),
+                    [
+                        'member_id' => $member->id,
+                        'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
+                        'time_log_id' => $timeLog->id,
+                        'time_in' => $timeLog->time_in,
+                        'method' => 'qr_scan',
+                        'mode' => 'auto'
+                    ]
+                );
+
+                return response()->json(['message' => '✅ Time-In successful for ' . $member->name]);
+            }
         }
+    }
+
+    public function scanQR($id)
+    {
+        // This method is deprecated, use scan() instead
+        return $this->scan(request(), $id);
     }
 
     // ✅ Helper: check if member is timed in

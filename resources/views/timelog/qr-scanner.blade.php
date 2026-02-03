@@ -359,13 +359,55 @@
   .icon-moon {
     display: none;
   }
-
+  
   input:checked + .slider .icon-sun {
     display: block;
   }
-
+  
   input:not(:checked) + .slider .icon-moon {
     display: block;
+  }
+  
+  .icon-time-in,
+  .icon-time-out {
+    display: none;
+  }
+
+  
+  input[id="scanModeToggle"]:checked + .slider .icon-time-out {
+    display: block;
+  }
+  
+  input[id="scanModeToggle"]:not(:checked) + .slider .icon-time-in {
+    display: block;
+  }
+  
+  .scan-mode-toggle .switch {
+    width: 80px;
+    height: 40px;
+  }
+  
+  .scan-mode-toggle .slider {
+    background: linear-gradient(135deg, var(--gray-300), var(--gray-400));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .scan-mode-toggle .slider-thumb {
+    height: 32px;
+    width: 32px;
+    left: 4px;
+    bottom: 4px;
+    background: linear-gradient(135deg, var(--white), var(--gray-100));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 18px;
+  }
+  
+  .scan-mode-toggle input:checked + .slider {
+    background: linear-gradient(135deg, var(--success), #059669);
+  }
+
+  .scan-mode-toggle input:checked + .slider .slider-thumb {
+    transform: translateX(40px);
   }
 
   .settings-btn {
@@ -671,7 +713,25 @@
       top: var(--spacing);
     }
   }
+  @media (max-width: 768px) {
+    .scan-mode-toggle .switch {
+      width: 70px;
+      height: 36px;
+    }
 
+    .scan-mode-toggle .slider-thumb {
+      height: 28px;
+      width: 28px;
+    }
+
+    .scan-mode-toggle input:checked + .slider .slider-thumb {
+      transform: translateX(34px);
+    }
+
+    #scanModeLabel {
+      font-size: 1rem;
+    }
+  }
   @media (max-width: 768px) {
     .hero-title {
       font-size: 1.75rem;
@@ -746,21 +806,31 @@
           <i class="fas fa-qrcode"></i>
           QR Scanner
         </h1>
-        <p class="hero-subtitle">Scan member QR codes for time-in/time-out</p>
+        <p class="hero-subtitle" id="heroSubtitle">Scan member QR codes for time-in only</p>
       </div>
     </div>
 
     <!-- Scanner Section -->
     <div class="scanner-section">
       <div class="scanner-container">
-        <div class="scanner-instructions">
+      <div class="scan-mode-toggle" style="display: flex; align-items: center; gap: var(--spacing); margin-bottom: var(--spacing-lg); justify-content: center;">
+      <label class="switch" title="Toggle Scan Mode">
+      <input type="checkbox" id="scanModeToggle">
+      <span class="slider">
+      <span class="slider-thumb">
+      <span class="icon-time-in">⏰</span>
+      <span class="icon-time-out">🏠</span>
+      </span>
+      </span>
+      </label>
+      <span id="scanModeLabel" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">Time-In Mode</span>
+      </div>
+      <div class="scanner-instructions">
           <h3><i class="fas fa-info-circle"></i> Instructions</h3>
-          <p>Point your camera at a member's QR code. The system will automatically detect and process time-in or time-out based on their current status.</p>
+          <p id="instructionsText">Point your camera at a member's QR code. The system will automatically detect and process time-in or time-out based on their current status.</p>
         </div>
 
         <div id="qr-reader"></div>
-
-        <div id="statusMessage" class="status-message"></div>
       </div>
     </div>
     </div>
@@ -799,6 +869,41 @@
       }
     });
 
+    // Scan Mode Toggle
+    const scanModeToggle = document.getElementById('scanModeToggle');
+    const scanModeLabel = document.getElementById('scanModeLabel');
+    const heroSubtitle = document.getElementById('heroSubtitle');
+
+    // Check for saved scan mode preference or default to time-in
+    const currentScanMode = localStorage.getItem('scanMode') || 'time-in';
+    const instructionsText = document.getElementById('instructionsText');
+    if (currentScanMode === 'time-out') {
+      scanModeToggle.checked = true;
+      scanModeLabel.textContent = 'Time-Out Mode';
+      heroSubtitle.textContent = 'Scan member QR codes for time-out';
+      instructionsText.textContent = 'Point your camera at a member\'s QR code. The system will process time-out for the scanned member.';
+    } else {
+      scanModeToggle.checked = false;
+      scanModeLabel.textContent = 'Time-In Mode';
+      heroSubtitle.textContent = 'Scan member QR codes for time-in only';
+      instructionsText.textContent = 'Point your camera at a member\'s QR code. The system will process time-in for the scanned member.';
+    }
+
+    // Scan mode toggle event listener
+    scanModeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        scanModeLabel.textContent = 'Time-Out Mode';
+        heroSubtitle.textContent = 'Scan member QR codes for time-out';
+        instructionsText.textContent = 'Point your camera at a member\'s QR code. The system will process time-out for the scanned member.';
+        localStorage.setItem('scanMode', 'time-out');
+      } else {
+        scanModeLabel.textContent = 'Time-In Mode';
+        heroSubtitle.textContent = 'Scan member QR codes for time-in only';
+        instructionsText.textContent = 'Point your camera at a member\'s QR code. The system will process time-in for the scanned member.';
+        localStorage.setItem('scanMode', 'time-in');
+      }
+    });
+
     // QR Scanner
     let html5QrCode;
     let qrScannerRunning = false;
@@ -828,14 +933,14 @@
             qrScannerRunning = true;
           }).catch(err => {
             console.error("Failed to start QR scanner:", err);
-            showStatus("❌ Failed to start camera. Please check permissions.", "error");
+            showToast("Failed to start camera. Please check permissions.", "error");
           });
         } else {
-          showStatus("❌ No camera found.", "error");
+          showToast("No camera found.", "error");
         }
       }).catch(err => {
         console.error("Error getting camera:", err);
-        showStatus("❌ Camera access denied.", "error");
+        showToast("Camera access denied.", "error");
       });
     }
 
@@ -871,8 +976,9 @@
 
     function processTimeLog(memberId) {
       const token = document.querySelector('meta[name="csrf-token"]').content;
+      const mode = scanModeToggle.checked ? 'time_out' : 'time_in';
 
-      fetch(`/time-log/scan/${memberId}`, {
+      fetch(`/time-log/scan/${memberId}?mode=${mode}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -885,26 +991,49 @@
           // Use toast notification for success
           showToast(data.message.replace(/[✅👋]/g, '').trim(), "success");
         } else if (data.message.includes("❌")) {
-          showStatus(data.message, "error");
+          showToast(data.message.replace(/[❌]/g, '').trim(), "error");
         } else {
-          showStatus(data.message, "info");
+          showToast(data.message.replace(/[⚠️]/g, '').trim(), "warning");
         }
       })
       .catch(err => {
         console.error("Error processing time log:", err);
-        showStatus("❌ Failed to process time log.", "error");
+        showToast("Failed to process time log.", "error");
       });
     }
 
-    function showStatus(message, type) {
-      const statusEl = document.getElementById('statusMessage');
-      statusEl.textContent = message;
-      statusEl.className = `status-message status-${type}`;
-      statusEl.style.display = 'block';
+    function showToast(message, type) {
+      const toastStack = document.getElementById('toast-stack');
+      const toast = document.createElement('div');
+      toast.className = `toast-notification toast-${type} show`;
 
-      // Auto-hide after 5 seconds
+      const iconMap = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      };
+
+      toast.innerHTML = `
+        <div class="toast-content">
+          <div class="toast-icon">
+            <i class="${iconMap[type] || 'fas fa-info-circle'}"></i>
+          </div>
+          <div class="toast-text">${message}</div>
+          <button class="toast-close" onclick="this.parentElement.parentElement.remove()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+
+      toastStack.appendChild(toast);
+
+      // Auto-remove after 5 seconds
       setTimeout(() => {
-        statusEl.style.display = 'none';
+        if (toast.parentElement) {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }
       }, 5000);
     }
 

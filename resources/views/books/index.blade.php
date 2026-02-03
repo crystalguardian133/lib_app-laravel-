@@ -2299,6 +2299,15 @@ body.dark-mode .premium-upload-area:hover {
 }
 
 /* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes iconBounce {
   0% { transform: scale(0) rotate(-180deg); }
   50% { transform: scale(1.3) rotate(-90deg); }
@@ -2487,6 +2496,11 @@ body.dark-mode .premium-upload-area:hover {
                     </tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
+                {{ $books->links() }}
             </div>
         </div>
     </div>
@@ -4805,7 +4819,7 @@ body.dark-mode .premium-upload-area:hover {
                     </button>
                     <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fas fa-file-alt"></i>
-                        <span>System Logs</span>
+                        <span>Logs and History</span>
                     </button>
                 </div>
 
@@ -4856,10 +4870,10 @@ body.dark-mode .premium-upload-area:hover {
                         <div style="margin-bottom: var(--spacing-lg);">
                             <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-file-alt" style="color: var(--accent);"></i>
-                                System Logs
+                                Logs and History
                             </h3>
                             <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
-                                View and manage system logs to monitor application activity, track errors, and troubleshoot issues. Logs contain detailed information about system events and operations.
+                                View system logs and borrow history to monitor application activity, track book transactions, and review library operations.
                             </p>
                         </div>
                         <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
@@ -4877,10 +4891,31 @@ body.dark-mode .premium-upload-area:hover {
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
-                            <i class="fas fa-external-link-alt"></i> 
-                            <span>Open System Logs Page</span>
-                        </a>
+                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                                <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                    <i class="fas fa-history" style="color: white; font-size: 20px;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                        Borrow History
+                                    </h4>
+                                    <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                        View complete borrow history with year-based filtering
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-sm);">
+                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Open System Logs</span>
+                            </a>
+                            <a href="{{ route('borrow.history') }}" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                                <i class="fas fa-history"></i>
+                                <span>View Borrow History</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4888,94 +4923,94 @@ body.dark-mode .premium-upload-area:hover {
     </div>
 
     <style>
-        .settings-btn:hover {
-            background: var(--surface-elevated) !important;
-            border-color: var(--primary) !important;
-            color: var(--primary) !important;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md) !important;
-        }
+      .settings-btn:hover {
+          background: var(--surface-elevated) !important;
+          border-color: var(--primary) !important;
+          color: var(--primary) !important;
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-md) !important;
+      }
 
-        .settings-btn:hover i {
-            animation: rotate 0.6s ease;
-        }
+      .settings-btn:hover i {
+          animation: rotate 0.6s ease;
+      }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+      @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+      }
 
-        .settings-tab {
-            position: relative;
-        }
+      .settings-tab {
+          position: relative;
+      }
 
-        .settings-tab.active {
-            color: var(--primary) !important;
-            border-bottom-color: var(--primary) !important;
-            background: var(--surface) !important;
-        }
+      .settings-tab.active {
+          color: var(--primary) !important;
+          border-bottom-color: var(--primary) !important;
+          background: var(--surface) !important;
+      }
 
-        .settings-tab:hover:not(.active) {
-            background: var(--surface) !important;
-            color: var(--text-primary) !important;
-        }
+      .settings-tab:hover:not(.active) {
+          background: var(--surface) !important;
+          color: var(--text-primary) !important;
+      }
 
-        .settings-tab-content {
-            animation: fadeIn 0.3s ease;
-        }
+      .settings-tab-content {
+          animation: fadeIn 0.3s ease;
+      }
 
-        .settings-tab-content.active {
-            display: block !important;
-        }
+      .settings-tab-content.active {
+          display: block !important;
+      }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+              transform: translateY(5px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
 
-        .form-group {
-            margin-bottom: var(--spacing-md);
-        }
+      .form-group {
+          margin-bottom: var(--spacing-md);
+      }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--surface);
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
-        }
+      .form-input {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          background: var(--surface);
+          color: var(--text-primary);
+          font-size: 14px;
+          transition: var(--transition);
+          font-family: 'Outfit', sans-serif;
+      }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
-            background: var(--surface-elevated);
-        }
+      .form-input:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+          background: var(--surface-elevated);
+      }
 
-        .form-input:hover {
-            border-color: var(--gray-400);
-        }
+      .form-input:hover {
+          border-color: var(--gray-400);
+      }
 
-        body.dark-mode .form-input {
-            background: rgba(30, 41, 59, 0.9);
-            border-color: rgba(71, 85, 105, 0.5);
-        }
+      body.dark-mode .form-input {
+          background: rgba(30, 41, 59, 0.9);
+          border-color: rgba(71, 85, 105, 0.5);
+      }
 
-        body.dark-mode .form-input:focus {
-            background: rgba(30, 41, 59, 1);
-            border-color: var(--primary);
-        }
-    </style>
+      body.dark-mode .form-input:focus {
+          background: rgba(30, 41, 59, 1);
+          border-color: var(--primary);
+      }
+  </style>
 
     <script>
         // Settings Modal Functions

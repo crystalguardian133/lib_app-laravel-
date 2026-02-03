@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Models\Book;
 use App\Models\Transaction;
+use App\Models\SystemLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class BorrowController extends Controller
 {
@@ -101,7 +103,7 @@ class BorrowController extends Controller
                     }
 
                     // Create transaction record
-                    Transaction::create([
+                    $transaction = Transaction::create([
                         'member_id' => $member->id,
                         'book_id' => $book->id,
                         'borrowed_at' => now(),
@@ -110,6 +112,20 @@ class BorrowController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    // Log the borrow action
+                    SystemLog::log(
+                        'book_borrowed',
+                        "Book '{$book->title}' borrowed by {$member->first_name} {$member->last_name}",
+                        Auth::id(),
+                        [
+                            'transaction_id' => $transaction->id,
+                            'book_id' => $book->id,
+                            'member_id' => $member->id,
+                            'borrowed_at' => $transaction->borrowed_at,
+                            'due_date' => $transaction->due_date,
+                        ]
+                    );
 
                     // Decrease book availability
                     $book->decrement('availability');

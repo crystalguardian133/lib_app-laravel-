@@ -8887,7 +8887,7 @@
 
     </script>
 
-    <!-- System Settings Modal -->
+    <!-- System Settings Modal -->Settings
     <div class="modal-overlay" id="settingsModal" style="z-index: 3000; display: none;">
         <div class="modal-container" style="max-width: 600px;">
             <div class="modal-header">
@@ -8906,7 +8906,7 @@
                     </button>
                     <button class="settings-tab" onclick="switchSettingsTab('logs')" data-tab="logs" style="flex: 1; padding: var(--spacing-md) var(--spacing-lg); background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fas fa-file-alt"></i>
-                        <span>System Logs</span>
+                        <span>Logs and History</span>
                     </button>
                 </div>
 
@@ -8957,10 +8957,10 @@
                         <div style="margin-bottom: var(--spacing-lg);">
                             <h3 style="color: var(--text-primary); font-size: 18px; font-weight: 600; margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-file-alt" style="color: var(--accent);"></i>
-                                System Logs
+                                Logs and History
                             </h3>
                             <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: var(--spacing-lg); line-height: 1.6;">
-                                View and manage system logs to monitor application activity, track errors, and troubleshoot issues. Logs contain detailed information about system events and operations.
+                                View system logs and borrow history to monitor application activity, track book transactions, and review library operations.
                             </p>
                         </div>
                         <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
@@ -8978,10 +8978,31 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
-                            <i class="fas fa-external-link-alt"></i> 
-                            <span>Open System Logs Page</span>
-                        </a>
+                        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--spacing-md);">
+                                <div style="width: 48px; height: 48px; border-radius: var(--radius); background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);">
+                                    <i class="fas fa-history" style="color: white; font-size: 20px;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                        Borrow History
+                                    </h4>
+                                    <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">
+                                        View complete borrow history with year-based filtering
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-sm);">
+                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Open System Logs</span>
+                            </a>
+                            <a href="{{ route('borrow.history') }}" class="btn btn-secondary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                                <i class="fas fa-history"></i>
+                                <span>View Borrow History</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

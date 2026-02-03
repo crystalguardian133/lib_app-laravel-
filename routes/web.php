@@ -144,6 +144,7 @@ Route::post('/borrow', [BorrowController::class, 'store'])->name('borrow.book');
 Route::post('/borrow/process', [BorrowController::class, 'borrow'])->name('borrow.process');
 
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+Route::get('/borrow-history', [TransactionController::class, 'history'])->name('borrow.history');
 Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
 Route::post('/transactions/{id}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
 Route::get('/transactions/overdue', [TransactionController::class, 'overdue'])->name('transactions.overdue');
@@ -156,7 +157,7 @@ Route::get('/qr-scanner', [TimeLogController::class, 'qrScanner'])->name('qr-sca
 Route::get('/timelog/search', [TimeLogController::class, 'search']);
 Route::post('/timelog/time-in', [TimeLogController::class, 'timeIn']);
 Route::post('/timelog/time-out', [TimeLogController::class, 'timeOut']);
-Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scanQR']);
+Route::post('/time-log/scan/{id}', [TimeLogController::class, 'scan']);
 
 // ===========================
 // SYSTEM LOGS ROUTES
@@ -166,10 +167,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/system-logs/clear', [SystemLogsController::class, 'clear'])->name('system-logs.clear');
 });
 
-// ===========================
-// ADMIN SETTINGS ROUTES
-// ===========================
 Route::middleware('auth')->group(function () {
+    // ===========================
+    // ADMIN SETTINGS ROUTES
+    // ===========================
     Route::post('/admin/change-password', [AdminController::class, 'changePassword'])->name('admin.change-password');
 });
 });

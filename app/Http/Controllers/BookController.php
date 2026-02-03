@@ -13,7 +13,7 @@ class BookController extends Controller
 {
     public function index()
     {
-        $books = Book::all();
+        $books = Book::paginate(10);
 
         foreach ($books as $book) {
             // Always regenerate QR codes regardless of whether they exist or not
@@ -200,6 +200,9 @@ public function store(Request $request)
             $validated['cover_image'] = 'cover/' . $filename;
         }
 
+        // Get old values before update
+        $oldValues = $book->only(array_keys($validated));
+
         $book->update($validated);
         $this->generateQrFile($book);
 
@@ -212,7 +215,8 @@ public function store(Request $request)
                 'book_id' => $book->id,
                 'book_title' => $book->title,
                 'book_author' => $book->author,
-                'changes' => $validated
+                'old_values' => $oldValues,
+                'new_values' => $validated
             ]
         );
 

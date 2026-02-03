@@ -7,6 +7,8 @@ use App\Models\Transaction;
 use App\Models\Book;
 use App\Models\Member;
 use App\Models\BookReturn;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -39,6 +41,62 @@ public function index()
         'returned' => $returned,
     ]);
 }
+
+    public function history(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
+        $status = $request->input('status');
+        $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
+
+        $query = Transaction::with(['member', 'book'])
+            ->whereNotNull('borrowed_at')
+            ->orderBy('borrowed_at', 'desc');
+
+        if ($year) {
+            $query->whereYear('borrowed_at', $year);
+        }
+
+        if ($month) {
+            $query->whereMonth('borrowed_at', $month);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('member', function ($memberQuery) use ($search) {
+                    $memberQuery->where('first_name', 'like', '%' . $search . '%')
+                                ->orWhere('last_name', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('book', function ($bookQuery) use ($search) {
+                    $bookQuery->where('title', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        $transactions = $query->paginate($perPage);
+
+        // Get distinct years for filter
+        $years = Transaction::selectRaw('YEAR(borrowed_at) as year')
+            ->whereNotNull('borrowed_at')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('borrow-history.index', [
+            'transactions' => $transactions,
+            'years' => $years,
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'selectedStatus' => $status,
+            'search' => $search,
+        ]);
+    }
+
     public function borrow(Request $request)
 {
     $validated = $request->validate([
@@ -78,6 +136,21 @@ public function returnBook($id)
 
     $transaction->book->increment('availability');
 
+    // Log the return action
+    SystemLog::log(
+        'book_returned',
+        "Book '{$transaction->book->title}' returned by {$transaction->member->first_name} {$transaction->member->last_name}",
+        Auth::id(),
+        [
+            'transaction_id' => $transaction->id,
+            'book_id' => $transaction->book_id,
+            'member_id' => $transaction->member_id,
+            'borrowed_at' => $transaction->borrowed_at,
+            'returned_at' => $transaction->returned_at,
+            'due_date' => $transaction->due_date,
+        ]
+    );
+
     return redirect()->route('dashboard')->with('returned', 'success');
 }
 
@@ -106,6 +179,21 @@ public function bulkReturn(Request $request)
 
             $transaction->book->increment('availability');
             $returnedBooks[] = $transaction->book->title;
+
+            // Log the return action
+            SystemLog::log(
+                'book_returned',
+                "Book '{$transaction->book->title}' returned by {$transaction->member->first_name} {$transaction->member->last_name}",
+                Auth::id(),
+                [
+                    'transaction_id' => $transaction->id,
+                    'book_id' => $transaction->book_id,
+                    'member_id' => $transaction->member_id,
+                    'borrowed_at' => $transaction->borrowed_at,
+                    'returned_at' => $transaction->returned_at,
+                    'due_date' => $transaction->due_date,
+                ]
+            );
         } else {
             $book = Book::find($bookId);
             $errors[] = $book ? $book->title : "Book ID {$bookId}";

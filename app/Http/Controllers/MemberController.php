@@ -165,6 +165,9 @@ public function update(Request $request, $id)
         $data['photo'] = $photoName;
     }
 
+    // Get old values before update
+    $oldValues = $member->only(array_keys($data));
+
     $member->update($data);
 
     // Log member update
@@ -175,7 +178,8 @@ public function update(Request $request, $id)
         [
             'member_id' => $member->id,
             'member_name' => trim($member->first_name . ' ' . ($member->middle_name ?? '') . ' ' . $member->last_name),
-            'changes' => $data
+            'old_values' => $oldValues,
+            'new_values' => $data
         ]
     );
 
@@ -399,7 +403,6 @@ public function update(Request $request, $id)
         $totalMembers = Member::count();
         $julitaCount = $julitaMembers->count();
         $nonJulitaCount = $nonJulitaMembers->count();
-
         return response()->json([
             'julitaMembers' => $julitaMembers->toArray(),
             'nonJulitaMembers' => $nonJulitaMembers->toArray(),
