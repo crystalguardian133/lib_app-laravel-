@@ -14,6 +14,11 @@ class TimeLogController extends Controller
 {
     public function index()
     {
+        // Check if user has permission to access timelog
+        if (!Auth::check() || !Auth::user()->hasPermission('time-in-out')) {
+            abort(403, 'Unauthorized. You do not have permission to access timelog.');
+        }
+        
         $logs = TimeLog::with('member')->whereNull('time_out')->get();
         $historyLogs = TimeLog::with('member')
             ->whereNotNull('time_out')
@@ -25,6 +30,11 @@ class TimeLogController extends Controller
 
     public function qrScanner()
     {
+        // Check if user has permission to access QR scanner
+        if (!Auth::check() || !Auth::user()->hasPermission('scan-qr')) {
+            abort(403, 'Unauthorized. You do not have permission to access QR scanner.');
+        }
+        
         return view('timelog.qr-scanner');
     }
 
@@ -41,6 +51,11 @@ class TimeLogController extends Controller
 
     public function timeIn(Request $request)
     {
+        // Check if user has permission for time-in
+        if (!Auth::check() || !Auth::user()->hasPermission('time-in-out')) {
+            return response()->json(['message' => 'Unauthorized. You do not have permission to perform time-in.'], 403);
+        }
+        
         $name = $request->input('member_name');
         $member = Member::where('name', $name)->first();
 
@@ -76,6 +91,11 @@ class TimeLogController extends Controller
 
     public function timeOut(Request $request)
     {
+        // Check if user has permission for time-out
+        if (!Auth::check() || !Auth::user()->hasPermission('time-in-out')) {
+            return response()->json(['message' => 'Unauthorized. You do not have permission to perform time-out.'], 403);
+        }
+        
         $id = $request->input('id');
         $log = TimeLog::find($id);
 
@@ -112,6 +132,11 @@ class TimeLogController extends Controller
 
     public function scan(Request $request, $id)
     {
+        // Check if user has permission for QR scan
+        if (!Auth::check() || !Auth::user()->hasPermission('scan-qr')) {
+            return response()->json(['message' => 'Unauthorized. You do not have permission to use QR scanner.'], 403);
+        }
+        
         $member = Member::find($id);
         if (!$member) {
             return response()->json(['message' => 'Member not found.'], 404);

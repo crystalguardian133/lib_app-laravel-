@@ -22,6 +22,11 @@ class MemberController extends Controller
 {
     public function index()
     {
+        // Check if user has permission to view members
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
+            abort(403, 'Unauthorized. You do not have permission to view members.');
+        }
+        
          $members = Member::latest()->get(); // or paginate()
 
         foreach ($members as $member) {
@@ -40,6 +45,11 @@ class MemberController extends Controller
 
     public function store(Request $request)
     {
+        // Check if user has permission to create members
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
+            return response()->json(['message' => 'Unauthorized. You do not have permission to create members.'], 403);
+        }
+        
         $validated = $request->validate([
             'firstName'     => 'required|string|max:100',
             'middleName'    => 'nullable|string|max:100',
@@ -119,6 +129,11 @@ class MemberController extends Controller
 
 public function update(Request $request, $id)
 {
+    // Check if user has permission to update members
+    if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
+        return response()->json(['message' => 'Unauthorized. You do not have permission to update members.'], 403);
+    }
+    
     $member = Member::findOrFail($id);
 
     // validate camelCase inputs
@@ -193,6 +208,11 @@ public function update(Request $request, $id)
 
     public function destroy($id)
     {
+        // Check if user has permission to delete members
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
+            return response()->json(['message' => 'Unauthorized. You do not have permission to delete members.'], 403);
+        }
+        
         $member = Member::find($id);
 
         if (!$member) {

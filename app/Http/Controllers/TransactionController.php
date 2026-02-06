@@ -14,6 +14,11 @@ class TransactionController extends Controller
 {
 public function index()
 {
+    // Check if user has permission to view transactions
+    if (!Auth::check() || !Auth::user()->hasPermission('view-transactions')) {
+        abort(403, 'Unauthorized. You do not have permission to view transactions.');
+    }
+    
     $borrowed = Transaction::where('status', 'borrowed')
         ->with(['member', 'book'])
         ->orderBy('due_date')
@@ -44,6 +49,11 @@ public function index()
 
     public function history(Request $request)
     {
+        // Check if user has permission to view transactions
+        if (!Auth::check() || !Auth::user()->hasPermission('view-transactions')) {
+            abort(403, 'Unauthorized. You do not have permission to view transactions.');
+        }
+        
         $year = $request->input('year');
         $month = $request->input('month');
         $status = $request->input('status');
@@ -98,37 +108,47 @@ public function index()
     }
 
     public function borrow(Request $request)
-{
-    $validated = $request->validate([
-        'member_id' => 'required|exists:members,id',
-        'book_ids' => 'required|array',
-        'book_ids.*' => 'exists:books,id',
-    ]);
-
-    $borrowedBooks = [];
-
-    foreach ($validated['book_ids'] as $bookId) {
-        $book = Book::find($bookId);
-
-        if ($book->availability > 0) {
-            Transaction::create([
-                'book_id' => $bookId,
-                'member_id' => $validated['member_id'],
-            ]);
-
-            $book->decrement('availability');
-            $borrowedBooks[] = $book->title;
+    {
+        // Check if user has permission to borrow books
+        if (!Auth::check() || !Auth::user()->hasPermission('borrow-books')) {
+            return back()->with('error', 'Unauthorized. You do not have permission to borrow books.');
         }
-    }
+        
+        $validated = $request->validate([
+            'member_id' => 'required|exists:members,id',
+            'book_ids' => 'required|array',
+            'book_ids.*' => 'exists:books,id',
+        ]);
 
-    if (count($borrowedBooks) === 0) {
-        return back()->with('error', 'No books were available to borrow.');
-    }
+        $borrowedBooks = [];
 
-    return back()->with('success', 'Borrowed books: ' . implode(', ', $borrowedBooks));
-}
+        foreach ($validated['book_ids'] as $bookId) {
+            $book = Book::find($bookId);
+
+            if ($book->availability > 0) {
+                Transaction::create([
+                    'book_id' => $bookId,
+                    'member_id' => $validated['member_id'],
+                ]);
+
+                $book->decrement('availability');
+                $borrowedBooks[] = $book->title;
+            }
+        }
+
+        if (count($borrowedBooks) === 0) {
+            return back()->with('error', 'No books were available to borrow.');
+        }
+
+        return back()->with('success', 'Borrowed books: ' . implode(', ', $borrowedBooks));
+    }
 public function returnBook($id)
 {
+    // Check if user has permission to return books
+    if (!Auth::check() || !Auth::user()->hasPermission('return-books')) {
+        return redirect()->route('dashboard')->with('error', 'Unauthorized. You do not have permission to return books.');
+    }
+    
     $transaction = Transaction::findOrFail($id);
     $transaction->status = 'returned';
     $transaction->returned_at = now();
@@ -156,6 +176,11 @@ public function returnBook($id)
 
 public function bulkReturn(Request $request)
 {
+    // Check if user has permission to return books
+    if (!Auth::check() || !Auth::user()->hasPermission('return-books')) {
+        return response()->json(['message' => 'Unauthorized. You do not have permission to return books.'], 403);
+    }
+    
     $validated = $request->validate([
         'member_id' => 'required|exists:members,id',
         'book_ids' => 'required|array',
@@ -222,6 +247,11 @@ public function bulkReturn(Request $request)
 
 public function overdue()
 {
+    // Check if user has permission to view overdue books
+    if (!Auth::check() || !Auth::user()->hasPermission('view-overdue')) {
+        return response()->json(['message' => 'Unauthorized. You do not have permission to view overdue books.'], 403);
+    }
+    
     $overdue = Transaction::where('status', 'borrowed')
         ->where('due_date', '<', now())
         ->with(['member', 'book'])

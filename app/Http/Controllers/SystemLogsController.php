@@ -8,11 +8,32 @@ use App\Models\SystemLog;
 
 class SystemLogsController extends Controller
 {
+    /**
+     * Log a system event (static method for use from anywhere).
+     */
+    public static function log(string $action, string $description = null, int $userId = null, array $metadata = []): void
+    {
+        SystemLog::create([
+            'action' => $action,
+            'description' => $description ?? $action,
+            'user_id' => $userId ?? (Auth::check() ? Auth::id() : null),
+            'metadata' => !empty($metadata) ? json_encode($metadata) : null,
+        ]);
+    }
+
     public function index(Request $request)
     {
         // Check if user is authenticated
         if (!Auth::check()) {
             return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        
+        // Check if user has permission to view system logs (permission check includes revocation)
+        // Admins also go through this check so revocations are respected
+        if (!$user->hasPermission('view_system_logs')) {
+            abort(403, 'Unauthorized. You do not have permission to access system logs.');
         }
 
         $perPage = $request->get('per_page', 50);
@@ -31,6 +52,12 @@ class SystemLogsController extends Controller
         // Check if user is authenticated
         if (!Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        // Check if user is admin
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Only admins can clear system logs.'], 403);
         }
 
         SystemLog::truncate();

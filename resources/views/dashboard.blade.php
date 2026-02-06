@@ -1479,6 +1479,43 @@
     border-color: var(--danger);
     color: white;
   }
+  
+  /* Dark mode for System Settings Modal */
+  body.dark-mode #settingsModal .modal-header {
+    background: rgba(30, 30, 30, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  body.dark-mode #settingsModal .modal-title span {
+    color: var(--text-primary);
+  }
+  
+  body.dark-mode #settingsModal .modal-close {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(71, 85, 105, 0.5);
+    color: var(--text-muted);
+  }
+  
+  body.dark-mode #settingsModal .modal-close:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+  
+  body.dark-mode #settingsModal .settings-tab {
+    background: rgba(30, 30, 30, 0.8);
+    color: var(--text-secondary);
+  }
+  
+  body.dark-mode #settingsModal .settings-tab.active {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--primary);
+  }
+  
+  body.dark-mode #settingsModal .settings-tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
   body.dark-mode .form-input, body.dark-mode .form-control {
     background: rgba(30, 41, 59, 0.9);
     border-color: rgba(71, 85, 105, 0.5);
@@ -3557,7 +3594,7 @@
     background: linear-gradient(135deg, var(--warning), #d97706);
   }
 </style>
-<body>
+<body data-user-role="{{ Auth::user() && Auth::user()->isAdmin() ? 'admin' : 'user' }}">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -3581,9 +3618,22 @@
                 <span class="icon"><i class="fas fa-user-clock"></i></span>
                 <span class="label">Member Time-in/out</span>
             </a>
+            <div class="admin-only-links">
+            <a href="{{ route('admin.users.index') }}" data-label="User Management">
+                <span class="icon"><i class="fas fa-users-cog"></i></span>
+                <span class="label">User Management</span>
+            </a>
+            <a href="{{ route('system-logs.index') }}" data-label="System Logs">
+                <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                <span class="label">System Logs</span>
+            </a>
+            </div>
         </nav>
         <!-- Settings and Logout Buttons -->
         <div style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <a href="{{ route('user.sessions') }}" class="settings-btn admin-only-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0; text-decoration: none;" title="Active Sessions">
+                <i class="fas fa-desktop"></i>
+            </a>
             <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
                 <i class="fas fa-cog"></i>
             </button>
@@ -8762,7 +8812,7 @@
                 modal.classList.remove('active');
                 document.body.classList.remove('modal-open');
                 // Reset form
-                const form = document.getElementById('changePasswordForm');
+                const form = document.getElementById('profileForm');
                 if (form) form.reset();
             }
         }
@@ -8818,7 +8868,7 @@
             }, 5000);
         }
 
-        function changePassword() {
+        function updateProfile() {
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -8838,12 +8888,12 @@
                 return;
             }
 
-            const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+            const submitBtn = document.querySelector('#profileForm button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
 
-            fetch('{{ route("admin.change-password") }}', {
+            fetch('{{ route("admin.update-profile") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -8876,11 +8926,11 @@
 
         // Setup password change form
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordForm = document.getElementById('changePasswordForm');
+            const passwordForm = document.getElementById('profileForm');
             if (passwordForm) {
                 passwordForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    changePassword();
+                    updateProfile();
                 });
             }
         });
@@ -8923,7 +8973,7 @@
                                 Update your administrator account password. Make sure to use a strong password.
                             </p>
                         </div>
-                        <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <form id="profileForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
                             <div class="form-group">
                                 <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                                     <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
@@ -8994,7 +9044,7 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: var(--spacing-sm);">
-                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" onclick="checkSystemLogsAccess(event)" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
                                 <i class="fas fa-external-link-alt"></i>
                                 <span>Open System Logs</span>
                             </a>
@@ -9217,5 +9267,48 @@
     </div>
 
 </body>
-</html>
+    <!-- Toast Notifications -->
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
+    
+    <script>
+    // Hide admin-only elements for non-admin users
+    document.addEventListener('DOMContentLoaded', function() {
+        const userRole = document.body.getAttribute('data-user-role');
+        
+        if (userRole !== 'admin') {
+            // Hide admin-only links in sidebar
+            const adminLinks = document.querySelectorAll('.admin-only-links');
+            adminLinks.forEach(function(el) {
+                el.style.display = 'none';
+            });
+            
+            // Hide admin-only buttons
+            const adminButtons = document.querySelectorAll('.admin-only-btn');
+            adminButtons.forEach(function(el) {
+                el.style.display = 'none';
+            });
+        }
+    });
+    </script>
+    
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ asset('js/toast.js') }}"></script>
+    
+    <script>
+    // Check system logs access for non-admin users
+    function checkSystemLogsAccess(event) {
+        const hasPermission = {{ auth()->check() && auth()->user()->hasPermission('view_system_logs') ? 'true' : 'false' }};
+        
+        if (!hasPermission) {
+            event.preventDefault();
+            if (typeof toast !== 'undefined') {
+                toast.accessDenied('System Logs');
+            } else {
+                alert('Access Denied: You do not have permission to access System Logs.');
+            }
+        }
+    }
+    </script>
 
+</body>
+</html>

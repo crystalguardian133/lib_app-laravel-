@@ -4027,7 +4027,22 @@
                 Update your administrator account password. Make sure to use a strong password.
               </p>
             </div>
-            <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+            <form id="profileForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+              <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                  <i class="fas fa-user" style="color: var(--text-muted); font-size: 14px;"></i>
+                  Username
+                </label>
+                <input type="text" id="username" class="form-input" required placeholder="Enter new username" value="{{ auth()->user()->username }}">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                  <i class="fas fa-envelope" style="color: var(--text-muted); font-size: 14px;"></i>
+                  Email Address
+                </label>
+                <input type="email" id="email" class="form-input" readonly placeholder="Email cannot be changed" value="{{ auth()->user()->email }}" style="background: var(--gray-100); cursor: not-allowed;">
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Email address cannot be changed</p>
+              </div>
               <div class="form-group">
                 <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                   <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
@@ -4051,7 +4066,7 @@
               </div>
               <button type="submit" class="btn btn-success" style="margin-top: var(--spacing-sm); width: 100%;">
                 <i class="fas fa-save"></i> 
-                <span>Change Password</span>
+                <span>Update Profile</span>
               </button>
             </form>
           </div>
@@ -4098,7 +4113,7 @@
               </div>
             </div>
             <div style="display: flex; gap: var(--spacing-sm);">
-              <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+              <a href="{{ route('system-logs.index') }}" class="btn btn-primary" onclick="checkSystemLogsAccess(event)" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
                 <i class="fas fa-external-link-alt"></i>
                 <span>Open System Logs</span>
               </a>
@@ -4723,7 +4738,8 @@ async function verifySmsCode() {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ code })
+            body: JSON.stringify({
+            username: username, code })
         });
 
         if (response.ok) {
@@ -4871,7 +4887,8 @@ async function verifyEmailCode() {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ code })
+            body: JSON.stringify({
+            username: username, code })
         });
 
         const result = await response.json();
@@ -4958,7 +4975,8 @@ function sendRegistrationEmailCode() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({
+            username: username, email })
     })
     .then(response => response.json())
     .then(data => {
@@ -5046,7 +5064,8 @@ function verifyRegistrationEmailCode() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ email: window.registrationEmail, code })
+        body: JSON.stringify({
+            username: username, email: window.registrationEmail, code })
     })
     .then(response => response.json())
     .then(data => {
@@ -5106,11 +5125,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Setup password change form
-    const passwordForm = document.getElementById('changePasswordForm');
+    const passwordForm = document.getElementById('profileForm');
     if (passwordForm) {
         passwordForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            changePassword();
+            updateProfile();
         });
     }
 });
@@ -5134,7 +5153,7 @@ function closeSettingsModal() {
         modal.classList.remove('active');
         document.body.classList.remove('modal-open');
         // Reset form
-        const form = document.getElementById('changePasswordForm');
+        const form = document.getElementById('profileForm');
         if (form) form.reset();
     }
 }
@@ -5165,11 +5184,25 @@ function switchSettingsTab(tabName) {
     }
 }
 
-function changePassword() {
+function updateProfile() {
+    const username = document.getElementById('username').value;
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
+    if (!username) {
+        showNotification('Please fill in username field', 'error');
+        return;
+    }
+
+    // If changing password validate all password fields
+    if (newPassword || confirmPassword || currentPassword) {
+        if (!currentPassword) {
+            showNotification('Current password is required to change password', 'error');
+            return;
+        }
+    }
+    // For password-only changes, validate all fields
     if (!currentPassword || !newPassword || !confirmPassword) {
         showNotification('Please fill in all fields', 'error');
         return;
@@ -5185,18 +5218,19 @@ function changePassword() {
         return;
     }
 
-    const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+    const submitBtn = document.querySelector('#profileForm button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
 
-    fetch('{{ route("admin.change-password") }}', {
+    fetch('{{ route("admin.update-profile") }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
         body: JSON.stringify({
+            username: username,
             current_password: currentPassword,
             new_password: newPassword,
             new_password_confirmation: confirmPassword
@@ -5205,7 +5239,7 @@ function changePassword() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showNotification('Password changed successfully!', 'success');
+            showNotification('Profile updated successfully!', 'success');
             closeSettingsModal();
         } else {
             showNotification(data.message || 'Failed to change password', 'error');
@@ -5223,6 +5257,25 @@ function changePassword() {
 
 </script>
 
+
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ asset('js/toast.js') }}"></script>
+    
+    <script>
+    function checkSystemLogsAccess(event) {
+        const isAdmin = {{ auth()->check() && auth()->user()->hasPermission('view_system_logs') ? 'true' : 'false' }};
+        
+        if (!isAdmin) {
+            event.preventDefault();
+            if (typeof toast !== 'undefined') {
+                toast.accessDenied('System Logs');
+            } else {
+                alert('Access Denied: You do not have permission to access System Logs.');
+            }
+        }
+    }
+    </script>
 
 </body>
 </html>

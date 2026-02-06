@@ -1048,9 +1048,151 @@
     });
 
     function openSettingsModal() {
-      // Placeholder for settings modal
-      alert('Settings modal not implemented yet.');
+      const modal = document.getElementById('settingsModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      } else {
+        // Create modal if it doesn't exist
+        const modalHtml = `
+          <div id="settingsModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 400px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+              <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 1.5rem;">Profile Settings</h2>
+                <span onclick="closeSettingsModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+              </div>
+              <form id="profileForm">
+                @csrf
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="username" style="display: block; margin-bottom: 5px; font-weight: 600;">Username</label>
+                  <input type="text" id="username" name="username" value="{{ auth()->user()->username }}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="email" style="display: block; margin-bottom: 5px; font-weight: 600;">Email</label>
+                  <input type="email" id="email" name="email" value="{{ auth()->user()->email }}" readonly style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #f5f5f5; cursor: not-allowed;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="currentPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">Current Password</label>
+                  <input type="password" id="currentPassword" name="current_password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Required to change password">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                  <label for="newPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">New Password</label>
+                  <input type="password" id="newPassword" name="new_password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Min 4 characters">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: 600;">Confirm New Password</label>
+                  <input type="password" id="confirmPassword" name="new_password_confirmation" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Confirm new password">
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                  <button type="button" onclick="closeSettingsModal()" style="padding: 10px 20px; background: #ccc; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                  <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Update Profile</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Add event listener for form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          updateProfile();
+        });
+        
+        document.getElementById('settingsModal').style.display = 'flex';
+      }
+    }
+    
+    function closeSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    function updateProfile() {
+      const username = document.getElementById('username').value;
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Basic validation
+      if (!username) {
+        alert('Please fill in username field');
+        return;
+      }
+
+      // If changing password, validate all password fields
+      if (newPassword || confirmPassword || currentPassword) {
+        if (!currentPassword) {
+          alert('Current password is required to change password');
+          return;
+        }
+        if (newPassword.length < 4) {
+          alert('New password must be at least 4 characters');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          alert('New passwords do not match');
+          return;
+        }
+      }
+
+      const submitBtn = document.querySelector('#profileForm button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+      fetch('{{ route("admin.update-profile") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          username: username,
+          current_password: currentPassword || '',
+          new_password: newPassword || '',
+          new_password_confirmation: confirmPassword || ''
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          closeSettingsModal();
+        } else {
+          alert(data.message || 'Failed to update profile');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      });
     }
   </script>
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ asset('js/toast.js') }}"></script>
+    
+    <script>
+    function checkSystemLogsAccess(event) {
+        const isAdmin = {{ auth()->check() && auth()->user()->hasPermission('view_system_logs') ? 'true' : 'false' }};
+        
+        if (!isAdmin) {
+            event.preventDefault();
+            if (typeof toast !== 'undefined') {
+                toast.accessDenied('System Logs');
+            } else {
+                alert('Access Denied: You do not have permission to access System Logs.');
+            }
+        }
+    }
+    </script>
+
 </body>
 </html>

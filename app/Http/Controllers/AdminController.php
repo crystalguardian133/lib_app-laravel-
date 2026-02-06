@@ -18,6 +18,11 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
+        // Redirect assistants to timelog page
+        if (Auth::user()->isAssistant()) {
+            return redirect()->route('timelog.index');
+        }
+
         \Log::info('Dashboard method called - starting data collection');
 
         $booksCount = Book::count();
@@ -959,47 +964,50 @@ private function getActiveAreasData()
         }
     }
 
-    public function changePassword(Request $request)
+    public function updateProfile(Request $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:4|confirmed',
-        ]);
-
         $user = Auth::user();
-
-        // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
-            // Log failed password change attempt
-            SystemLog::log(
-                'password_change_failed',
-                'Failed password change attempt - incorrect current password',
-                $user->id,
-                ['reason' => 'incorrect_current_password']
-            );
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Current password is incorrect.'
-            ], 400);
+        
+        $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'current_password' => 'required_with:new_password',
+            'new_password' => 'nullable|required_with:current_password|min:4|confirmed',
+        ]);
+        
+        // Verify current password if trying to change password
+        if ($request->filled('new_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                SystemLog::log(
+                    'profile_update_failed',
+                    'Failed profile update attempt - incorrect current password',
+                    $user->id,
+                    ['reason' => 'incorrect_current_password']
+                );
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Current password is incorrect.'
+                ], 400);
+            }
+            
+            $user->password = Hash::make($request->new_password);
         }
-
-        // Update password
-        $user->password = Hash::make($request->new_password);
+        
+        // Update username only (email and name cannot be edited by users)
+        $user->username = $request->username;
         $user->save();
-
-        // Log successful password change
+        
+        // Log successful profile update
         SystemLog::log(
-            'password_changed',
-            'Admin password was successfully changed',
+            'profile_updated',
+            'User profile was successfully updated',
             $user->id,
-            ['action' => 'password_update']
+            ['action' => 'profile_update', 'fields' => ['username', 'password']]
         );
-
+        
         return response()->json([
             'success' => true,
-            'message' => 'Password changed successfully!'
+            'message' => 'Profile updated successfully!'
         ]);
     }
 }
-

@@ -4836,7 +4836,7 @@ body.dark-mode .premium-upload-area:hover {
                                 Update your administrator account password. Make sure to use a strong password.
                             </p>
                         </div>
-                        <form id="changePasswordForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <form id="profileForm" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
                             <div class="form-group">
                                 <label class="form-label" style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--spacing-sm); font-weight: 600;">
                                     <i class="fas fa-lock" style="color: var(--text-muted); font-size: 14px;"></i>
@@ -4907,7 +4907,7 @@ body.dark-mode .premium-upload-area:hover {
                             </div>
                         </div>
                         <div style="display: flex; gap: var(--spacing-sm);">
-                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
+                            <a href="{{ route('system-logs.index') }}" class="btn btn-primary" onclick="checkSystemLogsAccess(event)" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1;">
                                 <i class="fas fa-external-link-alt"></i>
                                 <span>Open System Logs</span>
                             </a>
@@ -5031,7 +5031,7 @@ body.dark-mode .premium-upload-area:hover {
                 modal.style.display = 'none';
                 modal.classList.remove('active');
                 document.body.classList.remove('modal-open');
-                const form = document.getElementById('changePasswordForm');
+                const form = document.getElementById('profileForm');
                 if (form) form.reset();
             }
         }
@@ -5062,7 +5062,7 @@ body.dark-mode .premium-upload-area:hover {
             }
         }
 
-        function changePassword() {
+        function updateProfile() {
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -5082,12 +5082,12 @@ body.dark-mode .premium-upload-area:hover {
                 return;
             }
 
-            const submitBtn = document.querySelector('#changePasswordForm button[type="submit"]');
+            const submitBtn = document.querySelector('#profileForm button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
 
-            fetch('{{ route("admin.change-password") }}', {
+            fetch('{{ route("admin.update-profile") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -5119,11 +5119,11 @@ body.dark-mode .premium-upload-area:hover {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordForm = document.getElementById('changePasswordForm');
+            const passwordForm = document.getElementById('profileForm');
             if (passwordForm) {
                 passwordForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    changePassword();
+                    updateProfile();
                 });
             }
 
@@ -5135,5 +5135,24 @@ body.dark-mode .premium-upload-area:hover {
             });
         });
     </script>
+    <link rel="stylesheet" href="{{ asset('css/toast.css') }}">
+    <div id="toast-container" class="toast-container"></div>
+    <script src="{{ asset('js/toast.js') }}"></script>
+    
+    <script>
+    function checkSystemLogsAccess(event) {
+        const isAdmin = {{ auth()->check() && auth()->user()->hasPermission('view_system_logs') ? 'true' : 'false' }};
+        
+        if (!isAdmin) {
+            event.preventDefault();
+            if (typeof toast !== 'undefined') {
+                toast.accessDenied('System Logs');
+            } else {
+                alert('Access Denied: You do not have permission to access System Logs.');
+            }
+        }
+    }
+    </script>
+
 </body>
 </html>

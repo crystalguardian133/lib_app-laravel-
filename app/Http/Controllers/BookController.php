@@ -13,6 +13,11 @@ class BookController extends Controller
 {
     public function index()
     {
+        // Check if user has permission to view books
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-books')) {
+            abort(403, 'Unauthorized. You do not have permission to view books.');
+        }
+        
         $books = Book::paginate(10);
 
         foreach ($books as $book) {
@@ -28,6 +33,11 @@ class BookController extends Controller
 
 public function store(Request $request)
 {
+    // Check if user has permission to create books
+    if (!Auth::check() || !Auth::user()->hasPermission('manage-books')) {
+        return response()->json(['error' => 'Unauthorized. You do not have permission to create books.'], 403);
+    }
+    
     // Debug: Log the request data
     \Log::info('Book creation request data:', $request->all());
     \Log::info('Files in request:', $request->allFiles());
@@ -182,6 +192,11 @@ public function store(Request $request)
 
     public function update(Request $request, $id)
     {
+        // Check if user has permission to update books
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-books')) {
+            return response()->json(['error' => 'Unauthorized. You do not have permission to update books.'], 403);
+        }
+        
         $book = Book::findOrFail($id);
 
         $validated = $request->validate([
@@ -225,6 +240,11 @@ public function store(Request $request)
 
     public function destroy($id)
     {
+        // Check if user has permission to delete books
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-books')) {
+            return response()->json(['error' => 'Unauthorized. You do not have permission to delete books.'], 403);
+        }
+        
         try {
             $book = Book::findOrFail($id);
 

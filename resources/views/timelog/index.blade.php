@@ -932,7 +932,7 @@
         <span class="icon"><i class="fas fa-user-clock"></i></span>
         <span class="label">Member Time-in/out</span>
       </a>
-      <a href="{{ route('qr-scanner') }}" data-label="QR Scanner">
+      <a href="{{ route('timelog.qrScanner') }}" data-label="QR Scanner">
         <span class="icon"><i class="fas fa-qrcode"></i></span>
         <span class="label">QR Scanner</span>
       </a>
@@ -1575,7 +1575,7 @@
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
 
-          fetch('{{ route("admin.change-password") }}', {
+          fetch('{{ route("admin.update-profile") }}', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
