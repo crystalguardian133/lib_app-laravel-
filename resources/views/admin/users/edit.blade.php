@@ -226,6 +226,35 @@
             gap: 12px;
         }
         .warning-box i { color: #f59e0b; font-size: 20px; }
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 45px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 18px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+        .password-toggle:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -321,12 +350,18 @@
 
                     <div class="form-group">
                         <label class="form-label">New Password (leave blank to keep current)</label>
-                        <input type="password" name="password" class="form-input" 
-                               placeholder="Enter new password">
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="passwordInput" class="form-input" 
+                                   placeholder="Enter new password">
+                            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
+
 
                     <div class="form-group">
                         <label class="form-label">Role *</label>
@@ -364,6 +399,31 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
+
+        // Password visibility toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const toggleIcon = passwordToggle.querySelector('i');
+
+            if (passwordToggle) {
+                passwordToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.classList.remove('fa-eye');
+                        toggleIcon.classList.add('fa-eye-slash');
+                        passwordToggle.setAttribute('aria-label', 'Hide password');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.classList.remove('fa-eye-slash');
+                        toggleIcon.classList.add('fa-eye');
+                        passwordToggle.setAttribute('aria-label', 'Show password');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

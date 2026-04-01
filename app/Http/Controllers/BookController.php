@@ -11,14 +11,17 @@ use chillerlan\QRCode\QROptions;
 
 class BookController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Check if user has permission to view books
         if (!Auth::check() || !Auth::user()->hasPermission('manage-books')) {
             abort(403, 'Unauthorized. You do not have permission to view books.');
         }
         
-        $books = Book::paginate(10);
+        // Get per_page parameter from request, default to 10
+        $perPage = $request->get('per_page', 10);
+        
+        $books = Book::paginate($perPage);
 
         foreach ($books as $book) {
             // Always regenerate QR codes regardless of whether they exist or not
@@ -28,7 +31,7 @@ class BookController extends Controller
             $book->qr_url = asset('qrcode/books/' . $qrFileName);
         }
 
-        return view('books.index', compact('books'));
+        return view('books.index', compact('books', 'perPage'));
     }
 
 public function store(Request $request)

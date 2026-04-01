@@ -2426,35 +2426,49 @@
   }
 
   .overlay.name {
-    top: 110px;
-    left: 40px;
-    right: 30px;
+    top: 117px;
+    left: 54px;
+    right: 110px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     line-height: 1.2;
   }
 
   .overlay.date {
-    bottom: 50px;
-    left: 140px;
-    font-size: 13px;
+    bottom: 16px;
+    left: 152px;
+    font-size: 10.5px;
     text-transform: uppercase;
   }
 
+  .overlay.address {
+    bottom: 44px;
+    left: 93px;
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  .overlay.contact {
+    bottom: 8px;
+    left: 20px;
+    right: 120px;
+    font-size: 10px;
+    text-align: left;
+  }
+
   .overlay.photo {
-    top: 52%;
-    right: 24px;
-    width: 155px;
-    height: 155px;
-    border-radius: 50%;
+    top: 96px;
+    right: 67px;
+    width: 70px;
+    height: 70px;
+    border-radius: 1px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: var(--glass-blur);
-    transform: translateY(-50%);
     position: absolute;
     margin: 0;
   }
@@ -2468,11 +2482,11 @@
   }
 
   .overlay.qr {
-    top: 50%;
-    left: 50%;
-    width: 135px;
-    height: 135px;
-    transform: translate(-50%, -50%);
+    top: 52px;
+    right: 25px;
+    width: 119px;
+    height: 138px;
+    transform: none;
   }
 
   .overlay.qr img {
@@ -4255,9 +4269,12 @@
           <!-- Name overlay -->
           <div class="overlay name" id="card-name"></div>
 
-          <!-- Date overlay -->
+          <!-- Date value overlay -->
           <div class="overlay date" id="card-memberdate"></div>
 
+          <!-- Address value overlay -->
+          <div class="overlay address" id="card-address"></div>
+          
           <!-- Photo overlay -->
           <div class="overlay photo" id="card-photo"></div>
         </div>
@@ -4265,6 +4282,9 @@
         <!-- Back Card -->
         <div class="card back" id="card-back">
           <img src="{{ asset('card_temp/card-2.png') }}" class="card-bg">
+
+          <!-- Contact number value overlay -->
+          <div class="overlay contact" id="card-contact" style="color: #fff; font-size: 18px; font-weight: bold; background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 8px; position: absolute; left: 20px; bottom: 10px; z-index: 10; min-width: 120px; text-align: left;"></div>
 
           <!-- QR overlay -->
           <div class="overlay qr" id="card-qr"></div>

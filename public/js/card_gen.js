@@ -1,3 +1,95 @@
+/**
+ * Unified Card Generation System
+ * Ensures preview and export use identical positioning and sizing
+ * 
+ * Card dimensions: 380x240 logical units (matches 1012x638px at 300 DPI)
+ * DPI scaling: 2.666x (1012/380, 638/240)
+ */
+
+// ============================================================================
+// CARD LAYOUT CONFIGURATION - Single source of truth for all positioning
+// ============================================================================
+
+const CARD_CONFIG = {
+    // Logical canvas dimensions (used for all calculations)
+    LOGICAL_WIDTH: 380,
+    LOGICAL_HEIGHT: 240,
+    
+    // Export dimensions (physical pixels at 300 DPI)
+    EXPORT_WIDTH: 1012,
+    EXPORT_HEIGHT: 638,
+    
+    // Border radius
+    BORDER_RADIUS: 16,
+    
+    // FRONT CARD LAYOUT
+    FRONT: {
+        // Name positioning (goes after "MEMBER" label in middle area)
+        name: {
+            x: 46,
+            y: 118,
+            maxWidth: 200,
+            fontSize: 10,
+            lineHeight: 12,
+            fontWeight: 'bold',
+            color: '#FFFFFF',
+            uppercase: true
+        },
+        
+        // Address text VALUE (goes after "Address:" label in lower section)
+        address: {
+            x: 78,
+            y: 195.5,
+            maxWidth: 130,
+            fontSize: 7,
+            lineHeight: 8,
+            fontWeight: 'normal',
+            color: '#FFFFFF'
+        },
+        
+        // Membership date VALUE (goes after "Membership Date:" label at bottom)
+        memberdate: {
+            x: 128,
+            y: 224,
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#FFFFFF'
+        },
+        
+        // Photo positioning
+        photo: {
+            x: 265,
+            y: 81,
+            size: 59,
+            borderRadius: 0
+        }
+    },
+    
+    // BACK CARD LAYOUT
+    BACK: {
+        // Contact number VALUE (goes after "Contact Number:" label on left)
+        contactNumber: {
+            x: 20,
+            y: 232,
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#FFFFFF'
+        },
+        
+        // QR code positioning (right side, centered vertically)
+        qr: {
+            x: 250,
+            y: 38,
+            width: 113,
+            height: 130
+        }
+    }
+};
+
+// ============================================================================
+// OPEN CARD MODAL - Data Loading and Preview Setup
+// ============================================================================
+
 async function openCardModal(memberId) {
     try {
         const res = await fetch(`/members/${memberId}/json`);
@@ -8,46 +100,25 @@ async function openCardModal(memberId) {
         const middleInitial = member.middleName ? member.middleName.charAt(0).toUpperCase() + "." : "";
         const fullName = `${member.lastName.toUpperCase()}, ${member.firstName.toUpperCase()} ${middleInitial}`.trim();
 
+        // Format address
+        const address = `${member.house_number || ""} ${member.street || ""}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`
+            .replace(/, ,/g, ',').trim();
+
         // Store member data globally for download
-        const address = `${member.house_number || ""} ${member.street || ""}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`.replace(/, ,/g, ',').trim();
         window.currentMemberData = {
             fullName: fullName,
             memberdate: member.memberdate || "",
             photo: member.photo || null,
             id: member.id,
             address: address,
-            contact: member.contactnumber || ""
+            contact: member.contactnumber || member.contactNumber || ""
         };
 
-        // Fill overlays for preview
-        document.getElementById("card-name").innerText = fullName;
-        document.getElementById("card-memberdate").innerText = member.memberdate || "";
+        // === FRONT CARD PREVIEW ===
+        updateFrontCardPreview(window.currentMemberData);
 
-        // Photo
-        const photoDiv = document.getElementById("card-photo");
-        photoDiv.innerHTML = "";
-        photoDiv.style.cssText += 'border-radius: 0 !important; aspect-ratio: 1 !important; width: 80px !important; height: 80px !important;';
-        if (member.photo) {
-            const img = document.createElement("img");
-            img.src = member.photo;
-            img.style.cssText = `
-                width: 100%;
-                height: 100%;
-                object-fit: fill;
-                object-position: center center;
-                display: block;
-            `;
-            photoDiv.appendChild(img);
-        }
-
-        // QR Code
-        const qrDiv = document.getElementById("card-qr");
-        qrDiv.innerHTML = "";
-        if (member.id) {
-            const qrImg = document.createElement("img");
-            qrImg.src = `/qrcode/members/member-${member.id}.png`;
-            qrDiv.appendChild(qrImg);
-        }
+        // === BACK CARD PREVIEW ===
+        updateBackCardPreview(window.currentMemberData);
 
         // Show modal
         const modal = document.getElementById("cardModal");
@@ -60,28 +131,100 @@ async function openCardModal(memberId) {
     }
 }
 
-// Helper function to load image
+// ============================================================================
+// PREVIEW OVERLAY UPDATE FUNCTIONS
+// ============================================================================
+
+function updateFrontCardPreview(memberData) {
+    // Update name
+    const nameEl = document.getElementById("card-name");
+    nameEl.innerText = memberData.fullName;
+
+    // Update membership date VALUE
+    const dateEl = document.getElementById("card-memberdate");
+    dateEl.innerText = memberData.memberdate || "";
+
+    // Update address VALUE
+    const addressEl = document.getElementById("card-address");
+    addressEl.innerText = memberData.address;
+
+    // Update photo
+    const photoDiv = document.getElementById("card-photo");
+    photoDiv.innerHTML = "";
+    photoDiv.style.cssText = `
+        width: 70px !important;
+        height: 70px !important;
+        border-radius: 1px !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        top: 96px !important;
+        right: 67px !important;
+    `;
+    
+    if (memberData.photo) {
+        const img = document.createElement("img");
+        img.src = memberData.photo;
+        img.style.cssText = `
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        `;
+        photoDiv.appendChild(img);
+    }
+}
+
+function updateBackCardPreview(memberData) {
+    // Update contact number VALUE
+    const contactEl = document.getElementById("card-contact");
+    contactEl.innerText = memberData.contact || "";
+
+    // Update QR code
+    const qrDiv = document.getElementById("card-qr");
+    qrDiv.innerHTML = "";
+    qrDiv.style.cssText = `
+        top: 52px !important;
+        right: 25px !important;
+        width: 119px !important;
+        height: 138px !important;
+        position: absolute !important;
+    `;
+    
+    if (memberData.id) {
+        const qrImg = document.createElement("img");
+        qrImg.src = `/qrcode/members/member-${memberData.id}.png`;
+        qrImg.style.cssText = `
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        `;
+        qrDiv.appendChild(qrImg);
+    }
+}
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Load image asynchronously
+ */
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        // Only set crossOrigin for external images (different origin)
-        // For same-origin images, don't set crossOrigin to avoid CORS issues
         try {
-            // Handle both absolute and relative URLs
             let url;
             if (src.startsWith('http://') || src.startsWith('https://')) {
                 url = new URL(src);
             } else {
-                // Relative URL - resolve against current origin
                 url = new URL(src, window.location.origin);
             }
-            // Only set crossOrigin if image is from different origin
             if (url.origin !== window.location.origin) {
                 img.crossOrigin = "anonymous";
             }
         } catch (e) {
-            // If URL parsing fails, assume same-origin and don't set crossOrigin
-            console.warn('Could not parse image URL, assuming same-origin:', src, e);
+            console.warn('Could not parse image URL:', src, e);
         }
         img.onload = () => resolve(img);
         img.onerror = (error) => {
@@ -92,132 +235,114 @@ function loadImage(src) {
     });
 }
 
-
-// Wrap text to fit within width
-function wrapText(ctx, text, maxWidth) {
+/**
+ * Wrap text to fit within specified width
+ */
+function wrapText(text, maxWidth, fontSize, fontFamily = 'Inter, Arial, sans-serif', fontWeight = 'normal') {
+    // Create a temporary canvas to measure text
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    
     const words = text.split(' ');
     const lines = [];
-    let currentLine = words[0];
+    let currentLine = words[0] || '';
 
     for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
+        const testLine = currentLine + ' ' + words[i];
+        const metrics = tempCtx.measureText(testLine);
+        
+        if (metrics.width < maxWidth) {
+            currentLine = testLine;
         } else {
-            lines.push(currentLine);
-            currentLine = word;
+            if (currentLine) lines.push(currentLine);
+            currentLine = words[i];
         }
     }
-    lines.push(currentLine);
+    if (currentLine) lines.push(currentLine);
+    
     return lines;
 }
 
-// Generate front card on canvas
+/**
+ * Draw rounded rectangle clipping path
+ */
+function drawRoundedRectangles(ctx, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(width - radius, 0);
+    ctx.arcTo(width, 0, width, radius, radius);
+    ctx.lineTo(width, height - radius);
+    ctx.arcTo(width, height, width - radius, height, radius);
+    ctx.lineTo(radius, height);
+    ctx.arcTo(0, height, 0, height - radius, radius);
+    ctx.lineTo(0, radius);
+    ctx.arcTo(0, 0, radius, 0, radius);
+    ctx.closePath();
+    ctx.clip();
+}
+
+// ============================================================================
+// CANVAS RENDERING - FRONT CARD
+// ============================================================================
+
 async function generateFrontCard(memberData) {
-    // Philippine Driver's License / CR80 card size
-    // 85.6mm × 53.98mm at 300 DPI = 1012px × 638px
-    const cardWidth = 1012;
-    const cardHeight = 638;
-    
     const canvas = document.createElement('canvas');
-    canvas.width = cardWidth;
-    canvas.height = cardHeight;
-    const ctx = canvas.getContext('2d', { alpha: true });
+    canvas.width = CARD_CONFIG.EXPORT_WIDTH;
+    canvas.height = CARD_CONFIG.EXPORT_HEIGHT;
     
+    const ctx = canvas.getContext('2d', { alpha: true });
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0, 0, cardWidth, cardHeight);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Calculate scaling factors
-    const scaleX = cardWidth / 380;
-    const scaleY = cardHeight / 240;
+    // Scale context to work with logical coordinates
+    const scaleX = CARD_CONFIG.EXPORT_WIDTH / CARD_CONFIG.LOGICAL_WIDTH;
+    const scaleY = CARD_CONFIG.EXPORT_HEIGHT / CARD_CONFIG.LOGICAL_HEIGHT;
     ctx.scale(scaleX, scaleY);
-    
+
     try {
-        // Load background image first
-        let bgImg;
-        try {
-            bgImg = await loadImage('/card_temp/card-1.png');
-        } catch (bgError) {
-            throw new Error(`Failed to load front card background image: ${bgError.message || bgError}`);
-        }
+        // Load and draw background
+        const bgImg = await loadImage('/card_temp/card-1.png');
         
-        // Create rounded rectangle path for clipping
-        const borderRadius = 16;
-        ctx.beginPath();
-        ctx.moveTo(borderRadius, 0);
-        ctx.lineTo(380 - borderRadius, 0);
-        ctx.arcTo(380, 0, 380, borderRadius, borderRadius);
-        ctx.lineTo(380, 240 - borderRadius);
-        ctx.arcTo(380, 240, 380 - borderRadius, 240, borderRadius);
-        ctx.lineTo(borderRadius, 240);
-        ctx.arcTo(0, 240, 0, 240 - borderRadius, borderRadius);
-        ctx.lineTo(0, borderRadius);
-        ctx.arcTo(0, 0, borderRadius, 0, borderRadius);
-        ctx.closePath();
-        ctx.clip();
+        // Draw rounded rectangle with clipping
+        drawRoundedRectangles(ctx, CARD_CONFIG.LOGICAL_WIDTH, CARD_CONFIG.LOGICAL_HEIGHT, CARD_CONFIG.BORDER_RADIUS);
+        ctx.drawImage(bgImg, 0, 0, CARD_CONFIG.LOGICAL_WIDTH, CARD_CONFIG.LOGICAL_HEIGHT);
         
-        // Draw background
-        ctx.drawImage(bgImg, 0, 0, 380, 240);
-        
-        // Draw name text - WHITE COLOR, BOLD, UPPERCASE
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 11px Inter, Arial, sans-serif';
+        // Draw name
+        ctx.fillStyle = CARD_CONFIG.FRONT.name.color;
+        ctx.font = `${CARD_CONFIG.FRONT.name.fontWeight} ${CARD_CONFIG.FRONT.name.fontSize}px Inter, Arial, sans-serif`;
         ctx.textAlign = 'left';
-        ctx.letterSpacing = '0.5px';
-
-        const nameLines = wrapText(ctx, memberData.fullName, 180);
-        const nameX = 45;
-        let nameY = 121;
-        const lineHeight = 14;
-
-        nameLines.forEach((line, index) => {
-            ctx.fillText(line, nameX, nameY + (index * lineHeight));
-        });
-
-        // Draw membership date - WHITE COLOR, BOLD
-        ctx.font = 'bold 13px Inter, Arial, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.letterSpacing = '0.5px';
-        ctx.fillText(memberData.memberdate, 140, 189);
-
-        // Draw address - WHITE COLOR, smaller font
-        ctx.font = '10px Inter, Arial, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.letterSpacing = '0.5px';
-        const addressLines = wrapText(ctx, memberData.address, 180);
-        let addressY = 210;
-        addressLines.forEach((line, index) => {
-            ctx.fillText(line, 45, addressY + (index * 12));
-        });
-
-        // Draw 1:1 square photo if available (ID picture style)
-        if (memberData.photo) {
-            try {
-                const photoImg = await loadImage(memberData.photo);
-                const photoX = 410 - 2.5 - 130; // Right side position
-                const photoY = 125.5; // Center vertically
-                const photoSize = 70; // Further reduced square size for 1:1 ratio
-
-                // Draw square photo with 1:1 aspect ratio
-                ctx.save();
-                ctx.beginPath();
-                ctx.rect(photoX - photoSize/2, photoY - photoSize/2, photoSize, photoSize);
-                ctx.clip();
-
-                // Force resize to exact square dimensions
-                const drawWidth = photoSize;
-                const drawHeight = photoSize;
-
-                ctx.drawImage(photoImg, photoX - drawWidth/2, photoY - drawHeight/2, drawWidth, drawHeight);
-                ctx.restore();
-            } catch (photoError) {
-                console.warn('Could not load member photo, continuing without photo:', photoError);
-                // Continue without photo - card will still be generated
-            }
-        }
         
+        const nameLines = wrapText(memberData.fullName, CARD_CONFIG.FRONT.name.maxWidth, CARD_CONFIG.FRONT.name.fontSize);
+        nameLines.forEach((line, index) => {
+            ctx.fillText(line.toUpperCase(), CARD_CONFIG.FRONT.name.x, CARD_CONFIG.FRONT.name.y + (index * CARD_CONFIG.FRONT.name.lineHeight));
+        });
+
+        // Draw membership date
+        ctx.fillStyle = CARD_CONFIG.FRONT.memberdate.color;
+        ctx.font = `${CARD_CONFIG.FRONT.memberdate.fontWeight} ${CARD_CONFIG.FRONT.memberdate.fontSize}px Inter, Arial, sans-serif`;
+        ctx.fillText(memberData.memberdate, CARD_CONFIG.FRONT.memberdate.x, CARD_CONFIG.FRONT.memberdate.y);
+
+        // Draw address (value only - label is in template)
+        ctx.fillStyle = CARD_CONFIG.FRONT.address.color;
+        ctx.font = `${CARD_CONFIG.FRONT.address.fontWeight} ${CARD_CONFIG.FRONT.address.fontSize}px Inter, Arial, sans-serif`;
+        const addressLines = wrapText(memberData.address, CARD_CONFIG.FRONT.address.maxWidth, CARD_CONFIG.FRONT.address.fontSize);
+        addressLines.forEach((line, index) => {
+            ctx.fillText(line, CARD_CONFIG.FRONT.address.x, CARD_CONFIG.FRONT.address.y + (index * CARD_CONFIG.FRONT.address.lineHeight));
+        });
+
+        // Draw photo
+        if (memberData.photo) {
+            const photoImg = await loadImage(memberData.photo);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(CARD_CONFIG.FRONT.photo.x, CARD_CONFIG.FRONT.photo.y, CARD_CONFIG.FRONT.photo.size, CARD_CONFIG.FRONT.photo.size);
+            ctx.clip();
+            ctx.drawImage(photoImg, CARD_CONFIG.FRONT.photo.x, CARD_CONFIG.FRONT.photo.y, CARD_CONFIG.FRONT.photo.size, CARD_CONFIG.FRONT.photo.size);
+            ctx.restore();
+        }
+
         return canvas;
     } catch (error) {
         console.error('Error generating front card:', error);
@@ -225,84 +350,62 @@ async function generateFrontCard(memberData) {
     }
 }
 
-// Generate back card on canvas
+// ============================================================================
+// CANVAS RENDERING - BACK CARD
+// ============================================================================
+
 async function generateBackCard(memberData) {
-    // Philippine Driver's License / CR80 card size
-    const cardWidth = 1012;
-    const cardHeight = 638;
-    
     const canvas = document.createElement('canvas');
-    canvas.width = cardWidth;
-    canvas.height = cardHeight;
-    const ctx = canvas.getContext('2d', { alpha: true });
+    canvas.width = CARD_CONFIG.EXPORT_WIDTH;
+    canvas.height = CARD_CONFIG.EXPORT_HEIGHT;
     
+    const ctx = canvas.getContext('2d', { alpha: true });
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0, 0, cardWidth, cardHeight);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Calculate scaling factors
-    const scaleX = cardWidth / 380;
-    const scaleY = cardHeight / 240;
+    // Scale context to work with logical coordinates
+    const scaleX = CARD_CONFIG.EXPORT_WIDTH / CARD_CONFIG.LOGICAL_WIDTH;
+    const scaleY = CARD_CONFIG.EXPORT_HEIGHT / CARD_CONFIG.LOGICAL_HEIGHT;
     ctx.scale(scaleX, scaleY);
-    
+
     try {
-        // Load background image
-        let bgImg;
-        try {
-            bgImg = await loadImage('/card_temp/card-2.png');
-        } catch (bgError) {
-            throw new Error(`Failed to load back card background image: ${bgError.message || bgError}`);
-        }
+        // Load and draw background
+        const bgImg = await loadImage('/card_temp/card-2.png');
         
-        // Create rounded rectangle path for clipping
-        const borderRadius = 16; 
-        ctx.beginPath();
-        ctx.moveTo(borderRadius, 0);
-        ctx.lineTo(380 - borderRadius, 0);
-        ctx.arcTo(380, 0, 380, borderRadius, borderRadius);
-        ctx.lineTo(380, 240 - borderRadius);
-        ctx.arcTo(380, 240, 380 - borderRadius, 240, borderRadius);
-        ctx.lineTo(borderRadius, 240);
-        ctx.arcTo(0, 240, 0, 240 - borderRadius, borderRadius);
-        ctx.lineTo(0, borderRadius);
-        ctx.arcTo(0, 0, borderRadius, 0, borderRadius);
-        ctx.closePath();
-        ctx.clip();
+        // Draw rounded rectangle with clipping
+        drawRoundedRectangles(ctx, CARD_CONFIG.LOGICAL_WIDTH, CARD_CONFIG.LOGICAL_HEIGHT, CARD_CONFIG.BORDER_RADIUS);
+        ctx.drawImage(bgImg, 0, 0, CARD_CONFIG.LOGICAL_WIDTH, CARD_CONFIG.LOGICAL_HEIGHT);
         
-        // Draw background
-        ctx.drawImage(bgImg, 0, 0, 380, 240);
-        
-        // Draw QR code shifted to the right
+        // Draw contact number VALUE (template has "Contact Number:" label)
+        ctx.fillStyle = CARD_CONFIG.BACK.contactNumber.color;
+        ctx.font = `${CARD_CONFIG.BACK.contactNumber.fontWeight} ${CARD_CONFIG.BACK.contactNumber.fontSize}px Inter, Arial, sans-serif`;
+        ctx.textAlign = 'left';
+        ctx.fillText(memberData.contact || '', CARD_CONFIG.BACK.contactNumber.x, CARD_CONFIG.BACK.contactNumber.y);
+
+        // Draw QR code
         if (memberData.id) {
             try {
                 const qrImg = await loadImage(`/qrcode/members/member-${memberData.id}.png`);
-                const qrSize = 90;
-                const qrX = 380 - qrSize - 10; // Shifted to the right with reduced margin
-                const qrY = (240 - qrSize) / 2; // Center vertically
-                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                ctx.drawImage(qrImg, CARD_CONFIG.BACK.qr.x, CARD_CONFIG.BACK.qr.y, CARD_CONFIG.BACK.qr.width, CARD_CONFIG.BACK.qr.height);
             } catch (qrError) {
-                console.warn('Could not load QR code, continuing without QR:', qrError);
-                // Continue without QR code - card will still be generated
+                console.warn('Could not load QR code:', qrError);
             }
         }
 
-        // Draw contact number on the LEFT side
-        ctx.font = 'bold 12px Inter, Arial, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Contact: ${memberData.contact}`, 20, 200);
-        
         return canvas;
     } catch (error) {
         console.error('Error generating back card:', error);
-        throw new Error(`Failed to generate back card: ${error.message || error}`);
+        throw error;
     }
 }
 
-// ✅ Export both cards as PNG in ZIP - CANVAS METHOD
+// ============================================================================
+// DOWNLOAD FUNCTIONALITY
+// ============================================================================
+
 async function downloadCard() {
     try {
-        // Show loading state
         const downloadBtn = event.target;
         const originalText = downloadBtn.innerHTML;
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
@@ -313,64 +416,59 @@ async function downloadCard() {
             throw new Error("Member data not found");
         }
 
-        // Generate both cards using canvas
+        // Generate both cards
         const frontCanvas = await generateFrontCard(memberData);
         const backCanvas = await generateBackCard(memberData);
 
         // Create ZIP file
         const zip = new JSZip();
 
-        // Add front card as PNG
+        // Add front card
         const frontDataURL = frontCanvas.toDataURL("image/png", 1.0);
-        zip.file("membership-card-front.png", frontDataURL.split(',')[1], {base64: true});
+        zip.file("membership-card-front.png", frontDataURL.split(',')[1], { base64: true });
 
-        // Add back card as PNG
+        // Add back card
         const backDataURL = backCanvas.toDataURL("image/png", 1.0);
-        zip.file("membership-card-back.png", backDataURL.split(',')[1], {base64: true});
+        zip.file("membership-card-back.png", backDataURL.split(',')[1], { base64: true });
 
-        // Generate ZIP
-        const zipBlob = await zip.generateAsync({type: "blob"});
-
-        // Create download link
+        // Generate and download ZIP
+        const zipBlob = await zip.generateAsync({ type: "blob" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(zipBlob);
-        
         const memberName = memberData.fullName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.download = `membership-card-${memberName}.zip`;
         
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
-        // Clean up
         URL.revokeObjectURL(link.href);
 
         // Restore button
         downloadBtn.innerHTML = originalText;
         downloadBtn.disabled = false;
-
-        // Show success message
         alert("✅ Membership cards downloaded successfully!");
 
     } catch (error) {
         console.error("Download error:", error);
         alert("❌ Error creating download: " + error.message);
 
-        // Restore button
         const downloadBtn = event.target;
         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Cards (ZIP)';
         downloadBtn.disabled = false;
     }
 }
 
-// Close modal
+// ============================================================================
+// MODAL MANAGEMENT
+// ============================================================================
+
 function closeCardModal() {
     const modal = document.getElementById("cardModal");
     modal.classList.remove("show");
     modal.style.display = "none";
 }
 
-// Click outside modal to close
+// Close modal when clicking outside
 document.addEventListener('click', function(e) {
     const modal = document.getElementById("cardModal");
     if (e.target === modal && modal.classList.contains("show")) {

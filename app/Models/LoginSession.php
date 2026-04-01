@@ -84,6 +84,28 @@ class LoginSession extends Model
     }
 
     /**
+     * Get all active sessions across all users (for admin view).
+     */
+    public static function getAllActiveSessions()
+    {
+        return static::with('user')
+            ->where('is_active', true)
+            ->where('expires_at', '>', now())
+            ->orderBy('last_activity', 'desc');
+    }
+
+    /**
+     * Get count of active sessions per user.
+     */
+    public static function getActiveSessionCountPerUser()
+    {
+        return static::where('is_active', true)
+            ->where('expires_at', '>', now())
+            ->groupBy('user_id')
+            ->select('user_id', \Illuminate\Support\Facades\DB::raw('count(*) as session_count'));
+    }
+
+    /**
      * Create a new session record.
      */
     public static function createForUser($user, $request)

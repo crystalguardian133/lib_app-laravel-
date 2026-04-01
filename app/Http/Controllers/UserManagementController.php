@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
+use App\Models\LoginSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -131,9 +132,9 @@ class UserManagementController extends Controller
             'role_id' => 'required|exists:roles,id',
         ];
 
-        // Only require password if it's being changed
+        // Only require password if it's being changed - no confirmation needed for admin force change
         if ($request->password) {
-            $rules['password'] = 'string|min:8|confirmed';
+            $rules['password'] = 'string|min:8';
         }
 
         $request->validate($rules);
@@ -486,9 +487,13 @@ class UserManagementController extends Controller
 
         DB::beginTransaction();
         try {
-            // Invalidate remember token to force logout
+            // Invalidate all login sessions for this user
+            LoginSession::invalidateAllForUser($user->id);
+
+            // Clear remember token and set force_logout flag
             $user->forceFill([
                 'remember_token' => null,
+                'force_logout' => true,
             ])->save();
 
             // Log the action
@@ -509,6 +514,90 @@ class UserManagementController extends Controller
             return redirect()->back()
                 ->with('toast_type', 'error')
                 ->with('toast_message', 'Failed to force logout user. Please try again.');
+        }
+    }
+
+    /**
+     * Check if a user has been force-logged out.
+     * Returns JSON response for AJAX polling.
+     */
+    public function checkForceLogoutStatus($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Check if user has force_logout flag set
+        $forceLogout = $user->force_logout;
+        
+        return response()->json([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'force_logout' => $forceLogout,
+            'checked_at' => now()->toISOString(),
+        ]);
+    }
+
+    /**
+     * Clear the force_logout flag after user has been logged out.
+     * This is called after the user successfully logs in again.
+     */
+    public function clearForceLogoutFlag(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Only allow clearing if the user is themselves logging in
+        // This prevents others from clearing the flag
+        if (auth()->id() !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        $user->forceFill(['force_logout' => false])->save();
+        
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Terminate a specific session (admin function for managing all sessions).
+     */
+    public function terminateSession(Request $request, $sessionId)
+    {
+        $session = LoginSession::find($sessionId);
+        
+        if (!$session) {
+            return redirect()->back()
+                ->with('toast_type', 'error')
+                ->with('toast_message', 'Session not found.');
+        }
+        
+        $user = User::find($session->user_id);
+        $sessionUserName = $user ? $user->name : 'Unknown User';
+        
+        DB::beginTransaction();
+        try {
+            $session->invalidate();
+            
+            // Log the action
+            SystemLogsController::log(
+                'user_session_terminated',
+                "Admin terminated session for {$sessionUserName}",
+                auth()->id(),
+                [
+                    'target_user_id' => $session->user_id,
+                    'target_user_name' => $sessionUserName,
+                    'session_id' => $sessionId,
+                    'ip_address' => $session->ip_address,
+                ]
+            );
+            
+            DB::commit();
+            
+            return redirect()->back()
+                ->with('toast_type', 'success')
+                ->with('toast_message', "Session for '{$sessionUserName}' has been terminated.");
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()
+                ->with('toast_type', 'error')
+                ->with('toast_message', 'Failed to terminate session. Please try again.');
         }
     }
 }

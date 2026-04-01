@@ -533,6 +533,34 @@
                 </div>
             @endif
 
+            @if(session('toast_type') === 'error' && session('toast_message'))
+                <div class="error-message">
+                    {{ session('toast_message') }}
+                </div>
+            @endif
+
+            <script>
+            // Check for force logout message from sessionStorage
+            (function() {
+                const message = sessionStorage.getItem('force_logout_message');
+                if (message) {
+                    // Remove the message from storage
+                    sessionStorage.removeItem('force_logout_message');
+                    // Show the message
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = message;
+                    errorDiv.style.marginBottom = '1rem';
+                    
+                    // Insert after the form opening tag
+                    const form = document.getElementById('loginForm');
+                    if (form && form.parentNode) {
+                        form.parentNode.insertBefore(errorDiv, form);
+                    }
+                }
+            })();
+            </script>
+
             <div class="form-group">
                 <label for="username" class="form-label">
                     <i class="fas fa-user" style="margin-right: 0.5rem;"></i>

@@ -60,6 +60,9 @@ class LoginController extends Controller
             // Invalidate all other sessions for this user (single session per user)
             LoginSession::invalidateAllForUser($user->id);
 
+            // Clear force_logout flag on successful login
+            $user->forceFill(['force_logout' => false])->save();
+
             // Create new session record
             $loginSession = LoginSession::createForUser($user, $request);
 
@@ -120,9 +123,17 @@ class LoginController extends Controller
     public function sessions(Request $request)
     {
         $user = Auth::user();
-        $sessions = LoginSession::getActiveSessionsForUser($user->id)->get();
+        $viewingAll = $request->get('all', false);
+        
+        // Only admins can view all sessions
+        if ($viewingAll && $user->isAdmin()) {
+            $sessions = LoginSession::getAllActiveSessions()->get();
+        } else {
+            $sessions = LoginSession::getActiveSessionsForUser($user->id)->get();
+            $viewingAll = false;
+        }
 
-        return view('login.sessions', compact('sessions', 'user'));
+        return view('login.sessions', compact('sessions', 'user', 'viewingAll'));
     }
 
     /**
@@ -131,24 +142,31 @@ class LoginController extends Controller
     public function invalidateSession(Request $request, $sessionId)
     {
         $user = Auth::user();
-        $session = LoginSession::where('id', $sessionId)
-            ->where('user_id', $user->id)
-            ->first();
+        $session = LoginSession::find($sessionId);
+        
+        if (!$session) {
+            return back()->with('error', 'Session not found.');
+        }
 
-        if ($session) {
+        // Allow admins to invalidate any session, users can only invalidate their own
+        if ($user->isAdmin() || $session->user_id === $user->id) {
             $session->invalidate();
 
             SystemLog::log(
                 'user_session_terminated',
-                'User terminated a login session',
+                'User terminated a login session' . ($user->isAdmin() ? ' (admin action)' : ''),
                 $user->id,
-                ['terminated_session_id' => $sessionId]
+                [
+                    'terminated_session_id' => $sessionId,
+                    'target_user_id' => $session->user_id,
+                    'is_admin_action' => $user->isAdmin()
+                ]
             );
 
             return back()->with('success', 'Session terminated successfully.');
         }
 
-        return back()->with('error', 'Session not found.');
+        return back()->with('error', 'You can only terminate your own sessions.');
     }
 
     /**

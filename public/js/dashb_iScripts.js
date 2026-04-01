@@ -1528,11 +1528,6 @@ const statsData = {
 };
 
 function filterStats(period) {
-    const data = statsData[period];
-    document.getElementById('mainCount').textContent = data.mainCount;
-    document.getElementById('mainLabel').textContent = data.mainLabel;
-    document.getElementById('booksCount').textContent = data.booksCount;
-    document.getElementById('membersCount').textContent = data.membersCount;
     if (window.statsChart) {
         window.statsChart.data.labels = data.chartData.labels;
         window.statsChart.data.datasets[0].data = data.chartData.books;
@@ -2185,4 +2180,4 @@ window.closeReturnAllModal = closeReturnAllModal;
 window.startBookScanReturnAll = startBookScanReturnAll;
 window.confirmReturnAll = confirmReturnAll;
 
-console.log('✅ dashb_iScripts.js loaded successfully');[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+console.log('✅ dashb_iScripts.js loaded successfully');

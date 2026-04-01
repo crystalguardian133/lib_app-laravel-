@@ -54,8 +54,5 @@ class DatabaseSeeder extends Seeder
 
         // Run book seeder to create sample books
         $this->call(BookSeeder::class);
-
-        // Run transaction seeder to create sample borrowing data
-        $this->call(TransactionSeeder::class);
     }
 }

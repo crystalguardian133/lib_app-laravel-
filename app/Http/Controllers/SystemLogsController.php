@@ -39,10 +39,32 @@ class SystemLogsController extends Controller
         $perPage = $request->get('per_page', 50);
         $perPage = in_array($perPage, [10, 25, 50, 100]) ? $perPage : 50;
 
-        $logs = SystemLog::with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->appends(['per_page' => $perPage]);
+        $query = SystemLog::with('user')->orderBy('created_at', 'desc');
+
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('description', 'LIKE', "%{$search}%")
+                  ->orWhere('action', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Action type filter
+        if ($request->filled('action')) {
+            $query->where('action', $request->get('action'));
+        }
+
+        // Date range filters
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->get('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->get('date_to'));
+        }
+
+        $logs = $query->paginate($perPage)->appends($request->except('page'));
 
         return view('system-logs.index', compact('logs', 'perPage'));
     }

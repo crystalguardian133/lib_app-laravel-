@@ -17,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'restrict.assistant' => \App\Http\Middleware\RestrictAssistant::class,
+            'check.force.logout' => \App\Http\Middleware\CheckForceLogout::class,
+        ]);
+        
+        // Add CheckForceLogout to all auth-protected routes
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckForceLogout::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

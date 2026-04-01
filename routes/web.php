@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
 // ADMIN DASHBOARD ROUTES
 // Admin and Librarian only
 // ===========================
-Route::middleware(['auth', 'restrict.assistant'])->group(function () {
+Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard/books-data', [AdminController::class, 'getBooksData'])->name('dashboard.books-data');
     Route::get('/dashboard/members-data', [AdminController::class, 'getMembersData'])->name('dashboard.members-data');
@@ -233,4 +233,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     
     // Force logout route
     Route::post('/admin/users/{id}/force-logout', [\App\Http\Controllers\UserManagementController::class, 'forceLogout'])->name('admin.users.force-logout');
+
+    // Check if user has been force-logged out (for AJAX polling)
+    Route::get('/admin/users/{id}/force-logout-status', [\App\Http\Controllers\UserManagementController::class, 'checkForceLogoutStatus'])->name('admin.users.force-logout-status');
+
+    // Clear force_logout flag after successful re-login
+    Route::post('/admin/sessions/{sessionId}/terminate', [UserManagementController::class, 'terminateSession'])->name('admin.sessions.terminate');
+    Route::post('/admin/users/{id}/clear-force-logout', [\App\Http\Controllers\UserManagementController::class, 'clearForceLogoutFlag'])->name('admin.users.clear-force-logout');
 });

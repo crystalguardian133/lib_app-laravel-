@@ -426,6 +426,8 @@
             padding: 16px 20px;
             border-top: 1px solid var(--border);
             background: var(--bg-secondary);
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .pagination-info {
@@ -491,6 +493,35 @@
         .pagination-dots {
             padding: 0 4px;
             color: var(--text-secondary);
+        }
+
+        /* Entries Control */
+        .entries-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entries-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .entries-select {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .entries-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
         }
 
         /* Empty State */
@@ -819,6 +850,16 @@
             
             <!-- Pagination -->
             <div class="table-footer">
+                <div class="entries-control">
+                    <span class="entries-label">Show</span>
+                    <select class="entries-select" onchange="window.location.href = this.value">
+                        <option value="{{ route('system-logs.index', array_merge(request()->except('page'), ['per_page' => 10])) }}" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                        <option value="{{ route('system-logs.index', array_merge(request()->except('page'), ['per_page' => 25])) }}" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                        <option value="{{ route('system-logs.index', array_merge(request()->except('page'), ['per_page' => 50])) }}" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                        <option value="{{ route('system-logs.index', array_merge(request()->except('page'), ['per_page' => 100])) }}" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
+                    </select>
+                    <span class="entries-label">entries</span>
+                </div>
                 <div class="pagination-info">
                     Showing {{ $logs->firstItem() ?? 0 }} to {{ $logs->lastItem() ?? 0 }} of {{ $logs->total() }} logs
                 </div>

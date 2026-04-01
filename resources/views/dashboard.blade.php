@@ -9312,3 +9312,70 @@
 
 </body>
 </html>
+
+<script>
+// =========================================
+// Force Logout Detection for Current User
+// Polls every 3-5 seconds to check if user has been force-logged out
+// =========================================
+(function() {
+    'use strict';
+    
+    const POLL_INTERVAL = 4000; // 4 seconds
+    let isRefreshing = false;
+    
+    function checkCurrentUserForceLogout() {
+        // Only run if user is authenticated and not already refreshing
+        const userId = {{ auth()->check() ? auth()->id() : 'null' }};
+        if (!userId || isRefreshing) return;
+        
+        fetch(`/admin/users/${userId}/force-logout-status`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            // If redirected or unauthorized, user is logged out
+            if (response.redirected || response.status === 401) {
+                handleForceLogout();
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.force_logout) {
+                handleForceLogout();
+            }
+        })
+        .catch(error => {
+            // Network error might mean user is logged out
+            console.log('Force logout check failed:', error.message);
+        });
+    }
+    
+    function handleForceLogout() {
+        if (isRefreshing) return;
+        isRefreshing = true;
+        
+        // Store message in session storage for login page
+        sessionStorage.setItem('force_logout_message', 'Your session has ended. Please log in again.');
+        
+        // Show alert before redirecting
+        setTimeout(function() {
+            alert('Your session has ended. Please log in again.');
+            // Redirect to login page
+            window.location.href = '/login';
+        }, 100);
+    }
+    
+    // Start polling when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setInterval(checkCurrentUserForceLogout, POLL_INTERVAL);
+        });
+    } else {
+        setInterval(checkCurrentUserForceLogout, POLL_INTERVAL);
+    }
+})();
+</script>

@@ -11,66 +11,40 @@
 <style>
   :root {
     /* Shared Color Palette */
-    --primary: #2fb9eb;           /* Indigo */
+    --primary: #2fb9eb;
     --primary-dark: #4f46e5;
-    --secondary: #8b5cf6;         /* Purple */
-    --accent: #06b6d4;            /* Cyan */
+    --secondary: #8b5cf6;
+    --accent: #06b6d4;
     --accent-dark: #0891b2;
-    --success: #10b981;           /* Green */
-    --warning: #f59e0b;           /* Amber */
-    --danger: #ef4444;            /* Red */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
     /* Neutral Scale */
-    --white: #ffffff;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-400: #94a3b8;
-    --gray-500: #64748b;
-    --gray-600: #475569;
-    --gray-700: #334155;
-    --gray-800: #1e293b;
-    --gray-900: #0f172a;
-    /* 🌞 LIGHT MODE DEFAULT */
-    --background: #f8fafc;
-    --surface: rgba(255, 255, 255, 0.85);
-    --surface-elevated: rgba(255, 255, 255, 0.95);
-    --text-primary: var(--gray-900);
-    --text-secondary: var(--gray-600);
-    --text-muted: var(--gray-500);
-    --border: rgba(226, 232, 240, 0.7);
-    --border-light: rgba(241, 245, 249, 0.8);
-    /* Glassmorphism (Light) */
-    --glass-bg: rgba(255, 255, 255, 0.35);
-    --glass-border: rgba(255, 255, 255, 0.25);
-    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
-    --glass-blur: blur(10px);
-    /* Shadows & Effects */
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.12);
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius: 12px;
-    --radius-md: 16px;
-    --radius-lg: 20px;
-    --radius-xl: 24px;
-    /* Transitions */
-    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    /* Theme */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-hover: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
     /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 0.75rem;
-    --spacing: 1rem;
-    --spacing-md: 1.25rem;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
-    --spacing-2xl: 2.5rem;
+    /* Transitions */
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   /* 🌙 DARK MODE - With Dark Gray Background */
   body.dark-mode {
@@ -89,6 +63,9 @@
     --glass-blur: blur(10px);
     /* Stronger glow to pop on neutral dark */
     --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+    --bg-primary: rgba(30, 30, 30, 0.8);      /* Override table background */
+    --bg-secondary: rgba(20, 20, 20, 0.8);    /* Override header background */
+    --bg-hover: rgba(255, 255, 255, 0.05);    /* Override  hover state */
   }
   /* Additional dark mode styles */
   body.dark-mode .sidebar {
@@ -137,16 +114,11 @@
     padding: 0;
   }
   body {
-    font-family: 'Outfit', 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--background), #f1f5f9);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--gray-50);
     color: var(--text-primary);
-    line-height: 1.6;
-    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
-    overflow-x: hidden;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    position: relative;
   }
   /* Dark mode transition overlay */
   body::before {
@@ -420,94 +392,24 @@
     opacity: 1;
   }
   /* Main Content */
-  .main {
-    margin-left: 280px;
-    padding: var(--spacing-lg);
-    flex-grow: 1;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: calc(100% - 280px);
-    animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transform: translateZ(0);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
-
-  /* Page Title */
-  .dashboard-title {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: transparent;
-    padding: 1rem 0;
-    margin: -1rem 0 1rem 0;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--primary);
-    animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Books Content */
-  .books-content {
+  .main-content {
     flex: 1;
-    overflow-y: auto;
-    padding-right: 8px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-radius: var(--radius-lg);
+    margin-left: 280px;
+    padding: 32px;
+  }
+
+  /* Content Section */
+  .content-section {
+    background: var(--bg-primary);
+    border-radius: 12px;
     padding: var(--spacing-lg);
-    margin: var(--spacing-sm) 0;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
-
-
-  .books-content::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .books-content::-webkit-scrollbar-thumb {
-    background: var(--text-muted);
-    border-radius: 8px;
-  }
-  
-  .books-content::-webkit-scrollbar-track {
-    background: var(--border-light);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .table-wrapper {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    max-height: 70vh;
-    overflow: auto;
     min-width: fit-content;
-  }
-
-  .table-wrapper::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .table-wrapper::-webkit-scrollbar-thumb {
-    background: var(--text-muted);
-    border-radius: 8px;
-  }
-
-  .table-wrapper::-webkit-scrollbar-track {
-    background: var(--border-light);
-  }
-
-  .table-wrapper {
-    max-height: 70vh;
-    overflow: auto;
-    border-radius: var(--radius-lg);
   }
 
   /* Tooltip Styles */
@@ -539,153 +441,163 @@
 
   /* Page Header */
   .page-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin-bottom: var(--spacing-xl);
-    flex-wrap: wrap;
-    gap: var(--spacing);
-  }
-
-  .page-header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    max-width: 1200px;
   }
 
-  .page-header-left {
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
-  .page-controls {
+  .page-title i {
+    color: var(--primary);
+  }
+
+  .header-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-
-  /* Search Bar */
-  .search-bar {
-    width: 300px;
-    padding: 12px 16px 12px 40px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: var(--transition);
-    position: relative;
-  }
-
-  .search-container {
-    position: relative;
-  }
-
-  .search-container::before {
-    content: '\f002';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    z-index: 1;
-  }
-
-  .search-bar:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    gap: var(--spacing-md);
   }
 
   /* Buttons */
   .btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 0.95rem;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-spring);
+    transition: var(--transition);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    position: relative;
-    overflow: hidden;
   }
 
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .btn:hover::before {
-    left: 100%;
+  .btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--gray-300);
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: var(--primary);
     color: white;
-    box-shadow: var(--shadow);
+    border-color: var(--primary);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
   }
 
   .btn-outline {
     background: transparent;
     color: var(--primary);
     border: 1px solid var(--primary);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
   }
 
   .btn-outline:hover {
-    background: var(--glass-bg);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-md);
+    background: rgba(47, 185, 235, 0.1);
+    border-color: var(--primary);
   }
 
   .btn-sm {
-    padding: 8px 12px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    font-size: 13px;
   }
 
   .btn-danger {
-    background: linear-gradient(135deg, var(--danger), #dc2626);
+    background: var(--danger);
     color: white;
-    box-shadow: var(--shadow);
+    border-color: var(--danger);
   }
 
   .btn-danger:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
+    background: #dc2626;
+    border-color: #dc2626;
   }
 
   .btn-success {
-    background: linear-gradient(135deg, var(--success), #059669);
+    background: var(--success);
     color: white;
-    box-shadow: var(--shadow);
+    border-color: var(--success);
   }
 
   .btn-success:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
+    background: #059669;
+    border-color: #059669;
+  }
+
+  /* Filters Section */
+  .filters-section {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-input,
+  .filter-select {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: var(--transition);
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+  }
+
+  .search-input-wrapper {
+    position: relative;
+  }
+
+  .search-input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .search-input-wrapper input {
+    padding-left: 40px;
   }
 
   /* Custom Button Styles for Modals */
@@ -717,75 +629,82 @@
 
   /* Table Styles */
   .table-container {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    box-shadow: var(--glass-shadow);
-    margin-top: var(--spacing-lg);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    max-height: 70vh;
   }
 
-  .data-table {
+  /* Scrollable Table Section - wraps table and footer for vertical scrolling */
+  .scrollable-table-section {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .scrollable-table-section::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollable-table-section::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 4px;
+  }
+
+  .scrollable-table-section::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-400);
+  }
+
+  .scrollable-table-section::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 4px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
     width: 100%;
     border-collapse: collapse;
-    background: transparent;
-    min-width: fit-content;
-    table-layout: fixed;
-    margin: 0;
   }
 
-  .data-table th {
-    background: var(--glass-bg);
-    color: var(--text-primary);
-    font-weight: 600;
-    padding: 16px 12px;
-    text-align: center;
-    border-bottom: 2px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+  thead {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
   }
 
-  .data-table td {
-    padding: 16px 12px;
-    border-bottom: 1px solid var(--border-light);
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    vertical-align: middle;
-    text-align: center;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     white-space: nowrap;
   }
 
-  .data-table td:last-child {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
-    padding-left: 8px;
-    padding-right: 12px;
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
   }
 
-  .data-table tr:hover {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+  tbody tr:hover {
+    background: var(--bg-hover);
   }
 
-  .data-table tr:last-child td {
+  tbody tr:last-child {
     border-bottom: none;
+  }
+
+  td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    vertical-align: middle;
   }
 
   /* Book Cover in Table */
@@ -806,95 +725,9 @@
 
   /* Action Buttons in Table */
   .action-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 4px;
-    align-items: center;
-    justify-items: center;
-    width: 110px;
-    height: 55px;
-    padding: 3px;
-    position: relative;
-    margin: 0 0 0 8px;
-    justify-self: start;
-  }
-
-  /* Grid layout for action buttons */
-  .action-buttons .btn {
-    width: 100%;
-    height: 100%;
-    min-height: 22px;
     display: flex;
+    gap: 8px;
     align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    padding: 3px 4px;
-    cursor: pointer;
-    pointer-events: auto;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Enhanced button hover effects for scroll */
-  .action-buttons .btn {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-  }
-
-  .action-buttons .btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  }
-
-  /* Grid button hover effects */
-  .action-buttons .btn:hover {
-    transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
-    z-index: 10;
-  }
-
-  /* Active button state */
-  .action-buttons .btn:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.3);
-  }
-
-  /* Button click animation */
-  .action-buttons .btn.clicked {
-    animation: buttonClick 0.2s ease-out;
-  }
-
-  @keyframes buttonClick {
-    0% {
-      transform: translateY(0) scale(1);
-    }
-    50% {
-      transform: translateY(1px) scale(0.95);
-    }
-    100% {
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* Scroll indicator for action buttons */
-  .action-buttons.scrollable::after {
-    content: '⟨⟩';
-    position: absolute;
-    right: 2px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    color: var(--text-muted);
-    opacity: 0.7;
-    pointer-events: none;
-  }
-
-  .action-buttons .btn {
-    padding: 6px 8px;
-    font-size: 0.8rem;
-    min-width: 40px;
-    justify-content: center;
   }
 
   /* Status badges */
@@ -925,6 +758,136 @@
     color: var(--text-muted);
     font-style: italic;
     padding: 40px 20px;
+  }
+
+  /* Footer Pagination */
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .pagination-info {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pagination-button {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pagination-button:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--gray-300);
+  }
+
+  .pagination-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+
+  .pagination-number:hover {
+    background: var(--bg-hover);
+  }
+
+  .pagination-number.active {
+    background: var(--primary);
+    color: white;
+  }
+
+  .pagination-dots {
+    padding: 0 4px;
+    color: var(--text-secondary);
+  }
+
+  /* Entries Control */
+  .entries-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .entries-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .entries-select {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .entries-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state i {
+    font-size: 64px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+  }
+
+  .empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    color: var(--text-secondary);
+    font-size: 14px;
   }
 
   /* Selection Mode */
@@ -1443,7 +1406,7 @@
     .sidebar nav a .label {
       display: none !important;
     }
-    .main {
+    .main-content {
       margin-left: 80px;
       min-width: calc(100% - 80px);
       padding: var(--spacing-lg);
@@ -1452,7 +1415,7 @@
       flex-direction: column;
       align-items: stretch;
     }
-    .page-header-content {
+    .header-actions {
       flex-direction: column;
       gap: var(--spacing);
     }
@@ -1472,11 +1435,8 @@
     .data-table td {
       padding: 10px 8px;
     }
-    .table-container {
-      max-height: 60vh;
-    }
-    .table-wrapper {
-        max-height: 60vh;
+    .scrollable-table-section {
+      max-height: calc(100vh - 320px);
     }
 
     /* Selection mode responsive */
@@ -1521,13 +1481,10 @@
     }
 }
   @media (max-width: 480px) {
-    .main {
+    .main-content {
       padding: var(--spacing);
     }
-    .books-content {
-      padding: var(--spacing);
-    }
-    .dashboard-title {
+    .page-title {
       font-size: 1.5rem;
     }
     .table-container {
@@ -1555,18 +1512,12 @@
     }
 
     .action-buttons {
-        width: 85px;
-        height: 42px;
-        gap: 2px;
-        padding: 2px;
-        margin: 0 0 0 4px;
-        justify-self: start;
+        gap: 4px;
     }
 
     .action-buttons .btn {
-        min-height: 18px;
-        font-size: 0.6rem;
-        padding: 2px 3px;
+        padding: 4px 6px;
+        font-size: 0.75rem;
     }
 }
 
@@ -2388,32 +2339,67 @@ body.dark-mode .premium-upload-area:hover {
         </div>
 
     <!-- Main Content -->
-    <div class="main" id="mainContent">
-        <div class="dashboard-title">BOOKS MANAGEMENT</div>
-        <div class="books-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="page-header-content">
-                    <div class="page-header-left">
-                        <i class="fas fa-book" style="color: var(--primary); font-size: 1.5rem;"></i>
-                        <span style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">Book Collection</span>
-                    </div>
-                    <div class="page-controls">
-                        <div class="search-container">
-                            <input type="text" class="search-bar" placeholder="Search by title, author, or genre..." id="searchInput">
-                        </div>
-                        <button class="btn btn-success" onclick="openQuickBorrowModal()">
-                            <i class="fas fa-hand-holding"></i> Quick Borrow
-                        </button>
-                        <button class="btn btn-outline" onclick="enterSelectionMode()" id="selectButton">
-                            <i class="fas fa-check-square"></i> Select
-                        </button>
-                        <button class="btn btn-primary" onclick="openAddBookModal()">
-                            <i class="fas fa-plus"></i> Add Book
-                        </button>
+    <div class="main-content" id="mainContent">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-book"></i>
+                Books Management
+            </h1>
+            <div class="header-actions">
+                <button class="btn btn-success" onclick="openQuickBorrowModal()">
+                    <i class="fas fa-hand-holding"></i> Quick Borrow
+                </button>
+                <button class="btn btn-outline" onclick="enterSelectionMode()" id="selectButton">
+                    <i class="fas fa-check-square"></i> Select
+                </button>
+                <button class="btn btn-primary" onclick="openAddBookModal()">
+                    <i class="fas fa-plus"></i> Add Book
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="filter-input" placeholder="Search books..." id="searchInput">
                     </div>
                 </div>
+                <div class="filter-group">
+                    <label class="filter-label">Genre</label>
+                    <select class="filter-select" id="genreFilter">
+                        <option value="">All Genres</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Science">Science</option>
+                        <option value="History">History</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Children">Children</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="available">Available</option>
+                        <option value="unavailable">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <button class="btn btn-outline" onclick="resetFilters()">
+                        <i class="fas fa-refresh"></i>
+                        Reset
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <!-- Scrollable Table Section -->
+        <div class="scrollable-table-section">
             <!-- Books Table -->
             <div class="table-container">
                 <div class="table-wrapper">
@@ -2441,7 +2427,7 @@ body.dark-mode .premium-upload-area:hover {
                             data-cover-image="{{ $book->cover_image ?? '' }}"
                             data-qr-url="{{ $book->qr_url ?? '' }}">
                             <td>
-                                <img src="{{ $book->cover_image ?? '/images/no-cover.png' }}" alt="Cover" class="book-cover-small">
+                                <img src="{{ $book->cover_image ?? '/images/no-cover.jpg' }}" alt="Cover" class="book-cover-small">
                             </td>
                             <td style="font-weight: 600; color: var(--text-primary);" title="{{ $book->title }}">{{ $book->title }}</td>
                             <td title="{{ $book->author }}">{{ $book->author }}</td>
@@ -2484,12 +2470,15 @@ body.dark-mode .premium-upload-area:hover {
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                                <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
-                                <p>No books found. Add your first book to get started!</p>
-                                <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
-                                    <i class="fas fa-plus"></i> Add Book
-                                </button>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <i class="fas fa-book"></i>
+                                    <h3>No books found</h3>
+                                    <p>Add your first book to get started!</p>
+                                    <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
+                                        <i class="fas fa-plus"></i> Add Book
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforelse
@@ -2498,9 +2487,55 @@ body.dark-mode .premium-upload-area:hover {
                 </div>
             </div>
 
-            <!-- Pagination -->
-            <div class="pagination-container" style="margin-top: var(--spacing-lg); display: flex; justify-content: center;">
-                {{ $books->links() }}
+            <!-- Table Footer with Pagination -->
+            <div class="table-footer">
+                <div class="entries-control">
+                    <span class="entries-label">Show</span>
+                    <select class="entries-select" onchange="window.location.href = this.value">
+                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 10])) }}" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 25])) }}" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 50])) }}" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 100])) }}" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
+                    </select>
+                    <span class="entries-label">entries</span>
+                </div>
+                <div class="pagination-info">
+                    Showing {{ $books->firstItem() ?? 0 }} to {{ $books->lastItem() ?? 0 }} of {{ $books->total() }} books
+                </div>
+                <div class="pagination-controls">
+                    {{-- Previous Page Link --}}
+                    @if ($books->onFirstPage())
+                        <button class="pagination-button" disabled>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                    @else
+                        <a href="{{ $books->previousPageUrl() }}" class="pagination-button">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($books->getUrlRange(1, $books->lastPage()) as $page => $url)
+                        @if ($page == $books->currentPage())
+                            <span class="pagination-number active">{{ $page }}</span>
+                        @elseif ($page == 1 || $page == $books->lastPage() || ($page >= $books->currentPage() - 1 && $page <= $books->currentPage() + 1))
+                            <a href="{{ $url }}" class="pagination-number">{{ $page }}</a>
+                        @elseif ($page == $books->currentPage() - 2 || $page == $books->currentPage() + 2)
+                            <span class="pagination-dots">...</span>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($books->hasMorePages())
+                        <a href="{{ $books->nextPageUrl() }}" class="pagination-button">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <button class="pagination-button" disabled>
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -3814,6 +3849,24 @@ body.dark-mode .premium-upload-area:hover {
             });
         }
 
+        // Reset filters
+        function resetFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const genreFilter = document.getElementById('genreFilter');
+            const statusFilter = document.getElementById('statusFilter');
+
+            if (searchInput) searchInput.value = '';
+            if (genreFilter) genreFilter.value = '';
+            if (statusFilter) statusFilter.value = '';
+
+            // Reset table display
+            const tableBody = document.getElementById('booksTableBody');
+            if (tableBody) {
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach(row => row.style.display = '');
+            }
+        }
+
         // Cover upload functionality for Add Book Modal
         function initializeCoverUpload() {
             const coverPreviewArea = document.getElementById('cover-preview-area');
@@ -4019,12 +4072,15 @@ body.dark-mode .premium-upload-area:hover {
                 if (tableBody.children.length === 0) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="8" class="loading" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                                <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
-                                <p>No books found. Add your first book to get started!</p>
-                                <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
-                                    <i class="fas fa-plus"></i> Add Book
-                                </button>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <i class="fas fa-book"></i>
+                                    <h3>No books found</h3>
+                                    <p>Add your first book to get started!</p>
+                                    <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
+                                        <i class="fas fa-plus"></i> Add Book
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `;
