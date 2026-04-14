@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ChatbotController;
@@ -12,7 +11,6 @@ use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\SystemLogsController;
-use App\Models\Member;
 
 // Redirect root to the dashboard
 Route::get('/', function () {
@@ -94,7 +92,13 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
 // BOOKS ROUTES
 // Admin and Librarian only
 // ===========================
-Route::middleware(['auth', 'restrict.assistant'])->group(function () {
+// Dynamic genres for filter (must be declared before books/{book})
+Route::middleware(['auth', 'permission:manage-books'])->group(function () {
+    Route::get('/api/books/genres', [BookController::class, 'allGenres'])->name('api.books.genres');
+    Route::get('/books/genres', [BookController::class, 'allGenres'])->name('books.genres');
+});
+
+Route::middleware(['auth', 'restrict.assistant', 'permission:manage-books'])->group(function () {
     Route::resource('books', BookController::class)->except(['index', 'show']);
     Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
     Route::get('/api/media/images', [BookController::class, 'getMediaImages'])->name('api.media.images');
@@ -102,64 +106,46 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
     Route::post('/api/media/cleanup-temp', [BookController::class, 'cleanupTempImages'])->name('api.media.cleanup-temp');
 });
 
-// Books show route (accessible to all authenticated users)
-Route::resource('books', BookController::class)->only(['index', 'show']);
+// Books index/show routes (restricted to users with manage-books permission)
+Route::middleware(['auth', 'permission:manage-books'])->group(function () {
+    Route::resource('books', BookController::class)->only(['index', 'show']);
+});
+
+// ===========================
+// MEMBERS ROUTES - BORROW SUPPORT
+// Available to all authenticated, non-assistant users
+// ===========================
+Route::middleware(['auth', 'restrict.assistant'])->group(function () {
+    Route::get('/members/search', [BorrowController::class, 'search']);
+    Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
+});
 
 // ===========================
 // MEMBERS ROUTES
 // Admin and Librarian only
 // ===========================
-Route::middleware(['auth', 'restrict.assistant'])->group(function () {
+Route::middleware(['auth', 'restrict.assistant', 'permission:manage-members'])->group(function () {
     Route::resource('members', MemberController::class)->except(['index', 'show']);
     Route::get('/members/{memberId}/borrowing-history', [MemberController::class, 'getBorrowingHistory'])->name('members.borrowing-history');
     Route::get('/members/{memberId}/timelog-history', [MemberController::class, 'getTimelogHistory'])->name('members.timelog-history');
-    Route::post('/members/{memberId}/send-email-code', [MemberController::class, 'sendEmailCode'])->name('members.send-email-code');
+    Route::post('/members/{memberId}/send-email-code', [MemberController::class, 'sendEmailCode'])
+        ->middleware('throttle:3,10')
+        ->name('members.send-email-code');
     Route::post('/members/{memberId}/verify-email-code', [MemberController::class, 'verifyEmailCode'])->name('members.verify-email-code');
-    Route::post('/members/send-email-code-registration', [MemberController::class, 'sendEmailCodeForRegistration'])->name('members.send-email-code-registration');
+    Route::post('/members/send-email-code-registration', [MemberController::class, 'sendEmailCodeForRegistration'])
+        ->middleware('throttle:3,10')
+        ->name('members.send-email-code-registration');
     Route::post('/members/verify-email-code-registration', [MemberController::class, 'verifyEmailCodeForRegistration'])->name('members.verify-email-code-registration');
-    Route::get('/members/search', [BorrowController::class, 'search']);
-    Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
 });
 
-// Members show route (accessible to all authenticated users)
-Route::resource('members', MemberController::class)->only(['index', 'show']);
+// Members index/show routes (restricted to users with manage-members permission)
+Route::middleware(['auth', 'permission:manage-members'])->group(function () {
+    Route::resource('members', MemberController::class)->only(['index', 'show']);
+});
 
-// Card JSON endpoint (accessible to all authenticated users)
-Route::middleware('auth')->group(function () {
-    Route::get('/members/{id}/json', function ($id) {
-        $member = Member::find($id);
-
-        if (!$member) {
-            return response()->json(['message' => 'Not found'], 404);
-        }
-
-        $first  = $member->first_name ?: '';
-        $middle = $member->middle_name ?: '';
-        $last   = $member->last_name ?: '';
-
-        $middleInitial = $middle ? strtoupper(substr($middle, 0, 1)) . '.' : '';
-        $fullName = trim(preg_replace('/\s+/', ' ', "{$last}, {$first} {$middleInitial}"));
-
-        return response()->json([
-            'id'         => $member->id,
-            'firstName'  => $first,
-            'middleName' => $middle,
-            'lastName'   => $last,
-            'fullName'   => $fullName ?: '',
-            'age'        => $member->age ?? '',
-            'barangay'   => $member->barangay ?? '',
-            'municipality' => $member->municipality ?? '',
-            'province'   => $member->province ?? '',
-            'contactNumber' => $member->contactnumber ?? '',
-            'memberdate' => $member->memberdate
-                            ? \Carbon\Carbon::parse($member->memberdate)->format('Y-m-d')
-                            : '',
-            'photo'      => $member->photo
-                            ? URL::to('/resource/member_images/' . $member->photo)
-                            : '',
-            'qr'         => URL::to('/qrcode/members/member-' . $member->id . '.png'),
-        ]);
-    });
+// Card JSON endpoint (restricted to users with manage-members permission)
+Route::middleware(['auth', 'permission:manage-members'])->group(function () {
+    Route::get('/members/{id}/json', [MemberController::class, 'jsonShow'])->name('members.json');
 });
 
 // ===========================
@@ -205,6 +191,14 @@ Route::middleware(['auth'])->group(function () {
 // ===========================
 Route::middleware(['auth', 'restrict.assistant'])->group(function () {
     Route::post('/admin/update-profile', [AdminController::class, 'updateProfile'])->name('admin.update-profile');
+    // Current authenticated user force-logout status endpoint for client polling
+    Route::get('/auth/force-logout-status', [\App\Http\Controllers\UserManagementController::class, 'checkCurrentForceLogoutStatus'])
+        ->middleware('role:admin')
+        ->middleware('throttle:12,1')
+        ->name('auth.force-logout-status');
+    // Allow authenticated users to clear their own force-logout flag after login
+    Route::post('/users/{id}/clear-force-logout', [\App\Http\Controllers\UserManagementController::class, 'clearForceLogoutFlag'])
+        ->name('users.clear-force-logout');
 });
 
 // ===========================
@@ -234,10 +228,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Force logout route
     Route::post('/admin/users/{id}/force-logout', [\App\Http\Controllers\UserManagementController::class, 'forceLogout'])->name('admin.users.force-logout');
 
-    // Check if user has been force-logged out (for AJAX polling)
-    Route::get('/admin/users/{id}/force-logout-status', [\App\Http\Controllers\UserManagementController::class, 'checkForceLogoutStatus'])->name('admin.users.force-logout-status');
-
-    // Clear force_logout flag after successful re-login
-    Route::post('/admin/sessions/{sessionId}/terminate', [UserManagementController::class, 'terminateSession'])->name('admin.sessions.terminate');
-    Route::post('/admin/users/{id}/clear-force-logout', [\App\Http\Controllers\UserManagementController::class, 'clearForceLogoutFlag'])->name('admin.users.clear-force-logout');
+    Route::post('/admin/sessions/{sessionId}/terminate', [\App\Http\Controllers\UserManagementController::class, 'terminateSession'])->name('admin.sessions.terminate');
 });
+

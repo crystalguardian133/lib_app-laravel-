@@ -9316,20 +9316,29 @@
 <script>
 // =========================================
 // Force Logout Detection for Current User
-// Polls every 3-5 seconds to check if user has been force-logged out
+// Polls periodically to check if user has been force-logged out
 // =========================================
 (function() {
     'use strict';
+
+    const isAdmin = {{ auth()->check() && auth()->user()->isAdmin() ? 'true' : 'false' }};
+    if (!isAdmin) return;
     
-    const POLL_INTERVAL = 4000; // 4 seconds
+    const POLL_INTERVAL = 30000; // 30 seconds
+    const FORCE_LOGOUT_POPUP_KEY = 'force_logout_popup_shown';
+    const FORCE_LOGOUT_MESSAGE_KEY = 'force_logout_message';
     let isRefreshing = false;
+    let isChecking = false;
+    let pollTimer = null;
     
     function checkCurrentUserForceLogout() {
-        // Only run if user is authenticated and not already refreshing
+        // Only run if user is authenticated, visible, and not already redirecting/checking
         const userId = {{ auth()->check() ? auth()->id() : 'null' }};
-        if (!userId || isRefreshing) return;
+        if (!userId || isRefreshing || isChecking || document.hidden) return;
+
+        isChecking = true;
         
-        fetch(`/admin/users/${userId}/force-logout-status`, {
+        fetch('/auth/force-logout-status', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -9351,20 +9360,41 @@
         .catch(error => {
             // Network error might mean user is logged out
             console.log('Force logout check failed:', error.message);
+        })
+        .finally(() => {
+            isChecking = false;
         });
+    }
+
+    function startPolling() {
+        if (pollTimer) return;
+        checkCurrentUserForceLogout();
+        pollTimer = setInterval(checkCurrentUserForceLogout, POLL_INTERVAL);
+    }
+
+    function stopPolling() {
+        if (!pollTimer) return;
+        clearInterval(pollTimer);
+        pollTimer = null;
     }
     
     function handleForceLogout() {
         if (isRefreshing) return;
         isRefreshing = true;
+
+        const popupAlreadyShown = sessionStorage.getItem(FORCE_LOGOUT_POPUP_KEY) === '1';
         
         // Store message in session storage for login page
-        sessionStorage.setItem('force_logout_message', 'Your session has ended. Please log in again.');
+        if (!popupAlreadyShown) {
+            sessionStorage.setItem(FORCE_LOGOUT_MESSAGE_KEY, 'Your session has ended. Please log in again.');
+            sessionStorage.setItem(FORCE_LOGOUT_POPUP_KEY, '1');
+        }
         
-        // Show alert before redirecting
+        // Show alert only once per browser session, then redirect silently.
         setTimeout(function() {
-            alert('Your session has ended. Please log in again.');
-            // Redirect to login page
+            if (!popupAlreadyShown) {
+                alert('Your session has ended. Please log in again.');
+            }
             window.location.href = '/login';
         }, 100);
     }
@@ -9372,10 +9402,19 @@
     // Start polling when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            setInterval(checkCurrentUserForceLogout, POLL_INTERVAL);
+            startPolling();
         });
     } else {
-        setInterval(checkCurrentUserForceLogout, POLL_INTERVAL);
+        startPolling();
     }
+
+    // Avoid polling while tab is hidden.
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            startPolling();
+        }
+    });
 })();
 </script>

@@ -20,6 +20,39 @@ use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
+    private function isGmailDailyLimitExceeded(string $message): bool
+    {
+        $normalized = strtolower($message);
+
+        return str_contains($normalized, '550-5.4.5')
+            || str_contains($normalized, 'daily user sending limit exceeded')
+            || str_contains($normalized, 'gmail 550-5.4.5 sending limits');
+    }
+
+    private function buildMailFailureResponse(string $rawMessage): array
+    {
+        if ($this->isGmailDailyLimitExceeded($rawMessage)) {
+            return [
+                'success' => false,
+                'message' => 'Email service is temporarily unavailable because the Gmail daily sending limit was reached. Please try again after 24 hours or contact admin to switch mail provider.',
+                'code' => 'gmail_daily_limit_exceeded',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to send verification email. Please try again in a few minutes.',
+            'code' => 'mail_send_failed',
+        ];
+    }
+
+    private function findMemberOrFail(string $identifier): Member
+    {
+        return Member::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->firstOrFail();
+    }
+
     public function index()
     {
         // Check if user has permission to view members
@@ -122,6 +155,7 @@ class MemberController extends Controller
     'success' => true,
     'message' => '✅ Member registered successfully!',
     'member_id' => $member->id,
+    'member_uuid' => $member->uuid,
     'cardUrl' => asset("card/member_{$member->id}.pdf")
 ]);
 
@@ -134,7 +168,7 @@ public function update(Request $request, $id)
         return response()->json(['message' => 'Unauthorized. You do not have permission to update members.'], 403);
     }
     
-    $member = Member::findOrFail($id);
+    $member = $this->findMemberOrFail((string) $id);
 
     // validate camelCase inputs
     $validated = $request->validate([
@@ -148,7 +182,7 @@ public function update(Request $request, $id)
         'municipality'  => 'required|string|max:255',
         'province'      => 'required|string|max:255',
         'contactNumber' => 'required|string|max:20',
-        'email'         => 'required|email|unique:members,email,' . $id,
+        'email'         => 'required|email|unique:members,email,' . $member->id,
         'school'        => 'nullable|string|max:255',
         'photo'         => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
     ]);
@@ -213,7 +247,7 @@ public function update(Request $request, $id)
             return response()->json(['message' => 'Unauthorized. You do not have permission to delete members.'], 403);
         }
         
-        $member = Member::find($id);
+        $member = Member::where('uuid', $id)->orWhere('id', $id)->first();
 
         if (!$member) {
             return response()->json([
@@ -273,7 +307,7 @@ public function update(Request $request, $id)
                 'margin'     => 10,
             ]);
 
-            $qrData = route('members.show', $member->id);
+            $qrData = route('members.show', $member->uuid);
             (new QRCode($options))->render($qrData, $qrPath);
         }
 
@@ -283,21 +317,29 @@ public function update(Request $request, $id)
 
     public function jsonShow($id)
     {
-        $member = Member::find($id);
-
-        if (!$member) {
-            return response()->json(['message' => 'Not found'], 404);
-        }
+        $member = $this->findMemberOrFail((string) $id);
 
         return response()->json([
             'id'           => $member->id,
+            'uuid'         => $member->uuid,
+
+            // Legacy + new naming compatibility
+            'first_name'   => $member->first_name,
             'firstName'    => $member->firstName,
+            'middle_name'  => $member->middle_name,
             'middleName'   => $member->middleName,
+            'last_name'    => $member->last_name,
             'lastName'     => $member->lastName,
+
             'age'          => $member->age,
             'barangay'     => $member->barangay,
             'municipality' => $member->municipality,
             'province'     => $member->province,
+            'house_number' => $member->house_number,
+            'houseNumber'  => $member->house_number,
+            'street'       => $member->street,
+
+            'contactnumber'=> $member->contactnumber,
             'contactNumber'=> $member->contactNumber,
             'memberdate'   => $member->memberdate,
 
@@ -325,11 +367,11 @@ public function update(Request $request, $id)
 
     public function show($id)
     {
-        $member = Member::findOrFail($id);
-
-        if (!$member) {
-            return response()->json(['error' => 'Member not found'], 404);
+        if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
+            return response()->json(['error' => 'Unauthorized. You do not have permission to view members.'], 403);
         }
+
+        $member = $this->findMemberOrFail((string) $id);
 
         // Ensure null values are replaced with empty strings
         $first = $member->first_name ?? '';
@@ -339,15 +381,17 @@ public function update(Request $request, $id)
         // Remove extra spaces if middle name is empty
         $fullName = trim("{$first} {$middle} {$last}");
 
-        return response()->json($member);
+        return response()->json(array_merge($member->toArray(), [
+            'uuid' => $member->uuid,
+        ]));
     }
 
     public function getBorrowingHistory($memberId)
     {
-        $member = Member::findOrFail($memberId);
+        $member = $this->findMemberOrFail((string) $memberId);
 
         // Get borrowing history from transactions table
-        $borrowingHistory = Transaction::where('member_id', $memberId)
+        $borrowingHistory = Transaction::where('member_id', $member->id)
             ->with('book')
             ->orderBy('borrowed_at', 'desc')
             ->take(10)
@@ -374,10 +418,10 @@ public function update(Request $request, $id)
 
     public function getTimelogHistory($memberId)
     {
-        $member = Member::findOrFail($memberId);
+        $member = $this->findMemberOrFail((string) $memberId);
 
         // Get timelog history
-        $timelogHistory = TimeLog::where('member_id', $memberId)
+        $timelogHistory = TimeLog::where('member_id', $member->id)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get()
@@ -434,7 +478,7 @@ public function update(Request $request, $id)
 
     public function sendEmailCode(Request $request, $memberId)
     {
-        $member = Member::findOrFail($memberId);
+        $member = $this->findMemberOrFail((string) $memberId);
 
         if (!$member->email) {
             return response()->json(['success' => false, 'message' => 'No email address found for this member.'], 400);
@@ -448,7 +492,7 @@ public function update(Request $request, $id)
         $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
         // Store code in cache for 10 minutes
-        Cache::put("email_verification_{$memberId}", $code, now()->addMinutes(10));
+        Cache::put("email_verification_{$member->id}", $code, now()->addMinutes(10));
 
         try {
             Mail::raw("Hi {$member->first_name},\n\n" .
@@ -457,7 +501,7 @@ public function update(Request $request, $id)
                         ->subject('Email Verification Code - Julita Public Library');
             });
 
-            Log::info("Email verification code sent to {$member->email} for member ID {$memberId}");
+            Log::info("Email verification code sent to {$member->email} for member ID {$member->id}");
 
             $response = ['success' => true, 'message' => 'Verification code sent to your email.'];
 
@@ -473,12 +517,9 @@ public function update(Request $request, $id)
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            
-            return response()->json([
-                'success' => false, 
-                'message' => 'Failed to send email: ' . $e->getMessage(),
-                'error' => $e->getMessage()
-            ], 500);
+
+            $response = $this->buildMailFailureResponse($e->getMessage());
+            return response()->json($response, 503);
         }
     }
 
@@ -488,8 +529,8 @@ public function update(Request $request, $id)
             'code' => 'required|string|size:6'
         ]);
 
-        $member = Member::findOrFail($memberId);
-        $cachedCode = Cache::get("email_verification_{$memberId}");
+        $member = $this->findMemberOrFail((string) $memberId);
+        $cachedCode = Cache::get("email_verification_{$member->id}");
 
         if (!$cachedCode || $cachedCode !== $request->code) {
             return response()->json(['success' => false, 'message' => 'Invalid or expired verification code.'], 400);
@@ -499,7 +540,7 @@ public function update(Request $request, $id)
         $member->update(['email_verified' => true]);
 
         // Clear the cache
-        Cache::forget("email_verification_{$memberId}");
+        Cache::forget("email_verification_{$member->id}");
 
         return response()->json(['success' => true, 'message' => 'Email verified successfully!']);
     }
@@ -542,12 +583,9 @@ public function update(Request $request, $id)
                 'exception' => $e,
                 'trace' => $e->getTraceAsString()
             ]);
-            
-            return response()->json([
-                'success' => false, 
-                'message' => 'Failed to send email: ' . $e->getMessage(),
-                'error' => $e->getMessage()
-            ], 500);
+
+            $response = $this->buildMailFailureResponse($e->getMessage());
+            return response()->json($response, 503);
         }
     }
 
