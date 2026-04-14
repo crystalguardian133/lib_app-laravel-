@@ -638,8 +638,7 @@
   /* Scrollable Table Section - wraps table and footer for vertical scrolling */
   .scrollable-table-section {
     max-height: calc(100vh - 280px);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
@@ -663,17 +662,28 @@
   }
 
   .table-wrapper {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
     overflow-x: auto;
   }
 
   table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
   }
 
   thead {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
+  }
+
+  .table-container thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 var(--border);
   }
 
   th {
@@ -685,6 +695,30 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
+  }
+
+  .sort-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .sort-trigger .sort-icon {
+    opacity: 0.55;
+    font-size: 0.8rem;
+  }
+
+  .sort-trigger:hover .sort-icon,
+  .sort-trigger.active .sort-icon {
+    opacity: 1;
   }
 
   tbody tr {
@@ -1438,6 +1472,9 @@
     .scrollable-table-section {
       max-height: calc(100vh - 320px);
     }
+    .table-wrapper {
+      max-height: calc(100vh - 320px);
+    }
 
     /* Selection mode responsive */
     .selection-mode {
@@ -2145,110 +2182,6 @@ body.dark-mode .premium-upload-area:hover {
   margin: 0;
 }
 
-/* QR Scanner Modal - Right Side */
-.qr-scanner-modal {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 350px;
-  height: 100vh;
-  background: var(--surface-elevated);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border-left: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-xl);
-  z-index: 9999;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.qr-scanner-modal.active {
-  transform: translateX(0);
-}
-
-.qr-scanner-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.qr-scanner-header {
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface-elevated);
-}
-
-.qr-scanner-header h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.qr-scanner-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: var(--radius);
-  transition: var(--transition);
-}
-
-.qr-scanner-close:hover {
-  background: var(--glass-bg);
-  color: var(--danger);
-}
-
-.qr-scanner-body {
-  flex: 1;
-  padding: var(--spacing-lg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.qr-reader-container {
-  width: 100%;
-  height: 300px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.qr-placeholder {
-  text-align: center;
-  color: var(--text-muted);
-}
-
-.qr-placeholder i {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  display: block;
-}
-
-.qr-instruction {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 /* Animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
@@ -2372,13 +2305,7 @@ body.dark-mode .premium-upload-area:hover {
                 <div class="filter-group">
                     <label class="filter-label">Genre</label>
                     <select class="filter-select" id="genreFilter">
-                        <option value="">All Genres</option>
-                        <option value="Fiction">Fiction</option>
-                        <option value="Non-Fiction">Non-Fiction</option>
-                        <option value="Science">Science</option>
-                        <option value="History">History</option>
-                        <option value="Biography">Biography</option>
-                        <option value="Children">Children</option>
+                      <option value="">All Genres</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -2400,104 +2327,46 @@ body.dark-mode .premium-upload-area:hover {
 
         <!-- Scrollable Table Section -->
         <div class="scrollable-table-section">
-            <!-- Books Table -->
-            <div class="table-container">
-                <div class="table-wrapper">
-                    <table class="data-table" id="booksTable">
-                    <thead>
-                        <tr>
-                            <th>Cover</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Genre</th>
-                            <th>Year</th>
-                            <th>Status</th>
-                            <th>Available</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="booksTableBody">
-                        @forelse($books as $book)
-                        <tr data-id="{{ $book->id }}"
-                            data-title="{{ $book->title }}"
-                            data-author="{{ $book->author }}"
-                            data-genre="{{ $book->genre }}"
-                            data-published-year="{{ $book->published_year }}"
-                            data-availability="{{ $book->availability }}"
-                            data-cover-image="{{ $book->cover_image ?? '' }}"
-                            data-qr-url="{{ $book->qr_url ?? '' }}">
-                            <td>
-                                <img src="{{ $book->cover_image ?? '/images/no-cover.jpg' }}" alt="Cover" class="book-cover-small">
-                            </td>
-                            <td style="font-weight: 600; color: var(--text-primary);" title="{{ $book->title }}">{{ $book->title }}</td>
-                            <td title="{{ $book->author }}">{{ $book->author }}</td>
-                            <td title="{{ $book->genre }}">
-                                <span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
-                                    {{ $book->genre }}
-                                </span>
-                            </td>
-                            <td title="{{ $book->published_year }}">{{ $book->published_year }}</td>
-                            <td title="{{ $book->availability > 0 ? 'Available' : 'Out of Stock' }}">
-                                <span class="status-badge {{ $book->availability > 0 ? 'status-available' : 'status-unavailable' }}">
-                                    {{ $book->availability > 0 ? 'Available' : 'Out of Stock' }}
-                                </span>
-                            </td>
-                            <td title="{{ $book->availability }} copies">
-                                <strong style="color: var(--text-primary);">{{ $book->availability }}</strong> copies
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    @if(!empty($book->qr_url))
-                                        <button class="btn btn-outline btn-sm" onclick="showQRModal('{{ $book->title }}', '{{ $book->qr_url }}')" title="View QR Code">
-                                            <i class="fas fa-qrcode"></i>
-                                        </button>
-                                    @else
-                                        <button class="btn btn-outline btn-sm" onclick="window.generateQr({{ $book->id }})" title="Generate QR Code">
-                                            <i class="fas fa-qrcode"></i> Gen
-                                        </button>
-                                    @endif
-                                    <button class="btn btn-success btn-sm" onclick="window.borrowOne({{ $book->id }})" title="Borrow Book" {{ $book->availability <= 0 ? 'disabled' : '' }}>
-                                        <i class="fas fa-hand-holding"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm" onclick="window.editBook({{ $book->id }})" title="Edit Book">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="window.deleteBook({{ $book->id }})" title="Delete Book">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8">
-                                <div class="empty-state">
-                                    <i class="fas fa-book"></i>
-                                    <h3>No books found</h3>
-                                    <p>Add your first book to get started!</p>
-                                    <button class="btn btn-primary" onclick="openAddBookModal()" style="margin-top: 15px;">
-                                        <i class="fas fa-plus"></i> Add Book
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                    </table>
-                </div>
+
+            <!-- Skeleton Loader for Books Table -->
+            <div id="booksTableSkeleton" class="table-container" style="display:none; min-height:220px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cover</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>Status</th><th>Available</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for ($i = 0; $i < 7; $i++)
+                  <tr>
+                    <td><div class="skeleton skeleton-img"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:80px;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:60px;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:50px;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:40px;"></div></td>
+                    <td><div class="skeleton skeleton-badge"></div></td>
+                    <td><div class="skeleton skeleton-num"></div></td>
+                    <td><div class="skeleton skeleton-btn"></div></td>
+                  </tr>
+                  @endfor
+                </tbody>
+              </table>
             </div>
+
+            <!-- Books Table (Partial) -->
+            @include('books.partials.table')
 
             <!-- Table Footer with Pagination -->
             <div class="table-footer">
                 <div class="entries-control">
-                    <span class="entries-label">Show</span>
-                    <select class="entries-select" onchange="window.location.href = this.value">
-                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 10])) }}" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
-                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 25])) }}" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
-                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 50])) }}" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-                        <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 100])) }}" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
-                    </select>
-                    <span class="entries-label">entries</span>
+                  <span class="entries-label">Show</span>
+                  <select class="entries-select" id="entriesSelect">
+                    <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 10])) }}" data-value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                    <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 25])) }}" data-value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                    <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 50])) }}" data-value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                    <option value="{{ route('books.index', array_merge(request()->except('page'), ['per_page' => 100])) }}" data-value="100" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
+                  </select>
+                  <span class="entries-label">entries</span>
                 </div>
                 <div class="pagination-info">
                     Showing {{ $books->firstItem() ?? 0 }} to {{ $books->lastItem() ?? 0 }} of {{ $books->total() }} books
@@ -2873,28 +2742,6 @@ body.dark-mode .premium-upload-area:hover {
             </div>
         </div>
     </div>
-
-    <!-- QR SCANNER MODAL - RIGHT SIDE -->
-    <div class="qr-scanner-modal" id="qrScannerModal">
-        <div class="qr-scanner-content">
-            <div class="qr-scanner-header">
-                <h3><i class="fas fa-qrcode"></i> QR Scanner</h3>
-                <button class="qr-scanner-close" onclick="closeQRScannerModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="qr-scanner-body">
-                <div class="qr-reader-container" id="qr-reader-container">
-                    <div class="qr-placeholder">
-                        <i class="fas fa-camera"></i>
-                        <p>Initializing camera...</p>
-                    </div>
-                </div>
-                <p class="qr-instruction">Point camera at QR codes to scan</p>
-            </div>
-        </div>
-    </div>
-
     <!-- MEDIA PICKER MODAL -->
     <div class="modal" id="mediaPickerModal">
         <div class="modal-content" style="max-width: 800px;">
@@ -2925,7 +2772,9 @@ body.dark-mode .premium-upload-area:hover {
                         <div id="media-upload-content">
                             <i id="media-upload-icon" class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
                             <p style="color: var(--text-muted); margin: 0; font-weight: 500; font-size: 1rem;">Drag and drop image here or click to browse</p>
-                            <small style="color: var(--text-muted); margin-top: 8px; display: block;">Supports JPG, PNG, GIF (max 5MB)</small>
+                            <small style="color: var(--text-muted); margin-top: 8px; display: block;">
+                                Supports JPG, PNG, GIF (max 5MB)
+                            </small>
                             <input type="file" id="media-file-input" accept="image/*" style="display: none;">
                         </div>
                     </div>
@@ -2996,13 +2845,22 @@ body.dark-mode .premium-upload-area:hover {
                                 <i class="fas fa-id-card"></i>
                                 <span class="label-text">Member Name</span>
                             </label>
-                            <div class="input-wrapper">
-                                <input type="text" id="memberName" class="premium-input" placeholder="Scan QR code to fill member information" readonly style="background-color: var(--surface-elevated); cursor: not-allowed;">
+                        <div class="input-wrapper" style="position: relative;">
+                          <input type="text" id="memberName" list="memberNameList" class="premium-input" placeholder="Type a member name or scan QR code" autocomplete="off" style="background: var(--surface-elevated); cursor: text; padding-right: 120px;">
+                          <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; z-index: 2;">
+                            <button type="button" class="btn btn-outline" onclick="initializeQRScannerModal()" style="padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;">
+                              <i class="fas fa-qrcode"></i> Scan
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="clearMemberInfo()" style="padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;">
+                              <i class="fas fa-eraser"></i> Clear
+                            </button>
+                          </div>
                                 <div class="input-focus-line"></div>
+                          <datalist id="memberNameList"></datalist>
                             </div>
                             <input type="hidden" id="memberId">
                             <small style="display:block; margin-top:8px; color:var(--text-muted); font-size:0.85rem;">
-                                <i class="fas fa-info-circle"></i> This field is automatically filled when you scan a member QR code
+                          <i class="fas fa-info-circle"></i> Type a name to search members or scan a member QR code
                             </small>
                         </div>
                     </div>
@@ -3028,16 +2886,13 @@ body.dark-mode .premium-upload-area:hover {
                                 <span class="required-indicator">*</span>
                             </label>
                             <div class="input-wrapper">
-                                <div id="dueDateDisplay" class="premium-input" style="background: var(--surface-elevated); cursor: default; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; padding: 12px 16px;">
-                                    <i class="fas fa-calendar-check" style="margin-right: 8px; color: var(--primary);"></i>
-                                    <span id="dueDateText">Today</span>
-                                </div>
+                            <input type="date" id="dueDatePicker" class="premium-input" style="background: var(--surface-elevated); cursor: pointer; color: var(--text-primary); font-weight: 600; padding: 12px 16px;">
                                 <div class="input-focus-line"></div>
                             </div>
                             <!-- Hidden input to store the actual date value -->
                             <input type="hidden" id="dueDate" name="dueDate" value="">
                             <small style="display:block; margin-top:8px; color:var(--text-secondary); font-size:0.85rem;">
-                                <i class="fas fa-info-circle"></i> Automatically set to today's date
+                            <i class="fas fa-info-circle"></i> Available for the next 10 working days, excluding weekends and holidays
                             </small>
                         </div>
 
@@ -3120,6 +2975,10 @@ body.dark-mode .premium-upload-area:hover {
   <script src="{{ asset('js/qrgen.js') }}"></script>
   <script src="{{ asset('js/showqr.js') }}"></script>
   <script src="{{ asset('js/overdue.js') }}"></script>
+  <script>
+  // Legacy duplicate Books controls block removed.
+  // Active implementation is the final AJAX-driven controls script near the bottom of this file.
+  </script>
 
     <script>
         // Global variables
@@ -3173,16 +3032,134 @@ body.dark-mode .premium-upload-area:hover {
                 window.uploadedMediaFile = null;
             };
 
-            // Philippine holidays for 2025
+            // Philippine holidays for any year (month-day only)
             const philippineHolidays = [
-                '2025-01-01', '2025-02-25', '2025-04-17', '2025-04-18', '2025-04-19',
-                '2025-05-01', '2025-06-12', '2025-08-25', '2025-11-01', '2025-11-30',
-                '2025-12-25', '2025-12-30', '2025-12-31'
+              '01-01', '02-25', '04-17', '04-18', '04-19',
+              '05-01', '06-12', '08-25', '11-01', '11-30',
+              '12-25', '12-30', '12-31'
             ];
 
-            window.isPhilippineHoliday = function(dateString) {
-                return philippineHolidays.includes(dateString);
+            function getPhilippineNow() {
+              const now = new Date();
+              const philippineOffset = 8 * 60;
+              const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+              return new Date(utcTime + (philippineOffset * 60000));
+            }
+
+            function toIsoDate(date) {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            }
+
+            function getMonthDay(date) {
+              return toIsoDate(date).slice(5, 10);
+            }
+
+            function isPhilippineHoliday(dateString) {
+              const monthDay = dateString.slice(5, 10);
+              return philippineHolidays.includes(monthDay);
+            }
+
+            function isWorkingDay(date) {
+              const dayOfWeek = date.getDay();
+              return dayOfWeek >= 1 && dayOfWeek <= 5 && !isPhilippineHoliday(toIsoDate(date));
+            }
+
+            function getNearestWorkingDay(startDate) {
+              const date = new Date(startDate);
+              while (!isWorkingDay(date)) {
+                date.setDate(date.getDate() + 1);
+              }
+              return date;
+            }
+
+            function getWorkingDayWindow(startDate, limit = 10) {
+              const dates = [];
+              const cursor = new Date(startDate);
+              cursor.setHours(12, 0, 0, 0);
+
+              while (dates.length < limit) {
+                if (isWorkingDay(cursor)) {
+                  dates.push(new Date(cursor));
+                }
+                cursor.setDate(cursor.getDate() + 1);
+              }
+
+              return dates;
+            }
+
+            function formatDueDateLabel(date) {
+              return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+            }
+
+            function syncDueDatePicker() {
+              const dueDatePicker = document.getElementById('dueDatePicker');
+              const dueDateInput = document.getElementById('dueDate');
+              if (!dueDatePicker || !dueDateInput) {
+                return;
+              }
+
+              const today = getPhilippineNow();
+              const windowDates = getWorkingDayWindow(today, 10);
+              const firstAllowed = windowDates[0];
+              const lastAllowed = windowDates[windowDates.length - 1];
+              const currentValue = dueDatePicker.value ? new Date(dueDatePicker.value + 'T12:00:00') : firstAllowed;
+
+              let normalized = new Date(currentValue);
+              if (normalized < firstAllowed) {
+                normalized = new Date(firstAllowed);
+              }
+              if (normalized > lastAllowed) {
+                normalized = new Date(lastAllowed);
+              }
+
+              const snappedDate = getNearestWorkingDay(normalized);
+              const finalDate = snappedDate > lastAllowed ? new Date(lastAllowed) : snappedDate;
+
+              dueDatePicker.min = toIsoDate(firstAllowed);
+              dueDatePicker.max = toIsoDate(lastAllowed);
+              dueDatePicker.step = '1';
+              dueDatePicker.value = toIsoDate(finalDate);
+              dueDateInput.value = toIsoDate(finalDate);
+              dueDatePicker.setAttribute('title', `Available: ${toIsoDate(firstAllowed)} to ${toIsoDate(lastAllowed)}`);
+            }
+
+            window.isPhilippineHoliday = isPhilippineHoliday;
+
+            window.setAutomaticDueDate = function() {
+              syncDueDatePicker();
+
+              const dueDatePicker = document.getElementById('dueDatePicker');
+              const dueDateInput = document.getElementById('dueDate');
+              if (!dueDatePicker || !dueDateInput) {
+                return;
+              }
+
+              dueDateInput.value = dueDatePicker.value;
             };
+
+            document.addEventListener('DOMContentLoaded', function() {
+              const dueDatePicker = document.getElementById('dueDatePicker');
+              if (dueDatePicker) {
+                syncDueDatePicker();
+                dueDatePicker.addEventListener('change', function() {
+                  syncDueDatePicker();
+                });
+                dueDatePicker.addEventListener('input', function() {
+                  syncDueDatePicker();
+                });
+                dueDatePicker.addEventListener('blur', function() {
+                  syncDueDatePicker();
+                });
+              }
+            });
 
             // Set default due date and time using Philippine timezone and business days
             function calculatePhilippineBusinessDueDate() {
@@ -3253,8 +3230,7 @@ body.dark-mode .premium-upload-area:hover {
 
 
 
-            // Initialize search functionality
-            initializeSearch();
+            // Search/filter are handled by the live AJAX filter script.
 
             // Initialize confirm button state - use the one from borrow.js
             if (typeof window.updateConfirmButtonState === 'function') {
@@ -3450,12 +3426,12 @@ body.dark-mode .premium-upload-area:hover {
                         }
 
                         // Check if it's a member URL pattern: /members/{id}
-                        const memberMatch = url.pathname.match(/^\/members\/(\d+)$/);
+                        const memberMatch = url.pathname.match(/^\/members\/([A-Za-z0-9-]+)$/);
                         if (memberMatch) {
                             // For members, we need more data, but we can at least identify it as a member
                             return {
                                 type: 'member',
-                                id: parseInt(memberMatch[1])
+                            id: memberMatch[1]
                             };
                         }
 
@@ -3604,7 +3580,7 @@ body.dark-mode .premium-upload-area:hover {
 
                     console.log('Constructed name:', fullName);
 
-                    setMemberInModal(member.id, fullName || 'Unknown Member');
+                    setMemberInModal(member.uuid || member.id, fullName || 'Unknown Member');
                 })
                 .catch(error => {
                     console.error('Error fetching member:', error);
@@ -3623,7 +3599,18 @@ body.dark-mode .premium-upload-area:hover {
                 memberName.value = name;
                 memberId.value = id;
                 memberName.style.backgroundColor = 'var(--surface-elevated)';
-                memberName.style.cursor = 'default';
+            memberName.style.cursor = 'text';
+
+            const suggestions = document.getElementById('memberSuggestions');
+            if (suggestions) {
+              suggestions.innerHTML = '';
+              suggestions.style.display = 'none';
+            }
+
+            if (memberName.dataset.memberSearchInitialized !== '1') {
+              memberName.readOnly = false;
+              memberName.autocomplete = 'off';
+            }
 
                 showToast(`Member scanned: ${name}`, 'success');
 
@@ -3636,35 +3623,20 @@ body.dark-mode .premium-upload-area:hover {
         function handleModalBookQR(data) {
             const bookId = data.id;
 
-            // Check if borrow modal is open
-            const borrowModal = document.getElementById('borrowModal');
-            if (!borrowModal || borrowModal.style.display === 'none') {
-                showToast('Please open borrow modal first', 'warning');
-                return;
-            }
+          // Use global borrow.js flow first (supports all pages and API fetch fallback)
+          if (typeof window.processBookQR === 'function') {
+            window.processBookQR(String(bookId));
+            return;
+          }
 
-            // Add book to selected books
-            if (typeof window.addBookToBorrow === 'function') {
-                window.addBookToBorrow(bookId);
-                showToast(`Book added to borrow list`, 'success');
-            } else {
-                // Fallback: manually add to selectedBooks array
-                if (typeof selectedBooks !== 'undefined') {
-                    if (!selectedBooks.includes(bookId)) {
-                        selectedBooks.push(bookId);
+          // Legacy fallback: try compatibility helper
+          if (typeof window.addBookToBorrow === 'function') {
+            window.addBookToBorrow(bookId);
+            showToast(`Book added to borrow list`, 'success');
+            return;
+          }
 
-                        // Update the UI manually
-                        updateSelectedBooksUI(bookId);
-
-                        showToast(`Book added to borrow list`, 'success');
-
-                        // Check for auto-confirm
-                        checkAutoConfirmBorrow();
-                    } else {
-                        showToast('Book already in borrow list', 'info');
-                    }
-                }
-            }
+          showToast('Book scan handler is not available', 'error');
         }
 
         // Manually update selected books UI
@@ -3826,46 +3798,7 @@ body.dark-mode .premium-upload-area:hover {
             });
         }
 
-        // Search functionality
-        function initializeSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const tableBody = document.getElementById('booksTableBody');
-            const rows = Array.from(tableBody.querySelectorAll('tr'));
-
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                
-                rows.forEach(row => {
-                    const title = row.dataset.title?.toLowerCase() || '';
-                    const author = row.dataset.author?.toLowerCase() || '';
-                    const genre = row.dataset.genre?.toLowerCase() || '';
-                    
-                    const matches = title.includes(searchTerm) || 
-                                   author.includes(searchTerm) || 
-                                   genre.includes(searchTerm);
-                    
-                    row.style.display = matches ? '' : 'none';
-                });
-            });
-        }
-
-        // Reset filters
-        function resetFilters() {
-            const searchInput = document.getElementById('searchInput');
-            const genreFilter = document.getElementById('genreFilter');
-            const statusFilter = document.getElementById('statusFilter');
-
-            if (searchInput) searchInput.value = '';
-            if (genreFilter) genreFilter.value = '';
-            if (statusFilter) statusFilter.value = '';
-
-            // Reset table display
-            const tableBody = document.getElementById('booksTableBody');
-            if (tableBody) {
-                const rows = tableBody.querySelectorAll('tr');
-                rows.forEach(row => row.style.display = '');
-            }
-        }
+        // Search/reset controls are handled by the final AJAX-driven controls script.
 
         // Cover upload functionality for Add Book Modal
         function initializeCoverUpload() {
@@ -4227,6 +4160,11 @@ body.dark-mode .premium-upload-area:hover {
             const table = document.getElementById('booksTable');
             const checkboxHeaders = table.querySelectorAll('.checkbox-cell');
             checkboxHeaders.forEach(cell => cell.remove());
+
+            // Clear any highlighted rows from selection mode
+            table.querySelectorAll('tbody tr.selected').forEach(row => {
+              row.classList.remove('selected');
+            });
             
             // Hide selection bar
             document.getElementById('selectionBar').style.display = 'none';
@@ -5208,6 +5146,679 @@ body.dark-mode .premium-upload-area:hover {
             }
         }
     }
+    </script>
+
+    <script>
+    // Final AJAX-driven controls override for Books page.
+    (function () {
+      let booksAjaxController = null;
+      let searchTimer = null;
+      let ajaxRequestVersion = 0;
+      const ajaxResponseCache = new Map();
+      const AJAX_CACHE_TTL_MS = 8000;
+      const AJAX_CACHE_MAX_ITEMS = 40;
+      const GENRE_CACHE_TTL_MS = 60000;
+      const AJAX_CACHE_STORAGE_PREFIX = 'booksAjaxCache:v1:';
+      const AJAX_CACHE_STORAGE_INDEX = 'booksAjaxCache:v1:index';
+      const GENRE_CACHE_STORAGE_KEY = 'booksAjaxGenreCache:v1';
+      let genreCachePayload = null;
+      let genreCacheTs = 0;
+      let lastRequestedUrl = '';
+
+      function getPersistentStorage() {
+        try {
+          if (!window.localStorage) return null;
+          return window.localStorage;
+        } catch (_e) {
+          return null;
+        }
+      }
+
+      function readStoredJson(key) {
+        const storage = getPersistentStorage();
+        if (!storage) return null;
+        try {
+          const raw = storage.getItem(key);
+          if (!raw) return null;
+          return JSON.parse(raw);
+        } catch (_e) {
+          return null;
+        }
+      }
+
+      function writeStoredJson(key, value) {
+        const storage = getPersistentStorage();
+        if (!storage) return;
+        try {
+          storage.setItem(key, JSON.stringify(value));
+        } catch (_e) {
+          // Ignore quota/write errors.
+        }
+      }
+
+      function getCacheStorageKey(url) {
+        return AJAX_CACHE_STORAGE_PREFIX + encodeURIComponent(url);
+      }
+
+      function readCacheIndex() {
+        const list = readStoredJson(AJAX_CACHE_STORAGE_INDEX);
+        return Array.isArray(list) ? list : [];
+      }
+
+      function writeCacheIndex(list) {
+        writeStoredJson(AJAX_CACHE_STORAGE_INDEX, list);
+      }
+
+      function prunePersistentAjaxCache(nowTs) {
+        const storage = getPersistentStorage();
+        if (!storage) return;
+
+        let index = readCacheIndex();
+        if (index.length === 0) return;
+
+        index = index.filter(function (entry) {
+          if (!entry || typeof entry.url !== 'string') return false;
+          if ((nowTs - Number(entry.ts || 0)) > AJAX_CACHE_TTL_MS) {
+            storage.removeItem(getCacheStorageKey(entry.url));
+            return false;
+          }
+          return true;
+        });
+
+        if (index.length > AJAX_CACHE_MAX_ITEMS) {
+          const overflow = index.length - AJAX_CACHE_MAX_ITEMS;
+          const toRemove = index.slice(0, overflow);
+          toRemove.forEach(function (entry) {
+            storage.removeItem(getCacheStorageKey(entry.url));
+          });
+          index = index.slice(overflow);
+        }
+
+        writeCacheIndex(index);
+      }
+
+      function getPerPageValue(entriesSelect) {
+        if (!entriesSelect) return '10';
+        const selectedOption = entriesSelect.options[entriesSelect.selectedIndex];
+        return (selectedOption && selectedOption.getAttribute('data-value')) || selectedOption?.value || '10';
+      }
+
+      function buildBooksUrl(state) {
+        const params = new URLSearchParams();
+        if (state.search) params.set('search', state.search);
+        if (state.genre) params.set('genre', state.genre);
+        if (state.status) params.set('status', state.status);
+        if (state.perPage) params.set('per_page', state.perPage);
+        if (state.sortBy) params.set('sort_by', state.sortBy);
+        if (state.sortBy && state.sortDir) params.set('sort_dir', state.sortDir);
+        if (state.page && Number(state.page) > 1) params.set('page', String(state.page));
+        const query = params.toString();
+        return window.location.pathname + (query ? '?' + query : '');
+      }
+
+      function readState(searchInput, genreFilter, statusFilter, entriesSelect) {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          search: (searchInput ? searchInput.value : params.get('search') || '').trim(),
+          genre: genreFilter ? (genreFilter.value || '') : (params.get('genre') || ''),
+          status: statusFilter ? (statusFilter.value || '') : (params.get('status') || ''),
+          perPage: getPerPageValue(entriesSelect) || (params.get('per_page') || '10'),
+          sortBy: params.get('sort_by') || '',
+          sortDir: (params.get('sort_dir') || 'asc').toLowerCase() === 'desc' ? 'desc' : 'asc',
+          page: 1
+        };
+      }
+
+      function updateSortHeaderUI(sortBy, sortDir) {
+        document.querySelectorAll('.sort-trigger').forEach(function (btn) {
+          const key = btn.getAttribute('data-sort-by');
+          const icon = btn.querySelector('.sort-icon');
+          btn.classList.remove('active');
+
+          if (!icon) return;
+
+          icon.classList.remove('fa-sort', 'fa-sort-up', 'fa-sort-down');
+          if (key === sortBy) {
+            btn.classList.add('active');
+            icon.classList.add(sortDir === 'desc' ? 'fa-sort-down' : 'fa-sort-up');
+          } else {
+            icon.classList.add('fa-sort');
+          }
+        });
+      }
+
+      function showSkeleton(show) {
+        const skeleton = document.getElementById('booksTableSkeleton');
+        const table = document.querySelector('.table-container:not(#booksTableSkeleton)');
+        if (skeleton) skeleton.style.display = show ? '' : 'none';
+        if (table) table.style.visibility = show ? 'hidden' : '';
+      }
+
+      function updateSkeletonRowCount(perPage) {
+        const skeletonBody = document.querySelector('#booksTableSkeleton tbody');
+        if (!skeletonBody) return;
+
+        const wanted = Math.min(Math.max(Number(perPage) || 10, 5), 20);
+        const current = skeletonBody.querySelectorAll('tr').length;
+        if (current === wanted) return;
+
+        const row = `
+          <tr>
+            <td><div class="skeleton skeleton-img"></div></td>
+            <td><div class="skeleton skeleton-text" style="width:80px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width:60px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width:50px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width:40px;"></div></td>
+            <td><div class="skeleton skeleton-badge"></div></td>
+            <td><div class="skeleton skeleton-num"></div></td>
+            <td><div class="skeleton skeleton-btn"></div></td>
+          </tr>
+        `;
+
+        skeletonBody.innerHTML = new Array(wanted).fill(row).join('');
+      }
+
+      function renderBooksRows(rows) {
+        const tbody = document.getElementById('booksTableBody');
+        if (!tbody) return;
+
+        const selectionModeActive = typeof isSelectionMode !== 'undefined' && isSelectionMode;
+        const currentSelectedBooks = Array.isArray(selectedBooks) ? selectedBooks : [];
+
+        const displayValue = (v) => (v === null || v === undefined ? '' : String(v));
+        tbody.innerHTML = '';
+
+        if (!rows || rows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${selectionModeActive ? 9 : 8}"><div class="empty-state"><i class="fas fa-book"></i><h3>No books found</h3><p>No books match your filters.</p></div></td></tr>`;
+          if (selectionModeActive && typeof updateSelectedCount === 'function') {
+            updateSelectedCount();
+          }
+          return;
+        }
+
+        const rowHtml = [];
+        for (const book of rows) {
+          const title = displayValue(book.title);
+          const author = displayValue(book.author);
+          const publishedYear = displayValue(book.published_year);
+          const availabilityRaw = book.availability;
+          const hasAvailability = availabilityRaw !== null && availabilityRaw !== undefined && availabilityRaw !== '';
+          const availabilityNum = hasAvailability ? Number(availabilityRaw) : null;
+          const statusLabel = hasAvailability ? (availabilityNum > 0 ? 'Available' : 'Out of Stock') : '';
+          const coverImage = displayValue(book.cover_image) || '/images/no-cover.jpg';
+          const qrUrl = displayValue(book.qr_url);
+          const numericBookId = Number(book.id);
+          const isSelected = currentSelectedBooks.includes(numericBookId);
+
+          let genresArr = Array.isArray(book.genres) && book.genres.length
+            ? book.genres
+            : (book.genre ? String(book.genre).split(/\s*[,/&;|\\]+\s*/) : []);
+          genresArr = genresArr.map(g => String(g).trim()).filter(g => g.length > 0);
+          const genresHtml = genresArr.map(g => `<span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; margin-right: 4px; display: inline-block;">${g}</span>`).join('');
+          const genresJoined = genresArr.join(', ');
+
+          rowHtml.push(`
+            <tr data-id="${book.id}" data-title="${title}" data-author="${author}" data-genre="${genresJoined}" data-published-year="${publishedYear}" data-availability="${hasAvailability ? availabilityNum : ''}" data-cover-image="${coverImage}" data-qr-url="${qrUrl}" class="${selectionModeActive && isSelected ? 'selected' : ''}">
+              ${selectionModeActive ? `<td class="checkbox-cell"><input type="checkbox" class="book-checkbox" value="${book.id}" onchange="toggleBookSelection(this)" ${isSelected ? 'checked' : ''}></td>` : ''}
+              <td><img src="${coverImage}" alt="Cover" class="book-cover-small"></td>
+              <td style="font-weight: 600; color: var(--text-primary);" title="${title}">${title}</td>
+              <td title="${author}">${author}</td>
+              <td title="${genresJoined}">${genresHtml}</td>
+              <td title="${publishedYear}">${publishedYear}</td>
+              <td title="${statusLabel}">${hasAvailability ? `<span class="status-badge ${availabilityNum > 0 ? 'status-available' : 'status-unavailable'}">${statusLabel}</span>` : ''}</td>
+              <td title="${hasAvailability ? `${availabilityNum} copies` : ''}">${hasAvailability ? `<strong style="color: var(--text-primary);">${availabilityNum}</strong> copies` : ''}</td>
+              <td><div class="action-buttons">
+                ${qrUrl ? `<button class="btn btn-outline btn-sm" onclick="showQRModal('${title.replace(/'/g, "\\'")}','${qrUrl}')" title="View QR Code"><i class='fas fa-qrcode'></i></button>` : `<button class="btn btn-outline btn-sm" onclick="window.generateQr(${book.id})" title="Generate QR Code"><i class='fas fa-qrcode'></i> Gen</button>`}
+                <button class="btn btn-success btn-sm" onclick="window.borrowOne(${book.id})" title="Borrow Book" ${!hasAvailability || availabilityNum <= 0 ? 'disabled' : ''}><i class="fas fa-hand-holding"></i></button>
+                <button class="btn btn-primary btn-sm" onclick="window.editBook(${book.id})" title="Edit Book"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="window.deleteBook(${book.id})" title="Delete Book"><i class="fas fa-trash"></i></button>
+              </div></td>
+            </tr>
+          `);
+        }
+
+        tbody.innerHTML = rowHtml.join('');
+
+        if (selectionModeActive && typeof updateSelectAllCheckbox === 'function') {
+          updateSelectAllCheckbox();
+        }
+        if (selectionModeActive && typeof updateSelectedCount === 'function') {
+          updateSelectedCount();
+        }
+      }
+
+      function getCachedAjaxData(url) {
+        const now = Date.now();
+        if (ajaxResponseCache.size > AJAX_CACHE_MAX_ITEMS) {
+          // prune oldest entries
+          const keys = Array.from(ajaxResponseCache.keys());
+          for (let i = 0; i < Math.floor(keys.length / 3); i++) {
+            ajaxResponseCache.delete(keys[i]);
+          }
+        }
+
+        const cached = ajaxResponseCache.get(url);
+        if (!cached) return null;
+
+        if ((now - cached.ts) > AJAX_CACHE_TTL_MS) {
+          ajaxResponseCache.delete(url);
+          return null;
+        }
+
+        return cached.data;
+      }
+
+      function setCachedAjaxData(url, data) {
+        const now = Date.now();
+        ajaxResponseCache.set(url, { ts: now, data });
+
+        const storage = getPersistentStorage();
+        if (!storage) return;
+
+        try {
+          const serialized = JSON.stringify({ ts: now, data });
+          // Guard against oversized entries.
+          if (serialized.length > 140000) return;
+
+          storage.setItem(getCacheStorageKey(url), serialized);
+
+          let index = readCacheIndex().filter(function (entry) {
+            return entry && entry.url !== url;
+          });
+          index.push({ url, ts: now });
+          writeCacheIndex(index);
+          prunePersistentAjaxCache(now);
+        } catch (_e) {
+          // Ignore persistence failures.
+        }
+      }
+
+      function getPersistentCachedAjaxData(url) {
+        const now = Date.now();
+        prunePersistentAjaxCache(now);
+
+        const payload = readStoredJson(getCacheStorageKey(url));
+        if (!payload || typeof payload !== 'object') return null;
+        const ts = Number(payload.ts || 0);
+        if ((now - ts) > AJAX_CACHE_TTL_MS) return null;
+        return payload.data || null;
+      }
+
+      function prefetchAdjacentPages(state, paginationMeta) {
+        if (!paginationMeta) return;
+
+        const current = Number(paginationMeta.current_page || 1);
+        const last = Number(paginationMeta.last_page || 1);
+        const targetPages = [];
+        if (current + 1 <= last) targetPages.push(current + 1);
+        if (current - 1 >= 1) targetPages.push(current - 1);
+
+        targetPages.forEach(async function (page) {
+          const nextState = { ...state, page };
+          const nextUrl = buildBooksUrl(nextState);
+          if (getCachedAjaxData(nextUrl)) return;
+
+          try {
+            const response = await fetch(nextUrl, {
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+              }
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            setCachedAjaxData(nextUrl, data);
+          } catch (_e) {
+            // silent prefetch failure
+          }
+        });
+      }
+
+      function applyAjaxData(data, state, options) {
+        renderBooksRows(data.rows || []);
+        renderPagination(data.pagination || null, state);
+        updateSortHeaderUI(state.sortBy || '', state.sortDir || 'asc');
+
+        if (options && typeof options.afterRender === 'function') {
+          options.afterRender();
+        }
+      }
+
+      function renderPagination(meta, state) {
+        const info = document.querySelector('.pagination-info');
+        const controls = document.querySelector('.pagination-controls');
+        if (!info || !controls || !meta) return;
+
+        const from = meta.from || 0;
+        const to = meta.to || 0;
+        const total = meta.total || 0;
+        info.textContent = `Showing ${from} to ${to} of ${total} books`;
+
+        const current = Number(meta.current_page || 1);
+        const last = Number(meta.last_page || 1);
+
+        const pageLink = (page) => {
+          const url = buildBooksUrl({ ...state, page });
+          return `<a href="${url}" class="pagination-number" data-page="${page}">${page}</a>`;
+        };
+
+        const items = [];
+
+        if (current <= 1) {
+          items.push('<button class="pagination-button" disabled><i class="fas fa-chevron-left"></i> Previous</button>');
+        } else {
+          items.push(`<a href="${buildBooksUrl({ ...state, page: current - 1 })}" class="pagination-button" data-page="${current - 1}"><i class="fas fa-chevron-left"></i> Previous</a>`);
+        }
+
+        for (let page = 1; page <= last; page++) {
+          const nearCurrent = page >= current - 1 && page <= current + 1;
+          const edge = page === 1 || page === last;
+          if (page === current) {
+            items.push(`<span class="pagination-number active">${page}</span>`);
+          } else if (nearCurrent || edge) {
+            items.push(pageLink(page));
+          } else if (page === current - 2 || page === current + 2) {
+            items.push('<span class="pagination-dots">...</span>');
+          }
+        }
+
+        if (current >= last) {
+          items.push('<button class="pagination-button" disabled>Next <i class="fas fa-chevron-right"></i></button>');
+        } else {
+          items.push(`<a href="${buildBooksUrl({ ...state, page: current + 1 })}" class="pagination-button" data-page="${current + 1}">Next <i class="fas fa-chevron-right"></i></a>`);
+        }
+
+        controls.innerHTML = items.join('');
+      }
+
+      async function fetchGenresGlobal(genreFilter, selectedGenre) {
+        if (!genreFilter) return;
+        const now = Date.now();
+
+        if (!genreCachePayload) {
+          const storedGenreCache = readStoredJson(GENRE_CACHE_STORAGE_KEY);
+          if (storedGenreCache && typeof storedGenreCache === 'object') {
+            genreCachePayload = storedGenreCache.payload || null;
+            genreCacheTs = Number(storedGenreCache.ts || 0);
+          }
+        }
+
+        if (genreCachePayload && (now - genreCacheTs) <= GENRE_CACHE_TTL_MS) {
+          const genres = Array.isArray(genreCachePayload.genres) ? genreCachePayload.genres : [];
+          genreFilter.innerHTML = '<option value="">All Genres</option>';
+          genres.forEach(function (g) {
+            const opt = document.createElement('option');
+            opt.value = String(g);
+            opt.textContent = String(g);
+            genreFilter.appendChild(opt);
+          });
+          if (selectedGenre) {
+            const exists = Array.from(genreFilter.options).some(opt => opt.value === selectedGenre);
+            genreFilter.value = exists ? selectedGenre : '';
+          }
+          return;
+        }
+
+        const candidates = [
+          '/api/books/genres',
+          '/books/genres'
+        ];
+
+        for (const endpoint of candidates) {
+          try {
+            const response = await fetch(endpoint, {
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+              }
+            });
+
+            if (!response.ok) continue;
+            const data = await response.json();
+            const genres = Array.isArray(data.genres) ? data.genres : [];
+            genreCachePayload = { genres };
+            genreCacheTs = Date.now();
+            writeStoredJson(GENRE_CACHE_STORAGE_KEY, { payload: genreCachePayload, ts: genreCacheTs });
+
+            genreFilter.innerHTML = '<option value="">All Genres</option>';
+            genres.forEach(function (g) {
+              const opt = document.createElement('option');
+              opt.value = String(g);
+              opt.textContent = String(g);
+              genreFilter.appendChild(opt);
+            });
+
+            if (selectedGenre) {
+              const exists = Array.from(genreFilter.options).some(opt => opt.value === selectedGenre);
+              genreFilter.value = exists ? selectedGenre : '';
+            }
+            return;
+          } catch (_e) {
+            // Try next endpoint.
+          }
+        }
+      }
+
+      async function fetchBooksAjax(state, options) {
+        const url = buildBooksUrl(state);
+        window.history.replaceState({}, '', url);
+
+        if (url === lastRequestedUrl && !options?.force) {
+          return;
+        }
+        lastRequestedUrl = url;
+
+        const cached = getCachedAjaxData(url);
+        if (cached) {
+          applyAjaxData(cached, state, options);
+          prefetchAdjacentPages(state, cached.pagination || null);
+          return;
+        }
+
+        const persistentCached = getPersistentCachedAjaxData(url);
+        if (persistentCached) {
+          ajaxResponseCache.set(url, { ts: Date.now(), data: persistentCached });
+          applyAjaxData(persistentCached, state, options);
+          prefetchAdjacentPages(state, persistentCached.pagination || null);
+          return;
+        }
+
+        if (booksAjaxController) booksAjaxController.abort();
+        booksAjaxController = new AbortController();
+        const requestVersion = ++ajaxRequestVersion;
+        updateSkeletonRowCount(state.perPage);
+
+        const skeletonDelay = setTimeout(function () {
+          if (requestVersion === ajaxRequestVersion) {
+            showSkeleton(true);
+          }
+        }, 80);
+
+        try {
+          const response = await fetch(url, {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'Accept': 'application/json'
+            },
+            signal: booksAjaxController.signal
+          });
+
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+
+          if (requestVersion !== ajaxRequestVersion) {
+            return;
+          }
+
+          setCachedAjaxData(url, data);
+
+          applyAjaxData(data, state, options);
+          prefetchAdjacentPages(state, data.pagination || null);
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+          console.error('Live books fetch failed:', error);
+        } finally {
+          clearTimeout(skeletonDelay);
+          showSkeleton(false);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', async function () {
+        const searchInput = document.getElementById('searchInput');
+        const genreFilter = document.getElementById('genreFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const entriesSelect = document.getElementById('entriesSelect');
+        const resetBtn = document.querySelector('.btn.btn-outline[onclick*="resetFilters"]');
+
+        if (!searchInput || !genreFilter || !statusFilter || !entriesSelect) {
+          return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialState = {
+          search: (urlParams.get('search') || '').trim(),
+          genre: urlParams.get('genre') || '',
+          status: urlParams.get('status') || '',
+          perPage: urlParams.get('per_page') || getPerPageValue(entriesSelect),
+          sortBy: urlParams.get('sort_by') || '',
+          sortDir: (urlParams.get('sort_dir') || 'asc').toLowerCase() === 'desc' ? 'desc' : 'asc',
+          page: Number(urlParams.get('page') || 1)
+        };
+
+        searchInput.value = initialState.search;
+        statusFilter.value = initialState.status;
+
+        for (const option of entriesSelect.options) {
+          if (option.getAttribute('data-value') === String(initialState.perPage)) {
+            option.selected = true;
+            break;
+          }
+        }
+
+        await fetchGenresGlobal(genreFilter, initialState.genre);
+        updateSortHeaderUI(initialState.sortBy, initialState.sortDir);
+
+        window.resetFilters = function () {
+          searchInput.value = '';
+          genreFilter.value = '';
+          statusFilter.value = '';
+          const state = {
+            search: '',
+            genre: '',
+            status: '',
+            perPage: getPerPageValue(entriesSelect),
+            sortBy: initialState.sortBy,
+            sortDir: initialState.sortDir,
+            page: 1
+          };
+          fetchBooksAjax(state);
+        };
+
+        searchInput.addEventListener('input', function (event) {
+          event.stopImmediatePropagation();
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(function () {
+            const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+            state.page = 1;
+            fetchBooksAjax(state);
+          }, 220);
+        }, true);
+
+        genreFilter.addEventListener('change', function (event) {
+          event.stopImmediatePropagation();
+          const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+          state.page = 1;
+          fetchBooksAjax(state);
+        }, true);
+
+        statusFilter.addEventListener('change', function (event) {
+          event.stopImmediatePropagation();
+          const currentGenre = genreFilter.value;
+          const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+          state.page = 1;
+          fetchBooksAjax(state, {
+            afterRender: function () {
+              // Keep genre value stable when status changes.
+              genreFilter.value = currentGenre;
+            }
+          });
+        }, true);
+
+        entriesSelect.addEventListener('change', function (event) {
+          event.stopImmediatePropagation();
+          const perPage = getPerPageValue(entriesSelect);
+          localStorage.setItem('booksEntriesPerPage', perPage);
+          const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+          state.perPage = perPage;
+          state.page = 1;
+          fetchBooksAjax(state);
+        }, true);
+
+        if (resetBtn) {
+          resetBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.resetFilters();
+          }, true);
+        }
+
+        document.addEventListener('click', function (event) {
+          const sortBtn = event.target.closest('.sort-trigger');
+          if (!sortBtn) return;
+          if (sortBtn.closest('.modal') || sortBtn.closest('.modal-overlay')) return;
+
+          event.preventDefault();
+          event.stopImmediatePropagation();
+
+          const sortBy = sortBtn.getAttribute('data-sort-by') || '';
+          const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+
+          if (state.sortBy === sortBy) {
+            state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.sortBy = sortBy;
+            state.sortDir = 'asc';
+          }
+
+          state.page = 1;
+          fetchBooksAjax(state);
+        }, true);
+
+        document.addEventListener('click', function (event) {
+          const link = event.target.closest('a.pagination-number, a.pagination-button');
+          if (!link) return;
+          if (link.closest('.modal') || link.closest('.modal-overlay')) return;
+
+          event.preventDefault();
+          event.stopImmediatePropagation();
+
+          const target = new URL(link.href, window.location.origin);
+          const targetPage = Number(target.searchParams.get('page') || 1);
+          const state = readState(searchInput, genreFilter, statusFilter, entriesSelect);
+          state.page = targetPage;
+          fetchBooksAjax(state);
+        }, true);
+
+        window.addEventListener('popstate', function () {
+          const params = new URLSearchParams(window.location.search);
+          const state = {
+            search: (params.get('search') || '').trim(),
+            genre: params.get('genre') || '',
+            status: params.get('status') || '',
+            perPage: params.get('per_page') || getPerPageValue(entriesSelect),
+            sortBy: params.get('sort_by') || '',
+            sortDir: (params.get('sort_dir') || 'asc').toLowerCase() === 'desc' ? 'desc' : 'asc',
+            page: Number(params.get('page') || 1)
+          };
+
+          searchInput.value = state.search;
+          statusFilter.value = state.status;
+          fetchGenresGlobal(genreFilter, state.genre).then(function () {
+            fetchBooksAjax(state, { force: true });
+          });
+        });
+      });
+    })();
     </script>
 
 </body>

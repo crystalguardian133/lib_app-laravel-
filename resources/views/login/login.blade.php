@@ -542,20 +542,27 @@
             <script>
             // Check for force logout message from sessionStorage
             (function() {
+                const FORCE_LOGOUT_MESSAGE_KEY = 'force_logout_message';
+                const FORCE_LOGOUT_NOTICE_SHOWN_KEY = 'force_logout_notice_shown';
                 const message = sessionStorage.getItem('force_logout_message');
                 if (message) {
                     // Remove the message from storage
-                    sessionStorage.removeItem('force_logout_message');
-                    // Show the message
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'error-message';
-                    errorDiv.textContent = message;
-                    errorDiv.style.marginBottom = '1rem';
-                    
-                    // Insert after the form opening tag
-                    const form = document.getElementById('loginForm');
-                    if (form && form.parentNode) {
-                        form.parentNode.insertBefore(errorDiv, form);
+                    sessionStorage.removeItem(FORCE_LOGOUT_MESSAGE_KEY);
+
+                    if (sessionStorage.getItem(FORCE_LOGOUT_NOTICE_SHOWN_KEY) !== '1') {
+                        sessionStorage.setItem(FORCE_LOGOUT_NOTICE_SHOWN_KEY, '1');
+
+                        // Show the message once per session
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.textContent = message;
+                        errorDiv.style.marginBottom = '1rem';
+                        
+                        // Insert after the form opening tag
+                        const form = document.getElementById('loginForm');
+                        if (form && form.parentNode) {
+                            form.parentNode.insertBefore(errorDiv, form);
+                        }
                     }
                 }
             })();
@@ -677,6 +684,11 @@
 
         // Form submission with loading state
         document.getElementById('loginForm').addEventListener('submit', function(e) {
+            // New login attempt starts a fresh force-logout notification cycle.
+            sessionStorage.removeItem('force_logout_popup_shown');
+            sessionStorage.removeItem('force_logout_notice_shown');
+            sessionStorage.removeItem('force_logout_message');
+
             const btn = document.getElementById('loginBtn');
             const originalText = btn.innerHTML;
 

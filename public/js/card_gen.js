@@ -92,16 +92,24 @@ const CARD_CONFIG = {
 
 async function openCardModal(memberId) {
     try {
-        const res = await fetch(`/members/${memberId}/json`);
+        const res = await fetch(`/members/${encodeURIComponent(memberId)}/json`);
         if (!res.ok) throw new Error("Failed to fetch member data");
         const member = await res.json();
 
+        const firstName = member.firstName || member.first_name || '';
+        const middleName = member.middleName || member.middle_name || '';
+        const lastName = member.lastName || member.last_name || '';
+
         // Format full name: LAST, FIRST M.
-        const middleInitial = member.middleName ? member.middleName.charAt(0).toUpperCase() + "." : "";
-        const fullName = `${member.lastName.toUpperCase()}, ${member.firstName.toUpperCase()} ${middleInitial}`.trim();
+        const middleInitial = middleName ? middleName.charAt(0).toUpperCase() + "." : "";
+        const fullName = `${String(lastName).toUpperCase()}, ${String(firstName).toUpperCase()} ${middleInitial}`.trim();
 
         // Format address
-        const address = `${member.house_number || ""} ${member.street || ""}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`
+        const houseNumber = member.house_number || member.houseNumber || '';
+        const street = member.street || '';
+        const contact = member.contactnumber || member.contactNumber || '';
+
+        const address = `${houseNumber} ${street}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`
             .replace(/, ,/g, ',').trim();
 
         // Store member data globally for download
@@ -111,7 +119,7 @@ async function openCardModal(memberId) {
             photo: member.photo || null,
             id: member.id,
             address: address,
-            contact: member.contactnumber || member.contactNumber || ""
+            contact: contact
         };
 
         // === FRONT CARD PREVIEW ===

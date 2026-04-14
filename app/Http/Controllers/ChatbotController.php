@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Http;
 class ChatbotController extends Controller
 {
     public function send(Request $request)
-    {
+    {   
+        $prompt = ('You are a librarian assistant in a library management system. Answer user questions about book availability, library hours, and other related topics in a helpful and concise manner.');
         $question = $request->input('message');
+        $question = $prompt . ' ' . $question;
 
         if (!$question) {
             return response()->json(['error' => 'No message provided'], 400);

@@ -106,13 +106,14 @@ function showToast(message, type = 'info') {
 // CORE BORROW FUNCTIONS
 // ======================
 
-function openBorrowModal() {
+function openBorrowModal(initialBooks = []) {
     if (typeof window.setAutomaticDueDate === 'function') {
         window.setAutomaticDueDate();
     }
     
     const selectedRows = document.querySelectorAll('#booksTableBody tr.selected');
-    if (selectedRows.length === 0) {
+    const scannedBooks = Array.isArray(initialBooks) ? initialBooks : [];
+    if (selectedRows.length === 0 && scannedBooks.length === 0) {
         showToast("No books selected for borrowing", 'warning');
         return;
     }
@@ -123,20 +124,13 @@ function openBorrowModal() {
     const list = document.getElementById('selectedBooksList');
     if (list) {
         list.innerHTML = '';
-        selectedRows.forEach(row => {
-            const bookData = {
-                id: row.dataset.id,
-                title: row.dataset.title || 'Unknown Title',
-                author: row.dataset.author || 'Unknown Author',
-                genre: row.dataset.genre || null,
-                published_year: row.dataset.published_year || null,
-                availability: row.dataset.availability || 0
-            };
 
-            // Add to enhanced borrower data structure
-            addBookToBorrowerData(bookData);
+        const appendBookToList = (bookData) => {
+            const added = addBookToBorrowerData(bookData);
+            if (!added) {
+                return;
+            }
 
-            // Update UI list
             const li = document.createElement('li');
             li.textContent = `${bookData.title} by ${bookData.author}`;
             li.setAttribute('data-id', bookData.id);
@@ -145,7 +139,6 @@ function openBorrowModal() {
             li.style.borderBottom = '1px solid var(--border-light)';
             li.style.position = 'relative';
 
-            // Add remove button for each book
             const removeBtn = document.createElement('button');
             removeBtn.innerHTML = '×';
             removeBtn.className = 'btn btn-sm';
@@ -173,6 +166,22 @@ function openBorrowModal() {
 
             li.appendChild(removeBtn);
             list.appendChild(li);
+        };
+
+        selectedRows.forEach(row => {
+            const bookData = {
+                id: row.dataset.id,
+                title: row.dataset.title || 'Unknown Title',
+                author: row.dataset.author || 'Unknown Author',
+                genre: row.dataset.genre || null,
+                published_year: row.dataset.published_year || null,
+                availability: row.dataset.availability || 0
+            };
+            appendBookToList(bookData);
+        });
+
+        scannedBooks.forEach(bookData => {
+            appendBookToList(bookData);
         });
     }
 
@@ -194,14 +203,10 @@ function openBorrowModal() {
         modal.style.display = 'flex';
     }
 
-    updateConfirmButtonState();
+    initializeMemberNameSearch();
+    clearMemberSuggestions();
 
-    const memberNameInputModal = document.getElementById('memberName');
-    if (memberNameInputModal) {
-        memberNameInputModal.addEventListener('input', function() {
-            setTimeout(() => updateConfirmButtonState(), 10);
-        });
-    }
+    updateConfirmButtonState();
 }
 
 function closeBorrowModal() {
@@ -223,6 +228,8 @@ function closeBorrowModal() {
         if (field) field.value = '';
     });
 
+    clearMemberSuggestions();
+
     // Clear enhanced data structures
     selectedBooks = [];
     clearBorrowerBooksData();
@@ -236,8 +243,8 @@ function confirmBorrow() {
     const dueTimeHidden = document.getElementById('dueTime');
     const dueTime = dueTimeHidden ? dueTimeHidden.value : '';
 
-    if (!memberName || !memberId) {
-        showToast('Please scan member QR code first', 'warning');
+    if (!memberName) {
+        showToast('Please enter or scan a member name first', 'warning');
         return;
     }
 
@@ -280,7 +287,7 @@ function confirmBorrow() {
     // Enhanced borrow data with readable book information
     const borrowData = {
         member_name: memberName,
-        member_id: memberId,
+        member_id: memberId || null,
         due_date: dueDate,
         due_time: dueTime,
         book_ids: bookIds,
@@ -443,8 +450,161 @@ function clearMemberInfo() {
         memberId.value = '';
     }
 
+    clearMemberSuggestions();
+
     updateConfirmButtonState();
     showToast('Member information cleared', 'info');
+}
+
+let memberSearchTimeout = null;
+let memberSuggestionMap = new Map();
+
+function getMemberFullName(member) {
+    if (!member) return '';
+    if (member.name) return String(member.name).trim();
+
+    return [member.first_name, member.middle_name, member.last_name]
+        .map(part => (part && part !== 'null' ? String(part).trim() : ''))
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+}
+
+function clearMemberSuggestions() {
+    memberSuggestionMap.clear();
+    const datalist = document.getElementById('memberNameList');
+    if (!datalist) return;
+    datalist.innerHTML = '';
+}
+
+function renderMemberSuggestions(members) {
+    const datalist = document.getElementById('memberNameList');
+    if (!datalist) return;
+
+    datalist.innerHTML = '';
+    memberSuggestionMap.clear();
+
+    if (!Array.isArray(members) || members.length === 0) {
+        return;
+    }
+
+    members.forEach(member => {
+        const fullName = getMemberFullName(member);
+        if (!fullName) return;
+
+        memberSuggestionMap.set(fullName.toLowerCase(), member.uuid || member.id);
+
+        const option = document.createElement('option');
+        option.value = fullName;
+        option.label = `ID: ${member.id}`;
+        datalist.appendChild(option);
+    });
+}
+
+async function fetchMemberSuggestions(query) {
+    const endpoints = [
+        `/members/search?query=${encodeURIComponent(query)}`,
+        `/suggest-members?query=${encodeURIComponent(query)}`
+    ];
+
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                continue;
+            }
+
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                return data;
+            }
+        } catch (e) {
+            // try next endpoint
+        }
+    }
+
+    return [];
+}
+
+function initializeMemberNameSearch() {
+    const memberName = document.getElementById('memberName');
+    const memberId = document.getElementById('memberId');
+
+    if (!memberName || memberName.dataset.memberSearchInitialized === '1') {
+        return;
+    }
+
+    memberName.dataset.memberSearchInitialized = '1';
+    memberName.readOnly = false;
+    memberName.autocomplete = 'off';
+    memberName.style.cursor = 'text';
+
+    const normalize = (value) => String(value || '').trim().toLowerCase();
+
+    const runSearch = async () => {
+        const query = memberName.value.trim();
+
+        if (memberId && query === '') {
+            memberId.value = '';
+        }
+
+        if (query.length < 2) {
+            clearMemberSuggestions();
+            updateConfirmButtonState();
+            return;
+        }
+
+        try {
+            const members = await fetchMemberSuggestions(query);
+
+            if (Array.isArray(members) && members.length === 1) {
+                const exactName = normalize(getMemberFullName(members[0]));
+                if (exactName === normalize(query)) {
+                    if (memberId) memberId.value = members[0].id;
+                    memberName.value = getMemberFullName(members[0]);
+                    clearMemberSuggestions();
+                    updateConfirmButtonState();
+                    return;
+                }
+            }
+
+            renderMemberSuggestions(members);
+        } catch (error) {
+            console.error('Member search failed:', error);
+            clearMemberSuggestions();
+        }
+
+        updateConfirmButtonState();
+    };
+
+    memberName.addEventListener('input', function() {
+        if (memberId) {
+            const matchedId = memberSuggestionMap.get(memberName.value.trim().toLowerCase());
+            memberId.value = matchedId ? matchedId : '';
+        }
+        clearTimeout(memberSearchTimeout);
+        memberSearchTimeout = setTimeout(runSearch, 250);
+        updateConfirmButtonState();
+    });
+
+    memberName.addEventListener('focus', function() {
+        if (memberName.value.trim().length >= 2) {
+            clearTimeout(memberSearchTimeout);
+            memberSearchTimeout = setTimeout(runSearch, 100);
+        }
+    });
+
+    memberName.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            clearMemberSuggestions();
+        }
+    });
 }
 
 function removeBookFromSelection(bookId) {
@@ -1132,7 +1292,7 @@ function processMemberQR(qrData) {
         memberId = qrData.split('/').pop();
     }
 
-    if (!memberId || isNaN(memberId)) {
+    if (!memberId || String(memberId).trim() === '') {
         showToast('Invalid member QR code', 'error');
         return;
     }
@@ -1160,8 +1320,10 @@ function processMemberQR(qrData) {
             }
 
             if (memberIdInput) {
-                memberIdInput.value = member.id;
+                memberIdInput.value = member.uuid || member.id;
             }
+
+            clearMemberSuggestions();
 
             updateConfirmButtonState();
             showToast(`Member: ${fullName}`, 'success');
@@ -1175,18 +1337,73 @@ function processMemberQR(qrData) {
 function processBookQR(qrData) {
     let bookId = null;
 
+    const normalizeBookId = (value) => {
+        if (value === null || value === undefined) return null;
+        const str = String(value).trim();
+        const directNumeric = parseInt(str, 10);
+        if (!isNaN(directNumeric)) return directNumeric;
+
+        const bookPattern = str.match(/book\s*#?\s*(\d+)/i);
+        if (bookPattern) return parseInt(bookPattern[1], 10);
+
+        const idPattern = str.match(/(\d+)/);
+        if (idPattern) return parseInt(idPattern[1], 10);
+
+        return null;
+    };
+
+    const loadBookData = async (id) => {
+        const tableRow = document.querySelector(`tr[data-id="${id}"]`);
+        if (tableRow) {
+            return {
+                id: id,
+                title: tableRow.dataset.title || 'Unknown Title',
+                author: tableRow.dataset.author || 'Unknown Author',
+                genre: tableRow.dataset.genre || null,
+                published_year: tableRow.dataset.published_year || null,
+                availability: parseInt(tableRow.dataset.availability || '0', 10)
+            };
+        }
+
+        const endpoints = [`/api/books/${id}`, `/books/${id}`];
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(endpoint, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!response.ok) continue;
+                const data = await response.json();
+                return {
+                    id: parseInt(data.id ?? id, 10),
+                    title: data.title || 'Unknown Title',
+                    author: data.author || 'Unknown Author',
+                    genre: data.genre || null,
+                    published_year: data.published_year || null,
+                    availability: parseInt(data.availability ?? '0', 10)
+                };
+            } catch (e) {
+                // Try next endpoint
+            }
+        }
+
+        return null;
+    };
+
     try {
         const url = new URL(qrData);
         const parts = url.pathname.split('/');
         if (parts[1] === 'books' && parts[2]) {
-            bookId = parts[2];
+            bookId = normalizeBookId(parts[2]);
         }
     } catch {
         const match = qrData.match(/book-(\d+)/);
         if (match) {
-            bookId = match[1];
+            bookId = parseInt(match[1], 10);
         } else {
-            bookId = qrData.split('/').pop();
+            bookId = normalizeBookId(qrData.split('/').pop() || qrData);
         }
     }
 
@@ -1195,96 +1412,89 @@ function processBookQR(qrData) {
         return;
     }
 
-    const row = document.querySelector(`tr[data-id="${bookId}"]`);
-    if (!row) {
-        showToast('Book not found in table', 'error');
-        return;
-    }
-
-    const availability = parseInt(row.dataset.availability);
-    if (availability <= 0) {
-        showToast('Book not available', 'warning');
-        return;
-    }
-
-    // Check if book is already in borrower data
-    if (borrowerBooksData.find(book => book.id === bookId)) {
+    if (borrowerBooksData.find(book => String(book.id) === String(bookId))) {
         showToast('Book already selected', 'warning');
         return;
     }
 
-    const bookData = {
-        id: bookId,
-        title: row.dataset.title || 'Unknown Title',
-        author: row.dataset.author || 'Unknown Author',
-        genre: row.dataset.genre || null,
-        published_year: row.dataset.published_year || null,
-        availability: availability
-    };
-
-    // Check if borrow modal is open, if not, open it
     const borrowModal = document.getElementById('borrowModal');
     const isModalOpen = borrowModal && borrowModal.classList.contains('active');
 
-    if (!isModalOpen) {
-        // If no books are currently selected, select this one and open modal
-        document.querySelectorAll('#booksTableBody tr.selected').forEach(r => {
-            r.classList.remove('selected');
-        });
-        row.classList.add('selected');
-        openBorrowModal();
-    } else {
-        // Modal is already open, just add the book to selection
-        row.classList.add('selected');
+    (async () => {
+        const bookData = await loadBookData(bookId);
 
-        // Add to enhanced data structure
-        addBookToBorrowerData(bookData);
-
-        // Update UI list with enhanced information
-        const list = document.getElementById('selectedBooksList');
-        if (list) {
-            const li = document.createElement('li');
-            li.textContent = `${bookData.title} by ${bookData.author}`;
-            li.setAttribute('data-id', bookId);
-            li.setAttribute('title', `Book ID: ${bookId} | Genre: ${bookData.genre || 'N/A'} | Year: ${bookData.published_year || 'N/A'}`);
-            li.style.padding = '8px 0';
-            li.style.borderBottom = '1px solid var(--border-light)';
-            li.style.position = 'relative';
-
-            // Add remove button
-            const removeBtn = document.createElement('button');
-            removeBtn.innerHTML = '×';
-            removeBtn.className = 'btn btn-sm';
-            removeBtn.style.cssText = `
-                position: absolute;
-                right: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                background: var(--danger);
-                color: white;
-                border: none;
-                border-radius: 50%;
-                width: 20px;
-                height: 20px;
-                font-size: 12px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            removeBtn.onclick = function(e) {
-                e.stopPropagation();
-                removeBookFromSelection(bookId);
-            };
-
-            li.appendChild(removeBtn);
-            list.appendChild(li);
+        if (!bookData) {
+            showToast(`Book ${bookId} not found`, 'error');
+            return;
         }
 
-        updateConfirmButtonState();
-    }
+        if (!bookData.availability || bookData.availability <= 0) {
+            showToast('Book not available', 'warning');
+            return;
+        }
 
-    showToast(`Added: ${bookData.title} (ID: ${bookId})`, 'success');
+        const row = document.querySelector(`tr[data-id="${bookId}"]`);
+        if (row) {
+            row.classList.add('selected');
+        }
+
+        if (!isModalOpen) {
+            openBorrowModal([bookData]);
+        } else {
+            if (!addBookToBorrowerData(bookData)) {
+                showToast('Book already selected', 'warning');
+                return;
+            }
+
+            const list = document.getElementById('selectedBooksList');
+            if (list) {
+                const li = document.createElement('li');
+                li.textContent = `${bookData.title} by ${bookData.author}`;
+                li.setAttribute('data-id', String(bookData.id));
+                li.setAttribute('title', `Book ID: ${bookData.id} | Genre: ${bookData.genre || 'N/A'} | Year: ${bookData.published_year || 'N/A'}`);
+                li.style.padding = '8px 0';
+                li.style.borderBottom = '1px solid var(--border-light)';
+                li.style.position = 'relative';
+
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '×';
+                removeBtn.className = 'btn btn-sm';
+                removeBtn.style.cssText = `
+                    position: absolute;
+                    right: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: var(--danger);
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                removeBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    removeBookFromSelection(bookData.id);
+                };
+
+                li.appendChild(removeBtn);
+                list.appendChild(li);
+            }
+
+            updateConfirmButtonState();
+        }
+
+        showToast(`Added: ${bookData.title} (ID: ${bookData.id})`, 'success');
+    })();
+}
+
+// Backward-compatible helper used by legacy inline handlers
+function addBookToBorrow(bookId) {
+    processBookQR(String(bookId));
 }
 
 // ======================
@@ -1330,6 +1540,7 @@ window.stopAllMediaTracks = stopAllMediaTracks;
 window.cleanupScannerInstance = cleanupScannerInstance;
 window.processMemberQR = processMemberQR;
 window.processBookQR = processBookQR;
+window.addBookToBorrow = addBookToBorrow;
 window.initializeQRModalElements = initializeQRModalElements;
 
 window.openQRScanner = showQRScannerModal;

@@ -957,7 +957,25 @@
       <div class="logout-section" style="flex: 1; display: flex; justify-content: center;">
         <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
           @csrf
-          <button type="submit" class="logout-btn" style="background: linear-gradient(135deg, var(--danger), #dc2626); color: white; border: none; padding: 12px 16px; border-radius: var(--radius); font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow); cursor: pointer; width: 100%;">
+          <button type="submit" class="logout-btn" style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+              width: 100%;
+              padding: 10px 12px;
+              background: transparent;
+              color: var(--text-secondary);
+              border: 1px solid var(--border);
+              border-radius: var(--radius);
+              font-size: 12px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: none;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+          ">
             <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
             <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
           </button>

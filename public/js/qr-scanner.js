@@ -53,7 +53,7 @@ function stopQRScan() {
 
 function handleQRScan(data, type) {
   const bookIdMatch = data.match(/book-(\d+)\.png$/);
-  const memberIdMatch = data.match(/\/members\/(\d+)/);
+  const memberIdMatch = data.match(/\/members\/([A-Za-z0-9-]+)/);
 
   if (type === 'book' && bookIdMatch) {
     const bookId = bookIdMatch[1];

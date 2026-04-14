@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
@@ -39,7 +37,10 @@ class UserManagementController extends Controller
         $roles = Role::all();
 
         return view('admin.users.index', compact('users', 'roles'));
-    }
+
+}
+    
+    
 
     /**
      * Show the form for creating a new user.
@@ -153,6 +154,11 @@ class UserManagementController extends Controller
             
             $user->role_id = $request->role_id;
             $user->save();
+
+                // Invalidate all sessions and force logout
+                \App\Models\LoginSession::invalidateAllForUser($user->id);
+                $user->force_logout = true;
+                $user->save();
 
             $newRole = $user->role ? $user->role->name : 'No Role';
             $roleChange = $oldRole !== $newRole ? " (role changed from '{$oldRole}' to '{$newRole}')" : '';
@@ -307,6 +313,11 @@ class UserManagementController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+                // Invalidate all sessions and force logout
+                \App\Models\LoginSession::invalidateAllForUser($user->id);
+                $user->force_logout = true;
+                $user->save();
+
 
             // Log the action
             SystemLogsController::log(
@@ -346,6 +357,10 @@ class UserManagementController extends Controller
         DB::beginTransaction();
         try {
             $user->specialPermissions()->detach($permission->id);
+            // Invalidate all sessions and force logout
+            \App\Models\LoginSession::invalidateAllForUser($user->id);
+            $user->force_logout = true;
+            $user->save();
 
             // Log the action
             SystemLogsController::log(
@@ -429,47 +444,7 @@ class UserManagementController extends Controller
         }
     }
 
-    /**
-     * Restore a revoked permission for a user.
-     */
-    public function restorePermission($userId, $permissionId)
-    {
-        $user = User::findOrFail($userId);
-        $permission = Permission::findOrFail($permissionId);
 
-        if (!$user->revokedPermissions()->where('permission_id', $permission->id)->exists()) {
-            return redirect()->back()
-                ->with('toast_type', 'error')
-                ->with('toast_message', "Permission '{$permission->name}' is not revoked for this user.");
-        }
-
-        DB::beginTransaction();
-        try {
-            $user->revokedPermissions()->detach($permission->id);
-            
-            // Refresh the user to get updated relationships
-            $user->refresh();
-
-            // Log the action
-            SystemLogsController::log(
-                'permission_restored',
-                "Restored '{$permission->name}' for {$user->name}",
-                auth()->id(),
-                ['target_user_id' => $user->id, 'permission' => $permission->slug]
-            );
-
-            DB::commit();
-
-            return redirect()->back()
-                ->with('toast_type', 'success')
-                ->with('toast_message', "Permission '{$permission->name}' restored for '{$user->name}'.");
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()
-                ->with('toast_type', 'error')
-                ->with('toast_message', 'Failed to restore permission. Please try again.');
-        }
-    }
 
     /**
      * Force logout a user (invalidate their session).
@@ -523,6 +498,11 @@ class UserManagementController extends Controller
      */
     public function checkForceLogoutStatus($id)
     {
+        $authUser = auth()->user();
+        if (!$authUser || (!$authUser->isAdmin() && (int) $authUser->id !== (int) $id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         $user = User::findOrFail($id);
         
         // Check if user has force_logout flag set
@@ -537,16 +517,32 @@ class UserManagementController extends Controller
     }
 
     /**
+     * Check force-logout status for the currently authenticated user.
+     */
+    public function checkCurrentForceLogoutStatus(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json([
+            'force_logout' => (bool) $user->force_logout,
+            'checked_at' => now()->toISOString(),
+        ]);
+    }
+
+    /**
      * Clear the force_logout flag after user has been logged out.
      * This is called after the user successfully logs in again.
      */
     public function clearForceLogoutFlag(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $authUser = auth()->user();
         
-        // Only allow clearing if the user is themselves logging in
-        // This prevents others from clearing the flag
-        if (auth()->id() !== $user->id) {
+        // Allow the user themselves or an admin to clear the flag
+        if (!$authUser || (!$authUser->isAdmin() && (int) $authUser->id !== (int) $user->id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         

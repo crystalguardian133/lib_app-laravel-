@@ -789,7 +789,7 @@
 @if($user->id !== auth()->id())
                                             <form action="{{ route('admin.users.force-logout', $user->id) }}" method="POST" style="display: inline;" class="force-logout-form" data-user-id="{{ $user->id }}">
                                                 @csrf
-                                                <button type="submit" class="action-btn action-btn-logout" data-user-id="{{ $user->id }}" title="Force Logout" onclick="return confirm('Are you sure you want to force logout this user?')">
+                                                <button type="submit" class="action-btn action-btn-logout {{ $user->force_logout ? 'hidden' : 'visible' }}" data-user-id="{{ $user->id }}" title="{{ $user->force_logout ? 'Already force logged out' : 'Force Logout' }}" onclick="return confirm('Are you sure you want to force logout this user?')" {{ $user->force_logout ? 'disabled' : '' }}>
                                                     <i class="fas fa-sign-out-alt"></i>
                                                 </button>
                                             </form>
@@ -871,64 +871,15 @@
             }
         });
 
-        // =========================================
-        // Force Logout Session Polling (every 5 seconds)
-        // =========================================
-        function checkForceLogoutStatus(userId, buttonElement) {
-            if (!userId || !buttonElement) return;
-            
-            fetch(`/admin/users/${userId}/force-logout-status`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.force_logout) {
-                        buttonElement.classList.add('hidden');
-                        buttonElement.classList.remove('visible');
-                    } else {
-                        buttonElement.classList.remove('hidden');
-                        buttonElement.classList.add('visible');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking force logout status:', error);
-                    // Hide button on error to be safe
-                    buttonElement.classList.add('hidden');
-                    buttonElement.classList.remove('visible');
-                });
-        }
-
-        function initForceLogoutPolling() {
-            // Get all force logout buttons
-            const forceLogoutButtons = document.querySelectorAll('.action-btn-logout[data-user-id]');
-            
-            if (forceLogoutButtons.length === 0) return;
-            
-            // Initially hide all buttons - JavaScript will show them if user is not force-logged out
-            forceLogoutButtons.forEach(button => {
-                button.classList.add('hidden');
-                button.classList.remove('visible');
+        // Prevent accidental double-submit on force logout actions.
+        document.querySelectorAll('.force-logout-form').forEach(form => {
+            form.addEventListener('submit', function () {
+                const button = form.querySelector('.action-btn-logout');
+                if (!button) return;
+                button.classList.add('loading');
+                button.disabled = true;
             });
-            
-            // Check immediately for each user
-            forceLogoutButtons.forEach(button => {
-                const userId = button.getAttribute('data-user-id');
-                checkForceLogoutStatus(userId, button);
-            });
-            
-            // Poll every 5 seconds
-            setInterval(() => {
-                forceLogoutButtons.forEach(button => {
-                    const userId = button.getAttribute('data-user-id');
-                    checkForceLogoutStatus(userId, button);
-                });
-            }, 5000);
-        }
-        
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initForceLogoutPolling);
-        } else {
-            initForceLogoutPolling();
-        }
+        });
     </script>
 </body>
 </html>

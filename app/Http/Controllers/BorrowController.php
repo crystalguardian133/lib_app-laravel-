@@ -56,7 +56,7 @@ class BorrowController extends Controller
             $member = null;
             
             if ($memberId) {
-                $member = Member::find($memberId);
+                $member = Member::where('uuid', $memberId)->orWhere('id', $memberId)->first();
             }
             
             if (!$member) {
@@ -225,7 +225,7 @@ class BorrowController extends Controller
      */
     public function getMemberById($id)
     {
-        $member = Member::find($id);
+        $member = Member::where('uuid', $id)->orWhere('id', $id)->first();
         if (!$member) {
             return response()->json(['error' => 'Member not found'], 404);
         }
@@ -235,6 +235,7 @@ class BorrowController extends Controller
 
         return response()->json([
             'id' => $member->id,
+            'uuid' => $member->uuid,
             'name' => $fullName
         ]);
     }
@@ -252,6 +253,7 @@ class BorrowController extends Controller
 
         $members = Member::select(
             'id',
+            'uuid',
             DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name)) as name")
         )
         ->where(DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name))"), 'LIKE', '%' . $query . '%')
@@ -266,13 +268,14 @@ class BorrowController extends Controller
      */
     public function show($id)
     {
-        $member = Member::find($id);
+        $member = Member::where('uuid', $id)->orWhere('id', $id)->first();
         if (!$member) {
             return response()->json(['error' => 'Not found'], 404);
         }
 
         return response()->json([
             'id' => $member->id,
+            'uuid' => $member->uuid,
             'first_name' => $member->first_name,
             'middle_name' => $member->middle_name,
             'last_name' => $member->last_name,
@@ -292,7 +295,7 @@ class BorrowController extends Controller
 
         $members = Member::where('first_name', 'LIKE', '%' . $query . '%')
             ->orWhere('last_name', 'LIKE', '%' . $query . '%')
-            ->select('id', 'first_name', 'middle_name', 'last_name')
+            ->select('id', 'uuid', 'first_name', 'middle_name', 'last_name')
             ->limit(5)
             ->get();
 

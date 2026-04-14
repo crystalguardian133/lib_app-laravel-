@@ -139,6 +139,26 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(47, 185, 235, 0.1);
         }
+        .password-input-wrap {
+            position: relative;
+        }
+        .password-input-wrap .form-input {
+            padding-right: 46px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .password-toggle:hover {
+            color: var(--primary);
+        }
         .role-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -271,8 +291,13 @@
 
                     <div class="form-group">
                         <label class="form-label">Password *</label>
-                        <input type="password" name="password" class="form-input" 
-                               placeholder="Enter password" required>
+                        <div class="password-input-wrap">
+                            <input type="password" id="password" name="password" class="form-input" 
+                                   placeholder="Enter password" required>
+                            <button type="button" class="password-toggle" data-target="password" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -280,8 +305,13 @@
 
                     <div class="form-group">
                         <label class="form-label">Confirm Password *</label>
-                        <input type="password" name="password_confirmation" class="form-input" 
-                               placeholder="Confirm password" required>
+                        <div class="password-input-wrap">
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" 
+                                   placeholder="Confirm password" required>
+                            <button type="button" class="password-toggle" data-target="password_confirmation" aria-label="Show password confirmation">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -319,6 +349,21 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
         }
+
+        document.querySelectorAll('.password-toggle').forEach((toggleButton) => {
+            toggleButton.addEventListener('click', function () {
+                const inputId = this.getAttribute('data-target');
+                const input = document.getElementById(inputId);
+                const icon = this.querySelector('i');
+
+                if (!input || !icon) return;
+
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                icon.classList.toggle('fa-eye', !isHidden);
+                icon.classList.toggle('fa-eye-slash', isHidden);
+            });
+        });
     </script>
 </body>
 </html>

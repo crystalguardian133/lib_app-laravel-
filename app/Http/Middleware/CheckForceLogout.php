@@ -18,6 +18,7 @@ class CheckForceLogout
     {
         if (Auth::check()) {
             $user = Auth::user();
+            $currentSessionId = $request->session()->getId();
             
             // Refresh user from database to get latest force_logout status
             $user->refresh();
@@ -42,30 +43,36 @@ class CheckForceLogout
                 // Always redirect to login - don't return JSON
                 return redirect()->route('login');
             }
-            
-            // Also check if user still has an active session in the database
-            $hasActiveSession = LoginSession::where('user_id', $user->id)
-                ->where('is_active', true)
-                ->where('expires_at', '>', now())
-                ->exists();
-            
-            if (!$hasActiveSession) {
-                // Clear remember token
-                $user->forceFill(['remember_token' => null])->save();
-                
-                // Store message in session
-                Session::flash('toast_type', 'error');
-                Session::flash('toast_message', 'Your session has ended. Please log in again.');
-                
-                // Log the user out
-                Auth::logout();
-                
-                // Invalidate the current session
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                
-                // Always redirect to login - don't return JSON
-                return redirect()->route('login');
+
+            // Validate current session record only (avoid false logout when no legacy rows exist).
+            $currentSession = LoginSession::where('user_id', $user->id)
+                ->where('session_id', $currentSessionId)
+                ->first();
+
+            if ($currentSession) {
+                if (!$currentSession->is_active || ($currentSession->expires_at && $currentSession->expires_at->isPast())) {
+                    // Clear remember token
+                    $user->forceFill(['remember_token' => null])->save();
+
+                    // Store message in session
+                    Session::flash('toast_type', 'error');
+                    Session::flash('toast_message', 'Your session has ended. Please log in again.');
+
+                    // Log the user out
+                    Auth::logout();
+
+                    // Invalidate the current session
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return redirect()->route('login');
+                }
+
+                // Keep activity heartbeat fresh.
+                $currentSession->touchActivity();
+            } else {
+                // Self-heal legacy/missing session row to prevent accidental logout loops.
+                LoginSession::createForUser($user, $request);
             }
         }
 

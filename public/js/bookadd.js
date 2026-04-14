@@ -464,7 +464,7 @@ function startQRScan(type) {
             memberId = decodedText.split('/').pop();
           }
 
-          if (!memberId || isNaN(memberId)) {
+          if (!memberId || memberId.trim() === '') {
             showCornerPopup("Invalid member QR code format");
             return;
           }

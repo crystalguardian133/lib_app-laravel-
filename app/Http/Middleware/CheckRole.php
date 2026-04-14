@@ -21,9 +21,9 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        // Parse roles (can be comma or pipe separated)
-        $roles = explode('|', $roles);
-        
+        // Parse roles (comma or pipe separated)
+        $roles = preg_split('/[|,]/', $roles);
+
         // Check if user has any of the required roles
         $hasRole = false;
         foreach ($roles as $role) {

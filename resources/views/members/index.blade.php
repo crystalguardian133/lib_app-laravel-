@@ -3408,12 +3408,30 @@
       <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
         <i class="fas fa-cog"></i>
       </button>
-      <div class="logout-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(135deg, var(--danger), #dc2626); border: none; border-radius: var(--radius); padding: 12px 16px; color: white; text-decoration: none; font-weight: 600; box-shadow: var(--shadow); cursor: pointer;">
+      <div class="logout-section" style="display: flex; justify-content: center; flex: 1;">
         <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
           @csrf
-          <button type="submit" style="background: none; border: none; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; cursor: pointer; font-size: inherit; font-weight: inherit;">
-            <i class="fas fa-sign-out-alt"></i>
-            <span class="logout-text">Logout</span>
+          <button type="submit" class="logout-btn" style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+              width: 100%;
+              padding: 10px 12px;
+              background: transparent;
+              color: var(--text-secondary);
+              border: 1px solid var(--border);
+              border-radius: var(--radius);
+              font-size: 12px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: none;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+          ">
+            <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="label logout-text" style="font-size: 13.5px; font-weight: bold;">Logout</span>
           </button>
         </form>
       </div>

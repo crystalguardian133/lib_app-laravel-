@@ -4,6 +4,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Member extends Model
 {
@@ -12,6 +13,7 @@ class Member extends Model
 
     // Allow mass assignment for these fields
     protected $fillable = [
+        'uuid',
         'first_name',
         'middle_name',
         'last_name',
@@ -35,6 +37,15 @@ class Member extends Model
     protected $casts = [
         'memberdate' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Member $member) {
+            if (empty($member->uuid)) {
+                $member->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     public function getNameAttribute()
 {
