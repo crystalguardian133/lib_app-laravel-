@@ -761,6 +761,8 @@ class ComposerStaticInitc11025bdbce821d0476dd770f2de347a
 
     public static $classMap = array (
         'App\\Console\\Commands\\CleanupExpiredSessions' => __DIR__ . '/../..' . '/app/Console/Commands/CleanupExpiredSessions.php',
+        'App\\Console\\Commands\\DeactivateAllSessions' => __DIR__ . '/../..' . '/app/Console/Commands/DeactivateAllSessions.php',
+        'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
         'App\\Http\\Controllers\\BookController' => __DIR__ . '/../..' . '/app/Http/Controllers/BookController.php',
         'App\\Http\\Controllers\\BorrowController' => __DIR__ . '/../..' . '/app/Http/Controllers/BorrowController.php',
@@ -777,6 +779,7 @@ class ComposerStaticInitc11025bdbce821d0476dd770f2de347a
         'App\\Http\\Middleware\\CheckRole' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckRole.php',
         'App\\Http\\Middleware\\Cors' => __DIR__ . '/../..' . '/app/Http/Middleware/Cors.php',
         'App\\Http\\Middleware\\RestrictAssistant' => __DIR__ . '/../..' . '/app/Http/Middleware/RestrictAssistant.php',
+        'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Models\\Book' => __DIR__ . '/../..' . '/app/Models/Book.php',
         'App\\Models\\BookReturn' => __DIR__ . '/../..' . '/app/Models/BookReturn.php',

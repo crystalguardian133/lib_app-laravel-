@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'App\\Console\\Commands\\CleanupExpiredSessions' => $baseDir . '/app/Console/Commands/CleanupExpiredSessions.php',
+    'App\\Console\\Commands\\DeactivateAllSessions' => $baseDir . '/app/Console/Commands/DeactivateAllSessions.php',
+    'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Http\\Controllers\\AdminController' => $baseDir . '/app/Http/Controllers/AdminController.php',
     'App\\Http\\Controllers\\BookController' => $baseDir . '/app/Http/Controllers/BookController.php',
     'App\\Http\\Controllers\\BorrowController' => $baseDir . '/app/Http/Controllers/BorrowController.php',
@@ -23,6 +25,7 @@ return array(
     'App\\Http\\Middleware\\CheckRole' => $baseDir . '/app/Http/Middleware/CheckRole.php',
     'App\\Http\\Middleware\\Cors' => $baseDir . '/app/Http/Middleware/Cors.php',
     'App\\Http\\Middleware\\RestrictAssistant' => $baseDir . '/app/Http/Middleware/RestrictAssistant.php',
+    'App\\Http\\Middleware\\TrustProxies' => $baseDir . '/app/Http/Middleware/TrustProxies.php',
     'App\\Http\\Middleware\\VerifyCsrfToken' => $baseDir . '/app/Http/Middleware/VerifyCsrfToken.php',
     'App\\Models\\Book' => $baseDir . '/app/Models/Book.php',
     'App\\Models\\BookReturn' => $baseDir . '/app/Models/BookReturn.php',
