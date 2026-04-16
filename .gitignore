@@ -25,3 +25,4 @@ Homestead.yaml
 Thumbs.db
 .env
 env
+/public/resource/member_images

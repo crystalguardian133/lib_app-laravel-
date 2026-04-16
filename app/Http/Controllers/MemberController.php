@@ -53,14 +53,74 @@ class MemberController extends Controller
             ->firstOrFail();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         // Check if user has permission to view members
         if (!Auth::check() || !Auth::user()->hasPermission('manage-members')) {
             abort(403, 'Unauthorized. You do not have permission to view members.');
         }
-        
-         $members = Member::latest()->get(); // or paginate()
+
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'status' => 'nullable|in:verified,unverified,no_email',
+            'municipality' => 'nullable|string|max:100',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $search = trim((string) $request->get('search', ''));
+        $status = $request->get('status');
+        $municipality = $request->get('municipality');
+
+        $query = Member::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('contactnumber', 'LIKE', "%{$search}%")
+                    ->orWhere('school', 'LIKE', "%{$search}%")
+                    ->orWhere('house_number', 'LIKE', "%{$search}%")
+                    ->orWhere('street', 'LIKE', "%{$search}%")
+                    ->orWhere('barangay', 'LIKE', "%{$search}%")
+                    ->orWhere('municipality', 'LIKE', "%{$search}%")
+                    ->orWhere('province', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($status === 'verified') {
+            $query->whereNotNull('email')
+                ->where('email', '!=', '')
+                ->where('email', '!=', 'null')
+                ->where('email_verified', true);
+        } elseif ($status === 'unverified') {
+            $query->whereNotNull('email')
+                ->where('email', '!=', '')
+                ->where('email', '!=', 'null')
+                ->where('email_verified', false);
+        } elseif ($status === 'no_email') {
+            $query->where(function ($q) {
+                $q->whereNull('email')
+                    ->orWhere('email', '')
+                    ->orWhere('email', 'null');
+            });
+        }
+
+        if (!empty($municipality)) {
+            $query->where('municipality', $municipality);
+        }
+
+        $members = $query->latest()->paginate($perPage)->appends($request->except('page'));
+
+        $municipalities = Member::query()
+            ->select('municipality')
+            ->whereNotNull('municipality')
+            ->where('municipality', '!=', '')
+            ->where('municipality', '!=', 'null')
+            ->distinct()
+            ->orderBy('municipality')
+            ->pluck('municipality');
 
         foreach ($members as $member) {
             $qrFile = 'member-' . $member->id . '.png';
@@ -73,7 +133,14 @@ class MemberController extends Controller
             $member->qr_url = asset('qrcode/members/' . $qrFile);
         }
 
-        return view('members.index', compact('members'));
+        return view('members.index', compact(
+            'members',
+            'perPage',
+            'search',
+            'status',
+            'municipality',
+            'municipalities'
+        ));
     }
 
     public function store(Request $request)
@@ -203,14 +270,24 @@ public function update(Request $request, $id)
         'school'       => $validated['school'] ?? null,
     ];
 
-    // handle photo
+    // Handle photo replacement in the same public folder used by member creation/display.
     if ($request->hasFile('photo')) {
-        if ($member->photo && file_exists(storage_path('app/public/member_photos/' . $member->photo))) {
-            unlink(storage_path('app/public/member_photos/' . $member->photo));
+        $uploadPath = public_path('resource/member_images');
+
+        if (!File::exists($uploadPath)) {
+            File::makeDirectory($uploadPath, 0755, true);
         }
 
-        $photoName = time() . '.' . $request->photo->extension();
-        $request->photo->storeAs('public/member_photos', $photoName);
+        if (!empty($member->photo)) {
+            $oldPhotoPath = $uploadPath . DIRECTORY_SEPARATOR . $member->photo;
+            if (File::exists($oldPhotoPath)) {
+                File::delete($oldPhotoPath);
+            }
+        }
+
+        $file = $request->file('photo');
+        $photoName = time() . '_' . $file->getClientOriginalName();
+        $file->move($uploadPath, $photoName);
         $data['photo'] = $photoName;
     }
 

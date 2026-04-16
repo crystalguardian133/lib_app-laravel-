@@ -57,6 +57,8 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
     })->name('notifications.overdue');
     Route::get('/api/notifications/overdue', [BorrowController::class, 'getOverdueAndDueSoon'])
         ->name('api.notifications.overdue');
+    Route::post('/api/notifications/overdue/semi-auto-mailer', [BorrowController::class, 'sendSemiAutoOverdueMailer'])
+        ->name('api.notifications.overdue.semi-auto-mailer');
 });
 
 // ===========================

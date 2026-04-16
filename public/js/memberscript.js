@@ -22,6 +22,10 @@ function closeRegisterModal() {
   const registerModal = document.getElementById("registerModal");
   const julitaModal = document.getElementById("julitaRegisterModal");
 
+  if (typeof window.stopAllInlineCameras === "function") {
+    window.stopAllInlineCameras();
+  }
+
   registerModal.classList.remove("active");
   registerModal.style.display = "none";
 
@@ -53,6 +57,16 @@ function resetAllRegistrationForms() {
     if (preview) {
       preview.src = "";
       preview.style.display = "none";
+
+      const uploadArea = preview.previousElementSibling;
+      if (uploadArea && uploadArea.classList.contains("photo-upload")) {
+        uploadArea.classList.remove("hidden");
+      }
+
+      const removeBtn = preview.parentNode ? preview.parentNode.querySelector(".remove-photo") : null;
+      if (removeBtn) {
+        removeBtn.remove();
+      }
     }
   });
 
@@ -232,22 +246,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
  // Global key listeners
  document.addEventListener('keydown', function (e) {
-   const openModals = document.querySelectorAll('.modal-overlay.active');
+   const registerModal = document.getElementById("registerModal");
+   const julitaModal = document.getElementById("julitaRegisterModal");
+   const isRegisterOpen = !!registerModal && registerModal.classList.contains("active");
+   const isJulitaOpen = !!julitaModal && julitaModal.classList.contains("active");
 
-   if (openModals.length === 0) return;
+   if (!isRegisterOpen && !isJulitaOpen) return;
 
    if (e.key === "Escape") {
      e.preventDefault();
-     closeAllModals();
-   } else if (e.key === "Enter" && e.ctrlKey) {
+     closeRegisterModal();
+     return;
+   }
+
+   const tagName = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+   const isTextarea = tagName === 'textarea';
+   const isButton = tagName === 'button';
+
+   if (e.key === "Enter" && !e.shiftKey && !isTextarea && !isButton) {
      e.preventDefault();
-     // Only submit if it's a register modal that's open
-     const isRegisterOpen = document.getElementById("registerModal").classList.contains("active");
-     const isJulitaOpen = document.getElementById("julitaRegisterModal").classList.contains("active");
-     
-     if (isRegisterOpen || isJulitaOpen) {
-       submitRegister();
-     }
+     submitRegister();
    }
  });
 

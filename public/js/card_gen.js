@@ -100,22 +100,51 @@ async function openCardModal(memberId) {
         const middleName = member.middleName || member.middle_name || '';
         const lastName = member.lastName || member.last_name || '';
 
-        // Format full name: LAST, FIRST M.
-        const middleInitial = middleName ? middleName.charAt(0).toUpperCase() + "." : "";
-        const fullName = `${String(lastName).toUpperCase()}, ${String(firstName).toUpperCase()} ${middleInitial}`.trim();
+        // Format full name: LAST, FIRST M. - filter out null strings
+        const middleInitial = middleName && middleName !== 'null' && String(middleName).trim() 
+            ? String(middleName).charAt(0).toUpperCase() + "." 
+            : "";
+        const lastNameClean = String(lastName).trim() === 'null' ? '' : String(lastName).trim();
+        const firstNameClean = String(firstName).trim() === 'null' ? '' : String(firstName).trim();
+        const fullName = `${lastNameClean.toUpperCase()}, ${firstNameClean.toUpperCase()} ${middleInitial}`.replace(/,\s+,/, ',').trim();
 
-        // Format address
-        const houseNumber = member.house_number || member.houseNumber || '';
-        const street = member.street || '';
+        // Format address - filter out null strings
+        const houseNumber = (member.house_number || member.houseNumber || '').trim();
+        const street = (member.street || '').trim();
+        const barangay = (member.barangay || '').trim();
+        const municipality = (member.municipality || '').trim();
+        const province = (member.province || '').trim();
         const contact = member.contactnumber || member.contactNumber || '';
 
-        const address = `${houseNumber} ${street}, ${member.barangay || ""}, ${member.municipality || ""}, ${member.province || ""}`
-            .replace(/, ,/g, ',').trim();
+        // Build address, filtering out empty parts and 'null' strings
+        const addressParts = [
+            houseNumber && houseNumber !== 'null' ? houseNumber : '',
+            street && street !== 'null' ? street : '',
+            barangay && barangay !== 'null' ? barangay : '',
+            municipality && municipality !== 'null' ? municipality : '',
+            province && province !== 'null' ? province : ''
+        ].filter(part => part && part !== 'null');
+        const address = addressParts.join(', ');
+
+        // Format membership date - remove timestamp, show only date
+        let formattedDate = "";
+        if (member.memberdate) {
+            try {
+                const dateObj = new Date(member.memberdate);
+                if (!isNaN(dateObj)) {
+                    formattedDate = dateObj.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+                } else {
+                    formattedDate = member.memberdate;
+                }
+            } catch (e) {
+                formattedDate = member.memberdate;
+            }
+        }
 
         // Store member data globally for download
         window.currentMemberData = {
             fullName: fullName,
-            memberdate: member.memberdate || "",
+            memberdate: formattedDate,
             photo: member.photo || null,
             id: member.id,
             address: address,

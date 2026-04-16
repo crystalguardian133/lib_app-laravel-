@@ -2068,6 +2068,55 @@ body.dark-mode .premium-input:hover {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Unified modal refresh for add/edit book modals */
+#addBookModal .modern-modal-container,
+#manage-modal .modal-content {
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+  border-radius: 22px;
+  box-shadow: 0 28px 64px rgba(15, 23, 42, 0.28);
+}
+
+#addBookModal .modern-modal-header,
+#manage-modal .modal-header {
+  background: linear-gradient(135deg, rgba(47, 185, 235, 0.13), rgba(79, 70, 229, 0.08));
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+}
+
+#manage-modal .modal-body {
+  background: color-mix(in srgb, var(--bg-primary) 92%, white 8%);
+}
+
+#manage-modal .form-section {
+  background: color-mix(in srgb, var(--bg-primary) 94%, white 6%);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
+  border-radius: 14px;
+  padding: 14px;
+}
+
+#manage-modal .modal-actions {
+  border-top: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  background: color-mix(in srgb, var(--bg-primary) 88%, white 12%);
+}
+
+#addBookModal .btn-submit-premium,
+#manage-modal .btn-confirm {
+  border-radius: 12px;
+}
+
+#addBookModal .btn-cancel-premium,
+#manage-modal .btn-cancel,
+#manage-modal .btn-danger {
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  #addBookModal .modern-modal-container,
+  #manage-modal .modal-content {
+    width: min(95vw, 95vw);
+    border-radius: 14px;
+  }
+}
+
 body.dark-mode .premium-upload-area {
   background: rgba(30, 41, 59, 0.3);
   border-color: #9ca3af;
@@ -4407,6 +4456,41 @@ body.dark-mode .premium-upload-area:hover {
                 }
             }
         });
+
+          // Keyboard behavior for add/edit book modals
+          document.addEventListener('keydown', function(e) {
+            const addBookModal = document.getElementById('addBookModal');
+            const editBookModal = document.getElementById('manage-modal');
+
+            const addOpen = !!addBookModal && addBookModal.classList.contains('active');
+            const editOpen = !!editBookModal && window.getComputedStyle(editBookModal).display === 'flex';
+
+            if (!addOpen && !editOpen) {
+              return;
+            }
+
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              if (editOpen) {
+                closeEditBookModal();
+              } else {
+                closeAddBookModal();
+              }
+              return;
+            }
+
+            const tagName = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+            if (e.key === 'Enter' && !e.shiftKey && tagName !== 'textarea' && tagName !== 'button') {
+              e.preventDefault();
+              if (editOpen) {
+                if (typeof saveChanges === 'function') {
+                  saveChanges();
+                }
+              } else if (typeof submitAddBookFromBooksIndex === 'function') {
+                submitAddBookFromBooksIndex();
+              }
+            }
+          });
 
         // Media Picker Functions
         function openMediaPicker() {

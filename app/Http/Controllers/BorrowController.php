@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class BorrowController extends Controller
 {
@@ -348,6 +349,176 @@ class BorrowController extends Controller
         return response()->json([
             'overdue' => $format($overdue),
             'dueSoon' => $format($dueSoon),
+        ]);
+    }
+
+    /**
+     * Semi-auto overdue mailer.
+     *
+     * Manually triggered endpoint that automatically composes and sends
+     * grouped overdue reminders to members with verified email addresses.
+     */
+    public function sendSemiAutoOverdueMailer(Request $request)
+    {
+        if (!Auth::check() || !Auth::user()->hasPermission('view-overdue')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. You do not have permission to send overdue reminders.'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'member_ids' => 'nullable|array',
+            'member_ids.*' => 'integer|exists:members,id',
+            'force' => 'nullable|boolean',
+        ]);
+
+        $now = now();
+        $overdueQuery = Transaction::with(['member', 'book'])
+            ->where('status', 'borrowed')
+            ->where('due_date', '<', $now);
+
+        if (!empty($validated['member_ids'])) {
+            $overdueQuery->whereIn('member_id', $validated['member_ids']);
+        }
+
+        $overdueTransactions = $overdueQuery
+            ->orderBy('member_id')
+            ->orderBy('due_date')
+            ->get();
+
+        if ($overdueTransactions->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No overdue records found for reminder sending.',
+                'summary' => [
+                    'total_members' => 0,
+                    'sent' => 0,
+                    'skipped' => 0,
+                    'failed' => 0,
+                ],
+            ]);
+        }
+
+        $grouped = $overdueTransactions->groupBy('member_id');
+        $forceSend = (bool) ($validated['force'] ?? false);
+
+        $sent = [];
+        $skipped = [];
+        $failed = [];
+
+        foreach ($grouped as $memberId => $transactions) {
+            $member = $transactions->first()?->member;
+
+            if (!$member) {
+                $skipped[] = [
+                    'member_id' => (int) $memberId,
+                    'reason' => 'Member record not found',
+                ];
+                continue;
+            }
+
+            if (empty($member->email)) {
+                $skipped[] = [
+                    'member_id' => $member->id,
+                    'member_name' => $member->name,
+                    'reason' => 'No email address',
+                ];
+                continue;
+            }
+
+            if (!$member->email_verified) {
+                $skipped[] = [
+                    'member_id' => $member->id,
+                    'member_name' => $member->name,
+                    'email' => $member->email,
+                    'reason' => 'Email is not verified',
+                ];
+                continue;
+            }
+
+            $cooldownKey = "overdue_mailer_last_sent_member_{$member->id}";
+            $alreadySentToday = cache()->has($cooldownKey);
+
+            if ($alreadySentToday && !$forceSend) {
+                $skipped[] = [
+                    'member_id' => $member->id,
+                    'member_name' => $member->name,
+                    'email' => $member->email,
+                    'reason' => 'Reminder already sent today',
+                ];
+                continue;
+            }
+
+            $lines = [];
+            foreach ($transactions as $t) {
+                $title = $t->book?->title ?? 'Unknown Title';
+                $due = optional($t->due_date)->format('Y-m-d H:i');
+                $daysOverdue = optional($t->due_date)->diffInDays($now) ?? 0;
+                $lines[] = "- {$title} (Due: {$due}, {$daysOverdue} day(s) overdue)";
+            }
+
+            $messageBody = "Hi {$member->first_name},\n\n"
+                . "This is a reminder from Julita Public Library. "
+                . "You currently have overdue book(s):\n\n"
+                . implode("\n", $lines)
+                . "\n\nPlease return these as soon as possible to avoid further penalties."
+                . "\n\nThank you.";
+
+            try {
+                Mail::raw($messageBody, function ($message) use ($member) {
+                    $message->to($member->email)
+                        ->subject('Overdue Book Reminder - Julita Public Library');
+                });
+
+                cache()->put($cooldownKey, now()->toDateTimeString(), now()->addDay());
+
+                SystemLog::log(
+                    'overdue_reminder_sent',
+                    "Overdue reminder sent to {$member->name} ({$member->email})",
+                    Auth::id(),
+                    [
+                        'member_id' => $member->id,
+                        'member_email' => $member->email,
+                        'overdue_count' => $transactions->count(),
+                        'forced' => $forceSend,
+                    ]
+                );
+
+                $sent[] = [
+                    'member_id' => $member->id,
+                    'member_name' => $member->name,
+                    'email' => $member->email,
+                    'overdue_count' => $transactions->count(),
+                ];
+            } catch (\Throwable $e) {
+                Log::error('Failed to send semi-auto overdue reminder', [
+                    'member_id' => $member->id,
+                    'email' => $member->email,
+                    'error' => $e->getMessage(),
+                ]);
+
+                $failed[] = [
+                    'member_id' => $member->id,
+                    'member_name' => $member->name,
+                    'email' => $member->email,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Semi-auto overdue mailer completed.',
+            'summary' => [
+                'total_members' => $grouped->count(),
+                'sent' => count($sent),
+                'skipped' => count($skipped),
+                'failed' => count($failed),
+            ],
+            'sent' => $sent,
+            'skipped' => $skipped,
+            'failed' => $failed,
         ]);
     }
 }

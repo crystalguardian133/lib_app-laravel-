@@ -326,6 +326,295 @@
     flex-wrap: wrap;
   }
 
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+
+  /* Books-style filters + pagination layout for members page */
+  .filters-section {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-input,
+  .filter-select {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: var(--transition);
+  }
+
+  .filter-input:focus,
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+  }
+
+  .search-input-wrapper {
+    position: relative;
+  }
+
+  .search-input-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .search-input-wrapper input {
+    padding-left: 40px;
+  }
+
+  .scrollable-table-section {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .pagination-info {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pagination-button {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+  }
+
+  .pagination-button:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--gray-300);
+  }
+
+  .pagination-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+
+  .pagination-number:hover {
+    background: var(--bg-hover);
+  }
+
+  .pagination-number.active {
+    background: var(--primary);
+    color: white;
+  }
+
+  .pagination-dots {
+    padding: 0 4px;
+    color: var(--text-secondary);
+  }
+
+  .entries-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .entries-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .entries-select {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .entries-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(47, 185, 235, 0.1);
+  }
+
+  /* Books-style Table Styling */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  thead {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-container thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 var(--border);
+  }
+
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+
+  tbody tr:hover {
+    background: var(--bg-hover);
+  }
+
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+
+  /* Action Buttons in Table */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* Status badges */
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-badge.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .status-badge.pending {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+    color: var(--warning);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+  }
+
+  .status-badge.inactive {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.1));
+    color: var(--text-muted);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+  }
+
+  /* Dark mode table styles */
+  body.dark-mode .data-table th {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+  }
+
+  body.dark-mode tbody tr {
+    border-bottom-color: var(--border);
+  }
+
+  body.dark-mode tbody tr:hover {
+    background: var(--bg-hover);
+  }
+
+  body.dark-mode td {
+    color: var(--text-primary);
+  }
+
   .search-container {
     position: relative;
   }
@@ -486,72 +775,222 @@
     background: var(--border-light);
   }
 
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
+  .scrollable-table-section {
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: linear-gradient(180deg, rgba(20, 20, 28, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
   }
 
-  .data-table th {
-    background: var(--surface);
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 0.875rem;
+  .scrollable-table-section .table-container {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .scrollable-table-section .table-wrapper {
+    max-height: calc(100vh - 280px);
+    overflow: auto;
+    min-width: fit-content;
+  }
+
+  .scrollable-table-section .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .scrollable-table-section .data-table thead {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .scrollable-table-section .data-table th {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 700;
+    font-size: 0.72rem;
     text-align: left;
-    padding: var(--spacing-lg);
-    border-bottom: 2px solid var(--border);
-    border-right: none;
+    padding: 14px 16px;
+    border-bottom: none;
     position: sticky;
     top: 0;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  .data-table th:last-child {
+  .scrollable-table-section .data-table th:last-child {
     text-align: center;
-    width: 160px;
-    min-width: 160px;
-    font-weight: 600;
+    width: 170px;
+    min-width: 170px;
   }
 
-  /* Dark mode table header */
-  body.dark-mode .data-table th {
-    background: rgba(20, 20, 20, 0.95);
-    border-bottom-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  .scrollable-table-section .data-table tbody tr {
+    background: transparent;
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
   }
 
-  /* Dark mode members content */
-  body.dark-mode .members-content {
-    background: rgba(30, 30, 30, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+  .scrollable-table-section .data-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(47, 185, 235, 0.04));
+    transform: translateY(-1px);
   }
 
-  /* Dark mode members management header */
-  body.dark-mode .members-management-header {
-    background: rgba(30, 30, 30, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .data-table td {
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-light);
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+  .scrollable-table-section .data-table td {
+    padding: 15px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.84);
+    font-size: 0.86rem;
     vertical-align: middle;
     border-right: none;
   }
 
-  .data-table td:last-child {
+  .scrollable-table-section .data-table td:first-child {
+    color: #ffffff;
+  }
+
+  .scrollable-table-section .data-table td:last-child {
     border-right: none;
   }
 
-  /* Dark mode table cells */
-  body.dark-mode .data-table td {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
+  .scrollable-table-section .data-table tr:last-child td {
+    border-bottom: none;
   }
 
-  .data-table tr:hover {
-    background: var(--surface);
+  .scrollable-table-section .data-table td[title] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .scrollable-table-section .data-table td:nth-child(6) {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .scrollable-table-section .data-table td:nth-child(2) {
+    font-weight: 600;
+  }
+
+  .scrollable-table-section .data-table td:last-child {
+    text-align: center;
+  }
+
+  .scrollable-table-section .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .scrollable-table-section .action-buttons .btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.88);
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scrollable-table-section .action-buttons .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+  }
+
+  .scrollable-table-section .action-buttons .btn-primary {
+    background: rgba(59, 130, 246, 0.16);
+    border-color: rgba(59, 130, 246, 0.28);
+    color: #38bdf8;
+  }
+
+  .scrollable-table-section .action-buttons .btn-success {
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.28);
+    color: #34d399;
+  }
+
+  .scrollable-table-section .action-buttons .btn-outline {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .scrollable-table-section .status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+  }
+
+  .scrollable-table-section .status-badge.active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.24);
+  }
+
+  .scrollable-table-section .status-badge.pending {
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.24);
+  }
+
+  .scrollable-table-section .status-badge.inactive {
+    background: rgba(148, 163, 184, 0.12);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+  }
+
+  .scrollable-table-section .empty-state {
+    padding: 42px 20px;
+  }
+
+  .scrollable-table-section .empty-state i {
+    font-size: 2.8rem;
+    color: rgba(255, 255, 255, 0.28);
+    margin-bottom: 14px;
+  }
+
+  .scrollable-table-section .empty-state h3 {
+    color: #f8fafc;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .scrollable-table-section .empty-state p {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  body.dark-mode .scrollable-table-section {
+    background: linear-gradient(180deg, rgba(17, 17, 24, 0.96) 0%, rgba(10, 10, 12, 0.99) 100%);
+    border-color: rgba(255, 255, 255, 0.04);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table th,
+  body.dark-mode .scrollable-table-section .data-table td {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.035), rgba(47, 185, 235, 0.05));
+  }
+
+  body.dark-mode .scrollable-table-section .action-buttons .btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  body.dark-mode .scrollable-table-section .empty-state i {
+    color: rgba(255, 255, 255, 0.25);
   }
 
   /* Modal Styles */
@@ -771,6 +1210,120 @@
   }
   input:checked + .slider .icon-moon {
     opacity: 1;
+  }
+
+  /* Final Books-style table overrides */
+  .scrollable-table-section .table-container {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .scrollable-table-section .table-wrapper {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+
+  .scrollable-table-section .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .scrollable-table-section .data-table thead {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .scrollable-table-section .data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 var(--border);
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .scrollable-table-section .data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+
+  .scrollable-table-section .data-table tbody tr:hover {
+    background: var(--bg-hover);
+  }
+
+  .scrollable-table-section .data-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+
+  .scrollable-table-section .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .scrollable-table-section .action-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+  }
+
+  .scrollable-table-section .status-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .scrollable-table-section .status-badge.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .scrollable-table-section .status-badge.pending {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+    color: var(--warning);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+  }
+
+  .scrollable-table-section .status-badge.inactive {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.1));
+    color: var(--text-muted);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table th {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table tbody tr {
+    border-bottom-color: var(--border);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table tbody tr:hover {
+    background: var(--bg-hover);
+  }
+
+  body.dark-mode .scrollable-table-section .data-table td {
+    color: var(--text-primary);
   }
 
   /* Responsive Design */
@@ -1405,207 +1958,34 @@
     border-bottom: none;
   }
 
-  /* Modern Action Buttons in Table */
-  .action-buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px;
-    position: relative;
-    justify-content: center;
-    min-width: 200px;
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 
-  /* Primary and Secondary Action Layout */
-  .action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: stretch;
-    justify-content: center;
-    padding: 8px;
-    min-width: 120px;
+  /* Image Styling in Table */
+  .table-container .member-photo {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
   }
 
-  /* Primary Actions Row */
-  .primary-actions {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
+  /* Dark mode table adjustments */
+  body.dark-mode thead {
+    background: var(--bg-secondary);
   }
 
-  /* Secondary Actions Row */
-  .secondary-actions {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
+  body.dark-mode .table-container thead th {
+    background: var(--bg-secondary);
   }
 
-  /* Action Button Styling */
-  .action-buttons .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px 10px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    min-width: 32px;
-    height: 32px;
-    position: relative;
-    overflow: hidden;
+  body.dark-mode tbody tr {
+    border-bottom-color: var(--border);
   }
 
-  /* Button Hover Effects */
-  .action-buttons .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .action-buttons .btn:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Primary Actions Styling */
-  .primary-actions .btn {
-    background: var(--primary);
-    color: white;
-  }
-
-  .primary-actions .btn:hover {
-    background: var(--primary-dark);
-    box-shadow: 0 3px 8px rgba(99, 102, 241, 0.3);
-  }
-
-  /* Secondary Actions Styling */
-  .secondary-actions .btn {
-    background: var(--surface);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-  }
-
-  .secondary-actions .btn:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-  }
-
-  /* Info Button Special Styling */
-  .btn-info {
-    background: var(--accent);
-    color: white;
-  }
-
-  .btn-info:hover {
-    background: var(--accent-dark);
-    box-shadow: 0 3px 8px rgba(6, 182, 212, 0.3);
-  }
-
-  /* Danger Button Special Styling */
-  .btn-danger {
-    background: var(--danger);
-    color: white;
-  }
-
-  .btn-danger:hover {
-    background: #dc2626;
-    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
-  }
-
-  /* Icon Styling */
-  .action-buttons .btn i {
-    font-size: 0.8rem;
-  }
-
-  /* Button Text */
-  .action-buttons .btn .btn-text {
-    display: none;
-  }
-
-  /* Responsive Design for Action Buttons */
-  @media (min-width: 768px) {
-    .action-buttons .btn .btn-text {
-      display: inline;
-    }
-    
-    .action-buttons {
-      min-width: 160px;
-    }
-  }
-
-  /* Mobile Responsive Layout */
-  @media (max-width: 767px) {
-    .action-buttons {
-      flex-direction: row;
-      gap: 4px;
-      padding: 4px;
-      min-width: 120px;
-    }
-    
-    .primary-actions,
-    .secondary-actions {
-      flex-direction: column;
-      gap: 4px;
-    }
-    
-    .action-buttons .btn {
-      min-width: 28px;
-      height: 28px;
-      padding: 4px;
-    }
-    
-    .action-buttons .btn i {
-      font-size: 0.7rem;
-    }
-    
-    .data-table td:last-child {
-      width: 120px;
-      min-width: 120px;
-      padding: 8px 4px;
-    }
-  }
-
-  /* Tooltip Styling */
-  .action-buttons .btn[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gray-900);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-bottom: 2px;
-  }
-
-  /* Button Loading State */
-  .action-buttons .btn.loading {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .action-buttons .btn.loading::after {
-    content: '';
-    width: 12px;
-    height: 12px;
-    border: 2px solid currentColor;
-    border-top: 2px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 4px;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  body.dark-mode tbody tr:hover {
+    background: var(--bg-hover);
   }
 
   .data-table tr:last-child td {
@@ -2037,6 +2417,29 @@
     justify-content: center;
   }
 
+  .camera-launch-row {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #cameraStreamVideo {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    border-radius: 8px;
+    background: #000;
+    object-fit: cover;
+  }
+
+  .camera-stream-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
   /* Modern QR Modal */
   .qr-modal-overlay {
     position: fixed;
@@ -2207,10 +2610,17 @@
     padding: var(--spacing-xl);
     border-top: 1px solid var(--border);
     display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    align-items: stretch;
+    background: var(--glass-bg);
+  }
+
+  .edit-modal-footer-buttons {
+    display: flex;
     gap: var(--spacing-sm);
     justify-content: flex-end;
-    align-items: center;
-    background: var(--glass-bg);
   }
 
   /* Dark mode styling for edit modal */
@@ -2255,6 +2665,86 @@
   body.dark-mode .edit-modal-footer {
     background: rgba(30, 30, 30, 0.8);
     border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Unified redesign for member entry/edit modals */
+  #registerModal .modal-container,
+  #julitaRegisterModal .modal-container {
+    border-radius: 24px;
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.26);
+    overflow: hidden;
+  }
+
+  #registerModal .modal-header,
+  #julitaRegisterModal .modal-header {
+    background: linear-gradient(135deg, rgba(47, 185, 235, 0.12), rgba(6, 182, 212, 0.08));
+    border-bottom: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+  }
+
+  #registerModal .modal-body,
+  #julitaRegisterModal .modal-body {
+    padding-top: calc(var(--spacing-xl) + 4px);
+    padding-bottom: calc(var(--spacing-xl) + 2px);
+  }
+
+  #registerModal .modal-footer,
+  #julitaRegisterModal .modal-footer {
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, white 12%);
+  }
+
+  #registerModal .form-section,
+  #julitaRegisterModal .form-section,
+  #editModal .form-section {
+    border: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
+    border-radius: 14px;
+    padding: 14px;
+    background: color-mix(in srgb, var(--surface) 92%, white 8%);
+  }
+
+  #registerModal .form-section .section-title,
+  #julitaRegisterModal .form-section .section-title,
+  #editModal .form-section h4 {
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    border-bottom: 1px dashed color-mix(in srgb, var(--primary) 20%, var(--border));
+  }
+
+  #editModal .edit-modal-content {
+    border-radius: 24px;
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.3);
+  }
+
+  #editModal .edit-modal-header {
+    background: linear-gradient(135deg, rgba(47, 185, 235, 0.13), rgba(79, 70, 229, 0.08));
+  }
+
+  #editModal .edit-modal-footer {
+    background: color-mix(in srgb, var(--surface) 88%, white 12%);
+  }
+
+  @media (max-width: 768px) {
+    #registerModal .modal-container,
+    #julitaRegisterModal .modal-container,
+    #editModal .edit-modal-content {
+      width: min(95vw, 95vw);
+      border-radius: 16px;
+    }
+
+    #registerModal .modal-header,
+    #julitaRegisterModal .modal-header,
+    #registerModal .modal-body,
+    #julitaRegisterModal .modal-body,
+    #registerModal .modal-footer,
+    #julitaRegisterModal .modal-footer,
+    #editModal .edit-modal-header,
+    #editModal .edit-modal-body,
+    #editModal .edit-modal-footer {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
   }
 
   /* Form styling for edit modal */
@@ -2693,8 +3183,435 @@
     box-shadow: var(--shadow-lg) !important;
     border-radius: 24px !important;
   }
-  body.dark-mode .modal-content,
-  body.dark-mode .modal-card,
+
+  /* Photo Upload Modal Styles */
+  .photo-upload-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+  }
+
+  .photo-upload-modal-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUpModal 0.3s ease-out;
+  }
+
+  .photo-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .photo-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .close-btn:hover {
+    color: #111827;
+  }
+
+  .photo-modal-body {
+    padding: 2rem;
+  }
+
+  /* Tab Navigation */
+  .photo-upload-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 1rem;
+  }
+
+  .photo-tab-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1rem;
+    padding-bottom: 1.75rem;
+  }
+
+  .photo-tab-btn:hover {
+    color: #1f2937;
+  }
+
+  .photo-tab-btn.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+  }
+
+  .photo-tab-content {
+    display: none;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .photo-tab-content.active {
+    display: block;
+  }
+
+  /* Drop Zone */
+  .photo-drop-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f9fafb;
+  }
+
+  .photo-drop-zone:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+
+  .photo-drop-zone.dragover {
+    border-color: #2563eb;
+    background: #dbeafe;
+    transform: scale(1.02);
+  }
+
+  .drop-zone-content {
+    pointer-events: none;
+  }
+
+  .drop-zone-content i {
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .drop-zone-content h4 {
+    margin: 0.5rem 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .drop-zone-content p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .drop-zone-content small {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  /* Camera Container */
+  .camera-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  #photoCameraVideo {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    border-radius: 12px;
+    background: #000;
+    object-fit: cover;
+  }
+
+  .btn-camera-capture {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+
+  .btn-camera-capture .capture-ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-camera-capture:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+  }
+
+  .btn-camera-capture:active {
+    transform: scale(0.97);
+  }
+
+  .btn-camera-capture:hover .capture-ring {
+    background: #f8fafc;
+  }
+
+  .capture-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .btn-camera-toggle {
+    background: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-camera-toggle:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+  }
+
+  /* Photo Preview */
+  .photo-preview-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .photo-preview-section h4 {
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .photo-preview-container {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+  }
+
+  #photoPreviewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-preview-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  .photo-preview-actions .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #1d4ed8;
+  }
+
+  /* Dark Mode */
+  body.dark-mode .photo-upload-modal-content {
+    background: #1f2937;
+  }
+
+  body.dark-mode .photo-modal-header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+
+  body.dark-mode .photo-modal-header h3 {
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .close-btn {
+    color: #9ca3af;
+  }
+
+  body.dark-mode .close-btn:hover {
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .photo-upload-tabs {
+    border-bottom-color: #374151;
+  }
+
+  body.dark-mode .photo-tab-btn {
+    color: #9ca3af;
+  }
+
+  body.dark-mode .photo-tab-btn:hover {
+    color: #d1d5db;
+  }
+
+  body.dark-mode .photo-tab-btn.active {
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+  }
+
+  body.dark-mode .photo-drop-zone {
+    border-color: #4b5563;
+    background: #111827;
+  }
+
+  body.dark-mode .photo-drop-zone:hover {
+    border-color: #60a5fa;
+    background: #1e3a8a;
+  }
+
+  body.dark-mode .photo-drop-zone.dragover {
+    border-color: #60a5fa;
+    background: #1e3a8a;
+  }
+
+  body.dark-mode .drop-zone-content i {
+    color: #6b7280;
+  }
+
+  body.dark-mode .drop-zone-content h4 {
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .drop-zone-content p,
+  body.dark-mode .drop-zone-content small {
+    color: #9ca3af;
+  }
+
+  body.dark-mode .photo-preview-section {
+    border-top-color: #374151;
+  }
+
+  body.dark-mode .photo-preview-section h4 {
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .photo-preview-container {
+    background: #111827;
+  }
+
+  body.dark-mode .btn-secondary {
+    background: #374151;
+    color: #f3f4f6;
+  }
+
+  body.dark-mode .btn-secondary:hover {
+    background: #4b5563;
+  }
+
+  @keyframes slideUpModal {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   body.dark-mode .card-modal-content {
     background: rgba(15, 23, 42, 0.95) !important;
   }
@@ -3376,6 +4293,120 @@
       align-items: center;
       gap: var(--spacing-xs);
     }
+
+    /* Final table overrides to match Books page layout */
+    .scrollable-table-section .table-container {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .scrollable-table-section .table-wrapper {
+      max-height: calc(100vh - 280px);
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .scrollable-table-section .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .scrollable-table-section .data-table thead {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .scrollable-table-section .data-table th {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg-secondary);
+      box-shadow: 0 1px 0 var(--border);
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .scrollable-table-section .data-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .scrollable-table-section .data-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    .scrollable-table-section .data-table td {
+      padding: 16px;
+      font-size: 14px;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .scrollable-table-section .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .scrollable-table-section .action-buttons .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+    }
+
+    .scrollable-table-section .status-badge {
+      padding: 4px 12px;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .scrollable-table-section .status-badge.active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .scrollable-table-section .status-badge.pending {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+      color: var(--warning);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+    }
+
+    .scrollable-table-section .status-badge.inactive {
+      background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.1));
+      color: var(--text-muted);
+      border: 1px solid rgba(107, 114, 128, 0.2);
+    }
+
+    body.dark-mode .scrollable-table-section .data-table th {
+      background: var(--bg-secondary);
+      border-bottom-color: var(--border);
+    }
+
+    body.dark-mode .scrollable-table-section .data-table tbody tr {
+      border-bottom-color: var(--border);
+    }
+
+    body.dark-mode .scrollable-table-section .data-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    body.dark-mode .scrollable-table-section .data-table td {
+      color: var(--text-primary);
+    }
   }
   </style>
 </head>
@@ -3452,140 +4483,216 @@
 
   <!-- Main Content -->
   <div class="main" id="mainContent">
-    <div class="page-title">
-      <i class="fas fa-users"></i>
-      Registered Members
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-users"></i>
+        Members Management
+      </h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openRegisterModal()">
+          <i class="fas fa-user-plus"></i> Register Member
+        </button>
+      </div>
     </div>
 
-    <!-- Members Content Container (matching books page structure) -->
-    <div class="members-content">
-      <!-- Members Management Container -->
-      <div class="members-management-header">
-        <div class="members-management-content">
-          <div class="collection-info">
-            <i class="fas fa-users" style="color: var(--primary); font-size: 1.5rem; margin-right: 12px;"></i>
-            <span style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">Members Collection</span>
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <form method="GET" action="{{ route('members.index') }}" class="filters-grid">
+        <div class="filter-group">
+          <label class="filter-label" for="memberSearchInput">Search</label>
+          <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              class="filter-input"
+              id="memberSearchInput"
+              name="search"
+              placeholder="Search members..."
+              value="{{ request('search') }}"
+            >
           </div>
-          <div class="management-controls">
-            <div class="search-container">
-              <input type="text" class="search-input" placeholder="Search members by name, address, or contact..." id="searchInput">
-              <i class="fas fa-search search-icon"></i>
-            </div>
-            <button class="btn btn-primary" onclick="openRegisterModal()">
-              <i class="fas fa-user-plus"></i> Register Member
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" for="memberStatusFilter">Status</label>
+          <select class="filter-select" id="memberStatusFilter" name="status">
+            <option value="">All Status</option>
+            <option value="verified" {{ request('status') === 'verified' ? 'selected' : '' }}>Verified Email</option>
+            <option value="unverified" {{ request('status') === 'unverified' ? 'selected' : '' }}>Unverified Email</option>
+            <option value="no_email" {{ request('status') === 'no_email' ? 'selected' : '' }}>No Email</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label" for="memberMunicipalityFilter">Municipality</label>
+          <select class="filter-select" id="memberMunicipalityFilter" name="municipality">
+            <option value="">All Municipalities</option>
+            @foreach(($municipalities ?? []) as $city)
+              <option value="{{ $city }}" {{ request('municipality') === $city ? 'selected' : '' }}>{{ $city }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="filter-group" style="justify-content: flex-end;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-filter"></i> Apply
             </button>
+            <a class="btn btn-outline" href="{{ route('members.index') }}">
+              <i class="fas fa-refresh"></i> Reset
+            </a>
           </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Scrollable Table Section -->
+    <div class="scrollable-table-section">
+      <div class="table-container">
+        <div class="table-wrapper">
+          <table class="data-table" id="membersTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Address</th>
+                <th>Contact</th>
+                <th>School</th>
+                <th>Member Since</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="membersTableBody">
+              @if(isset($members) && $members->count())
+                @foreach ($members as $member)
+                  @php
+                    $memberName = trim((( !empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '')
+                      . (((!empty($member->first_name) && $member->first_name !== 'null') && (!empty($member->last_name) && $member->last_name !== 'null')) ? ', ' : '')
+                      . (( !empty($member->first_name) && $member->first_name !== 'null') ? $member->first_name : '')
+                      . (( !empty($member->middle_name) && $member->middle_name !== 'null') ? ' ' . $member->middle_name : ''));
+                    $memberAddress = collect([
+                      (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
+                      (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
+                      (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
+                      (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
+                      (!empty($member->province) && $member->province !== 'null') ? $member->province : null
+                    ])->filter()->implode(', ');
+                  @endphp
+                  <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);" title="{{ $memberName !== '' ? $memberName : '-' }}">{{ $memberName !== '' ? $memberName : '-' }}</td>
+                    <td title="{{ $member->age ?? '-' }}">{{ $member->age ?? '-' }}</td>
+                    <td title="{{ $memberAddress !== '' ? $memberAddress : '-' }}">{{ $memberAddress !== '' ? $memberAddress : '-' }}</td>
+                    <td title="{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '-' }}">{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '-' }}</td>
+                    <td title="{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '-' }}">{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '-' }}</td>
+                    <td>
+                      @if (!empty($member->memberdate) && $member->memberdate !== 'null')
+                        {{ \Carbon\Carbon::parse($member->memberdate)->format('M j, Y') }}
+                      @else
+                        -
+                      @endif
+                    </td>
+                    <td>
+                      @if(empty($member->email) || $member->email === 'null')
+                        <span class="status-badge inactive" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: No Email">No Email</span>
+                      @elseif(!$member->email_verified)
+                        <span class="status-badge pending" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Unverified">Unverified Email</span>
+                      @else
+                        <span class="status-badge active" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Verified">Verified Email</span>
+                      @endif
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm" onclick="editMember({{ $member->id }})" title="Edit Member">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        @if(!$member->email_verified && $member->email)
+                          <button class="btn btn-success btn-sm" id="verifyEmailBtn_{{ $member->id }}" onclick="openEmailVerificationModal({{ $member->id }}, '{{ $member->email }}')" title="Verify Email">
+                            <i class="fas fa-envelope"></i>
+                          </button>
+                        @elseif($member->email_verified)
+                          <button class="btn btn-success btn-sm" disabled title="Email Verified">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        @endif
+                        <button class="btn btn-outline btn-sm" onclick="viewMemberActivity({{ $member->id }})" title="View Activity History">
+                          <i class="fas fa-history"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="openCardModal({{ $member->id }})" title="View Membership Card">
+                          <i class="fas fa-id-card"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                @endforeach
+              @else
+                <tr>
+                  <td colspan="8">
+                    <div class="empty-state">
+                      <i class="fas fa-users"></i>
+                      <h3>No members found</h3>
+                      <p>No results match your current filters.</p>
+                      <a class="btn btn-outline" href="{{ route('members.index') }}" style="margin-top: 15px;">
+                        <i class="fas fa-refresh"></i> Clear Filters
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              @endif
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Members Table -->
-      <div class="table-container">
-      <div class="table-wrapper">
-        <table class="data-table" id="membersTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Address</th>
-            <th>Contact</th>
-            <th>School</th>
-            <th>Member Since</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="membersTableBody">
-          @if(isset($members) && $members->count())
-            @foreach ($members as $member)
-              <tr>
-                <td>
-                  {{ (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '' }}
-                  @if (!empty($member->first_name) && $member->first_name !== 'null')
-                    {{ (!empty($member->last_name) && $member->last_name !== 'null') ? ', ' : '' }}{{ $member->first_name }}
-                  @endif
-                  @if (!empty($member->middle_name) && $member->middle_name !== 'null')
-                    {{ ' ' . $member->middle_name }}
-                  @endif
-                </td>
-                <td>{{ $member->age ?? '-' }}</td>
-                <td>
-                  {{ collect([
-                    (!empty($member->house_number) && $member->house_number !== 'null') ? $member->house_number : null,
-                    (!empty($member->street) && $member->street !== 'null') ? $member->street : null,
-                    (!empty($member->barangay) && $member->barangay !== 'null') ? $member->barangay : null,
-                    (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
-                    (!empty($member->province) && $member->province !== 'null') ? $member->province : null
-                  ])->filter()->implode(', ') }}
-                </td>
-                <td>{{ (!empty($member->contactnumber) && $member->contactnumber !== 'null') ? $member->contactnumber : '-' }}</td>
-                <td>{{ (!empty($member->school) && $member->school !== 'null') ? $member->school : '-' }}</td>
-                <td>
-                  @if (!empty($member->memberdate) && $member->memberdate !== 'null')
-                    {{ \Carbon\Carbon::parse($member->memberdate)->format('M j, Y') }}
-                  @else
-                    -
-                  @endif
-                </td>
-                <td>
-                  @if(empty($member->email) || $member->email === 'null')
-                    <span class="status-badge inactive" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: No Email">No Email</span>
-                  @elseif(!$member->email_verified)
-                    <span class="status-badge pending" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Unverified">Unverified Email</span>
-                  @else
-                    <span class="status-badge active" title="Phone: {{ $member->phone_verified ? 'Verified' : 'Not Verified' }} | Email: Verified">Verified Email</span>
-                  @endif
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <div class="primary-actions">
-                      <button class="btn" onclick="editMember({{ $member->id }})" title="Edit Member">
-                        <i class="fas fa-edit"></i>
-                        <span class="btn-text">Edit</span>
-                      </button>
-                      @if(!$member->email_verified && $member->email)
-                        <button class="btn btn-success" id="verifyEmailBtn_{{ $member->id }}" onclick="openEmailVerificationModal({{ $member->id }}, '{{ $member->email }}')" title="Verify Email">
-                          <i class="fas fa-envelope"></i>
-                          <span class="btn-text">Verify Email</span>
-                        </button>
-                      @elseif($member->email_verified)
-                        <button class="btn" disabled style="background: #10b981; color: white; cursor: not-allowed;" title="Email Verified">
-                          <i class="fas fa-check"></i>
-                          <span class="btn-text">Verified</span>
-                        </button>
-                      @endif
-                    </div>
-                    <div class="secondary-actions">
-                      <button class="btn btn-info" onclick="viewMemberActivity({{ $member->id }})" title="View Activity History">
-                        <i class="fas fa-history"></i>
-                        <span class="btn-text">Activity</span>
-                      </button>
-                      <button class="btn" onclick="openCardModal({{ $member->id }})" title="View Membership Card">
-                        <i class="fas fa-id-card"></i>
-                        <span class="btn-text">Card</span>
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            @endforeach
+      <div class="table-footer">
+        <div class="entries-control">
+          <span class="entries-label">Show</span>
+          <select class="entries-select" id="entriesSelect">
+            <option value="{{ route('members.index', array_merge(request()->except('page', 'per_page'), ['per_page' => 10])) }}" {{ (int) request('per_page', 10) === 10 ? 'selected' : '' }}>10</option>
+            <option value="{{ route('members.index', array_merge(request()->except('page', 'per_page'), ['per_page' => 25])) }}" {{ (int) request('per_page', 10) === 25 ? 'selected' : '' }}>25</option>
+            <option value="{{ route('members.index', array_merge(request()->except('page', 'per_page'), ['per_page' => 50])) }}" {{ (int) request('per_page', 10) === 50 ? 'selected' : '' }}>50</option>
+            <option value="{{ route('members.index', array_merge(request()->except('page', 'per_page'), ['per_page' => 100])) }}" {{ (int) request('per_page', 10) === 100 ? 'selected' : '' }}>100</option>
+          </select>
+          <span class="entries-label">entries</span>
+        </div>
+
+        <div class="pagination-info">
+          Showing {{ $members->firstItem() ?? 0 }} to {{ $members->lastItem() ?? 0 }} of {{ $members->total() }} members
+        </div>
+
+        <div class="pagination-controls">
+          @if ($members->onFirstPage())
+            <button class="pagination-button" disabled>
+              <i class="fas fa-chevron-left"></i> Previous
+            </button>
           @else
-            <tr>
-              <td colspan="9" style="text-align: center; padding: 2rem;">
-                <i class="fas fa-users" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
-                <h3 style="color: #6b7280; margin-bottom: 0.5rem;">No Members Found</h3>
-                <p style="color: #9ca3af; margin-bottom: 1.5rem;">Start by registering your first member to get started.</p>
-                <button class="btn btn-primary" onclick="openRegisterModal()">
-                  <i class="fas fa-user-plus"></i>
-                  Register First Member
-                </button>
-              </td>
-            </tr>
+            <a href="{{ $members->previousPageUrl() }}" class="pagination-button">
+              <i class="fas fa-chevron-left"></i> Previous
+            </a>
           @endif
-        </tbody>
-        </table>
+
+          @foreach ($members->getUrlRange(1, $members->lastPage()) as $page => $url)
+            @if ($page == $members->currentPage())
+              <span class="pagination-number active">{{ $page }}</span>
+            @elseif ($page == 1 || $page == $members->lastPage() || ($page >= $members->currentPage() - 1 && $page <= $members->currentPage() + 1))
+              <a href="{{ $url }}" class="pagination-number">{{ $page }}</a>
+            @elseif ($page == $members->currentPage() - 2 || $page == $members->currentPage() + 2)
+              <span class="pagination-dots">...</span>
+            @endif
+          @endforeach
+
+          @if ($members->hasMorePages())
+            <a href="{{ $members->nextPageUrl() }}" class="pagination-button">
+              Next <i class="fas fa-chevron-right"></i>
+            </a>
+          @else
+            <button class="pagination-button" disabled>
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          @endif
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- MEMBER ACTIVITY HISTORY MODAL -->
@@ -3780,6 +4887,11 @@
                </div>
                <img id="photoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
              </div>
+              <div class="camera-launch-row">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openCameraStreamModal('photo')">
+                  <i class="fas fa-video"></i> Open Camera
+                </button>
+              </div>
            </div>
          </div>
        </form>
@@ -3983,6 +5095,11 @@
                   <input type="file" id="julitaPhoto" name="photo" accept="image/*" class="form-input">
                 </div>
                 <img id="julitaPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+              </div>
+              <div class="camera-launch-row">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openCameraStreamModal('julitaPhoto')">
+                  <i class="fas fa-video"></i> Open Camera
+                </button>
               </div>
             </div>
           </div>
@@ -4272,6 +5389,72 @@
     </div>
   </div>
 
+  <!-- Member Photo Upload Modal -->
+  <div id="photoUploadModal" class="photo-upload-modal" style="display: none;">
+    <div class="photo-upload-modal-content">
+      <div class="photo-modal-header">
+        <h3><i class="fas fa-image"></i> Upload Member Photo</h3>
+        <button class="close-btn" onclick="closePhotoUploadModal()">&times;</button>
+      </div>
+
+      <div class="photo-modal-body">
+        <!-- Tab Navigation -->
+        <div class="photo-upload-tabs">
+          <button class="photo-tab-btn active" onclick="switchPhotoTab('upload')" data-tab="upload">
+            <i class="fas fa-cloud-upload-alt"></i> Upload File
+          </button>
+          <button class="photo-tab-btn" onclick="switchPhotoTab('camera')" data-tab="camera">
+            <i class="fas fa-camera"></i> Capture Photo
+          </button>
+        </div>
+
+        <!-- Upload Tab Content -->
+        <div id="photo-upload-tab" class="photo-tab-content active">
+          <div class="photo-drop-zone" id="photoDropZone" ondragover="handlePhotoDragOver(event)" ondragleave="handlePhotoDragLeave(event)" ondrop="handlePhotoDrop(event)">
+            <div class="drop-zone-content">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <h4>Drag and drop image here</h4>
+              <p>or click to select a file</p>
+              <small>JPG, PNG, GIF up to 5MB</small>
+            </div>
+            <input type="file" id="photoFileInput" accept="image/*" style="display: none;" onchange="handlePhotoFileSelect(event)">
+          </div>
+        </div>
+
+        <!-- Camera Tab Content -->
+        <div id="photo-camera-tab" class="photo-tab-content">
+          <div class="camera-container">
+            <video id="photoCameraVideo" playsinline autoplay></video>
+            <canvas id="photoCanvasCapture" style="display: none;"></canvas>
+            <button type="button" class="btn-camera-capture" onclick="capturePhoto()" aria-label="Capture photo">
+              <span class="capture-ring"><i class="fas fa-camera"></i></span>
+            </button>
+            <span class="capture-label">Capture</span>
+            <button type="button" class="btn-camera-toggle" onclick="switchPhotoCamera()">
+              <i class="fas fa-sync"></i> Switch Camera
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="photoPreviewSection" class="photo-preview-section" style="display: none;">
+          <h4>Preview</h4>
+          <div class="photo-preview-container">
+            <img id="photoPreviewImg" alt="Photo Preview">
+          </div>
+          <div class="photo-preview-actions">
+            <button type="button" class="btn btn-secondary" onclick="resetPhotoUpload()">
+              <i class="fas fa-redo"></i> Choose Again
+            </button>
+            <button type="button" class="btn btn-primary" onclick="savePhotoUpload()">
+              <i class="fas fa-check"></i> Save Photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Membership Card Preview Modal -->
   <div id="cardModal" class="card-modal" style="display: none;">
     <div class="card-modal-content">
@@ -4377,6 +5560,27 @@
             </div>
           </div>
 
+          <!-- Photo Section -->
+          <div class="form-section">
+            <h4><i class="fas fa-camera"></i> Member Photo</h4>
+            <div class="form-group">
+              <label for="editPhoto" class="form-label">Profile Photo</label>
+              <div class="photo-upload-container">
+                <div class="photo-upload">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <input type="file" id="editPhoto" name="photo" accept="image/*" class="form-input">
+                </div>
+                <img id="editPhotoPreview" class="photo-preview" src="#" alt="Photo Preview" style="display: none;">
+              </div>
+              <div class="camera-launch-row">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openCameraStreamModal('editPhoto')">
+                  <i class="fas fa-video"></i> Open Camera
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Contact Information Section -->
           <div class="form-section">
             <h4><i class="fas fa-phone"></i> Contact Information</h4>
@@ -4398,15 +5602,17 @@
         </form>
       </div>
       <div class="edit-modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-danger" onclick="deleteMember()" style="margin-left: auto;">
-          <i class="fas fa-trash"></i> Delete Member
-        </button>
-        <button type="submit" class="btn btn-primary" form="editForm">
-          <i class="fas fa-save"></i> Save Changes
-        </button>
+        <div class="edit-modal-footer-buttons">
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-danger" onclick="deleteMember()">
+            <i class="fas fa-trash"></i> Delete Member
+          </button>
+          <button type="submit" class="btn btn-primary" form="editForm">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -4418,6 +5624,7 @@
 
 <!-- Custom Scripts -->
 <script src="{{ asset('js/photoprev.js') }}"></script>
+<script src="{{ asset('js/photoupload.js') }}"></script>
 <script src="{{ asset('js/membersearch.js') }}"></script>
 <script src="{{ asset('js/memberscript.js') }}"></script>
 <script src="{{ asset('js/memberedit.js') }}"></script>
@@ -4426,6 +5633,20 @@
 <script src="{{ asset('js/showqr.js') }}"></script>
 <script src="{{ asset('js/qrgen.js') }}"></script>
 <script src="{{ asset('js/card_gen.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const entriesSelect = document.getElementById('entriesSelect');
+
+  if (entriesSelect) {
+    entriesSelect.addEventListener('change', function () {
+      if (this.value) {
+        window.location.href = this.value;
+      }
+    });
+  }
+});
+</script>
 
 <!-- Member Activity History Functions -->
 <script>
@@ -4525,13 +5746,17 @@ function updateMemberStats(stats) {
 
 function updateMemberAvatar(photoFilename) {
     const avatarContainer = document.getElementById('memberAvatar');
+  if (!avatarContainer) {
+    return;
+  }
 
     if (photoFilename && photoFilename !== 'null' && photoFilename !== '') {
-        // Member has a photo, display it
-        const photoUrl = `/resource/member_images/${photoFilename}`;
-        avatarContainer.innerHTML = `<img src="${photoUrl}" alt="Member Photo" class="member-photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+    const photoUrl = String(photoFilename).startsWith('http') || String(photoFilename).startsWith('/')
+      ? photoFilename
+      : `/resource/member_images/${photoFilename}`;
+
+    avatarContainer.innerHTML = `<img src="${photoUrl}" alt="Member Photo" class="member-photo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>';">`;
     } else {
-        // No photo, show default icon
         avatarContainer.innerHTML = '<i class="fas fa-user"></i>';
     }
 }
@@ -4669,6 +5894,37 @@ function showNotification(message, type = 'info') {
             <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
             <div>
                 <div style="font-weight: 600;">${message}</div>
+            <!-- Camera Stream Modal For Register/Edit Photo Capture -->
+            <div id="cameraStreamModal" class="modal-overlay" style="display: none; z-index: 3200;">
+              <div class="modal-container" style="max-width: 720px;">
+                <div class="modal-header">
+                  <div class="modal-title">
+                    <i class="fas fa-camera"></i>
+                    Camera Capture
+                  </div>
+                  <button class="modal-close" onclick="closeCameraStreamModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                  <div class="camera-container">
+                    <video id="cameraStreamVideo" playsinline autoplay></video>
+                    <canvas id="cameraStreamCanvas" style="display: none;"></canvas>
+                    <span class="capture-label">Capture Photo</span>
+                    <div class="camera-stream-actions">
+                      <button type="button" class="btn btn-primary" onclick="captureCameraStreamPhoto()">
+                        <i class="fas fa-camera"></i> Capture
+                      </button>
+                      <button type="button" class="btn btn-outline" onclick="switchCameraStreamDevice()">
+                        <i class="fas fa-sync"></i> Switch Camera
+                      </button>
+                      <button type="button" class="btn btn-secondary" onclick="closeCameraStreamModal()">
+                        <i class="fas fa-times"></i> Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             </div>
         </div>
         <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>

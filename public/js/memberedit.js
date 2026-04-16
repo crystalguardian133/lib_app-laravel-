@@ -62,6 +62,16 @@ class EditModalHandler {
          document.addEventListener('keydown', (e) => {
              if (e.key === 'Escape' && this.modal && this.modal.classList.contains('show')) {
                  this.closeEditModal();
+             } else if (e.key === 'Enter' && this.modal && this.modal.classList.contains('show')) {
+                 const tagName = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                 if (tagName !== 'textarea' && tagName !== 'button' && this.form) {
+                     e.preventDefault();
+                     if (typeof this.form.requestSubmit === 'function') {
+                         this.form.requestSubmit();
+                     } else {
+                         this.submitEdit();
+                     }
+                 }
              }
          });
 
@@ -195,6 +205,17 @@ class EditModalHandler {
          this.setFieldValue('editEmail', member.email);
          this.setFieldValue('editSchool', member.school);
 
+         // Photo preview in edit modal
+         const photoUrl = member.photo
+             ? (String(member.photo).startsWith('http') || String(member.photo).startsWith('/')
+                 ? member.photo
+                 : `/resource/member_images/${member.photo}`)
+             : '';
+
+         if (typeof window.setPhotoPreviewFromUrl === 'function') {
+             window.setPhotoPreviewFromUrl('editPhoto', photoUrl);
+         }
+
          // Restore form from loading state
          this.restoreFromLoading();
 
@@ -306,6 +327,10 @@ class EditModalHandler {
       * Close the modal
       */
      closeEditModal() {
+         if (typeof window.toggleInlineCamera === 'function') {
+             window.toggleInlineCamera('editPhoto', false);
+         }
+
          if (this.modal) {
              this.modal.classList.remove('show');
              setTimeout(() => {
@@ -317,6 +342,22 @@ class EditModalHandler {
 
          if (this.form) {
              this.form.reset();
+         }
+
+         const editPreview = document.getElementById('editPhotoPreview');
+         if (editPreview) {
+             editPreview.src = '#';
+             editPreview.style.display = 'none';
+
+             const uploadArea = editPreview.previousElementSibling;
+             if (uploadArea && uploadArea.classList.contains('photo-upload')) {
+                 uploadArea.classList.remove('hidden');
+             }
+
+             const removeBtn = editPreview.parentNode ? editPreview.parentNode.querySelector('.remove-photo') : null;
+             if (removeBtn) {
+                 removeBtn.remove();
+             }
          }
 
          this.currentMemberId = null;
