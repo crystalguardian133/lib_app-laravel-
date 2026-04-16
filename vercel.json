@@ -14,5 +14,6 @@
   ],
   "env": {
     "APP_ENV": "production"
-  }
+  },
+  "outputDirectory": "build"
 }
