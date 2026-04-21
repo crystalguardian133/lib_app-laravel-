@@ -13,7 +13,15 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next, string $permissions): Response
     {
+        $expectsJson = $request->expectsJson() || $request->is('api/*');
+
         if (!$request->user()) {
+            if ($expectsJson) {
+                return response()->json([
+                    'error' => 'Unauthenticated.',
+                ], 401);
+            }
+
             return redirect()->route('login');
         }
 
@@ -42,7 +50,7 @@ class CheckPermission
                 ]
             );
 
-            if ($request->expectsJson()) {
+            if ($expectsJson) {
                 return response()->json([
                     'error' => 'You do not have permission to access this resource.',
                     'required' => $permissions

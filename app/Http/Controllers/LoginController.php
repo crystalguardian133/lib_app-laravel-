@@ -21,6 +21,17 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        // Validate input to prevent malformed attacks
+        $validated = $request->validate([
+            'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9._-]+$/',
+            'password' => 'required|string|max:255',
+            'remember' => 'nullable|boolean',
+        ], [
+            'username.regex' => 'Username contains invalid characters.',
+            'username.max' => 'Username must not exceed 255 characters.',
+            'password.max' => 'Password must not exceed 255 characters.',
+        ]);
+
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials, $request->remember)) {
@@ -81,12 +92,17 @@ class LoginController extends Controller
             return redirect()->intended($this->redirectToAppropriatePage())->with('success', 'Welcome back!');
         }
 
-        // Log failed login attempt
+        // Log failed login attempt (without exposing username for security)
         SystemLog::log(
             'login_failed',
-            'Failed login attempt with username: ' . ($request->username ?? 'unknown'),
+            'Failed login attempt',
             null,
-            ['username_attempted' => $request->username]
+            [
+                'ip_address' => $request->ip(),
+                'attempted_at' => now(),
+                // Hash the username so logs don't reveal valid usernames
+                'username_hash' => hash('sha256', strtolower($request->username ?? ''))
+            ]
         );
 
         return back()->withErrors([
@@ -122,10 +138,16 @@ class LoginController extends Controller
      */
     public function sessions(Request $request)
     {
-        $user = Auth::user();
-        $viewingAll = $request->get('all', false);
+        // Explicitly validate and cast the 'all' parameter to boolean
+        $viewingAll = filter_var($request->get('all', false), FILTER_VALIDATE_BOOLEAN);
         
-        // Only admins can view all sessions
+        $user = Auth::user();
+        
+        // Only admins can view all sessions - explicit authorization check
+        if ($viewingAll && !$user->isAdmin()) {
+            return back()->with('error', 'You do not have permission to view all sessions.');
+        }
+        
         if ($viewingAll && $user->isAdmin()) {
             $sessions = LoginSession::getAllActiveSessions()->get();
         } else {
@@ -141,32 +163,34 @@ class LoginController extends Controller
      */
     public function invalidateSession(Request $request, $sessionId)
     {
+        // Validate that sessionId is a valid integer
+        if (!is_numeric($sessionId) || $sessionId <= 0) {
+            return back()->with('error', 'Invalid session ID.');
+        }
+
         $user = Auth::user();
-        $session = LoginSession::find($sessionId);
+        $session = LoginSession::findOrFail($sessionId);
         
-        if (!$session) {
-            return back()->with('error', 'Session not found.');
+        // Authorization check: User can only invalidate their own sessions (unless admin)
+        if (!$user->isAdmin() && $session->user_id !== $user->id) {
+            // Don't reveal whether session exists - consistent response
+            return back()->with('error', 'Unauthorized action.');
         }
 
-        // Allow admins to invalidate any session, users can only invalidate their own
-        if ($user->isAdmin() || $session->user_id === $user->id) {
-            $session->invalidate();
+        $session->invalidate();
 
-            SystemLog::log(
-                'user_session_terminated',
-                'User terminated a login session' . ($user->isAdmin() ? ' (admin action)' : ''),
-                $user->id,
-                [
-                    'terminated_session_id' => $sessionId,
-                    'target_user_id' => $session->user_id,
-                    'is_admin_action' => $user->isAdmin()
-                ]
-            );
+        SystemLog::log(
+            'user_session_terminated',
+            'User terminated a login session' . ($user->isAdmin() ? ' (admin action)' : ''),
+            $user->id,
+            [
+                'terminated_session_id' => $sessionId,
+                'target_user_id' => $session->user_id,
+                'is_admin_action' => $user->isAdmin()
+            ]
+        );
 
-            return back()->with('success', 'Session terminated successfully.');
-        }
-
-        return back()->with('error', 'You can only terminate your own sessions.');
+        return back()->with('success', 'Session terminated successfully.');
     }
 
     /**

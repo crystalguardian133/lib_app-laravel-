@@ -737,7 +737,9 @@ function deleteBook(bookId = null) {
     }
   }
 
-  const row = document.querySelector(`tr[data-id="${bookId}"]`);
+  const normalizedId = String(bookId ?? '').trim();
+  const row = document.querySelector(`tr[data-id="${normalizedId}"]`) ||
+    document.querySelector(`tr[data-legacy-id="${normalizedId}"]`);
   if (!row) {
     showToast("Book not found.", "error");
     return;

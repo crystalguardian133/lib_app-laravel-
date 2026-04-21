@@ -3,18 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Book extends Model
 {
     protected $table = 'books';
 
     protected $fillable = [
-        'title', 'author', 'genre', 'published_year', 'availability', 'qr_url', 'cover_image', 'genres'
+        'uuid', 'title', 'author', 'genre', 'published_year', 'availability', 'qr_url', 'cover_image', 'genres'
     ];
 
     protected $casts = [
         'genres' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Book $book) {
+            if (empty($book->uuid)) {
+                $book->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     /**
      * Get genres as an array, always.

@@ -87,7 +87,6 @@ class ChristmasEffects {
         // Handle user interaction for music playback
         document.addEventListener('click', () => {
             if (this.isActive && this.music && this.music.paused) {
-                this.music.play().catch(e => console.log('Could not play music after user interaction:', e));
             }
         }, { once: true }); // Only listen once
     }
@@ -126,7 +125,6 @@ class ChristmasEffects {
         this.addSantaHats();
         this.startMusic();
 
-        console.log('🎄 Christmas effects started!');
     }
 
     stopChristmasEffects() {
@@ -142,7 +140,6 @@ class ChristmasEffects {
         this.removeSantaHats();
         this.stopMusic();
 
-        console.log('❌ Christmas effects stopped!');
     }
 
     // Snow Effect System
@@ -617,15 +614,12 @@ class ChristmasEffects {
             const playPromise = this.music.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log('🎵 Christmas music started!');
                 }).catch(error => {
-                    console.log('Could not play Christmas music:', error);
                     // Show user-friendly message
                     this.showToast('info', 'Click anywhere to enable Christmas music! 🎵');
                 });
             }
         } catch (error) {
-            console.log('Error creating audio:', error);
         }
     }
 
@@ -718,7 +712,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleChristmasEffects = () => christmasEffects.toggle();
     window.getChristmasState = () => christmasEffects.getState();
 
-    console.log('🎄 Christmas effects system loaded and ready!');
 });
 
 // Export for module systems

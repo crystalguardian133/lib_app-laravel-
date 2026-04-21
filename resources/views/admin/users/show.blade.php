@@ -344,6 +344,8 @@
             </span>
         </div>
 
+        @php($userIdentifier = $user->uuid ?: $user->id)
+
         <div class="grid">
             <!-- Role Permissions -->
             <div class="card">
@@ -356,9 +358,7 @@
                 <div class="card-body">
                     <ul class="permission-list">
                         @forelse($rolePermissions as $permission)
-                        @php
-                            $isRevoked = $user->revokedPermissions->contains($permission->id);
-                        @endphp
+                        @php($isRevoked = $user->revokedPermissions->contains($permission->id))
                         <li class="permission-item" style="{{ $isRevoked ? 'opacity: 0.6;' : '' }}">
                             <div class="permission-info">
                                 <div class="permission-icon {{ $isRevoked ? 'revoked' : 'active' }}">
@@ -383,7 +383,7 @@
                                 </div>
                             </div>
                             @if($isRevoked)
-                                <form action="{{ route('admin.users.restore-permission', [$user->id, $permission->id]) }}" method="POST">
+                                <form action="{{ route('admin.users.restore-permission', [$userIdentifier, $permission->id]) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Restore this permission?')">
                                         <i class="fas fa-undo"></i> Restore
@@ -433,11 +433,9 @@
                                         <div class="permission-name">{{ $permission->name }}</div>
                                         <div class="permission-desc">{{ $permission->description }}</div>
                                         @if($permission->pivot->expires_at)
-                                            @php
-                                                $expiresAt = \Carbon\Carbon::parse($permission->pivot->expires_at);
-                                                $isExpired = $expiresAt->isPast();
-                                                $isSoon = $expiresAt->isFuture() && $expiresAt->diffInDays() <= 7;
-                                            @endphp
+                                            @php($expiresAt = \Carbon\Carbon::parse($permission->pivot->expires_at))
+                                            @php($isExpired = $expiresAt->isPast())
+                                            @php($isSoon = $expiresAt->isFuture() && $expiresAt->diffInDays() <= 7)
                                             <div class="expiry-info {{ $isExpired ? 'expired' : ($isSoon ? 'expiry-soon' : '') }}">
                                                 <i class="fas fa-clock"></i>
                                                 {{ $isExpired ? 'Expired' : 'Expires' }}: {{ $expiresAt->format('M d, Y') }}
@@ -445,7 +443,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <form action="{{ route('admin.users.revoke-special-permission', [$user->id, $permission->id]) }}" method="POST">
+                                <form action="{{ route('admin.users.revoke-special-permission', [$userIdentifier, $permission->id]) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Revoke this special permission?')">
@@ -474,11 +472,9 @@
             <div class="card-body">
                 <ul class="permission-list">
                     @foreach($allPermissions as $permission)
-                    @php
-                        $hasRolePermission = $user->role && $user->role->permissions->contains($permission->id);
-                        $hasSpecialPermission = $user->specialPermissions->contains($permission->id);
-                        $isRevoked = $user->revokedPermissions->contains($permission->id);
-                    @endphp
+                    @php($hasRolePermission = $user->role && $user->role->permissions->contains($permission->id))
+                    @php($hasSpecialPermission = $user->specialPermissions->contains($permission->id))
+                    @php($isRevoked = $user->revokedPermissions->contains($permission->id))
                     <li class="permission-item" style="{{ $isRevoked ? 'opacity: 0.6;' : '' }}">
                         <div class="permission-info">
                             <div class="permission-icon {{ $hasRolePermission || $hasSpecialPermission ? ($isRevoked ? 'revoked' : 'active') : 'inactive' }}">
@@ -507,14 +503,14 @@
                                     <i class="fas fa-ban"></i> Revoke
                                 </button>
                             @elseif($isRevoked)
-                                <form action="{{ route('admin.users.restore-permission', [$user->id, $permission->id]) }}" method="POST">
+                                <form action="{{ route('admin.users.restore-permission', [$userIdentifier, $permission->id]) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-success btn-sm">
                                         <i class="fas fa-undo"></i> Restore
                                     </button>
                                 </form>
                             @elseif(!$hasSpecialPermission)
-                                <form action="{{ route('admin.users.grant-special-permission', $user->id) }}" method="POST">
+                                <form action="{{ route('admin.users.grant-special-permission', $userIdentifier) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="permission_id" value="{{ $permission->id }}">
                                     <button type="submit" class="btn btn-primary btn-sm">
@@ -543,7 +539,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form action="{{ route('admin.users.grant-special-permission', $user->id) }}" method="POST">
+            <form action="{{ route('admin.users.grant-special-permission', $userIdentifier) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
@@ -584,7 +580,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form action="{{ route('admin.users.revoke-role-permission', $user->id) }}" method="POST">
+            <form action="{{ route('admin.users.revoke-role-permission', $userIdentifier) }}" method="POST">
                 @csrf
                 <input type="hidden" name="permission_id" id="revokePermissionId">
                 <div class="modal-body">

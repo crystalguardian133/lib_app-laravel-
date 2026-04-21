@@ -25,9 +25,8 @@ class CheckForceLogout
             
             // Check if user has been force-logged out
             if ($user->force_logout) {
-                // Clear remember token and sessions
+                // Invalidate tracked app sessions only.
                 LoginSession::invalidateAllForUser($user->id);
-                $user->forceFill(['remember_token' => null])->save();
                 
                 // Store message in session
                 Session::flash('toast_type', 'error');
@@ -51,9 +50,6 @@ class CheckForceLogout
 
             if ($currentSession) {
                 if (!$currentSession->is_active || ($currentSession->expires_at && $currentSession->expires_at->isPast())) {
-                    // Clear remember token
-                    $user->forceFill(['remember_token' => null])->save();
-
                     // Store message in session
                     Session::flash('toast_type', 'error');
                     Session::flash('toast_message', 'Your session has ended. Please log in again.');

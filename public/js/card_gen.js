@@ -92,29 +92,37 @@ const CARD_CONFIG = {
 
 async function openCardModal(memberId) {
     try {
-        const res = await fetch(`/members/${encodeURIComponent(memberId)}/json`);
-        if (!res.ok) throw new Error("Failed to fetch member data");
+        const res = await fetch(`/api/members/${encodeURIComponent(memberId)}`, {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+        if (!res.ok) {
+            if (res.status === 401 || res.status === 403) {
+                throw new Error('You do not have permission to view this member.');
+            }
+            throw new Error("Failed to fetch member data");
+        }
         const member = await res.json();
+        const row = document.querySelector(`tr[data-id="${String(memberId).trim()}"]`) ||
+            document.querySelector(`tr[data-legacy-id="${String(memberId).trim()}"]`);
+        const rowFullName = row?.dataset.fullName || '';
+        const rowMemberdate = row?.dataset.memberdate || '';
+        const rowPhotoUrl = row?.dataset.photoUrl || '';
+        const rowUuid = row?.dataset.uuid || row?.dataset.id || String(memberId).trim();
 
-        const firstName = member.firstName || member.first_name || '';
-        const middleName = member.middleName || member.middle_name || '';
-        const lastName = member.lastName || member.last_name || '';
-
-        // Format full name: LAST, FIRST M. - filter out null strings
-        const middleInitial = middleName && middleName !== 'null' && String(middleName).trim() 
-            ? String(middleName).charAt(0).toUpperCase() + "." 
-            : "";
-        const lastNameClean = String(lastName).trim() === 'null' ? '' : String(lastName).trim();
-        const firstNameClean = String(firstName).trim() === 'null' ? '' : String(firstName).trim();
-        const fullName = `${lastNameClean.toUpperCase()}, ${firstNameClean.toUpperCase()} ${middleInitial}`.replace(/,\s+,/, ',').trim();
+        const fullName = (member.full_name || member.fullName || rowFullName || [member.lastName || member.last_name, member.firstName || member.first_name, member.middleName || member.middle_name]
+            .filter(part => part && part !== 'null')
+            .join(' ')).trim();
 
         // Format address - filter out null strings
-        const houseNumber = (member.house_number || member.houseNumber || '').trim();
-        const street = (member.street || '').trim();
-        const barangay = (member.barangay || '').trim();
-        const municipality = (member.municipality || '').trim();
-        const province = (member.province || '').trim();
-        const contact = member.contactnumber || member.contactNumber || '';
+        const houseNumber = (member.house_number || member.houseNumber || row?.dataset.houseNumber || '').trim();
+        const street = (member.street || row?.dataset.street || '').trim();
+        const barangay = (member.barangay || row?.dataset.barangay || '').trim();
+        const municipality = (member.municipality || row?.dataset.municipality || '').trim();
+        const province = (member.province || row?.dataset.province || '').trim();
+        const contact = member.contactnumber || member.contactNumber || row?.dataset.contactnumber || '';
 
         // Build address, filtering out empty parts and 'null' strings
         const addressParts = [
@@ -128,25 +136,26 @@ async function openCardModal(memberId) {
 
         // Format membership date - remove timestamp, show only date
         let formattedDate = "";
-        if (member.memberdate) {
+        if (member.memberdate || rowMemberdate) {
             try {
-                const dateObj = new Date(member.memberdate);
+                const rawDate = member.memberdate || rowMemberdate;
+                const dateObj = new Date(rawDate);
                 if (!isNaN(dateObj)) {
                     formattedDate = dateObj.toISOString().split('T')[0]; // Returns YYYY-MM-DD
                 } else {
-                    formattedDate = member.memberdate;
+                    formattedDate = rawDate;
                 }
             } catch (e) {
-                formattedDate = member.memberdate;
+                formattedDate = member.memberdate || rowMemberdate;
             }
         }
 
         // Store member data globally for download
         window.currentMemberData = {
             fullName: fullName,
-            memberdate: formattedDate,
-            photo: member.photo || null,
-            id: member.id,
+            memberdate: formattedDate || rowMemberdate,
+            photo: member.photo_url || member.photo || rowPhotoUrl || null,
+            qrKey: member.uuid || rowUuid || null,
             address: address,
             contact: contact
         };
@@ -175,7 +184,7 @@ async function openCardModal(memberId) {
 function updateFrontCardPreview(memberData) {
     // Update name
     const nameEl = document.getElementById("card-name");
-    nameEl.innerText = memberData.fullName;
+    nameEl.innerText = memberData.fullName || "";
 
     // Update membership date VALUE
     const dateEl = document.getElementById("card-memberdate");
@@ -196,6 +205,7 @@ function updateFrontCardPreview(memberData) {
         position: absolute !important;
         top: 96px !important;
         right: 67px !important;
+        z-index: 3 !important;
     `;
     
     if (memberData.photo) {
@@ -226,11 +236,12 @@ function updateBackCardPreview(memberData) {
         width: 119px !important;
         height: 138px !important;
         position: absolute !important;
+        z-index: 3 !important;
     `;
     
-    if (memberData.id) {
+    if (memberData.qrKey) {
         const qrImg = document.createElement("img");
-        qrImg.src = `/qrcode/members/member-${memberData.id}.png`;
+        qrImg.src = `/qrcode/members/member-${memberData.qrKey}.png`;
         qrImg.style.cssText = `
             width: 100%;
             height: 100%;
@@ -371,7 +382,10 @@ async function generateFrontCard(memberData) {
 
         // Draw photo
         if (memberData.photo) {
-            const photoImg = await loadImage(memberData.photo);
+            const photoSrc = String(memberData.photo).startsWith('http://') || String(memberData.photo).startsWith('https://')
+                ? memberData.photo
+                : `/resource/member_images/${memberData.photo}`;
+            const photoImg = await loadImage(photoSrc);
             ctx.save();
             ctx.beginPath();
             ctx.rect(CARD_CONFIG.FRONT.photo.x, CARD_CONFIG.FRONT.photo.y, CARD_CONFIG.FRONT.photo.size, CARD_CONFIG.FRONT.photo.size);
@@ -421,9 +435,9 @@ async function generateBackCard(memberData) {
         ctx.fillText(memberData.contact || '', CARD_CONFIG.BACK.contactNumber.x, CARD_CONFIG.BACK.contactNumber.y);
 
         // Draw QR code
-        if (memberData.id) {
+        if (memberData.qrKey) {
             try {
-                const qrImg = await loadImage(`/qrcode/members/member-${memberData.id}.png`);
+                const qrImg = await loadImage(`/qrcode/members/member-${memberData.qrKey}.png`);
                 ctx.drawImage(qrImg, CARD_CONFIG.BACK.qr.x, CARD_CONFIG.BACK.qr.y, CARD_CONFIG.BACK.qr.width, CARD_CONFIG.BACK.qr.height);
             } catch (qrError) {
                 console.warn('Could not load QR code:', qrError);

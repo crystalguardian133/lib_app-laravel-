@@ -12,6 +12,13 @@ use Carbon\Carbon;
 
 class TimeLogController extends Controller
 {
+    private function findMemberByIdentifier(string $identifier): ?Member
+    {
+        return Member::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->first();
+    }
+
     public function index()
     {
         // Check if user has permission to access timelog
@@ -137,7 +144,7 @@ class TimeLogController extends Controller
             return response()->json(['message' => 'Unauthorized. You do not have permission to use QR scanner.'], 403);
         }
         
-        $member = Member::find($id);
+        $member = $this->findMemberByIdentifier((string) $id);
         if (!$member) {
             return response()->json(['message' => 'Member not found.'], 404);
         }

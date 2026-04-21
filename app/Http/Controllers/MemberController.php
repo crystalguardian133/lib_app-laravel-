@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Member;
+use App\Http\Resources\MemberJsonResource;
 use App\Models\Transaction;
 use App\Models\TimeLog;
 use App\Models\SystemLog;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use App\Http\Resources\MemberAdminResource;
+use App\Http\Resources\MemberLibrarianResource;
 
 class MemberController extends Controller
 {
@@ -123,7 +126,7 @@ class MemberController extends Controller
             ->pluck('municipality');
 
         foreach ($members as $member) {
-            $qrFile = 'member-' . $member->id . '.png';
+            $qrFile = 'member-' . $member->uuid . '.png';
             $qrPath = public_path('qrcode/members/' . $qrFile);
 
             if (!file_exists($qrPath)) {
@@ -340,9 +343,14 @@ public function update(Request $request, $id)
             }
         }
 
-        $qrPath = public_path('qrcode/members/member-' . $member->id . '.png');
-        if (File::exists($qrPath)) {
-            File::delete($qrPath);
+        $qrPaths = [
+            public_path('qrcode/members/member-' . $member->uuid . '.png'),
+            public_path('qrcode/members/member-' . $member->id . '.png'),
+        ];
+        foreach ($qrPaths as $qrPath) {
+            if (File::exists($qrPath)) {
+                File::delete($qrPath);
+            }
         }
 
         $memberData = [
@@ -374,7 +382,7 @@ public function update(Request $request, $id)
             mkdir($dir, 0755, true);
         }
 
-        $qrPath = $dir . 'member-' . $member->id . '.png';
+        $qrPath = $dir . 'member-' . $member->uuid . '.png';
 
         if (!file_exists($qrPath)) {
             $options = new QROptions([
@@ -392,54 +400,26 @@ public function update(Request $request, $id)
     }
 
 
-    public function jsonShow($id)
+    public function jsonShow(Member $memberUuid)
     {
-        $member = $this->findMemberOrFail((string) $id);
-
-        return response()->json([
-            'id'           => $member->id,
-            'uuid'         => $member->uuid,
-
-            // Legacy + new naming compatibility
-            'first_name'   => $member->first_name,
-            'firstName'    => $member->firstName,
-            'middle_name'  => $member->middle_name,
-            'middleName'   => $member->middleName,
-            'last_name'    => $member->last_name,
-            'lastName'     => $member->lastName,
-
-            'age'          => $member->age,
-            'barangay'     => $member->barangay,
-            'municipality' => $member->municipality,
-            'province'     => $member->province,
-            'house_number' => $member->house_number,
-            'houseNumber'  => $member->house_number,
-            'street'       => $member->street,
-
-            'contactnumber'=> $member->contactnumber,
-            'contactNumber'=> $member->contactNumber,
-            'memberdate'   => $member->memberdate,
-
-            // ✅ Photo URL or null
-            'photo' => $member->photo
-                ? URL::to('/resource/member_images/' . $member->photo)
-                : null,
-
-            // ✅ QR code URL (format: member-{id}.png)
-            'qr' => URL::to('/qrcode/members/member-' . $member->id . '.png'),
-
-            // ✅ Preformatted full name
-            'fullName' => trim(implode(' ', array_filter([
-                $member->firstName,
-                $member->middleName !== "null" ? $member->middleName : null,
-                $member->lastName,
-            ]))),
-        ]);
+        return new MemberJsonResource($memberUuid);
     }
 
-    public function apiShow($id)
+    public function apiShow(Request $request, $memberIdentifier)
     {
-        return $this->show($id);
+        $user = $request->user();
+
+        if (!$user || (!$user->hasRole('admin') && !$user->hasRole('librarian'))) {
+            return response()->json(['error' => 'Unauthorized. You do not have permission to view members.'], 403);
+        }
+
+        $member = $this->findMemberOrFail((string) $memberIdentifier);
+
+        if ($user->hasRole('admin')) {
+            return new MemberAdminResource($member);
+        }
+
+        return new MemberLibrarianResource($member);
     }
 
     public function show($id)
@@ -450,17 +430,32 @@ public function update(Request $request, $id)
 
         $member = $this->findMemberOrFail((string) $id);
 
-        // Ensure null values are replaced with empty strings
-        $first = $member->first_name ?? '';
-        $middle = $member->middle_name ?? '';
-        $last = $member->last_name ?? '';
-
-        // Remove extra spaces if middle name is empty
-        $fullName = trim("{$first} {$middle} {$last}");
-
-        return response()->json(array_merge($member->toArray(), [
+        return response()->json([
             'uuid' => $member->uuid,
-        ]));
+            'first_name' => $member->first_name,
+            'middle_name' => $member->middle_name,
+            'last_name' => $member->last_name,
+            'full_name' => trim(implode(' ', array_filter([
+                $member->first_name,
+                ($member->middle_name && $member->middle_name !== 'null') ? $member->middle_name : null,
+                $member->last_name,
+            ]))),
+            'age' => $member->age,
+            'house_number' => $member->house_number,
+            'street' => $member->street,
+            'barangay' => $member->barangay,
+            'municipality' => $member->municipality,
+            'province' => $member->province,
+            'contactnumber' => $member->contactnumber,
+            'email' => $member->email,
+            'school' => $member->school,
+            'memberdate' => $member->memberdate,
+            'photo_url' => $member->photo
+                ? URL::to('/resource/member_images/' . $member->photo)
+                : null,
+            'email_verified' => (bool) $member->email_verified,
+            'phone_verified' => (bool) $member->phone_verified,
+        ]);
     }
 
     public function getBorrowingHistory($memberId)

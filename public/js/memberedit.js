@@ -11,8 +11,7 @@ class EditModalHandler {
 
         if (this.modal && this.form) {
             this.initializeEventListeners();
-            console.log('EditModalHandler initialized successfully');
-        } else {o
+        } else {
             console.error('Modal or form elements not found');
         }
     }
@@ -21,17 +20,13 @@ class EditModalHandler {
       * Initialize all event listeners
       */
      initializeEventListeners() {
-         console.log('Initializing event listeners...');
-
          // Add table event listener for edit buttons
          const tableBody = document.getElementById('membersTableBody');
          if (tableBody) {
-             console.log('Adding table click event listener');
              tableBody.addEventListener('click', (e) => {
                  if (e.target.classList.contains('editBtn') || e.target.closest('.editBtn')) {
                      const button = e.target.classList.contains('editBtn') ? e.target : e.target.closest('.editBtn');
                      const memberId = button.getAttribute('data-id');
-                     console.log('Edit button clicked for member ID:', memberId);
                      this.openEditModal(memberId);
                  }
              });
@@ -41,7 +36,6 @@ class EditModalHandler {
 
          // Form submission
          if (this.form) {
-             console.log('Adding form submit event listener');
              this.form.addEventListener('submit', (e) => {
                  e.preventDefault();
                  this.submitEdit();
@@ -50,7 +44,6 @@ class EditModalHandler {
 
          // Close modal on backdrop click
          if (this.modal) {
-             console.log('Adding modal click event listener');
              this.modal.addEventListener('click', (e) => {
                  if (e.target === this.modal) {
                      this.closeEditModal();
@@ -74,8 +67,6 @@ class EditModalHandler {
                  }
              }
          });
-
-         console.log('Event listeners initialized');
      }
 
     /**
@@ -84,7 +75,6 @@ class EditModalHandler {
       */
      async openEditModal(memberId) {
          try {
-             console.log('Opening edit modal for member ID:', memberId);
              this.currentMemberId = memberId;
 
              // Show modal immediately
@@ -111,20 +101,15 @@ class EditModalHandler {
       * @returns {Promise<Object>} Member data
       */
      async fetchMemberData(memberId) {
-         console.log('Fetching member data for ID:', memberId);
-
          // Check if CSRF token exists
          const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-         if (!csrfTokenMeta) {
-             console.warn('CSRF token not found in meta tag');
-         }
 
-         const url = `/members/${memberId}`;
-         console.log('Request URL:', url);
+        const url = `/api/members/${encodeURIComponent(memberId)}`;
 
          try {
              const response = await fetch(url, {
                  method: 'GET',
+                 credentials: 'include',
                  headers: {
                      'Accept': 'application/json',
                      'Content-Type': 'application/json',
@@ -132,18 +117,16 @@ class EditModalHandler {
                  }
              });
 
-             console.log('Response status:', response.status);
-             console.log('Response content-type:', response.headers.get('content-type'));
-
              if (!response.ok) {
-                 const errorText = await response.text();
-                 console.error('Response error text:', errorText);
-
                  if (response.status === 419) {
                      throw new Error('CSRF token mismatch. Please refresh the page and try again.');
+                 } else if (response.status === 401 || response.status === 403) {
+                     throw new Error('You do not have permission to view this member.');
                  } else if (response.status === 404) {
                      throw new Error('Member not found. The member may have been deleted.');
                  } else {
+                     const errorText = await response.text();
+                     console.error('Response error text:', errorText);
                      throw new Error(`Server error (${response.status}): ${errorText}`);
                  }
              }
@@ -157,7 +140,6 @@ class EditModalHandler {
              }
 
              const data = await response.json();
-             console.log('Received member data:', data);
 
              // Handle different response formats
              if (data.error) {
@@ -175,51 +157,83 @@ class EditModalHandler {
      }
 
     /**
+      * Get fallback member data from the table row.
+      * @param {string} memberId
+      * @returns {Object|null}
+      */
+     getMemberRowData(memberId) {
+         const normalizedId = String(memberId ?? '').trim();
+         const row = document.querySelector(`tr[data-id="${normalizedId}"]`) ||
+             document.querySelector(`tr[data-legacy-id="${normalizedId}"]`);
+
+         if (!row) {
+             return null;
+         }
+
+         return {
+             uuid: row.dataset.id || normalizedId,
+             first_name: row.dataset.firstName || '',
+             middle_name: row.dataset.middleName || '',
+             last_name: row.dataset.lastName || '',
+             age: row.dataset.age || '',
+             house_number: row.dataset.houseNumber || '',
+             street: row.dataset.street || '',
+             barangay: row.dataset.barangay || '',
+             municipality: row.dataset.municipality || '',
+             province: row.dataset.province || '',
+             contactnumber: row.dataset.contactnumber || '',
+             email: row.dataset.email || '',
+             school: row.dataset.school || '',
+             memberdate: row.dataset.memberdate || '',
+             photo_url: row.dataset.photoUrl || ''
+         };
+     }
+
+    /**
       * Populate the form with member data
       * @param {Object} member - Member data object
       */
      populateForm(member) {
-         console.log('Populating form with member data:', member);
+         const fallbackMember = this.getMemberRowData(member.uuid || member.id || this.currentMemberId) || {};
+         const resolvedMember = { ...fallbackMember, ...member };
 
          // Set member ID
          const memberIdField = document.getElementById('editMemberId');
          if (memberIdField) {
-             memberIdField.value = member.id;
+             memberIdField.value = resolvedMember.uuid || resolvedMember.id || this.currentMemberId;
          }
 
          // Personal Information
-         this.setFieldValue('editFirstName', member.first_name);
-         this.setFieldValue('editMiddleName', member.middle_name);
-         this.setFieldValue('editLastName', member.last_name);
-         this.setFieldValue('editAge', member.age);
+         this.setFieldValue('editFirstName', resolvedMember.first_name);
+         this.setFieldValue('editMiddleName', resolvedMember.middle_name);
+         this.setFieldValue('editLastName', resolvedMember.last_name);
+         this.setFieldValue('editAge', resolvedMember.age);
 
          // Address Information
-         this.setFieldValue('editHouseNumber', member.house_number);
-         this.setFieldValue('editStreet', member.street);
-         this.setFieldValue('editBarangay', member.barangay);
-         this.setFieldValue('editMunicipality', member.municipality);
-         this.setFieldValue('editProvince', member.province);
+         this.setFieldValue('editHouseNumber', resolvedMember.house_number);
+         this.setFieldValue('editStreet', resolvedMember.street);
+         this.setFieldValue('editBarangay', resolvedMember.barangay);
+         this.setFieldValue('editMunicipality', resolvedMember.municipality);
+         this.setFieldValue('editProvince', resolvedMember.province);
 
          // Contact Information
-         this.setFieldValue('editContactNumber', member.contactnumber);
-         this.setFieldValue('editEmail', member.email);
-         this.setFieldValue('editSchool', member.school);
+         this.setFieldValue('editContactNumber', resolvedMember.contactnumber);
+         this.setFieldValue('editEmail', resolvedMember.email);
+         this.setFieldValue('editSchool', resolvedMember.school);
 
          // Photo preview in edit modal
-         const photoUrl = member.photo
-             ? (String(member.photo).startsWith('http') || String(member.photo).startsWith('/')
-                 ? member.photo
-                 : `/resource/member_images/${member.photo}`)
+         const photoSource = resolvedMember.photo_url || resolvedMember.photo
+             ? (String(resolvedMember.photo_url || resolvedMember.photo).startsWith('http') || String(resolvedMember.photo_url || resolvedMember.photo).startsWith('/')
+                 ? (resolvedMember.photo_url || resolvedMember.photo)
+                 : `/resource/member_images/${resolvedMember.photo_url || resolvedMember.photo}`)
              : '';
 
          if (typeof window.setPhotoPreviewFromUrl === 'function') {
-             window.setPhotoPreviewFromUrl('editPhoto', photoUrl);
+             window.setPhotoPreviewFromUrl('editPhoto', photoSource);
          }
 
          // Restore form from loading state
          this.restoreFromLoading();
-
-         console.log('Form populated and loading state cleared');
      }
 
      /**
@@ -300,7 +314,6 @@ class EditModalHandler {
       * Show the modal immediately
       */
      showModal() {
-         console.log('Showing edit modal immediately...');
 
          if (!this.modal) {
              console.error('Modal element not found!');
@@ -320,7 +333,6 @@ class EditModalHandler {
              }
          }
 
-         console.log('Edit modal displayed immediately');
      }
 
      /**
@@ -411,8 +423,6 @@ class EditModalHandler {
                  body: formData
              });
 
-             console.log('Update response status:', response.status);
-
              if (!response.ok) {
                  if (response.status === 419) {
                      throw new Error('CSRF token expired. Please refresh the page and try again.');
@@ -434,7 +444,6 @@ class EditModalHandler {
              }
 
              const data = await response.json();
-             console.log('Update response data:', data);
 
              if (data.success) {
                  this.showSuccess('Member updated successfully!');
@@ -483,7 +492,6 @@ class EditModalHandler {
 
          const row = editButton.closest('tr');
          if (!row) {
-             console.warn('Could not find table row for member ID:', member.id);
              return;
          }
 
@@ -520,8 +528,6 @@ class EditModalHandler {
                  day: 'numeric'
              });
          }
-
-         console.log('Table row updated successfully for member:', member.id);
      }
 
     /**
@@ -563,8 +569,6 @@ class EditModalHandler {
                  }
              });
 
-             console.log('Delete response status:', response.status);
-
              if (!response.ok) {
                  if (response.status === 419) {
                      throw new Error('CSRF token expired. Please refresh the page and try again.');
@@ -585,7 +589,6 @@ class EditModalHandler {
              }
 
              const data = await response.json();
-             console.log('Delete response data:', data);
 
              if (data.success) {
                  this.showSuccess('Member deleted successfully!');
@@ -709,20 +712,13 @@ class EditModalHandler {
 
 // Global functions for backward compatibility
 function editMember(memberId) {
-    console.log('editMember called with ID:', memberId);
-
     if (window.editModalHandler) {
-        console.log('EditModalHandler found, opening modal...');
         window.editModalHandler.openEditModal(memberId);
     } else {
-        console.error('EditModalHandler not initialized. Make sure memberedit.js is loaded after the modal HTML.');
-
         // Try to initialize if not already done
         if (document.getElementById('editModal') && document.getElementById('editForm')) {
-            console.log('Attempting to initialize EditModalHandler...');
             window.editModalHandler = new EditModalHandler();
             if (window.editModalHandler) {
-                console.log('EditModalHandler initialized successfully, opening modal...');
                 window.editModalHandler.openEditModal(memberId);
             }
         } else {
@@ -744,26 +740,13 @@ function deleteMember() {
 }
 
 // Simple initialization
- console.log('EditModalHandler loaded and ready');
-
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing EditModalHandler...');
-
     // Check if required elements exist
     const modal = document.getElementById('editModal');
     const form = document.getElementById('editForm');
 
-    console.log('Modal element found:', !!modal);
-    console.log('Form element found:', !!form);
-
     if (modal && form) {
         window.editModalHandler = new EditModalHandler();
-        console.log('EditModalHandler initialized successfully');
-    } else {
-        console.error('Required elements not found:', {
-            modal: !!modal,
-            form: !!form
-        });
     }
 });

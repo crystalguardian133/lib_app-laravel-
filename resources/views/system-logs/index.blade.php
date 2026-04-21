@@ -911,7 +911,6 @@
     <script>
         function viewLogDetails(logId) {
             // View log details functionality
-            console.log('Viewing log details for:', logId);
         }
     </script>
 </body>

@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
+    private function findBookOrFail(string $identifier): Book
+    {
+        return Book::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->firstOrFail();
+    }
+
     /**
      * Return all unique genres (flattened from genres array and legacy genre string) for filter dropdown.
      */
@@ -158,6 +165,7 @@ class BookController extends Controller
             foreach ($books as $book) {
                 $rows[] = [
                     'id' => $book->id,
+                    'uuid' => $book->uuid,
                     'title' => $book->title,
                     'author' => $book->author,
                     'genre' => $book->genre,
@@ -315,7 +323,7 @@ class BookController extends Controller
             return response()->json(['error' => 'Unauthorized. You do not have permission to view books.'], 403);
         }
 
-        return response()->json(Book::findOrFail($id));
+        return response()->json($this->findBookOrFail((string) $id));
     }
 
     public function update(Request $request, $id)
@@ -324,7 +332,7 @@ class BookController extends Controller
             return response()->json(['error' => 'Unauthorized. You do not have permission to update books.'], 403);
         }
 
-        $book = Book::findOrFail($id);
+        $book = $this->findBookOrFail((string) $id);
 
 
         $validated = $request->validate([
@@ -379,10 +387,10 @@ class BookController extends Controller
         }
 
         try {
-            $book = Book::findOrFail($id);
+            $book = $this->findBookOrFail((string) $id);
 
             $activeTransactions = \DB::table('transactions')
-                ->where('book_id', $id)
+                ->where('book_id', $book->id)
                 ->where('status', 'borrowed')
                 ->count();
 
@@ -398,13 +406,13 @@ class BookController extends Controller
                 'book_author'=> $book->author,
             ];
 
-            \DB::table('returns')->whereIn('transaction_id', function ($query) use ($id) {
-                $query->select('id')->from('transactions')->where('book_id', $id);
+            \DB::table('returns')->whereIn('transaction_id', function ($query) use ($book) {
+                $query->select('id')->from('transactions')->where('book_id', $book->id);
             })->delete();
 
-            \DB::table('transactions')->where('book_id', $id)->delete();
+            \DB::table('transactions')->where('book_id', $book->id)->delete();
 
-            Book::destroy($id);
+            $book->delete();
 
             try {
                 SystemLog::log(
@@ -567,7 +575,7 @@ class BookController extends Controller
             'scale'      => 10,
         ]);
 
-        $qrData = route('books.show', $book->id);
+        $qrData = route('books.show', ['book' => $book->uuid]);
         (new QRCode($options))->render($qrData, $qrPath);
 
         $book->qr_url = asset('qrcode/books/' . $qrFileName);

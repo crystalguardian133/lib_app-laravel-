@@ -45,7 +45,8 @@
                 $availabilityText = $hasAvailability ? $availability . ' copies' : '';
                 $genresList = $book->genres_list ?? [];
             @endphp
-            <tr data-id="{{ $book->id }}"
+            <tr data-id="{{ $book->uuid ?? $book->id }}"
+                data-legacy-id="{{ $book->id }}"
                 data-title="{{ $title }}"
                 data-author="{{ $author }}"
                 data-genre="{{ implode(', ', $genresList) }}"
@@ -85,17 +86,17 @@
                                 <i class="fas fa-qrcode"></i>
                             </button>
                         @else
-                            <button class="btn btn-outline btn-sm" onclick="window.generateQr({{ $book->id }})" title="Generate QR Code">
+                            <button class="btn btn-outline btn-sm" onclick="window.generateQr('{{ $book->uuid ?? $book->id }}')" title="Generate QR Code">
                                 <i class="fas fa-qrcode"></i> Gen
                             </button>
                         @endif
-                        <button class="btn btn-success btn-sm" onclick="window.borrowOne({{ $book->id }})" title="Borrow Book" {{ !$hasAvailability || $availability <= 0 ? 'disabled' : '' }}>
+                        <button class="btn btn-success btn-sm" onclick="window.borrowOne('{{ $book->uuid ?? $book->id }}')" title="Borrow Book" {{ !$hasAvailability || $availability <= 0 ? 'disabled' : '' }}>
                             <i class="fas fa-hand-holding"></i>
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="window.editBook({{ $book->id }})" title="Edit Book">
+                        <button class="btn btn-primary btn-sm" onclick="window.editBook('{{ $book->uuid ?? $book->id }}')" title="Edit Book">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm" onclick="window.deleteBook({{ $book->id }})" title="Delete Book">
+                        <button class="btn btn-danger btn-sm" onclick="window.deleteBook('{{ $book->uuid ?? $book->id }}')" title="Delete Book">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>

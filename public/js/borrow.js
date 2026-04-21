@@ -9,6 +9,17 @@ let selectionMode = false;
 // Enhanced book data structure for better readability
 let borrowerBooksData = [];
 
+function normalizeIdentifier(value) {
+    return String(value ?? '').trim();
+}
+
+function findBookRow(identifier) {
+    const normalized = normalizeIdentifier(identifier);
+    if (!normalized) return null;
+    return document.querySelector(`tr[data-id="${normalized}"]`) ||
+        document.querySelector(`tr[data-legacy-id="${normalized}"]`);
+}
+
 // DEBUG: Log when borrow.js is loaded
 console.log('🚀 BORROW.JS LOADED - Enhanced Multiple Books Version');
 
@@ -21,7 +32,7 @@ function addBookToBorrowerData(bookData) {
     }
 
     // Check if book already exists
-    const existingIndex = borrowerBooksData.findIndex(book => book.id === bookData.id);
+    const existingIndex = borrowerBooksData.findIndex(book => String(book.id) === String(bookData.id));
     if (existingIndex >= 0) {
         console.log('Book already in borrower data:', bookData.title);
         return false;
@@ -45,7 +56,8 @@ function addBookToBorrowerData(bookData) {
 }
 
 function removeBookFromBorrowerData(bookId) {
-    const index = borrowerBooksData.findIndex(book => book.id === bookId);
+    const normalizedBookId = normalizeIdentifier(bookId);
+    const index = borrowerBooksData.findIndex(book => String(book.id) === normalizedBookId);
     if (index >= 0) {
         const removedBook = borrowerBooksData.splice(index, 1)[0];
         console.log('Removed book from borrower data:', removedBook);
@@ -340,7 +352,7 @@ function confirmBorrow() {
 }
 
 function borrowOne(bookId) {
-    const row = document.querySelector(`tr[data-id="${bookId}"]`);
+    const row = findBookRow(bookId);
     if (!row) {
         showToast("Book not found", 'error');
         return;
@@ -394,7 +406,7 @@ function updateConfirmButtonState() {
 }
 
 function toggleBookSelection(bookId) {
-    const row = document.querySelector(`tr[data-id="${bookId}"]`);
+    const row = findBookRow(bookId);
     if (!row) return;
 
     if (row.classList.contains('selected')) {
@@ -459,29 +471,89 @@ function clearMemberInfo() {
 let memberSearchTimeout = null;
 let memberSuggestionMap = new Map();
 
+function setMemberFromSuggestion(member) {
+    const memberName = document.getElementById('memberName');
+    const memberId = document.getElementById('memberId');
+    const fullName = getMemberFullName(member);
+
+    if (!memberName || !fullName) return;
+
+    memberName.value = fullName;
+    memberName.style.cursor = 'text';
+    memberName.readOnly = false;
+
+    if (memberId) {
+        memberId.value = member.uuid || member.id || '';
+    }
+
+    clearMemberSuggestions();
+    updateConfirmButtonState();
+}
+
 function getMemberFullName(member) {
     if (!member) return '';
-    if (member.name) return String(member.name).trim();
 
-    return [member.first_name, member.middle_name, member.last_name]
-        .map(part => (part && part !== 'null' ? String(part).trim() : ''))
-        .filter(Boolean)
-        .join(' ')
-        .trim();
+    const clean = (value) => {
+        const str = String(value || '').trim();
+        if (str === 'null' || str === '' || /^[-_\.\s]+$/.test(str)) return '';
+        return str;
+    };
+
+    // Try single 'name' or 'full_name' field first
+    if (member.name) {
+        const nameValue = clean(member.name);
+        if (nameValue) return nameValue;
+    }
+    if (member.full_name) {
+        const fullNameValue = clean(member.full_name);
+        if (fullNameValue) return fullNameValue;
+    }
+
+    // Combine first/middle/last name parts
+    const parts = [
+        clean(member.first_name),
+        clean(member.middle_name),
+        clean(member.last_name)
+    ].filter(Boolean);
+
+    if (parts.length > 0) {
+        return parts.join(' ');
+    }
+
+    // Final fallback with ID
+    return `Member #${member.id || member.uuid || 'Unknown'}`;
 }
 
 function clearMemberSuggestions() {
     memberSuggestionMap.clear();
+
     const datalist = document.getElementById('memberNameList');
-    if (!datalist) return;
-    datalist.innerHTML = '';
+    if (datalist) {
+        datalist.innerHTML = '';
+    }
+
+    const suggestions = document.getElementById('memberSuggestions');
+    if (suggestions) {
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'none';
+    }
 }
 
 function renderMemberSuggestions(members) {
     const datalist = document.getElementById('memberNameList');
-    if (!datalist) return;
+    const suggestions = document.getElementById('memberSuggestions');
 
-    datalist.innerHTML = '';
+    if (!datalist && !suggestions) return;
+
+    if (datalist) {
+        datalist.innerHTML = '';
+    }
+
+    if (suggestions) {
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'none';
+    }
+
     memberSuggestionMap.clear();
 
     if (!Array.isArray(members) || members.length === 0) {
@@ -494,11 +566,29 @@ function renderMemberSuggestions(members) {
 
         memberSuggestionMap.set(fullName.toLowerCase(), member.uuid || member.id);
 
-        const option = document.createElement('option');
-        option.value = fullName;
-        option.label = `ID: ${member.id}`;
-        datalist.appendChild(option);
+        if (datalist) {
+            const option = document.createElement('option');
+            option.value = fullName;
+            option.label = `ID: ${member.id}`;
+            datalist.appendChild(option);
+        }
+
+        if (suggestions) {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'member-suggestion-item';
+            item.dataset.memberId = member.uuid || member.id;
+            item.dataset.memberName = fullName;
+            item.style.cssText = 'display:block; width:100%; text-align:left; border:none; background:transparent; padding:10px 12px; cursor:pointer; color: var(--text-primary);';
+            item.innerHTML = `<strong>${escapeHtml(fullName)}</strong><br><small style="color: var(--text-secondary);">ID: ${escapeHtml(String(member.id ?? ''))}</small>`;
+            item.addEventListener('click', () => setMemberFromSuggestion(member));
+            suggestions.appendChild(item);
+        }
     });
+
+    if (suggestions && suggestions.children.length > 0) {
+        suggestions.style.display = 'block';
+    }
 }
 
 async function fetchMemberSuggestions(query) {
@@ -566,7 +656,7 @@ function initializeMemberNameSearch() {
             if (Array.isArray(members) && members.length === 1) {
                 const exactName = normalize(getMemberFullName(members[0]));
                 if (exactName === normalize(query)) {
-                    if (memberId) memberId.value = members[0].id;
+                    if (memberId) memberId.value = members[0].uuid || members[0].id;
                     memberName.value = getMemberFullName(members[0]);
                     clearMemberSuggestions();
                     updateConfirmButtonState();
@@ -600,6 +690,22 @@ function initializeMemberNameSearch() {
         }
     });
 
+    memberName.addEventListener('blur', function() {
+        setTimeout(() => {
+            const suggestions = document.getElementById('memberSuggestions');
+            if (suggestions) {
+                suggestions.style.display = 'none';
+            }
+        }, 150);
+    });
+
+    memberName.addEventListener('click', function() {
+        if (memberName.value.trim().length >= 2) {
+            clearTimeout(memberSearchTimeout);
+            memberSearchTimeout = setTimeout(runSearch, 100);
+        }
+    });
+
     memberName.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             clearMemberSuggestions();
@@ -608,17 +714,18 @@ function initializeMemberNameSearch() {
 }
 
 function removeBookFromSelection(bookId) {
+    const normalizedBookId = normalizeIdentifier(bookId);
     // Remove from enhanced data structure
-    const removedBook = removeBookFromBorrowerData(bookId);
+    const removedBook = removeBookFromBorrowerData(normalizedBookId);
 
     // Remove visual selection
-    const row = document.querySelector(`tr[data-id="${bookId}"]`);
+    const row = findBookRow(normalizedBookId);
     if (row) {
         row.classList.remove('selected');
     }
 
     // Remove from UI list
-    const listItem = document.querySelector(`#selectedBooksList li[data-id="${bookId}"]`);
+    const listItem = document.querySelector(`#selectedBooksList li[data-id="${normalizedBookId}"]`);
     if (listItem) {
         listItem.remove();
     }
@@ -626,7 +733,7 @@ function removeBookFromSelection(bookId) {
     updateConfirmButtonState();
 
     if (removedBook) {
-        showToast(`Removed: ${removedBook.title} (ID: ${bookId})`, 'info');
+        showToast(`Removed: ${removedBook.title} (ID: ${normalizedBookId})`, 'info');
     } else {
         showToast('Book removed from selection', 'info');
     }
@@ -670,26 +777,18 @@ function exitSelectionMode() {
 }
 
 function toggleRowSelection(row) {
-    const bookId = row.dataset.id;
+    const bookId = normalizeIdentifier(row.dataset.id);
     const bookTitle = row.dataset.title;
 
-    let parsedBookId;
-    try {
-        parsedBookId = bookId ? parseInt(bookId, 10) : null;
-    } catch (e) {
-        console.error('Error parsing book ID:', bookId, e);
-        return;
-    }
-
-    if (!parsedBookId || isNaN(parsedBookId)) {
+    if (!bookId) {
         showToast('Error: Invalid book data', 'error');
         return;
     }
 
-    const index = selectedBooks.findIndex(b => b.id === parsedBookId);
+    const index = selectedBooks.findIndex(b => String(b.id) === bookId);
 
     if (index === -1) {
-        selectedBooks.push({ id: parsedBookId, title: bookTitle || 'Unknown Title' });
+        selectedBooks.push({ id: bookId, title: bookTitle || 'Unknown Title' });
         row.classList.add('selected');
     } else {
         selectedBooks.splice(index, 1);
@@ -702,22 +801,15 @@ function selectAllBooks() {
     let newSelections = 0;
 
     visibleRows.forEach(row => {
-        const bookId = row.dataset.id;
+        const bookId = normalizeIdentifier(row.dataset.id);
         const bookTitle = row.dataset.title;
 
-        let parsedBookId;
-        try {
-            parsedBookId = bookId ? parseInt(bookId, 10) : null;
-        } catch (e) {
+        if (!bookId) {
             return;
         }
 
-        if (!parsedBookId || isNaN(parsedBookId)) {
-            return;
-        }
-
-        if (!selectedBooks.find(b => b.id === parsedBookId)) {
-            selectedBooks.push({ id: parsedBookId, title: bookTitle || 'Unknown Title' });
+        if (!selectedBooks.find(b => String(b.id) === bookId)) {
+            selectedBooks.push({ id: bookId, title: bookTitle || 'Unknown Title' });
             row.classList.add('selected');
             newSelections++;
         }
@@ -755,14 +847,14 @@ function deleteSelected() {
     let booksToProcess = selectedBooks;
     if (selectedBooks.length > 0 && (typeof selectedBooks[0] === 'number' || typeof selectedBooks[0] === 'string')) {
         booksToProcess = selectedBooks.map(id => {
-            const row = document.querySelector(`tr[data-id="${id}"]`);
+            const row = findBookRow(id);
             const title = row ? row.dataset.title : 'Unknown Title';
             return { id: id, title: title };
         });
     }
 
     const validBooks = booksToProcess.filter(book => {
-        return book.id && book.id !== 'undefined' && book.id !== '' && !isNaN(book.id);
+        return book.id && book.id !== 'undefined' && String(book.id).trim() !== '';
     });
 
     if (validBooks.length === 0) {
@@ -809,7 +901,7 @@ function deleteMultipleBooks() {
         .then(response => {
             if (response.ok) {
                 completed++;
-                const row = document.querySelector(`tr[data-id="${book.id}"]`);
+                const row = findBookRow(book.id);
                 if (row) row.remove();
             } else {
                 failed++;
@@ -843,7 +935,7 @@ function editBook(bookId) {
         document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
         selectedBooks = [];
 
-        const row = document.querySelector(`tr[data-id="${bookId}"]`);
+        const row = findBookRow(bookId);
         if (row) {
             row.classList.add('selected');
             selectedBooks.push({ id: bookId, title: row.dataset.title });
@@ -1202,6 +1294,8 @@ function debugButtonState() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    initializeMemberNameSearch();
+
     const forceEnableButtons = () => {
         const buttons = document.querySelectorAll('button');
         buttons.forEach(btn => {
@@ -1340,23 +1434,25 @@ function processBookQR(qrData) {
     const normalizeBookId = (value) => {
         if (value === null || value === undefined) return null;
         const str = String(value).trim();
+        if (!str) return null;
+
+        const uuidMatch = str.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}/);
+        if (uuidMatch) return uuidMatch[0];
+
         const directNumeric = parseInt(str, 10);
-        if (!isNaN(directNumeric)) return directNumeric;
+        if (!isNaN(directNumeric)) return String(directNumeric);
 
         const bookPattern = str.match(/book\s*#?\s*(\d+)/i);
-        if (bookPattern) return parseInt(bookPattern[1], 10);
+        if (bookPattern) return String(bookPattern[1]);
 
-        const idPattern = str.match(/(\d+)/);
-        if (idPattern) return parseInt(idPattern[1], 10);
-
-        return null;
+        return str;
     };
 
     const loadBookData = async (id) => {
-        const tableRow = document.querySelector(`tr[data-id="${id}"]`);
+        const tableRow = findBookRow(id);
         if (tableRow) {
             return {
-                id: id,
+                id: normalizeIdentifier(tableRow.dataset.id || id),
                 title: tableRow.dataset.title || 'Unknown Title',
                 author: tableRow.dataset.author || 'Unknown Author',
                 genre: tableRow.dataset.genre || null,
@@ -1377,7 +1473,7 @@ function processBookQR(qrData) {
                 if (!response.ok) continue;
                 const data = await response.json();
                 return {
-                    id: parseInt(data.id ?? id, 10),
+                    id: normalizeIdentifier(data.uuid || data.id || id),
                     title: data.title || 'Unknown Title',
                     author: data.author || 'Unknown Author',
                     genre: data.genre || null,
@@ -1401,13 +1497,13 @@ function processBookQR(qrData) {
     } catch {
         const match = qrData.match(/book-(\d+)/);
         if (match) {
-            bookId = parseInt(match[1], 10);
+            bookId = String(match[1]);
         } else {
             bookId = normalizeBookId(qrData.split('/').pop() || qrData);
         }
     }
 
-    if (!bookId || isNaN(bookId)) {
+    if (!bookId) {
         showToast('Invalid book QR code', 'error');
         return;
     }
@@ -1433,7 +1529,7 @@ function processBookQR(qrData) {
             return;
         }
 
-        const row = document.querySelector(`tr[data-id="${bookId}"]`);
+        const row = findBookRow(bookData.id);
         if (row) {
             row.classList.add('selected');
         }
@@ -1542,5 +1638,7 @@ window.processMemberQR = processMemberQR;
 window.processBookQR = processBookQR;
 window.addBookToBorrow = addBookToBorrow;
 window.initializeQRModalElements = initializeQRModalElements;
+window.initializeMemberNameSearch = initializeMemberNameSearch;
+window.clearMemberSuggestions = clearMemberSuggestions;
 
 window.openQRScanner = showQRScannerModal;

@@ -17,7 +17,15 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $roles): Response
     {
+        $expectsJson = $request->expectsJson() || $request->is('api/*');
+
         if (!$request->user()) {
+            if ($expectsJson) {
+                return response()->json([
+                    'error' => 'Unauthenticated.',
+                ], 401);
+            }
+
             return redirect()->route('login');
         }
 
@@ -47,6 +55,13 @@ class CheckRole
                 $toastMessage = 'Only Admins can access this feature.';
             } else {
                 $toastMessage = 'You do not have permission to access this feature.';
+            }
+
+            if ($expectsJson) {
+                return response()->json([
+                    'error' => $toastMessage,
+                    'required_roles' => array_map('trim', $roles),
+                ], 403);
             }
 
             // Redirect back with toast notification

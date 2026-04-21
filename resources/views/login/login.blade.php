@@ -617,7 +617,7 @@
         </form>
 
         <div class="login-footer">
-            <a href="#">
+            <a href="{{ route('password.forgot') }}">
                 <i class="fas fa-key" style="margin-right: 0.25rem;"></i>
                 Forgot your password?
             </a>

@@ -738,6 +738,7 @@
                             </thead>
                             <tbody>
                                 @foreach($users as $user)
+                                @php($userIdentifier = $user->uuid ?: $user->id)
                                 <tr>
                                     <td>
                                         <div class="user-info">
@@ -773,13 +774,13 @@
                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                     <td>
                                         <div class="actions">
-                                            <a href="{{ route('admin.users.edit', $user->id) }}" class="action-btn action-btn-edit" title="Edit User">
+                                            <a href="{{ route('admin.users.edit', $userIdentifier) }}" class="action-btn action-btn-edit" title="Edit User">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{{ route('admin.users.show', $user->id) }}" class="action-btn action-btn-special" title="Manage Permissions">
+                                            <a href="{{ route('admin.users.show', $userIdentifier) }}" class="action-btn action-btn-special" title="Manage Permissions">
                                                 <i class="fas fa-shield-alt"></i>
                                             </a>
-                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display: inline;">
+                                            <form action="{{ route('admin.users.destroy', $userIdentifier) }}" method="POST" style="display: inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="action-btn action-btn-delete" title="Delete User" onclick="return confirm('Are you sure you want to delete this user?')">
@@ -787,9 +788,9 @@
                                                 </button>
                                             </form>
 @if($user->id !== auth()->id())
-                                            <form action="{{ route('admin.users.force-logout', $user->id) }}" method="POST" style="display: inline;" class="force-logout-form" data-user-id="{{ $user->id }}">
+                                            <form action="{{ route('admin.users.force-logout', $userIdentifier) }}" method="POST" style="display: inline;" class="force-logout-form" data-user-id="{{ $userIdentifier }}">
                                                 @csrf
-                                                <button type="submit" class="action-btn action-btn-logout {{ $user->force_logout ? 'hidden' : 'visible' }}" data-user-id="{{ $user->id }}" title="{{ $user->force_logout ? 'Already force logged out' : 'Force Logout' }}" onclick="return confirm('Are you sure you want to force logout this user?')" {{ $user->force_logout ? 'disabled' : '' }}>
+                                                <button type="submit" class="action-btn action-btn-logout {{ $user->force_logout ? 'hidden' : 'visible' }}" data-user-id="{{ $userIdentifier }}" title="{{ $user->force_logout ? 'Already force logged out' : 'Force Logout' }}" onclick="return confirm('Are you sure you want to force logout this user?')" {{ $user->force_logout ? 'disabled' : '' }}>
                                                     <i class="fas fa-sign-out-alt"></i>
                                                 </button>
                                             </form>

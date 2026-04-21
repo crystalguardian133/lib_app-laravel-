@@ -5504,7 +5504,6 @@
                     const dt = new DataTransfer();
                     dt.items.add(file);
                     coverInput.files = dt.files;
-                    console.log('Updated form with selected image:', imageName);
                 }
             } catch (error) {
                 console.error('Error updating form with selected image:', error);
@@ -5795,15 +5794,11 @@
         // Load non-Julita demographics
         function loadNonJulitaDemographics() {
             console.log('Loading non-Julita demographics...');
-            console.log('Full demographicsData:', demographicsData);
-            console.log('Municipalities object:', demographicsData.municipalities);
-            console.log('Municipalities keys:', Object.keys(demographicsData.municipalities || {}));
             
             const municipalities = Object.entries(demographicsData.municipalities || {})
                 .filter(([name, data]) => data && data.count > 0)
                 .sort((a, b) => b[1].count - a[1].count);
             
-            console.log('Filtered municipalities data:', municipalities);
             console.log('Municipalities count:', municipalities.length);
             
             // Create municipality chart
@@ -6249,7 +6244,6 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched monthly borrows data:', data);
 
                     // Validate data structure
                     if (this.validateMonthlyData(data)) {
@@ -6303,13 +6297,11 @@
             if (!forceRefresh) {
                 const cached = analyticsCache.get(cacheKey);
                 if (cached) {
-                    console.log('📊 Using cached active areas data');
                     return cached;
                 }
             }
 
             try {
-                console.log('🔄 Fetching fresh active areas data...');
                 const response = await fetch('/api/analytics/active-areas', {
                     method: 'GET',
                     headers: {
@@ -6322,18 +6314,15 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched active areas data:', data);
 
                     // Validate and structure data
                     if (this.validateActiveAreasData(data)) {
                         analyticsCache.set(cacheKey, data);
                         return data;
                     } else {
-                        console.warn('⚠️ Invalid active areas data structure, using fallback');
                         return getFallbackActiveAreasData();
                     }
                 } else {
-                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
                     return getFallbackActiveAreasData();
                 }
             } catch (error) {
@@ -6360,6 +6349,12 @@
         }
 
         // ===== CHART LOADING & ERROR HANDLING =====
+        function getCssColor(variableName, fallbackColor) {
+            const rootStyles = getComputedStyle(document.documentElement);
+            const value = rootStyles.getPropertyValue(variableName).trim();
+            return value || fallbackColor;
+        }
+
         // Show loading state on chart canvas
         function showChartLoading(canvas, message = 'Loading...') {
             const ctx = canvas.getContext('2d');
@@ -6370,11 +6365,11 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Set background
-            ctx.fillStyle = 'var(--surface, #ffffff)';
+            ctx.fillStyle = getCssColor('--surface', '#ffffff');
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw loading text
-            ctx.fillStyle = 'var(--text-muted, #64748b)';
+            ctx.fillStyle = getCssColor('--text-muted', '#64748b');
             ctx.font = '14px Outfit, Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(message, centerX, centerY);
@@ -6384,7 +6379,7 @@
             ctx.translate(centerX, centerY - 30);
             ctx.beginPath();
             ctx.arc(0, 0, 10, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'var(--primary, #6366f1)';
+            ctx.strokeStyle = getCssColor('--primary', '#6366f1');
             ctx.lineWidth = 2;
             ctx.stroke();
 
@@ -6392,7 +6387,7 @@
             const time = Date.now() * 0.005;
             ctx.beginPath();
             ctx.arc(0, 0, 10, time, time + Math.PI);
-            ctx.strokeStyle = 'var(--accent, #06b6d4)';
+            ctx.strokeStyle = getCssColor('--accent', '#06b6d4');
             ctx.stroke();
             ctx.restore();
         }
@@ -6413,22 +6408,22 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Set background
-            ctx.fillStyle = 'var(--surface, #ffffff)';
+            ctx.fillStyle = getCssColor('--surface', '#ffffff');
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw error icon
-            ctx.fillStyle = 'var(--danger, #ef4444)';
+            ctx.fillStyle = getCssColor('--danger', '#ef4444');
             ctx.font = '24px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('⚠️', centerX, centerY - 20);
 
             // Draw error text
-            ctx.fillStyle = 'var(--text-primary, #1e293b)';
+            ctx.fillStyle = getCssColor('--text-primary', '#1e293b');
             ctx.font = '14px Outfit, Inter, sans-serif';
             ctx.fillText(message, centerX, centerY + 10);
 
             // Draw retry hint
-            ctx.fillStyle = 'var(--text-muted, #64748b)';
+            ctx.fillStyle = getCssColor('--text-muted', '#64748b');
             ctx.font = '12px Outfit, Inter, sans-serif';
             ctx.fillText('Please refresh the page', centerX, centerY + 30);
         }
@@ -6525,10 +6520,6 @@
                 }
 
                 const totalVisits = peakHoursData.data.reduce((sum, val) => sum + val, 0);
-                console.log('📊 Creating peak hours chart with:', {
-                    hours: peakHoursData.labels.length,
-                    totalVisits
-                });
 
                 const colors = getChartThemeColors();
                 const isDarkMode = document.body.classList.contains('dark-mode');
@@ -6674,8 +6665,6 @@
                     }
                 });
 
-                console.log('✅ Peak hours chart created successfully');
-
             } catch (error) {
                 console.error('❌ Error creating peak hours chart:', error);
                 clearChartLoading(ctx);
@@ -6713,11 +6702,6 @@
                     showChartError(ctx, 'No age activity data available');
                     return;
                 }
-
-                console.log('📊 Creating age activity chart with:', {
-                    ageGroups: ageActivityData.labels.length,
-                    datasets: ageActivityData.datasets.length
-                });
 
                 const colors = getChartThemeColors();
                 const isDarkMode = document.body.classList.contains('dark-mode');
@@ -6851,8 +6835,6 @@
                         }
                     }
                 });
-
-                console.log('✅ Age activity chart created successfully');
 
             } catch (error) {
                 console.error('❌ Error creating age activity chart:', error);
@@ -7074,7 +7056,6 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched book borrowing frequency data:', data);
 
                     // Validate data structure
                     if (data && data.books && data.totalBorrows !== undefined) {
@@ -7143,10 +7124,6 @@
                 }
 
                 const totalActivities = activeAreasData.data.reduce((sum, val) => sum + val, 0);
-                console.log('📊 Creating active areas chart with:', {
-                    areas: activeAreasData.labels.length,
-                    totalActivities
-                });
 
                 // Check for dark mode
                 const isDarkMode = document.body.classList.contains('dark-mode');
@@ -7271,8 +7248,6 @@
                     }
                 });
 
-                console.log('✅ Active areas chart created successfully');
-
                 // Apply current filter after chart creation
                 const filterSelect = document.getElementById('activeAreasFilter');
                 if (filterSelect) {
@@ -7378,11 +7353,9 @@
                     },
                     credentials: 'same-origin'
                 });
-                console.log('API Response status:', response.status);
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('API Response data:', data);
                     processDemographicsData(data);
                 } else {
                     console.warn('Failed to load demographics data (HTTP ' + response.status + ')');
@@ -7400,7 +7373,6 @@
 
         // Process demographics data from API
         function processDemographicsData(data) {
-            console.log('Processing demographics data:', data);
 
             // Reset data
             Object.keys(demographicsData.julitaBarangays).forEach(barangay => {
@@ -7470,9 +7442,7 @@
                 console.warn('No nonJulitaMembers data found or not an array:', data.nonJulitaMembers);
             }
 
-            console.log('Processed demographics data:', demographicsData);
             console.log('Municipalities count:', Object.keys(demographicsData.municipalities).length);
-            console.log('Municipalities data:', demographicsData.municipalities);
 
             // Reload the current view to refresh data display
             const currentView = document.getElementById('demographicsFilter')?.value || 'julita';
@@ -7829,7 +7799,6 @@
         // External Data Integration Functions
         function loadExternalMapData(dataSource, callback) {
             // Function to load external data for map integration
-            console.log('Loading external data from:', dataSource);
             
             // Placeholder for external API calls
             // This can be integrated with:
@@ -7846,7 +7815,6 @@
 
         function integrateExternalMapData(container, externalData, type) {
             // Function to integrate external data with the map containers
-            console.log('Integrating external data:', externalData, 'for type:', type);
             
             // Placeholder for external data integration
             // This can handle:
@@ -8133,13 +8101,11 @@
             if (!forceRefresh) {
                 const cached = analyticsCache.get(cacheKey);
                 if (cached) {
-                    console.log('📊 Using cached peak hours data');
                     return cached;
                 }
             }
 
             try {
-                console.log('🔄 Fetching fresh peak hours data for:', filterValue);
                 const response = await fetch(`/api/analytics/peak-hours?period=${filterValue}`, {
                     method: 'GET',
                     headers: {
@@ -8152,18 +8118,15 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched peak hours data:', data);
 
                     // Validate data structure
                     if (validatePeakHoursData(data)) {
                         analyticsCache.set(cacheKey, data);
                         return data;
                     } else {
-                        console.warn('⚠️ Invalid data structure, using fallback');
                         return getFallbackPeakHoursData(filterValue);
                     }
                 } else {
-                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
                     return getFallbackPeakHoursData(filterValue);
                 }
             } catch (error) {
@@ -8209,13 +8172,11 @@
             if (!forceRefresh) {
                 const cached = analyticsCache.get(cacheKey);
                 if (cached) {
-                    console.log('📊 Using cached age activity data');
                     return cached;
                 }
             }
 
             try {
-                console.log('🔄 Fetching fresh age activity data for:', filterValue);
                 const response = await fetch(`/api/analytics/age-activity?period=${filterValue}`, {
                     method: 'GET',
                     headers: {
@@ -8228,18 +8189,15 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched age activity data:', data);
 
                     // Validate data structure
                     if (validateAgeActivityData(data)) {
                         analyticsCache.set(cacheKey, data);
                         return data;
                     } else {
-                        console.warn('⚠️ Invalid data structure, using fallback');
                         return getFallbackAgeActivityData(filterValue);
                     }
                 } else {
-                    console.warn(`⚠️ API returned ${response.status}, using fallback`);
                     return getFallbackAgeActivityData(filterValue);
                 }
             } catch (error) {
@@ -8320,7 +8278,6 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('✅ Fetched most borrowed book trend data:', data);
 
                     // Validate data structure
                     if (validateBookTrendData(data)) {

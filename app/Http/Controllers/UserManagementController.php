@@ -7,10 +7,25 @@ use App\Models\LoginSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class UserManagementController extends Controller
 {
+    private function findUserOrFail(string $identifier): User
+    {
+        $query = User::query();
+
+        if (Schema::hasColumn((new User())->getTable(), 'uuid')) {
+            $query->where('uuid', $identifier)
+                ->orWhere('id', $identifier);
+        } else {
+            $query->where('id', $identifier);
+        }
+
+        return $query->firstOrFail();
+    }
+
     /**
      * Display a listing of users.
      */
@@ -101,7 +116,15 @@ class UserManagementController extends Controller
      */
     public function show($id)
     {
-        $user = User::with(['role.permissions', 'specialPermissions', 'revokedPermissions'])->findOrFail($id);
+        $user = User::with(['role.permissions', 'specialPermissions', 'revokedPermissions']);
+
+        if (Schema::hasColumn((new User())->getTable(), 'uuid')) {
+            $user = $user->where('uuid', $id)->orWhere('id', $id);
+        } else {
+            $user = $user->where('id', $id);
+        }
+
+        $user = $user->firstOrFail();
         $allPermissions = Permission::all();
         $rolePermissions = $user->role ? $user->role->permissions : collect([]);
 
@@ -113,7 +136,7 @@ class UserManagementController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
         $roles = Role::all();
 
         return view('admin.users.edit', compact('user', 'roles'));
@@ -124,12 +147,12 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
 
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'role_id' => 'required|exists:roles,id',
         ];
 
@@ -190,7 +213,7 @@ class UserManagementController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
 
         // Prevent deleting yourself
         if ($user->id === auth()->id()) {
@@ -239,7 +262,7 @@ class UserManagementController extends Controller
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
         $newRole = Role::findOrFail($request->role_id);
 
         // Prevent changing your own role
@@ -287,7 +310,7 @@ class UserManagementController extends Controller
             'expires_at' => 'nullable|date|after_or_equal:today',
         ]);
 
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
         $permission = Permission::findOrFail($request->permission_id);
 
         // Check if user already has this permission (either via role or special)
@@ -345,7 +368,7 @@ class UserManagementController extends Controller
      */
     public function revokeSpecialPermission($userId, $permissionId)
     {
-        $user = User::findOrFail($userId);
+        $user = $this->findUserOrFail((string) $userId);
         $permission = Permission::findOrFail($permissionId);
 
         if (!$user->specialPermissions->contains($permission->id)) {
@@ -393,7 +416,7 @@ class UserManagementController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        $user = User::findOrFail($userId);
+        $user = $this->findUserOrFail((string) $userId);
         $permission = Permission::findOrFail($request->permission_id);
 
         // Check if user has this permission via role
@@ -451,7 +474,7 @@ class UserManagementController extends Controller
      */
     public function forceLogout(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
 
         // Prevent force logging out yourself
         if ($user->id === auth()->id()) {
@@ -503,7 +526,7 @@ class UserManagementController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
         
         // Check if user has force_logout flag set
         $forceLogout = $user->force_logout;
@@ -538,7 +561,7 @@ class UserManagementController extends Controller
      */
     public function clearForceLogoutFlag(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->findUserOrFail((string) $id);
         $authUser = auth()->user();
         
         // Allow the user themselves or an admin to clear the flag

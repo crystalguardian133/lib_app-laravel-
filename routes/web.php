@@ -11,6 +11,7 @@ use App\Http\Controllers\BorrowController;
 use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\SystemLogsController;
+use App\Http\Controllers\PasswordResetController;
 
 // Redirect root to the dashboard
 Route::get('/', function () {
@@ -22,7 +23,24 @@ Route::get('/', function () {
 // ===========================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::post('/login', [LoginController::class, 'login'])
+        ->middleware('throttle:5,5')  // Max 5 attempts per 15 minutes
+        ->name('login.post');
+
+    // Forgot password flow
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.forgot');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetEmail'])
+        ->middleware('throttle:5,5')
+        ->name('password.send-reset-email');
+    
+    // Email verification
+    Route::get('/forgot-password/verify-email', [PasswordResetController::class, 'showVerifyEmail'])->name('password.verify-email');
+    Route::post('/forgot-password/verify-email', [PasswordResetController::class, 'verifyEmail'])->name('password.verify-email.post');
+    
+    // Reset password
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+        ->middleware('throttle:5,15')
+        ->name('password.reset');
 });
 
 // Logout route (accessible when authenticated)
@@ -55,10 +73,6 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
     Route::get('/notifications/overdue', function () {
         return view('overdue');
     })->name('notifications.overdue');
-    Route::get('/api/notifications/overdue', [BorrowController::class, 'getOverdueAndDueSoon'])
-        ->name('api.notifications.overdue');
-    Route::post('/api/notifications/overdue/semi-auto-mailer', [BorrowController::class, 'sendSemiAutoOverdueMailer'])
-        ->name('api.notifications.overdue.semi-auto-mailer');
 });
 
 // ===========================
@@ -73,39 +87,18 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
 // AUDIO ROUTES
 // Admin and Librarian only
 // ===========================
-Route::middleware(['auth', 'restrict.assistant'])->group(function () {
-    Route::get('/api/audio/files', [AdminController::class, 'getAudioFiles'])->name('api.audio.files');
-});
-
-// ===========================
-// ANALYTICS ROUTES
-// Admin and Librarian only
-// ===========================
-Route::middleware(['auth', 'restrict.assistant'])->group(function () {
-    Route::get('/api/analytics/monthly-borrows', [AdminController::class, 'getMonthlyBorrowsApi'])->name('api.analytics.monthly-borrows');
-    Route::get('/api/analytics/active-areas', [AdminController::class, 'getActiveAreasApi'])->name('api.analytics.active-areas');
-    Route::get('/api/analytics/books-trend', [AdminController::class, 'getBooksTrendApi'])->name('api.analytics.books-trend');
-    Route::get('/api/analytics/book-borrowing-frequency', [AdminController::class, 'getBookBorrowingFrequencyApi'])->name('api.analytics.book-borrowing-frequency');
-    Route::get('/api/analytics/peak-hours', [AdminController::class, 'getPeakHoursApi'])->name('api.analytics.peak-hours');
-    Route::get('/api/analytics/age-activity', [AdminController::class, 'getAgeActivityApi'])->name('api.analytics.age-activity');
-});
-
 // ===========================
 // BOOKS ROUTES
 // Admin and Librarian only
 // ===========================
 // Dynamic genres for filter (must be declared before books/{book})
 Route::middleware(['auth', 'permission:manage-books'])->group(function () {
-    Route::get('/api/books/genres', [BookController::class, 'allGenres'])->name('api.books.genres');
     Route::get('/books/genres', [BookController::class, 'allGenres'])->name('books.genres');
 });
 
 Route::middleware(['auth', 'restrict.assistant', 'permission:manage-books'])->group(function () {
     Route::resource('books', BookController::class)->except(['index', 'show']);
     Route::post('/books/{id}/generate-qr', [BookController::class, 'generateQr'])->name('books.generateQr');
-    Route::get('/api/media/images', [BookController::class, 'getMediaImages'])->name('api.media.images');
-    Route::post('/api/media/upload-temp', [BookController::class, 'uploadTempImage'])->name('api.media.upload-temp');
-    Route::post('/api/media/cleanup-temp', [BookController::class, 'cleanupTempImages'])->name('api.media.cleanup-temp');
 });
 
 // Books index/show routes (restricted to users with manage-books permission)
@@ -120,12 +113,17 @@ Route::middleware(['auth', 'permission:manage-books'])->group(function () {
 Route::middleware(['auth', 'restrict.assistant'])->group(function () {
     Route::get('/members/search', [BorrowController::class, 'search']);
     Route::get('/suggest-members', [BorrowController::class, 'suggestMembers']);
+    Route::get('/members/lookup/{id}', [BorrowController::class, 'show']);
 });
 
 // ===========================
 // MEMBERS ROUTES
 // Admin and Librarian only
 // ===========================
+Route::middleware(['auth', 'permission:manage-members'])->group(function () {
+    Route::resource('members', MemberController::class)->only(['index', 'show']);
+});
+
 Route::middleware(['auth', 'restrict.assistant', 'permission:manage-members'])->group(function () {
     Route::resource('members', MemberController::class)->except(['index', 'show']);
     Route::get('/members/{memberId}/borrowing-history', [MemberController::class, 'getBorrowingHistory'])->name('members.borrowing-history');
@@ -138,16 +136,6 @@ Route::middleware(['auth', 'restrict.assistant', 'permission:manage-members'])->
         ->middleware('throttle:3,10')
         ->name('members.send-email-code-registration');
     Route::post('/members/verify-email-code-registration', [MemberController::class, 'verifyEmailCodeForRegistration'])->name('members.verify-email-code-registration');
-});
-
-// Members index/show routes (restricted to users with manage-members permission)
-Route::middleware(['auth', 'permission:manage-members'])->group(function () {
-    Route::resource('members', MemberController::class)->only(['index', 'show']);
-});
-
-// Card JSON endpoint (restricted to users with manage-members permission)
-Route::middleware(['auth', 'permission:manage-members'])->group(function () {
-    Route::get('/members/{id}/json', [MemberController::class, 'jsonShow'])->name('members.json');
 });
 
 // ===========================
@@ -182,7 +170,7 @@ Route::middleware('auth')->group(function () {
 // SYSTEM LOGS ROUTES
 // Admin only - protected by auth and permission check in controller
 // ===========================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/system-logs', [SystemLogsController::class, 'index'])->name('system-logs.index');
     Route::post('/system-logs/clear', [SystemLogsController::class, 'clear'])->name('system-logs.clear');
 });
@@ -198,10 +186,11 @@ Route::middleware(['auth', 'restrict.assistant'])->group(function () {
         ->middleware('role:admin')
         ->middleware('throttle:12,1')
         ->name('auth.force-logout-status');
-    // Allow authenticated users to clear their own force-logout flag after login
-    Route::post('/users/{id}/clear-force-logout', [\App\Http\Controllers\UserManagementController::class, 'clearForceLogoutFlag'])
-        ->name('users.clear-force-logout');
 });
+
+Route::post('/users/{id}/clear-force-logout', [\App\Http\Controllers\UserManagementController::class, 'clearForceLogoutFlag'])
+    ->middleware('auth')
+    ->name('users.clear-force-logout');
 
 // ===========================
 // USER MANAGEMENT ROUTES

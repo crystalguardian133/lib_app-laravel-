@@ -226,7 +226,7 @@
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     padding: 14px 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     transition: all 0.3s ease;
     font-weight: 500;
     position: relative;

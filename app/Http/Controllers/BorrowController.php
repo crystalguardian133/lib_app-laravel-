@@ -14,6 +14,20 @@ use Illuminate\Support\Facades\Mail;
 
 class BorrowController extends Controller
 {
+    private function findMemberByIdentifier(string $identifier): ?Member
+    {
+        return Member::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->first();
+    }
+
+    private function findBookByIdentifier(string $identifier): ?Book
+    {
+        return Book::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->first();
+    }
+
     /**
      * Main borrow method - handles the borrow/process endpoint
      */
@@ -57,7 +71,7 @@ class BorrowController extends Controller
             $member = null;
             
             if ($memberId) {
-                $member = Member::where('uuid', $memberId)->orWhere('id', $memberId)->first();
+                $member = $this->findMemberByIdentifier((string) $memberId);
             }
             
             if (!$member) {
@@ -91,7 +105,7 @@ class BorrowController extends Controller
 
             try {
                 foreach ($bookIds as $bookId) {
-                    $book = Book::find($bookId);
+                    $book = $this->findBookByIdentifier((string) $bookId);
 
                     if (!$book) {
                         $errors[] = "Book ID {$bookId} not found";
@@ -187,15 +201,21 @@ class BorrowController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'member_id' => 'required|integer|exists:members,id',
+            'member_id' => 'required',
             'book_ids'  => 'required|array',
             'due_date'  => 'required|date|after_or_equal:today',
         ]);
 
-        $member = Member::find($validated['member_id']);
+        $member = $this->findMemberByIdentifier((string) $validated['member_id']);
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Member not found.',
+            ], 404);
+        }
 
         foreach ($validated['book_ids'] as $bookId) {
-            $book = Book::find($bookId);
+            $book = $this->findBookByIdentifier((string) $bookId);
 
             if (!$book || $book->availability <= 0) {
                 return response()->json([
@@ -206,7 +226,7 @@ class BorrowController extends Controller
 
             Transaction::create([
                 'member_id'   => $member->id,
-                'book_id'     => $bookId,
+                'book_id'     => $book->id,
                 'borrow_date' => now(),
                 'due_date'    => $validated['due_date'],
                 'status' => 'borrowed',
@@ -245,6 +265,9 @@ class BorrowController extends Controller
      * Search members by query string
      */
     public function search(Request $request)
+
+
+
     {
         $query = $request->input('query');
 
@@ -255,7 +278,9 @@ class BorrowController extends Controller
         $members = Member::select(
             'id',
             'uuid',
-            DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name)) as name")
+            'first_name',
+            'middle_name',
+            'last_name'
         )
         ->where(DB::raw("TRIM(CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), last_name))"), 'LIKE', '%' . $query . '%')
         ->limit(10)

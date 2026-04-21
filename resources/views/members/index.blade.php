@@ -2904,6 +2904,9 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
   }
 
   /* Card overlay elements */
@@ -2913,6 +2916,7 @@
     font-family: 'Inter', sans-serif;
     pointer-events: none;
     font-weight: bold;
+    z-index: 2;
   }
 
   .overlay.name {
@@ -2961,6 +2965,7 @@
     backdrop-filter: var(--glass-blur);
     position: absolute;
     margin: 0;
+    z-index: 3;
   }
 
   .overlay.photo img {
@@ -2977,6 +2982,7 @@
     width: 119px;
     height: 138px;
     transform: none;
+    z-index: 3;
   }
 
   .overlay.qr img {
@@ -3178,10 +3184,11 @@
   .modal-content,
   .modal-card,
   .card-modal-content {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)) !important;
     backdrop-filter: blur(20px) !important;
-    box-shadow: var(--shadow-lg) !important;
-    border-radius: 24px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(99, 102, 241, 0.5) !important;
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 
   /* Photo Upload Modal Styles */
@@ -3201,7 +3208,7 @@
 
   .photo-upload-modal-content {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 600px;
@@ -4567,6 +4574,7 @@
               @if(isset($members) && $members->count())
                 @foreach ($members as $member)
                   @php
+                    $memberIdentifier = $member->uuid ?: $member->id;
                     $memberName = trim((( !empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : '')
                       . (((!empty($member->first_name) && $member->first_name !== 'null') && (!empty($member->last_name) && $member->last_name !== 'null')) ? ', ' : '')
                       . (( !empty($member->first_name) && $member->first_name !== 'null') ? $member->first_name : '')
@@ -4578,8 +4586,32 @@
                       (!empty($member->municipality) && $member->municipality !== 'null') ? $member->municipality : null,
                       (!empty($member->province) && $member->province !== 'null') ? $member->province : null
                     ])->filter()->implode(', ');
+                    $memberPhotoUrl = (!empty($member->photo) && $member->photo !== 'null') ? asset('resource/member_images/' . $member->photo) : '';
+                    $memberFullName = trim(implode(' ', array_filter([
+                      (!empty($member->first_name) && $member->first_name !== 'null') ? $member->first_name : null,
+                      (!empty($member->middle_name) && $member->middle_name !== 'null') ? $member->middle_name : null,
+                      (!empty($member->last_name) && $member->last_name !== 'null') ? $member->last_name : null,
+                    ])));
                   @endphp
-                  <tr>
+                  <tr
+                    data-id="{{ $memberIdentifier }}"
+                    data-full-name="{{ e($memberFullName) }}"
+                    data-first-name="{{ e($member->first_name ?? '') }}"
+                    data-middle-name="{{ e($member->middle_name ?? '') }}"
+                    data-last-name="{{ e($member->last_name ?? '') }}"
+                    data-age="{{ e($member->age ?? '') }}"
+                    data-house-number="{{ e($member->house_number ?? '') }}"
+                    data-street="{{ e($member->street ?? '') }}"
+                    data-barangay="{{ e($member->barangay ?? '') }}"
+                    data-municipality="{{ e($member->municipality ?? '') }}"
+                    data-province="{{ e($member->province ?? '') }}"
+                    data-contactnumber="{{ e($member->contactnumber ?? '') }}"
+                    data-email="{{ e($member->email ?? '') }}"
+                    data-school="{{ e($member->school ?? '') }}"
+                    data-memberdate="{{ e($member->memberdate ?? '') }}"
+                    data-address="{{ e($memberAddress) }}"
+                    data-photo-url="{{ e($memberPhotoUrl) }}"
+                  >
                     <td style="font-weight: 600; color: var(--text-primary);" title="{{ $memberName !== '' ? $memberName : '-' }}">{{ $memberName !== '' ? $memberName : '-' }}</td>
                     <td title="{{ $member->age ?? '-' }}">{{ $member->age ?? '-' }}</td>
                     <td title="{{ $memberAddress !== '' ? $memberAddress : '-' }}">{{ $memberAddress !== '' ? $memberAddress : '-' }}</td>
@@ -4603,11 +4635,11 @@
                     </td>
                     <td>
                       <div class="action-buttons">
-                        <button class="btn btn-primary btn-sm" onclick="editMember({{ $member->id }})" title="Edit Member">
+                        <button class="btn btn-primary btn-sm" onclick='editMember(@json((string) $memberIdentifier))' title="Edit Member">
                           <i class="fas fa-edit"></i>
                         </button>
                         @if(!$member->email_verified && $member->email)
-                          <button class="btn btn-success btn-sm" id="verifyEmailBtn_{{ $member->id }}" onclick="openEmailVerificationModal({{ $member->id }}, '{{ $member->email }}')" title="Verify Email">
+                          <button class="btn btn-success btn-sm" id="verifyEmailBtn_{{ $memberIdentifier }}" onclick='openEmailVerificationModal(@json((string) $memberIdentifier), @json($member->email))' title="Verify Email">
                             <i class="fas fa-envelope"></i>
                           </button>
                         @elseif($member->email_verified)
@@ -4615,10 +4647,10 @@
                             <i class="fas fa-check"></i>
                           </button>
                         @endif
-                        <button class="btn btn-outline btn-sm" onclick="viewMemberActivity({{ $member->id }})" title="View Activity History">
+                        <button class="btn btn-outline btn-sm" onclick='viewMemberActivity(@json((string) $memberIdentifier))' title="View Activity History">
                           <i class="fas fa-history"></i>
                         </button>
-                        <button class="btn btn-outline btn-sm" onclick="openCardModal({{ $member->id }})" title="View Membership Card">
+                        <button class="btn btn-outline btn-sm" onclick='openCardModal(@json((string) $memberIdentifier))' title="View Membership Card">
                           <i class="fas fa-id-card"></i>
                         </button>
                       </div>
@@ -5693,15 +5725,30 @@ function switchActivityTab(tabName) {
 async function fetchMemberActivity(memberId) {
     try {
         // Fetch member basic info
-        const memberResponse = await fetch(`/members/${memberId}`);
-        if (!memberResponse.ok) throw new Error('Failed to fetch member data');
+  const memberResponse = await fetch(`/api/members/${encodeURIComponent(memberId)}`, {
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
+        if (!memberResponse.ok) {
+            if (memberResponse.status === 401 || memberResponse.status === 403) {
+                throw new Error('You do not have permission to view this member.');
+            }
+            throw new Error('Failed to fetch member data');
+        }
 
-        const member = await memberResponse.json();
-        const fullName = [member.last_name, member.first_name, member.middle_name].filter(n => n && n !== 'null').join(' ');
+        const memberPayload = await memberResponse.json();
+        const member = memberPayload?.data || memberPayload;
+        const row = document.querySelector(`tr[data-id="${String(memberId).trim()}"]`) ||
+          document.querySelector(`tr[data-legacy-id="${String(memberId).trim()}"]`);
+        const fullName = (member?.full_name || row?.dataset.fullName || [member?.last_name, member?.first_name, member?.middle_name]
+          .filter(n => n && n !== 'null')
+          .join(' ')).trim();
         document.getElementById('activityMemberName').textContent = fullName || 'Unknown Member';
 
         // Update member avatar
-        updateMemberAvatar(member.photo);
+      updateMemberAvatar(member?.photo_url || member?.photo || row?.dataset.photoUrl);
 
         // Fetch borrowing history
         const borrowingResponse = await fetch(`/members/${memberId}/borrowing-history`);
@@ -5944,6 +5991,7 @@ function showNotification(message, type = 'info') {
 
 // Enhanced button click handlers with visual feedback
 function addButtonClickEffect(button) {
+  if (!button) return;
     button.classList.add('loading');
     
     // Remove loading state after a short delay
@@ -5953,25 +6001,37 @@ function addButtonClickEffect(button) {
 }
 
 // Override existing functions to add visual feedback
-const originalEditMember = editMember;
-editMember = function(memberId) {
-    const button = event.target.closest('.btn');
-    addButtonClickEffect(button);
+const originalEditMember = typeof window.editMember === 'function' ? window.editMember : null;
+window.editMember = function(memberId) {
+  const button = (typeof event !== 'undefined' && event && event.target)
+    ? event.target.closest('.btn')
+    : null;
+  addButtonClickEffect(button);
+  if (originalEditMember) {
     originalEditMember(memberId);
+  }
 };
 
-const originalOpenCardModal = openCardModal;
-openCardModal = function(memberId) {
-    const button = event.target.closest('.btn');
-    addButtonClickEffect(button);
+const originalOpenCardModal = typeof window.openCardModal === 'function' ? window.openCardModal : null;
+window.openCardModal = function(memberId) {
+  const button = (typeof event !== 'undefined' && event && event.target)
+    ? event.target.closest('.btn')
+    : null;
+  addButtonClickEffect(button);
+  if (originalOpenCardModal) {
     originalOpenCardModal(memberId);
+  }
 };
 
-const originalViewMemberActivity = viewMemberActivity;
-viewMemberActivity = function(memberId) {
-    const button = event.target.closest('.btn');
-    addButtonClickEffect(button);
+const originalViewMemberActivity = typeof window.viewMemberActivity === 'function' ? window.viewMemberActivity : null;
+window.viewMemberActivity = function(memberId) {
+  const button = (typeof event !== 'undefined' && event && event.target)
+    ? event.target.closest('.btn')
+    : null;
+  addButtonClickEffect(button);
+  if (originalViewMemberActivity) {
     originalViewMemberActivity(memberId);
+  }
 };
 
 // SMS Verification Functions
@@ -6054,7 +6114,7 @@ async function verifySmsCode() {
 // ============================================
 
 // For existing members (via modal)
-let currentEmailMemberId = null;
+var currentEmailMemberId = null;
 
 function openEmailVerificationModal(memberId, email) {
     currentEmailMemberId = memberId;
@@ -6299,7 +6359,6 @@ function sendRegistrationEmailCode() {
             let notificationMsg = 'Verification code sent to your email!';
             if (data.debug_code) {
                 notificationMsg += ` (Debug code: ${data.debug_code})`;
-                console.log('Debug verification code:', data.debug_code);
             }
             showNotification(notificationMsg, 'success');
         } else {

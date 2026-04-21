@@ -317,7 +317,8 @@
                 </div>
                 @endif
 
-                <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+                @php($userIdentifier = $user->uuid ?: $user->id)
+                <form action="{{ route('admin.users.update', $userIdentifier) }}" method="POST">
                     @csrf
                     @method('PUT')
                     

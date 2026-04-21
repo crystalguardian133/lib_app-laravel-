@@ -43,8 +43,24 @@
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-md: 16px;
+    --radius-lg: 6px;
+    --radius-xl: 28px;
+    --radius-full: 50%;
     /* Transitions */
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 30px 60px rgba(0, 0, 0, 0.25);
   }
   /* 🌙 DARK MODE - With Dark Gray Background */
   body.dark-mode {
@@ -96,14 +112,18 @@
     background: rgba(255, 255, 255, 0.05);
   }
   body.dark-mode .form-control {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(71, 85, 105, 0.5);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(25, 35, 50, 0.5));
+    border-color: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
+
   body.dark-mode .form-control:focus {
-    background: rgba(30, 41, 59, 1);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(25, 35, 50, 0.7));
     border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
+
   body.dark-mode .form-control:hover {
     border-color: rgba(255, 255, 255, 0.2);
   }
@@ -190,7 +210,7 @@
   width: 170px;
   height: 170px;
   object-fit: contain;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   transition: var(--transition-spring);
   filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
 }
@@ -229,7 +249,7 @@
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     padding: 14px 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     transition: all 0.3s ease;
     font-weight: 500;
     position: relative;
@@ -282,7 +302,7 @@
     color: white;
     border: none;
     padding: 12px 24px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     font-weight: 600;
     text-decoration: none;
     display: flex;
@@ -469,7 +489,7 @@
   .btn {
     padding: 10px 20px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 14px;
@@ -569,7 +589,7 @@
   .filter-select {
     padding: 10px 14px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 14px;
@@ -615,16 +635,27 @@
   }
 
   .btn-confirm {
-    background: linear-gradient(135deg, var(--success), #059669);
+    background: linear-gradient(135deg, var(--success), #10b981);
     color: white;
-    box-shadow: var(--shadow);
-    transition: var(--transition-spring);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .btn-confirm:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
-    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(16, 185, 129, 0.4);
+  }
+
+  .btn-confirm:active {
+    transform: translateY(-1px);
   }
 
   /* Table Styles */
@@ -746,7 +777,7 @@
     width: 40px;
     height: 55px;
     object-fit: cover;
-    border-radius: var(--radius-sm);
+    border-radius: 6px;
     box-shadow: var(--shadow);
     transition: var(--transition);
   }
@@ -767,7 +798,7 @@
   /* Status badges */
   .status-badge {
     padding: 4px 12px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-xl);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -822,7 +853,7 @@
     border: 1px solid var(--border);
     background: var(--bg-primary);
     color: var(--text-primary);
-    border-radius: 6px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     transition: var(--transition);
     font-size: 13px;
@@ -848,7 +879,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: var(--radius-lg);
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
@@ -886,7 +917,7 @@
   .entries-select {
     padding: 6px 10px;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: var(--radius-lg);
     background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 14px;
@@ -972,7 +1003,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
   }
 
   .btn-select-all:hover {
@@ -993,7 +1024,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
   }
 
   .btn-unselect-all:hover {
@@ -1026,7 +1057,6 @@
     cursor: pointer;
   }
 
-  /* Modal Styles */
   .modal {
     display: none;
     position: fixed;
@@ -1034,14 +1064,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 999997; /* Base modal z-index */
+    z-index: 999997;
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .modal-overlay {
@@ -1051,14 +1081,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 999997; /* Base modal overlay z-index */
+    z-index: 999997;
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .modal-overlay.active {
@@ -1102,17 +1132,17 @@
 
 
   .modal-content, .modal-card {
-    background: var(--surface-elevated);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
+    background: linear-gradient(135deg, var(--surface-elevated) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 32px;
     width: 100%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(99, 102, 241, 0.5);
     animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
   }
@@ -1130,9 +1160,14 @@
 
   body.dark-mode .modal-content,
   body.dark-mode .modal-card {
-    background: var(--surface-elevated);
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(35, 35, 35, 0.85));
     color: var(--text-primary);
-    border-color: var(--glass-border);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  body.dark-mode .modern-modal-container {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(35, 35, 35, 0.85));
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
   .modal-header {
@@ -1140,8 +1175,8 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   body.dark-mode .modal-header {
@@ -1149,8 +1184,8 @@
   }
 
   .modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 800;
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1159,6 +1194,7 @@
     align-items: center;
     gap: 12px;
     margin: 0;
+    letter-spacing: -0.5px;
   }
 
   .modal-close, .close-modal {
@@ -1168,7 +1204,7 @@
     color: var(--text-secondary);
     cursor: pointer;
     padding: 8px 12px;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     transition: var(--transition);
     width: 40px;
     height: 40px;
@@ -1192,10 +1228,10 @@
   .modal-footer, .modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
+    gap: 12px;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 2px solid var(--border-light);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   body.dark-mode .modal-footer,
@@ -1208,15 +1244,18 @@
   }
 
   .section-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.1);
   }
 
   .form-grid {
@@ -1232,35 +1271,39 @@
   }
 
   .form-group label {
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
     font-size: 0.95rem;
+    letter-spacing: 0.3px;
   }
 
   .form-control {
     padding: 12px 16px;
-    border: 2px solid var(--glass-border);
-    border-radius: var(--radius);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: var(--text-primary);
     font-size: 1rem;
-    transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   .form-control:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), var(--shadow);
-    background: var(--surface-elevated);
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 4px rgba(47, 185, 235, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    transform: translateY(-2px);
   }
 
   .form-control:hover {
-    border-color: var(--primary);
+    border-color: rgba(255, 255, 255, 0.25);
     transform: translateY(-1px);
   }
 
@@ -1272,7 +1315,7 @@
     border: 2px solid var(--glass-border);
     color: var(--text-primary);
     transition: var(--transition);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     padding: 8px 12px;
     font-size: 1rem;
     font-weight: 500;
@@ -1291,7 +1334,7 @@
     margin-bottom: 8px;
     background: var(--surface);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1327,7 +1370,7 @@
   /* Cover Preview Area */
   #cover-preview-area {
     border: 2px dashed var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     padding: 2rem;
     text-align: center;
     transition: var(--transition);
@@ -1428,6 +1471,39 @@
   @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes iconBounce {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(-90deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  @keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(40px) scale(0.95); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0) scale(1); 
+    }
   }
 
   /* Responsive Design */
@@ -1558,31 +1634,34 @@
     }
 }
 
-/* Modern Modal Styles */
+/* ✨ REDESIGNED MODERN MODAL STYLES */
 .modern-modal-container {
-  background: var(--surface-elevated);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  background: linear-gradient(135deg, var(--surface-elevated) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(99, 102, 241, 0.5);
   width: 100%;
   max-width: 800px;
-  max-height: 450px;
-  aspect-ratio: 16 / 9;
+  max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transform: scale(0.9) translateY(20px);
+  transform: scale(0.85) translateY(40px);
   opacity: 0;
-  transition: var(--transition);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .modal-overlay.active .modern-modal-container {
   transform: scale(1) translateY(0);
   opacity: 1;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2), 0 0 40px rgba(99, 102, 241, 0.15);
 }
 
 .modern-modal-header {
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: 1px solid var(--border);
+  padding: 28px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1590,9 +1669,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--surface-elevated);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .header-gradient-bg {
@@ -1614,16 +1693,16 @@
 }
 
 .modal-icon-container {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   background: linear-gradient(135deg, var(--primary), var(--accent));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.2rem;
-  box-shadow: var(--shadow-lg);
+  font-size: 1.4rem;
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -1638,15 +1717,15 @@
 }
 
 .modal-main-title {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.95rem;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0;
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.5px;
 }
 
 .modal-description {
@@ -1657,29 +1736,33 @@
 }
 
 .modern-close-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  width: 32px;
-  height: 32px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-fast);
-  color: var(--text-muted);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: var(--text-secondary);
   position: relative;
   z-index: 2;
+  font-size: 1.2rem;
+  backdrop-filter: blur(10px);
 }
 
 .modern-close-btn:hover {
-  background: var(--danger);
+  background: linear-gradient(135deg, var(--danger), #dc2626);
   color: white;
   border-color: var(--danger);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
 }
 
 .modern-modal-body {
-  padding: var(--spacing-xl) var(--spacing-2xl);
+  padding: 28px 32px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1700,13 +1783,14 @@
 }
 
 .modern-modal-footer {
-  padding: var(--spacing-sm) var(--spacing-xl);
-  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 12px;
   justify-content: flex-end;
   flex-shrink: 0;
   align-items: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03), rgba(6, 182, 212, 0.03));
 }
 
 .footer-actions {
@@ -1715,13 +1799,13 @@
 }
 
 .btn-cancel-premium {
-  background: linear-gradient(135deg, #9ca3af, #6b7280);
-  color: white;
-  box-shadow: var(--shadow);
-  transition: var(--transition-spring);
-  border: none;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 12px 28px;
+  border-radius: 24px;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -1730,20 +1814,22 @@
 }
 
 .btn-cancel-premium:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: var(--shadow-lg);
-  background: linear-gradient(135deg, #6b7280, #4b5563);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
 }
 
 .btn-submit-premium {
-  background: linear-gradient(135deg, var(--success), #059669);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   color: white;
-  box-shadow: var(--shadow);
-  transition: var(--transition-spring);
-  border: none;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
-  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(47, 185, 235, 0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1753,9 +1839,13 @@
 }
 
 .btn-submit-premium:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: var(--shadow-lg);
-  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(47, 185, 235, 0.4);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.btn-submit-premium:active {
+  transform: translateY(-1px);
 }
 
 .btn-glow {
@@ -1776,14 +1866,14 @@
 .premium-form-section {
   margin-bottom: 2rem;
   animation: slideInFromLeft 0.6s ease-out;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  box-shadow: var(--glass-shadow);
-  transition: var(--transition);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .premium-form-section:nth-child(even) {
@@ -1791,9 +1881,9 @@
 }
 
 .premium-form-section:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
-  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 0 40px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .section-header {
@@ -1831,22 +1921,23 @@
 }
 
 .premium-upload-area {
-  border: 3px dashed var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
+  border: 3px dashed rgba(99, 102, 241, 0.3);
+  border-radius: 24px;
+  padding: 40px 24px;
   text-align: center;
-  transition: var(--transition-fast);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(6, 182, 212, 0.05));
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .premium-upload-area:hover {
   border-color: var(--primary);
-  background: rgba(99, 102, 241, 0.05);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(6, 182, 212, 0.1));
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
 }
 
 .upload-zone {
@@ -1864,16 +1955,16 @@
 }
 
 .upload-icon-circle {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   background: linear-gradient(135deg, var(--primary), var(--accent));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.2rem;
-  box-shadow: var(--shadow-md);
+  font-size: 1.4rem;
+  box-shadow: 0 12px 32px rgba(47, 185, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -1982,29 +2073,29 @@
 
 .premium-input {
   padding: 12px 16px;
-  border: 2px solid var(--glass-border);
-  border-radius: 12px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--text-primary);
   font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
   width: 100%;
 }
 
 .premium-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 4px rgba(47, 185, 235, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  transform: translateY(-2px);
 }
 
 .premium-input:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
@@ -2052,17 +2143,16 @@ body.dark-mode .modern-close-btn:hover {
 }
 
 body.dark-mode .premium-input {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(71, 85, 105, 0.5);
-  color: var(--text-primary);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(25, 35, 50, 0.5));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
 
-body.dark-mode .premium-input:focus {
-  background: rgba(30, 41, 59, 1);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), 0 4px 12px rgba(0, 0, 0, 0.3);
-}
+  body.dark-mode .premium-input:focus {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(25, 35, 50, 0.7));
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.3);
 
 body.dark-mode .premium-input:hover {
   border-color: rgba(255, 255, 255, 0.2);
@@ -2118,117 +2208,125 @@ body.dark-mode .premium-input:hover {
 }
 
 body.dark-mode .premium-upload-area {
-  background: rgba(30, 41, 59, 0.3);
-  border-color: #9ca3af;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08));
+    border-color: rgba(99, 102, 241, 0.25);
+  }
+
+  body.dark-mode .premium-upload-area:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
 }
 
-body.dark-mode .premium-upload-area:hover {
-  background: rgba(6, 182, 212, 0.1);
-  border-color: var(--accent);
-}
-
-/* QR Scanner Modal - Right Side */
-.qr-scanner-modal {
+/* QR Scanner Modal - Clean Redesign */
+#qrScannerPanel {
   position: fixed;
   top: 0;
   right: 0;
-  width: 350px;
-  height: 100vh;
+  bottom: 0;
+  width: 360px;
   background: var(--surface-elevated);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border-left: 1px solid var(--glass-border);
   box-shadow: var(--shadow-xl);
-  z-index: 9999;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
+  z-index: 999999;
+  transform: translateX(400px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex;
   flex-direction: column;
 }
 
-.qr-scanner-modal.active {
+#qrScannerPanel.show {
   transform: translateX(0);
 }
 
-.qr-scanner-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.qr-scanner-header {
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--border);
+.qr-panel-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--surface-elevated);
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.qr-scanner-header h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 600;
+.qr-panel-header-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.qr-scanner-close {
+.qr-panel-header-title i {
+  color: var(--primary);
+}
+
+.qr-panel-close-btn {
   background: none;
   border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
   color: var(--text-muted);
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 8px;
-  border-radius: var(--radius);
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.qr-scanner-close:hover {
+.qr-panel-close-btn:hover {
   background: var(--glass-bg);
   color: var(--danger);
 }
 
-.qr-scanner-body {
+.qr-panel-body {
   flex: 1;
-  padding: var(--spacing-lg);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md);
+  gap: 12px;
+  overflow-y: auto;
 }
 
-.qr-reader-container {
+.qr-scanner-wrapper {
   width: 100%;
-  height: 300px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
+  height: 280px;
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   background: var(--surface);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
 }
 
-.qr-placeholder {
+#qr-reader {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-scanner-status {
+  padding: 12px;
+  background: rgba(47, 185, 235, 0.08);
+  border: 1px solid rgba(47, 185, 235, 0.2);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   text-align: center;
-  color: var(--text-muted);
 }
 
-.qr-placeholder i {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  display: block;
+.qr-scanner-status.success {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
-.qr-instruction {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin: 0;
+.qr-scanner-status.error {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* Animations */
@@ -2275,7 +2373,7 @@ body.dark-mode .premium-upload-area:hover {
         </nav>
          <!-- Settings and Logout Buttons -->
          <div style="margin-top: auto; margin-bottom: var(--spacing-lg); display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
+            <button onclick="openSettingsModal()" class="settings-btn" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-size: 16px; box-shadow: var(--shadow-sm); flex-shrink: 0;" title="Settings">
                 <i class="fas fa-cog"></i>
             </button>
             <div class="logout-section" style="display: flex; justify-content: center; flex: 1;">
@@ -2291,7 +2389,7 @@ body.dark-mode .premium-upload-area:hover {
                         background: transparent;
                         color: var(--text-secondary);
                         border: 1px solid var(--border);
-                        border-radius: var(--radius);
+                        border-radius: var(--radius-lg);
                         font-size: 12px;
                         font-weight: 600;
                         cursor: pointer;
@@ -2897,7 +2995,7 @@ body.dark-mode .premium-upload-area:hover {
                         <div class="input-wrapper" style="position: relative;">
                           <input type="text" id="memberName" list="memberNameList" class="premium-input" placeholder="Type a member name or scan QR code" autocomplete="off" style="background: var(--surface-elevated); cursor: text; padding-right: 120px;">
                           <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; z-index: 2;">
-                            <button type="button" class="btn btn-outline" onclick="initializeQRScannerModal()" style="padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;">
+                            <button type="button" class="btn btn-outline" onclick="openQRScannerModal()" style="padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;">
                               <i class="fas fa-qrcode"></i> Scan
                             </button>
                             <button type="button" class="btn btn-outline" onclick="clearMemberInfo()" style="padding: 6px 10px; font-size: 0.75rem; white-space: nowrap;">
@@ -2906,6 +3004,7 @@ body.dark-mode .premium-upload-area:hover {
                           </div>
                                 <div class="input-focus-line"></div>
                           <datalist id="memberNameList"></datalist>
+                          <div id="memberSuggestions" style="display:none; position:relative; margin-top: 6px; max-height: 220px; overflow-y: auto; background: var(--surface-elevated); border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: var(--shadow-lg); z-index: 99999;"></div>
                             </div>
                             <input type="hidden" id="memberId">
                             <small style="display:block; margin-top:8px; color:var(--text-muted); font-size:0.85rem;">
@@ -2997,26 +3096,25 @@ body.dark-mode .premium-upload-area:hover {
         </div>
     </div>
 
-    <!-- QR SCANNER MODAL - RIGHT SIDE -->
-    <div class="qr-scanner-modal" id="qrScannerModal">
-        <div class="qr-scanner-content">
-            <div class="qr-scanner-header">
-                <h3><i class="fas fa-qrcode"></i> QR Scanner</h3>
-                <button class="qr-scanner-close" onclick="closeQRScannerModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="qr-scanner-body">
-                <div class="qr-reader-container" id="qr-reader-container">
-                    <div class="qr-placeholder">
-                        <i class="fas fa-camera"></i>
-                        <p>Initializing camera...</p>
-                    </div>
-                </div>
-                <p class="qr-instruction">Point camera at QR codes to scan</p>
+    <!-- New QR Scanner Panel - Right Side -->
+    <div id="qrScannerPanel">
+        <div class="qr-panel-header">
+            <h3 class="qr-panel-header-title">
+                <i class="fas fa-qrcode"></i>
+                <span>QR Scanner</span>
+            </h3>
+            <button class="qr-panel-close-btn" onclick="closeQRPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="qr-panel-body">
+            <div class="qr-scanner-wrapper" id="qr-reader"></div>
+            <div class="qr-scanner-status" id="qrStatus">
+                <i class="fas fa-camera"></i> Ready to scan
             </div>
         </div>
     </div>
+
    <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
   <script src="{{ asset('js/borrow.js') }}"></script>
   <script src="{{ asset('js/bookadd.js') }}"></script>
@@ -3037,6 +3135,12 @@ body.dark-mode .premium-upload-area:hover {
 
         // Dark mode functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Move QR scanner panel to body for proper fixed positioning
+            const qrPanel = document.getElementById('qrScannerPanel');
+            if (qrPanel) {
+                document.body.appendChild(qrPanel);
+            }
+
             const darkModeToggle = document.getElementById('darkModeToggle');
             const darkModeLabel = document.getElementById('darkModeLabel');
 
@@ -3242,7 +3346,7 @@ body.dark-mode .premium-upload-area:hover {
                     date: currentDate.toISOString().split('T')[0],
                     time: '23:59' // End of day
                 };
-            }
+              }
 
             // Global function to set automatic due date
             window.setAutomaticDueDate = function() {
@@ -3269,8 +3373,6 @@ body.dark-mode .premium-upload-area:hover {
                     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                     const formattedDate = philippineTime.toLocaleDateString('en-US', options);
                     dueDateText.textContent = formattedDate;
-                    
-                    console.log('Automatic due date set to today:', formattedDate);
                 }
             };
 
@@ -3324,75 +3426,138 @@ body.dark-mode .premium-upload-area:hover {
         });
 
         // Initialize QR Scanner for Modal
-        function initializeQRScannerModal() {
-            const qrReaderElement = document.getElementById('qr-reader-container');
-            if (!qrReaderElement || typeof Html5Qrcode === 'undefined') {
-                console.log('QR Scanner not available');
+        // QR Scanner Panel - New Implementation
+        let qrScanner = null;
+        let qrScanCooldown = false;
+
+        function openQRPanel() {
+            const panel = document.getElementById('qrScannerPanel');
+            if (!panel) return;
+            
+            // Show panel
+            panel.classList.add('show');
+            
+            // Initialize scanner if not already running
+            if (!qrScanner) {
+                setTimeout(() => initQRScanner(), 300);
+            }
+        }
+
+        function closeQRPanel() {
+            const panel = document.getElementById('qrScannerPanel');
+            if (!panel) return;
+            
+            // Hide panel
+            panel.classList.remove('show');
+            
+            // Stop scanner
+            stopQRScanner();
+        }
+
+        function initQRScanner() {
+            if (typeof Html5Qrcode === 'undefined') {
+                updateQRStatus('QR library not loaded', 'error');
                 return;
             }
 
-            // Stop any existing scanner
-            if (window.modalQrCode) {
-                window.modalQrCode.stop().catch(() => {});
+            // Stop existing scanner
+            if (qrScanner) {
+                qrScanner.stop().catch(() => {});
             }
 
-            // Clear any existing content
-            qrReaderElement.innerHTML = '';
+            try {
+                qrScanner = new Html5Qrcode("qr-reader");
 
-            const html5QrCode = new Html5Qrcode("qr-reader-container");
+                const config = {
+                    fps: 15,
+                    qrbox: { width: 250, height: 250 },
+                    disableFlip: false
+                };
 
-            // Configure scanner for continuous operation
-            const config = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0,
-                supportedScanTypes: [Html5QrcodeSupportedFormats.QR_CODE]
-            };
-
-            // Start scanning
-            html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText, decodedResult) => {
-                    // Handle successful scan
-                    handleModalQRScan(decodedText);
-                },
-                (errorMessage) => {
-                    // Ignore scanning errors, keep scanner running
-                }
-            ).then(() => {
-                console.log('Modal QR Scanner started successfully');
-                qrReaderElement.style.borderColor = 'var(--success)';
-            }).catch((err) => {
-                console.error('Modal QR Scanner initialization failed:', err);
-                qrReaderElement.innerHTML = `
-                    <div class="qr-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Camera access denied or unavailable</p>
-                        <button onclick="initializeQRScannerModal()" class="btn btn-primary btn-sm" style="margin-top: 10px;">
-                            <i class="fas fa-redo"></i> Retry
-                        </button>
-                    </div>
-                `;
-                qrReaderElement.style.borderColor = 'var(--danger)';
-            });
-
-            // Store scanner instance globally
-            window.modalQrCode = html5QrCode;
+                qrScanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText) => handleQRScan(decodedText),
+                    (err) => {} // Silent errors
+                ).then(() => {
+                    updateQRStatus('Ready to scan', 'success');
+                }).catch((err) => {
+                    updateQRStatus(`Camera error: ${err.message}`, 'error');
+                    qrScanner = null;
+                });
+            } catch (err) {
+                updateQRStatus('Failed to initialize camera', 'error');
+                qrScanner = null;
+            }
         }
 
-        // Stop modal QR scanner
-        function stopQRScannerModal() {
-            if (window.modalQrCode) {
-                window.modalQrCode.stop().catch(() => {});
-                window.modalQrCode = null;
+        function stopQRScanner() {
+            if (qrScanner) {
+                try {
+                    if (qrScanner.isScanning && qrScanner.isScanning()) {
+                        qrScanner.stop().catch(() => {});
+                    }
+                    qrScanner = null;
+                } catch (e) {
+                    qrScanner = null;
+                }
             }
+            updateQRStatus('Scanner stopped', 'success');
+        }
+
+        function updateQRStatus(message, type = 'info') {
+            const status = document.getElementById('qrStatus');
+            if (status) {
+                status.textContent = message;
+                status.className = `qr-scanner-status ${type}`;
+            }
+        }
+
+        function handleQRScan(decodedText) {
+            if (qrScanCooldown) return;
+            
+            qrScanCooldown = true;
+            setTimeout(() => { qrScanCooldown = false; }, 500);
+
+            try {
+                const qrData = parseQRData(decodedText);
+                if (qrData.type === 'member') {
+                    handleModalMemberQR(qrData);
+                } else if (qrData.type === 'book') {
+                    handleModalBookQR(qrData);
+                }
+            } catch (err) {
+                updateQRStatus('Invalid QR code', 'error');
+            }
+        }
+
+        function parseQRData(text) {
+            try {
+                const data = JSON.parse(text);
+                if (data.type && (data.type === 'member' || data.type === 'book')) {
+                    return data;
+                }
+            } catch (e) {}
+
+            try {
+                const url = new URL(text);
+                const bookMatch = url.pathname.match(/^\/books\/(\d+)$/);
+                if (bookMatch) {
+                    return { type: 'book', id: bookMatch[1] };
+                }
+                const memberMatch = url.pathname.match(/^\/members\/(.+)$/);
+                if (memberMatch) {
+                    return { type: 'member', id: memberMatch[1] };
+                }
+            } catch (e) {}
+
+            throw new Error('Unable to parse QR code');
         }
 
         // Close borrow modal with scanner cleanup
         function closeBorrowModalWithScanner() {
-            // Stop the QR scanner modal
-            closeQRScannerModal();
+            // Stop the QR scanner panel
+            closeQRPanel();
 
             // Call the original close function
             if (typeof closeBorrowModal === 'function') {
@@ -3475,7 +3640,7 @@ body.dark-mode .premium-upload-area:hover {
                         }
 
                         // Check if it's a member URL pattern: /members/{id}
-                        const memberMatch = url.pathname.match(/^\/members\/([A-Za-z0-9-]+)$/);
+                        const memberMatch = url.pathname.match(/^\/members\/([A-Za-z0-9-]+)\/?$/);
                         if (memberMatch) {
                             // For members, we need more data, but we can at least identify it as a member
                             return {
@@ -3496,7 +3661,16 @@ body.dark-mode .premium-upload-area:hover {
                             };
                         }
                     } catch (e3) {
-                        // Strategy 5: Try parsing as plain numeric ID (legacy support)
+                        // Strategy 5: Try parsing a raw UUID member id
+                        const uuidMatch = text.trim().match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/);
+                        if (uuidMatch) {
+                          return {
+                            type: 'member',
+                            id: uuidMatch[0]
+                          };
+                        }
+
+                        // Strategy 6: Try parsing as plain numeric ID (legacy support)
                         const numericId = parseInt(text.trim());
                         if (!isNaN(numericId) && numericId > 0) {
                             return {
@@ -3538,11 +3712,6 @@ body.dark-mode .premium-upload-area:hover {
                 if (typeof data.id === 'number' && (isNaN(data.id) || data.id <= 0)) {
                     return false;
                 }
-            }
-
-            // Additional validation for member QR
-            if (data.type === 'member' && !data.name) {
-                return false;
             }
 
             return true;
@@ -3601,71 +3770,58 @@ body.dark-mode .premium-upload-area:hover {
             }
         }
 
-        // Fetch member data by ID
+        // Fetch member data by identifier (UUID preferred)
         function fetchMemberData(memberId) {
-            console.log('Fetching member data for ID:', memberId);
+          const endpoints = [
+            `/members/lookup/${encodeURIComponent(memberId)}`,
+            `/members/${encodeURIComponent(memberId)}`,
+            `/api/members/${encodeURIComponent(memberId)}`
+          ];
 
-            fetch(`/api/members/${memberId}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+          const requestOptions = {
+            headers: {
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          };
+
+          const tryFetch = (index = 0) => {
+            if (index >= endpoints.length) {
+              throw new Error('Member not found');
+            }
+
+            return fetch(endpoints[index], requestOptions)
+              .then(response => {
+                if (!response.ok) {
+                  return tryFetch(index + 1);
                 }
-            })
-                .then(response => {
-                    console.log('API response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: Member not found`);
+                return response.json();
+              });
+          };
+
+          tryFetch()
+            .then(member => {
+                    console.log('Member data from API:', member);
+                    
+                    // Use setMemberFromSuggestion which handles all member setup
+                    if (typeof setMemberFromSuggestion === 'function') {
+                        setMemberFromSuggestion(member);
+                    } else {
+                        // Fallback if function not available
+                        const fullName = `${member.first_name || ''} ${member.middle_name || ''} ${member.last_name || ''}`.trim().replace(/\s+/g, ' ') || member.name || member.full_name || `Member #${memberId}`;
+                        const memberNameField = document.getElementById('memberName');
+                        const memberIdField = document.getElementById('memberId');
+                        if (memberNameField) memberNameField.value = fullName;
+                        if (memberIdField) memberIdField.value = member.uuid || member.id || memberId;
                     }
-                    return response.json();
-                })
-                .then(member => {
-                    console.log('Member data received:', member);
 
-                    // Construct full name from member data
-                    const first = member.first_name || '';
-                    const middle = member.middle_name || '';
-                    const last = member.last_name || '';
-                    const fullName = `${first} ${middle} ${last}`.trim().replace(/\s+/g, ' ');
-
-                    console.log('Constructed name:', fullName);
-
-                    setMemberInModal(member.uuid || member.id, fullName || 'Unknown Member');
-                })
-                .catch(error => {
-                    console.error('Error fetching member:', error);
-                    showToast('Member not found or network error', 'error');
-                    // Fallback: set with ID only
-                    setMemberInModal(memberId, `Member #${memberId}`);
-                });
-        }
-
-        // Set member information in borrow modal
-        function setMemberInModal(id, name) {
-            const memberName = document.getElementById('memberName');
-            const memberId = document.getElementById('memberId');
-
-            if (memberName && memberId) {
-                memberName.value = name;
-                memberId.value = id;
-                memberName.style.backgroundColor = 'var(--surface-elevated)';
-            memberName.style.cursor = 'text';
-
-            const suggestions = document.getElementById('memberSuggestions');
-            if (suggestions) {
-              suggestions.innerHTML = '';
-              suggestions.style.display = 'none';
-            }
-
-            if (memberName.dataset.memberSearchInitialized !== '1') {
-              memberName.readOnly = false;
-              memberName.autocomplete = 'off';
-            }
-
-                showToast(`Member scanned: ${name}`, 'success');
-
-                // Check for auto-confirm - trigger borrow process when member is scanned
-                checkAutoConfirmBorrow();
-            }
+                    // Check for auto-confirm - trigger borrow process when member is scanned
+                    checkAutoConfirmBorrow();
+            })
+            .catch(error => {
+                console.error('Error fetching member:', error);
+                showToast('Member not found or network error', 'error');
+            });
         }
 
         // Handle book QR scan for modal
@@ -3762,89 +3918,88 @@ body.dark-mode .premium-upload-area:hover {
 
         // Perform automatic borrow transaction
         function performAutoBorrow() {
-            const memberName = document.getElementById('memberName')?.value;
-            const memberId = document.getElementById('memberId')?.value;
-            const dueDate = document.getElementById('dueDate')?.value;
-            const dueTime = document.getElementById('dueTime')?.value;
+          if (typeof window.confirmBorrow === 'function') {
+            window.confirmBorrow();
+            return;
+          }
 
-            if (!memberName || !memberId) {
-                showToast('Member information missing', 'error');
-                return;
+          // Fallback only if borrow.js is unavailable
+          const memberName = document.getElementById('memberName')?.value;
+          const memberId = document.getElementById('memberId')?.value;
+          const dueDate = document.getElementById('dueDate')?.value;
+          const dueTime = document.getElementById('dueTime')?.value;
+
+          if (!memberName || !memberId) {
+            showToast('Member information missing', 'error');
+            return;
+          }
+
+          if (!dueTime) {
+            showToast('Due time not set', 'error');
+            return;
+          }
+
+          const bookIds = [];
+
+          if (typeof window.getBookIdsArray === 'function') {
+            const fromBorrowData = window.getBookIdsArray();
+            if (Array.isArray(fromBorrowData)) {
+              bookIds.push(...fromBorrowData);
             }
+          }
 
-            if (!dueTime) {
-                showToast('Due time not set', 'error');
-                return;
-            }
-
-            // Get book IDs from selectedBooks array
-            const bookIds = [];
-            if (typeof selectedBooks !== 'undefined') {
-                bookIds.push(...selectedBooks);
-            }
-
-            if (bookIds.length === 0) {
-                showToast('No books selected', 'error');
-                return;
-            }
-
-            // Get CSRF token
-            const tokenElement = document.querySelector('meta[name="csrf-token"]');
-            if (!tokenElement) {
-                showToast('CSRF token not found', 'error');
-                return;
-            }
-            const token = tokenElement.content;
-
-            // Prepare borrow data
-            const borrowData = {
-                member_name: memberName,
-                member_id: memberId,
-                due_date: dueDate,
-                due_time: dueTime,
-                book_ids: bookIds,
-                books_data: bookIds.map(id => ({ id: id })), // Simple book data
-                books_count: bookIds.length,
-                transaction_summary: {
-                    member: `${memberName} (ID: ${memberId})`,
-                    books: `Selected ${bookIds.length} book(s)`,
-                    due_datetime: `${dueDate} ${dueTime}`,
-                    total_books: bookIds.length
-                }
-            };
-
-            console.log('Performing auto borrow:', borrowData);
-
-            // Send borrow request
-            fetch('/borrow/process', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(borrowData)
-            })
-            .then(response => {
-                console.log('Borrow response status:', response.status);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Borrow success:', data);
-                showToast(data.message || 'Books borrowed successfully!', 'success');
-
-                // Refresh the page to update book availability
-                setTimeout(() => {
-                    showToast('Refreshing page...', 'info');
-                    window.location.reload();
-                }, 1500);
-            })
-            .catch(error => {
-                console.error('Borrow error:', error);
-                showToast('Failed to borrow books: ' + error.message, 'error');
+          if (bookIds.length === 0) {
+            const listItems = document.querySelectorAll('#selectedBooksList li[data-id]');
+            listItems.forEach(item => {
+              const id = item.getAttribute('data-id');
+              if (id) bookIds.push(id);
             });
+          }
+
+          if (bookIds.length === 0 && typeof selectedBooks !== 'undefined' && Array.isArray(selectedBooks)) {
+            bookIds.push(...selectedBooks);
+          }
+
+          if (bookIds.length === 0) {
+            showToast('No books selected', 'error');
+            return;
+          }
+
+          const tokenElement = document.querySelector('meta[name="csrf-token"]');
+          if (!tokenElement) {
+            showToast('CSRF token not found', 'error');
+            return;
+          }
+          const token = tokenElement.content;
+
+          fetch('/borrow/process', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'X-CSRF-TOKEN': token,
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              member_name: memberName,
+              member_id: memberId,
+              due_date: dueDate,
+              due_time: dueTime,
+              book_ids: bookIds
+            })
+          })
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+          })
+          .then(data => {
+            showToast(data.message || 'Books borrowed successfully!', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+          })
+          .catch(error => {
+            console.error('Borrow error:', error);
+            showToast('Failed to borrow books: ' + error.message, 'error');
+          });
         }
 
         // Search/reset controls are handled by the final AJAX-driven controls script.
@@ -3922,11 +4077,24 @@ body.dark-mode .premium-upload-area:hover {
             if (memberName) {
                 memberName.value = '';
                 memberName.style.backgroundColor = 'var(--surface-elevated)';
-                memberName.style.cursor = 'not-allowed';
+              memberName.style.cursor = 'text';
+              memberName.readOnly = false;
+              memberName.autocomplete = 'off';
             }
 
             if (memberId) {
                 memberId.value = '';
+            }
+
+            const datalist = document.getElementById('memberNameList');
+            if (datalist) {
+              datalist.innerHTML = '';
+            }
+
+            const suggestions = document.getElementById('memberSuggestions');
+            if (suggestions) {
+              suggestions.innerHTML = '';
+              suggestions.style.display = 'none';
             }
 
             // Use the function from borrow.js
@@ -3935,10 +4103,29 @@ body.dark-mode .premium-upload-area:hover {
             }
         }
 
+        // Open Borrow Modal with selected books
+        function openBorrowModal() {
+            // Open the borrow modal
+            const modal = document.getElementById('borrowModal');
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+
+            // Open QR scanner panel
+            openQRPanel();
+        }
+
         // Quick Borrow Modal function
         function openQuickBorrowModal() {
             // Clear member information
             clearMemberInfo();
+
+          if (typeof window.initializeMemberNameSearch === 'function') {
+            window.initializeMemberNameSearch();
+          }
+
+          if (typeof window.clearMemberSuggestions === 'function') {
+            window.clearMemberSuggestions();
+          }
 
             // Clear selected books
             if (typeof selectedBooks !== 'undefined') {
@@ -3960,34 +4147,8 @@ body.dark-mode .premium-upload-area:hover {
             modal.classList.add('active');
             modal.style.display = 'flex';
 
-            // Open QR scanner modal
-            openQRScannerModal();
-        }
-
-        // Open QR Scanner Modal
-        function openQRScannerModal() {
-            const modal = document.getElementById('qrScannerModal');
-            modal.classList.add('active');
-
-            // Reset cooldown state
-            qrScanCooldown = false;
-
-            // Start QR scanner
-            setTimeout(() => {
-                initializeQRScannerModal();
-            }, 300);
-        }
-
-        // Close QR Scanner Modal
-        function closeQRScannerModal() {
-            const modal = document.getElementById('qrScannerModal');
-            modal.classList.remove('active');
-
-            // Stop QR scanner
-            stopQRScannerModal();
-
-            // Reset cooldown state
-            qrScanCooldown = false;
+            // Open QR scanner panel
+            openQRPanel();
         }
 
         // Modal functions
@@ -4230,7 +4391,7 @@ body.dark-mode .premium-upload-area:hover {
         }
 
         function toggleBookSelection(checkbox) {
-            const bookId = parseInt(checkbox.value);
+            const bookId = String(checkbox.value);
             
             if (checkbox.checked) {
                 if (!selectedBooks.includes(bookId)) {
@@ -4292,7 +4453,8 @@ body.dark-mode .premium-upload-area:hover {
 
         function openEditModal() {
             if (selectedBooks.length === 1) {
-                editBook(selectedBooks[0]);
+              const selected = selectedBooks[0];
+              editBook(typeof selected === 'object' ? selected.id : selected);
             }
         }
 
@@ -4320,6 +4482,7 @@ body.dark-mode .premium-upload-area:hover {
                     
                     const newRow = document.createElement('tr');
                     newRow.dataset.id = newId;
+                    newRow.dataset.legacyId = newId;
                     newRow.dataset.title = title;
                     newRow.dataset.author = author;
                     newRow.dataset.genre = genre;
@@ -4349,16 +4512,16 @@ body.dark-mode .premium-upload-area:hover {
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-outline btn-sm" onclick="window.generateQr(${newId})" title="Generate QR Code">
+                                <button class="btn btn-outline btn-sm" onclick="window.generateQr('${newId}')" title="Generate QR Code">
                                     <i class="fas fa-qrcode"></i> Gen
                                 </button>
-                                <button class="btn btn-success btn-sm" onclick="window.borrowOne(${newId})" title="Borrow Book">
+                                <button class="btn btn-success btn-sm" onclick="window.borrowOne('${newId}')" title="Borrow Book">
                                     <i class="fas fa-hand-holding"></i>
                                 </button>
-                                <button class="btn btn-primary btn-sm" onclick="window.editBook(${newId})" title="Edit Book">
+                                <button class="btn btn-primary btn-sm" onclick="window.editBook('${newId}')" title="Edit Book">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-danger btn-sm" onclick="window.deleteBook(${newId})" title="Delete Book">
+                                <button class="btn btn-danger btn-sm" onclick="window.deleteBook('${newId}')" title="Delete Book">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -4663,7 +4826,6 @@ body.dark-mode .premium-upload-area:hover {
                     dt.items.add(file);
                     coverInput.files = dt.files;
 
-                    console.log('Updated form with selected image:', imageName);
                 }
             } catch (error) {
                 console.error('Error updating form with selected image:', error);
@@ -4776,7 +4938,6 @@ body.dark-mode .premium-upload-area:hover {
                 dt.items.add(file);
                 coverInput.files = dt.files;
 
-                console.log('Updated form with uploaded file:', file.name);
             }
         }
 
@@ -5431,8 +5592,11 @@ body.dark-mode .premium-upload-area:hover {
           const statusLabel = hasAvailability ? (availabilityNum > 0 ? 'Available' : 'Out of Stock') : '';
           const coverImage = displayValue(book.cover_image) || '/images/no-cover.jpg';
           const qrUrl = displayValue(book.qr_url);
-          const numericBookId = Number(book.id);
-          const isSelected = currentSelectedBooks.includes(numericBookId);
+          const bookIdentifier = displayValue(book.uuid || book.id);
+          const selectedIdentifiers = currentSelectedBooks.map(item =>
+            typeof item === 'object' ? String(item.id) : String(item)
+          );
+          const isSelected = selectedIdentifiers.includes(bookIdentifier);
 
           let genresArr = Array.isArray(book.genres) && book.genres.length
             ? book.genres
@@ -5442,8 +5606,8 @@ body.dark-mode .premium-upload-area:hover {
           const genresJoined = genresArr.join(', ');
 
           rowHtml.push(`
-            <tr data-id="${book.id}" data-title="${title}" data-author="${author}" data-genre="${genresJoined}" data-published-year="${publishedYear}" data-availability="${hasAvailability ? availabilityNum : ''}" data-cover-image="${coverImage}" data-qr-url="${qrUrl}" class="${selectionModeActive && isSelected ? 'selected' : ''}">
-              ${selectionModeActive ? `<td class="checkbox-cell"><input type="checkbox" class="book-checkbox" value="${book.id}" onchange="toggleBookSelection(this)" ${isSelected ? 'checked' : ''}></td>` : ''}
+            <tr data-id="${bookIdentifier}" data-legacy-id="${displayValue(book.id)}" data-title="${title}" data-author="${author}" data-genre="${genresJoined}" data-published-year="${publishedYear}" data-availability="${hasAvailability ? availabilityNum : ''}" data-cover-image="${coverImage}" data-qr-url="${qrUrl}" class="${selectionModeActive && isSelected ? 'selected' : ''}">
+              ${selectionModeActive ? `<td class="checkbox-cell"><input type="checkbox" class="book-checkbox" value="${bookIdentifier}" onchange="toggleBookSelection(this)" ${isSelected ? 'checked' : ''}></td>` : ''}
               <td><img src="${coverImage}" alt="Cover" class="book-cover-small"></td>
               <td style="font-weight: 600; color: var(--text-primary);" title="${title}">${title}</td>
               <td title="${author}">${author}</td>
@@ -5452,10 +5616,10 @@ body.dark-mode .premium-upload-area:hover {
               <td title="${statusLabel}">${hasAvailability ? `<span class="status-badge ${availabilityNum > 0 ? 'status-available' : 'status-unavailable'}">${statusLabel}</span>` : ''}</td>
               <td title="${hasAvailability ? `${availabilityNum} copies` : ''}">${hasAvailability ? `<strong style="color: var(--text-primary);">${availabilityNum}</strong> copies` : ''}</td>
               <td><div class="action-buttons">
-                ${qrUrl ? `<button class="btn btn-outline btn-sm" onclick="showQRModal('${title.replace(/'/g, "\\'")}','${qrUrl}')" title="View QR Code"><i class='fas fa-qrcode'></i></button>` : `<button class="btn btn-outline btn-sm" onclick="window.generateQr(${book.id})" title="Generate QR Code"><i class='fas fa-qrcode'></i> Gen</button>`}
-                <button class="btn btn-success btn-sm" onclick="window.borrowOne(${book.id})" title="Borrow Book" ${!hasAvailability || availabilityNum <= 0 ? 'disabled' : ''}><i class="fas fa-hand-holding"></i></button>
-                <button class="btn btn-primary btn-sm" onclick="window.editBook(${book.id})" title="Edit Book"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-sm" onclick="window.deleteBook(${book.id})" title="Delete Book"><i class="fas fa-trash"></i></button>
+                ${qrUrl ? `<button class="btn btn-outline btn-sm" onclick="showQRModal('${title.replace(/'/g, "\\'")}','${qrUrl}')" title="View QR Code"><i class='fas fa-qrcode'></i></button>` : `<button class="btn btn-outline btn-sm" onclick="window.generateQr('${bookIdentifier}')" title="Generate QR Code"><i class='fas fa-qrcode'></i> Gen</button>`}
+                <button class="btn btn-success btn-sm" onclick="window.borrowOne('${bookIdentifier}')" title="Borrow Book" ${!hasAvailability || availabilityNum <= 0 ? 'disabled' : ''}><i class="fas fa-hand-holding"></i></button>
+                <button class="btn btn-primary btn-sm" onclick="window.editBook('${bookIdentifier}')" title="Edit Book"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="window.deleteBook('${bookIdentifier}')" title="Delete Book"><i class="fas fa-trash"></i></button>
               </div></td>
             </tr>
           `);

@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
+    private function findMemberByIdentifier(string $identifier): ?Member
+    {
+        return Member::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->first();
+    }
+
+    private function findBookByIdentifier(string $identifier): ?Book
+    {
+        return Book::where('uuid', $identifier)
+            ->orWhere('id', $identifier)
+            ->first();
+    }
+
 public function index()
 {
     // Check if user has permission to view transactions
@@ -115,20 +129,28 @@ public function index()
         }
         
         $validated = $request->validate([
-            'member_id' => 'required|exists:members,id',
+            'member_id' => 'required',
             'book_ids' => 'required|array',
-            'book_ids.*' => 'exists:books,id',
         ]);
+
+        $member = $this->findMemberByIdentifier((string) $validated['member_id']);
+        if (!$member) {
+            return back()->with('error', 'Member not found.');
+        }
 
         $borrowedBooks = [];
 
         foreach ($validated['book_ids'] as $bookId) {
-            $book = Book::find($bookId);
+            $book = $this->findBookByIdentifier((string) $bookId);
+
+            if (!$book) {
+                continue;
+            }
 
             if ($book->availability > 0) {
                 Transaction::create([
-                    'book_id' => $bookId,
-                    'member_id' => $validated['member_id'],
+                    'book_id' => $book->id,
+                    'member_id' => $member->id,
                 ]);
 
                 $book->decrement('availability');
@@ -182,18 +204,32 @@ public function bulkReturn(Request $request)
     }
     
     $validated = $request->validate([
-        'member_id' => 'required|exists:members,id',
+        'member_id' => 'required',
         'book_ids' => 'required|array',
-        'book_ids.*' => 'exists:books,id',
     ]);
+
+    $member = $this->findMemberByIdentifier((string) $validated['member_id']);
+    if (!$member) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Member not found.'
+        ], 404);
+    }
 
     $returnedBooks = [];
     $errors = [];
 
     foreach ($validated['book_ids'] as $bookId) {
+        $book = $this->findBookByIdentifier((string) $bookId);
+
+        if (!$book) {
+            $errors[] = "Book identifier {$bookId}";
+            continue;
+        }
+
         // Find the transaction for this book and member
-        $transaction = Transaction::where('book_id', $bookId)
-            ->where('member_id', $validated['member_id'])
+        $transaction = Transaction::where('book_id', $book->id)
+            ->where('member_id', $member->id)
             ->where('status', 'borrowed')
             ->first();
 
@@ -220,8 +256,7 @@ public function bulkReturn(Request $request)
                 ]
             );
         } else {
-            $book = Book::find($bookId);
-            $errors[] = $book ? $book->title : "Book ID {$bookId}";
+            $errors[] = $book->title;
         }
     }
 

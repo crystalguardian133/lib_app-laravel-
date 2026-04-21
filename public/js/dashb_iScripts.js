@@ -1528,6 +1528,8 @@ const statsData = {
 };
 
 function filterStats(period) {
+    const data = statsData[period] || statsData.lifetime;
+
     if (window.statsChart) {
         window.statsChart.data.labels = data.chartData.labels;
         window.statsChart.data.datasets[0].data = data.chartData.books;

@@ -486,7 +486,7 @@ function startQRScan(type) {
             const fullName = nameParts.join(' ');
 
             document.getElementById('memberName').value = fullName;
-            document.getElementById('memberId').value = member.id;
+            document.getElementById('memberId').value = member.uuid || member.id;
             showCornerPopup(`✅ Member: ${fullName}`);
 
             // Close QR scanner modal immediately after successful scan
@@ -500,6 +500,14 @@ function startQRScan(type) {
         }
       } else if (type === 'book') {
         try {
+          const normalizeIdentifier = (value) => String(value ?? '').trim();
+          const findBookRow = (identifier) => {
+            const normalized = normalizeIdentifier(identifier);
+            if (!normalized) return null;
+            return document.querySelector(`tr[data-id="${normalized}"]`) ||
+              document.querySelector(`tr[data-legacy-id="${normalized}"]`);
+          };
+
           // Extract book ID from QR code URL (e.g., http://localhost:8000/books/1)
           let bookId = null;
           try {
@@ -518,7 +526,12 @@ function startQRScan(type) {
             }
           }
 
-          if (!bookId || isNaN(bookId)) {
+          const uuidMatch = String(bookId || '').match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}/);
+          if (uuidMatch) {
+            bookId = uuidMatch[0];
+          }
+
+          if (!bookId || normalizeIdentifier(bookId) === '') {
             showCornerPopup("❌ Invalid book QR code format");
             return;
           }
@@ -526,14 +539,16 @@ function startQRScan(type) {
           console.log('📚 Extracted book ID:', bookId);
 
           // Find the book row in the table
-          const bookRow = document.querySelector(`tr[data-id="${bookId}"]`);
+          const bookRow = findBookRow(bookId);
           if (!bookRow) {
             showCornerPopup("❌ Book not found in library");
             return;
           }
 
+          const selectedIdentifier = normalizeIdentifier(bookRow.dataset.id || bookId);
+
           // Check if book is already selected (prevent duplication)
-          const existingSelection = document.querySelector(`#selectedBooksList li[data-id="${bookId}"]`);
+          const existingSelection = document.querySelector(`#selectedBooksList li[data-id="${selectedIdentifier}"]`);
           if (existingSelection) {
             showCornerPopup("⚠️ Book already selected");
             stopQRScan();
@@ -555,7 +570,7 @@ function startQRScan(type) {
           if (selectedBooksList) {
             const li = document.createElement('li');
             li.textContent = bookTitle;
-            li.setAttribute('data-id', bookId);
+            li.setAttribute('data-id', selectedIdentifier);
             li.style.cssText = 'padding: 8px 0; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;';
 
             const removeBtn = document.createElement('button');
